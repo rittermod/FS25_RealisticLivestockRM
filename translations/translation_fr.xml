@@ -1,0 +1,627 @@
+<l10n>
+	<texts>
+		<!-- COWS -->
+		
+		<text name="fillType_bull" text="Taureau"/>
+		<text name="fillType_bull_swiss_brown" text="Taureau Brun-Suisse"/>
+		<text name="fillType_bull_holstein" text="Taureau Holstein"/>
+		<text name="fillType_bull_angus" text="Taureau Angus"/>
+		<text name="fillType_bull_limousin" text="Taureau Limousin"/>
+		<text name="fillType_cow_hereford" text="Hereford"/>
+		<text name="fillType_bull_hereford" text="Taureau Hereford"/>
+		<text name="animal_descriptionBullFeed" text="Les taureaux aiment l'herbe, le foin et le TMR."/>
+		<text name="animal_descriptionBullYoung" text="Il s'agit d'un veau mâle."/>
+		<text name="animal_descriptionBullReproduction" text="Les taureaux en bonne santé et âgés de plus de 12 mois peuvent se reproduire."/>
+
+		<!-- WATER BUFFALOS -->
+
+		<text name="fillType_bull_waterbuffalo" text="Taureau buffle d'eau"/>
+
+		<!-- PIGS -->
+		
+		<text name="fillType_boar" text="Verrat"/>
+		<text name="fillType_boar_landrace" text="Sanglier de race locale"/>
+		<text name="fillType_boar_black_pied" text="Sanglier à Pied Noir"/>
+		<text name="fillType_boar_berkshire" text="Sanglier du Berkshire"/>
+		<text name="animal_descriptionBoarReproduction" text="Les verrats en bonne santé et âgés de plus de 8 mois peuvent se reproduire."/>
+		<text name="animal_descriptionBoarFeed" text="Les sangliers mangent presque n'importe quoi. Vous pouvez leur donner du maïs, du blé, de l'orge, du canola, du tournesol, du soja, des pommes de terre, du sorgho et des betteraves sucrières."/>
+		<text name="animal_descriptionBoarYoung" text="Il s'agit d'un porcelet mâle."/>
+
+		<!-- SHEEP -->
+		
+		<text name="fillType_ram" text="Bélier"/>
+		<text name="fillType_ram_landrace" text="Race locale de Bentheim Bélier"/>
+		<text name="fillType_ram_steinschaf" text="Steinschaf Bélier"/>
+		<text name="fillType_ram_black_welsh" text="Bélier gallois noir"/>
+		<text name="fillType_ram_swiss_mountain" text="Bélier suisse noir et brun"/>
+		<text name="animal_descriptionRamFeed" text="Les béliers mangent de l'herbe et du foin."/>
+		<text name="animal_descriptionRamYoung" text="Il s'agit d'un agneau mâle."/>
+		<text name="animal_descriptionRamReproduction" text="Les béliers en bonne santé et âgés de plus de 5 mois peuvent se reproduire."/>
+
+		<!-- GOATS -->
+
+		<text name="fillType_ram_goat" text="Chèvre bélier"/>
+		
+		<!-- HORSES -->
+		
+		<text name="fillType_stallion" text="Étalon"/>
+		<text name="fillType_stallion_gray" text="Étalon gris"/>
+		<text name="fillType_stallion_pinto" text="Étalon Pinto"/>
+		<text name="fillType_stallion_palomino" text="Étalon palomino"/>
+		<text name="fillType_stallion_chestnut" text="Étalon alezan"/>
+		<text name="fillType_stallion_bay" text="Étalon bai"/>
+		<text name="fillType_stallion_black" text="Étalon noir"/>
+		<text name="fillType_stallion_seal_brown" text="Étalon brun du phoque"/>
+		<text name="fillType_stallion_dun" text="Étalon Dun"/>
+		<text name="animal_descriptionStallionFeed" text="Les étalons aiment le foin, l'avoine et le sorgho."/>
+		<text name="animal_descriptionStallionProfit" text="Les étalons peuvent être vendus avec profit."/>
+		<text name="animal_descriptionStallionReproduction" text="Les étalons en bonne santé et âgés de plus de 36 mois peuvent se reproduire."/>
+
+
+        <!-- UI -->
+
+		
+        <text name="input_VisualAnimalsDialog" text="Changement Animaux Visuels Montant"/>
+        <text name="rl_button_apply" text="Appliquer"/>
+		<text name="rl_button_confirm" text="Confirmer"/>
+        <text name="rl_button_recommended" text="Recommandé"/>
+        <text name="rl_button_cancel" text="Annuler"/>
+		<text name="rl_button_random" text="Aléatoire"/>
+        <text name="rl_dialog_title" text="Définir le nombre maximum d'animaux visuels"/>
+
+        <text name="rl_ui_unhealthy" text="Trop malsain"/>
+        <text name="rl_ui_unhealthyBracketed" text="Non (trop malsain)"/>
+        <text name="rl_ui_noMaleAnimal" text="Pas d'animal mâle approprié"/>
+        <text name="rl_ui_noMaleAnimalBracketed" text="Non (pas d'animal mâle approprié)"/>
+        <text name="rl_ui_recoveringLastBirth" text="Récupération après le dernier accouchement"/>
+        <text name="rl_ui_recoveringLastBirthBracketed" text="Non (en convalescence depuis le dernier accouchement)"/>
+        <text name="rl_ui_tooYoung" text="Trop jeune"/>
+        <text name="rl_ui_tooYoungBracketed" text="Non (trop jeune)"/>
+        <text name="rl_ui_pregnant" text="Enceinte"/>
+        <text name="rl_ui_lactating" text="Allaitement"/>
+        <text name="rl_ui_canReproduce" text="Peut se reproduire"/>
+        <text name="rl_ui_impregnatedBy" text="Imprégné par"/>
+        <text name="rl_ui_unknown" text="Inconnu"/>
+        <text name="rl_ui_yes" text="Oui"/>
+        <text name="rl_ui_no" text="Non"/>
+        <text name="rl_ui_mother" text="Mère"/>
+        <text name="rl_ui_father" text="Père"/>
+        <text name="rl_ui_uniqueId" text="Identifiant unique"/>
+        <text name="rl_ui_farmId" text="ID de l'exploitation"/>
+        <text name="rl_ui_gender" text="Genre"/>
+        <text name="rl_ui_male" text="Homme"/>
+        <text name="rl_ui_female" text="Femme"/>
+		<text name="rl_ui_weight" text="Poids"/>
+		<text name="rl_ui_targetWeight" text="Poids cible"/>
+		<text name="rl_ui_value" text="Valeur"/>
+		<text name="rl_ui_valuePerKilo" text="Valeur par kg"/>
+		<text name="rl_ui_genetics" text="Génétique"/>
+		<text name="rl_ui_overall" text="Globalement"/>
+		<text name="rl_ui_rename" text="Changer de nom"/>
+		<text name="rl_ui_cantFindAnimal" text="Impossible de trouver l'animal"/>
+		<text name="rl_ui_maleNumImpregnatable" text="Animaux imprégnables dans un enclos"/>
+
+		<text name="rl_ui_breederQuality" text="Qualité de l'éleveur"/>
+		<text name="rl_ui_birthday" text="Anniversaire"/>
+		<text name="rl_ui_pregnancyExpected" text="Attendu"/>
+		<text name="rl_ui_pregnancyExpecting" text="Attente"/>
+		<text name="rl_ui_pregnancyBaby" text="bébé"/>
+		<text name="rl_ui_pregnancyBabies" text="bébés"/>
+		<text name="rl_ui_animalOrigin" text="Origine"/>
+		<text name="rl_ui_months" text="mois"/>
+		<text name="rl_ui_month" text="mois"/>
+		<text name="rl_ui_years" text="années"/>
+		<text name="rl_ui_year" text="année"/>
+
+		<text name="rl_ui_milk" text="Production laitière"/>
+		<text name="rl_ui_wool" text="Production de laine"/>
+		<text name="rl_ui_eggs" text="Production d'œufs"/>
+		<text name="rl_ui_metabolism" text="Métabolisme"/>
+		<text name="rl_ui_meat" text="Qualité"/>
+		<text name="rl_ui_health" text="Santé"/>
+		<text name="rl_ui_fertility" text="Fécondité"/>
+
+		<text name="rl_ui_genetics_infertile" text="Infertile"/>
+		<text name="rl_ui_genetics_extremelyLow" text="Extrêmement faible"/>
+		<text name="rl_ui_genetics_veryLow" text="Très faible"/>
+		<text name="rl_ui_genetics_low" text="Faible"/>
+		<text name="rl_ui_genetics_average" text="Moyenne"/>
+		<text name="rl_ui_genetics_high" text="Haut"/>
+		<text name="rl_ui_genetics_veryHigh" text="Très haut"/>
+		<text name="rl_ui_genetics_extremelyHigh" text="Extrêmement haut"/>
+
+		<text name="rl_ui_genetics_extremelyBad" text="Extrêmement mauvais"/>
+		<text name="rl_ui_genetics_veryBad" text="Très mauvais"/>
+		<text name="rl_ui_genetics_bad" text="Mauvais"/>
+		<text name="rl_ui_genetics_good" text="Bon"/>
+		<text name="rl_ui_genetics_veryGood" text="Très bon"/>
+		<text name="rl_ui_genetics_extremelyGood" text="Extrêmement bon"/>
+
+		<text name="rl_ui_buySelected" text="Achetez ce qui a été sélectionné"/>
+		<text name="rl_ui_sellSelected" text="Vendre sélectionné"/>
+		<text name="rl_ui_moveSelected" text="Déplacer la sélection"/>
+		<text name="rl_ui_buyConfirmation" text="Êtes-vous sûr de vouloir acheter %s animaux pour %s?" tag="format"/>
+		<text name="rl_ui_sellConfirmation" text="Êtes-vous sûr de vouloir vendre %s animaux pour %s?" tag="format"/>
+		<text name="rl_ui_moveConfirmation" text="Êtes-vous sûr de vouloir déplacer %s animaux?" tag="format"/>
+		<text name="rl_ui_buyBulkResult" text="%s animaux achetés pour %s" tag="format"/>
+		<text name="rl_ui_sellBulkResult" text="%s animaux vendus pour %s" tag="format"/>
+		<text name="rl_ui_moveBulkResult" text="%s animaux déplacés" tag="format"/>
+
+		<text name="rl_ui_monitor" text="Moniteur"/>
+		<text name="rl_ui_monitorSubscriptions" text="Abonnements au moniteur"/>
+		<text name="finance_monitorSubscriptions" text="Abonnements au moniteur"/>
+		<text name="rl_ui_monitorFee" text="Taxe de surveillance"/>
+		<text name="rl_ui_applyMonitor" text="Appliquer le moniteur"/>
+		<text name="rl_ui_removeMonitor" text="Retirer le moniteur"/>
+		<text name="rl_ui_input_food" text="Alimentation"/>
+		<text name="rl_ui_input_water" text="L'eau"/>
+		<text name="rl_ui_input_straw" text="Paille"/>
+		<text name="rl_ui_output_milk" text="Lait"/>
+		<text name="rl_ui_output_manure" text="Fumier"/>
+		<text name="rl_ui_output_liquidManure" text="Lisier"/>
+		<text name="rl_ui_output_pallets_eggs" text="Œufs"/>
+		<text name="rl_ui_output_pallets_wool" text="Laine"/>
+		<text name="rl_ui_output_pallets_goatMilk" text="Lait de chèvre"/>
+		<text name="rl_ui_amountPerDay" text="%.0fL / jour" tag="format"/>
+		<text name="rl_ui_feePerMonth" text="%s / mois" tag="format"/>
+
+		<text name="rl_ui_animalType" text="Type"/>
+		<text name="rl_ui_amountMonitored" text="Contrôlé"/>
+		<text name="rl_ui_production" text="Produits"/>
+		<text name="rl_ui_applyAllMonitor" text="Appliquer tous les moniteurs"/>
+		<text name="rl_ui_removeAllMonitor" text="Supprimer tous les moniteurs"/>
+		<text name="rl_ui_fee" text="Frais"/>
+
+		<text name="rl_ui_leftEarTag" text="Étiquette d'oreille gauche"/>
+		<text name="rl_ui_rightEarTag" text="Étiquette d'oreille droite"/>
+		<text name="rl_ui_backgroundColour" text="Couleur d'arrière-plan"/>
+		<text name="rl_ui_backgroundHue" text="Arrière-plan Hue"/>
+		<text name="rl_ui_backgroundRgb" text="Arrière-plan RGB"/>
+		<text name="rl_ui_textColour" text="Couleur du texte"/>
+		<text name="rl_ui_textHue" text="Texte Hue"/>
+		<text name="rl_ui_textRgb" text="Texte RGB"/>
+
+		<text name="rl_ui_formatMonths" text="%s mois"/>
+		<text name="rl_ui_formatMonth" text="%s mois"/>
+		<text name="rl_ui_notPregnant" text="Non enceinte"/>
+		<text name="rl_ui_any" text="N'importe quel"/>
+		<text name="rl_ui_pregnancy" text="Grossesse"/>
+		<text name="rl_ui_productivity" text="Productivité"/>
+		<text name="rl_ui_selectAll" text="Sélectionner tout"/>
+		<text name="rl_ui_selectNone" text="Sélectionner Aucun"/>
+		<text name="rl_ui_filters" text="Filtres"/>
+		<text name="rl_ui_doesntHaveName" text="Sans nom"/>
+		<text name="rl_ui_doesHaveName" text="A un nom"/>
+
+
+
+		<text name="rl_ui_castrated" text="Castrated"/>
+		<text name="rl_ui_castrate" text="Castrate"/>
+		<text name="rl_ui_importance" text="Importance"/>
+		<text name="rl_ui_type" text="Type"/>
+		<text name="rl_ui_date" text="Date"/>
+		<text name="rl_ui_message" text="Message"/>
+		<text name="rl_ui_messages" text="Messages"/>
+		<text name="rl_ui_unknownCauses" text="unknown causes"/>
+		<text name="rl_ui_messageNumber" text="%s-%s of %s"/>
+		<text name="rl_ui_deleteMessage" text="Delete Message"/>
+		<text name="rl_ui_unreadMessages" text="Husbandry '%s' has unread messages!"/>
+		<text name="rl_ui_herdsman" text="Herdsman"/>
+		<text name="rl_ui_budget" text="Budget"/>
+		<text name="rl_ui_budgetType" text="Budget Type"/>
+		<text name="rl_ui_fixed" text="Fixed"/>
+		<text name="rl_ui_percentage" text="Percentage"/>
+		<text name="rl_ui_maxAnimals" text="Max Animals"/>
+		<text name="rl_ui_infinite" text="Infinite"/>
+		<text name="rl_ui_herdsmanRecentlyBought" text="Recent Herdsman Purchase"/>
+		<text name="rl_ui_previousWage" text="Previous Wage"/>
+		<text name="rl_ui_herdsmanWages" text="Herdsman Wages"/>
+		<text name="finance_herdsmanWages" text="Herdsman Wages"/>
+		<text name="rl_ui_medicine" text="Medicine"/>
+		<text name="finance_medicine" text="Medicine"/>
+		<text name="rl_ui_semenPurchase" text="Inseminant Purchase"/>
+		<text name="rl_ui_semenPurchase_github" text="Semen Purchase"/>
+		<text name="finance_semenPurchase" text="Inseminant Purchase"/>
+		<text name="finance_semenPurchase_github" text="Semen Purchase"/>
+		<text name="rl_ui_noDiseases" text="No Diseases"/>
+		<text name="rl_ui_onlyDiseases" text="Only Diseases"/>
+		<text name="rl_ui_naming" text="Naming"/>
+		<text name="rl_ui_alphabetical" text="Alphabetical"/>
+		<text name="rl_ui_breed" text="Breed"/>
+		<text name="rl_ui_dontMark" text="Don't Mark"/>
+		<text name="rl_ui_mark" text="Mark"/>
+		<text name="rl_ui_unmark" text="Unmark"/>
+		<text name="rl_ui_favourite" text="Favourite"/>
+		<text name="rl_ui_unFavourite" text="Unfavourite"/>
+		<text name="rl_ui_quantity" text="Quantity"/>
+		<text name="rl_ui_dewar" text="Dewar"/>
+		<text name="rl_ui_semenPurchase_successful" text="Artificial inseminant successfully purchased. You can pick it up at the store"/>
+		<text name="rl_ui_semenPurchase_successful_github" text="Semen successfully purchased. You can pick it up at the store"/>
+		<text name="rl_ui_semenPurchase_unsuccessful" text="Artificial inseminant could not be purchased"/>
+		<text name="rl_ui_semenPurchase_unsuccessful_github" text="Semen could not be purchased"/>
+		<text name="rl_ui_earTag" text="Ear Tag"/>
+		<text name="rl_ui_species" text="Species"/>
+		<text name="rl_ui_strawSingle" text="Straw"/>
+		<text name="rl_ui_strawMultiple" text="Straws"/>
+		<text name="rl_ui_artificialInsemination" text="Artificial Insemination"/>
+		<text name="rl_ui_semenPurchaseNoPermission" text="You don't have to permission to trade animals or purchase inseminant."/>
+		<text name="rl_ui_semenPurchaseNoPermission_github" text="You don't have to permission to trade animals or purchase semen."/>
+		<text name="rl_ui_semenPurchaseNoMoney" text="You don't have enough money to purchase this inseminant."/>
+		<text name="rl_ui_semenPurchaseNoMoney_github" text="You don't have enough money to purchase this semen."/>
+		<text name="rl_ui_takeStraw" text="Take Straw"/>
+		<text name="rl_ui_inseminateAnimal" text="Inseminate %s"/>
+		<text name="rl_ui_inseminate" text="Inseminate"/>
+		<text name="rl_ui_strawEmpty" text="This straw is empty"/>
+		<text name="rl_ui_averageSuccessColon" text="Average Success: "/>
+		<text name="rl_ui_averageSuccess" text="Average Success"/>
+		<text name="rl_ui_success" text="Success"/>
+		<text name="rl_ui_save" text="Save"/>
+		<text name="rl_ui_load" text="Load"/>
+		<text name="rl_ui_saveProfile" text="Save Profile"/>
+		<text name="rl_ui_loadProfile" text="Load Profile"/>
+
+		<text name="rl_ui_healthy" text="Healthy"/>
+		<text name="rl_ui_hasDisease" text="Has Disease"/>
+		<text name="rl_ui_diseasedAnimals" text="Diseased Animals"/>
+
+
+		<text name="rl_insemination_male" text="Only females can be artificially inseminated"/>
+		<text name="rl_insemination_pregnant" text="This animal is already pregnant"/>
+		<text name="rl_insemination_animalType" text="Animal must be of the same species as the father"/>
+		<text name="rl_insemination_inseminated" text="This animal has already been artificially inseminated"/>
+		<text name="rl_insemination_recovering" text="This animal is still recovering from its previous pregnancy"/>
+		<text name="rl_insemination_father" text="Inbreeding is not permitted"/>
+		<text name="rl_insemination_young" text="This animal is too young to be artificially inseminated"/>
+
+
+		<text name="rl_mark_aiManager_sell" text="Herdsman marked for selling"/>
+		<text name="rl_mark_aiManager_castrate" text="Herdsman marked for castrating"/>
+		<text name="rl_mark_aiManager_disease" text="Herdsman marked for treating"/>
+		<text name="rl_mark_aiManager_ai" text="Herdsman marked for artificial insemination"/>
+		<text name="rl_mark_player" text="Marked by player"/>
+
+
+		<!-- AI - BUYING -->
+
+
+		<text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="The herdsman will not purchase animals"/>
+		<text name="rl_ui_herdsmanTooltip_buy_enabled_2" text="The herdsman will purchase animals"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Purchasing budget is a fixed amount"/>
+		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Purchasing budget is a percentage of your farm's money"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="The herdsman will spend up to %s per day"/>
+		<text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="The herdsman will spend up to %s of your farm's money per day"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="The herdsman will buy up to %s animals per day"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_breed" text="The herdsman will only buy %s animals"/>
+		<text name="rl_ui_herdsmanTooltip_buy_breed_any" text="The herdsman will buy any breed"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="The herdsman will only purchase animals without any diseases"/>
+		<text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="The herdsman will purchase animals regardless of diseases"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_gender_1" text="The herdsman will only purchase female animals"/>
+		<text name="rl_ui_herdsmanTooltip_buy_gender_2" text="The herdsman will purchase female and male animals"/>
+		<text name="rl_ui_herdsmanTooltip_buy_gender_3" text="The herdsman will only purchase male animals"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_age_equal" text="The herdsman will only purchase animals that are %s old"/>
+		<text name="rl_ui_herdsmanTooltip_buy_age_range" text="The herdsman will only purchase animals that are between %s and %s old"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="The herdsman will only purchase animals with %s quality"/>
+		<text name="rl_ui_herdsmanTooltip_buy_quality_range" text="The herdsman will only purchase animals with quality between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="The herdsman will only purchase animals with %s fertility"/>
+		<text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="The herdsman will only purchase animals with fertility between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_health_equal" text="The herdsman will only purchase animals with %s health"/>
+		<text name="rl_ui_herdsmanTooltip_buy_health_range" text="The herdsman will only purchase animals with health between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="The herdsman will only purchase animals with %s productivity"/>
+		<text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="The herdsman will only purchase animals with productivity between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="The herdsman will only purchase animals with %s metabolism"/>
+		<text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="The herdsman will only purchase animals with metabolism between %s and %s"/>
+
+
+		<!-- AI - SELLING -->
+
+
+		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="The herdsman will not sell animals"/>
+		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="The herdsman will sell animals"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="The herdsman will sell up to %s animals per day"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_mark_1" text="The herdsman will not mark animals to be sold"/>
+		<text name="rl_ui_herdsmanTooltip_sell_mark_2" text="The herdsman will mark animals to be sold"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="The herdsman will sell animals regardless of diseases"/>
+		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="The herdsman will only sell animals with a disease"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_gender_1" text="The herdsman will only sell female animals"/>
+		<text name="rl_ui_herdsmanTooltip_sell_gender_2" text="The herdsman will sell female and male animals"/>
+		<text name="rl_ui_herdsmanTooltip_sell_gender_3" text="The herdsman will only sell male animals"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_age_equal" text="The herdsman will only sell animals that are %s old"/>
+		<text name="rl_ui_herdsmanTooltip_sell_age_range" text="The herdsman will only sell animals that are between %s and %s old"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="The herdsman will only sell animals with %s quality"/>
+		<text name="rl_ui_herdsmanTooltip_sell_quality_range" text="The herdsman will only sell animals with quality between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="The herdsman will only sell animals with %s fertility"/>
+		<text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="The herdsman will only sell animals with fertility between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_health_equal" text="The herdsman will only sell animals with %s health"/>
+		<text name="rl_ui_herdsmanTooltip_sell_health_range" text="The herdsman will only sell animals with health between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="The herdsman will only sell animals with %s productivity"/>
+		<text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="The herdsman will only sell animals with productivity between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="The herdsman will only sell animals with %s metabolism"/>
+		<text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="The herdsman will only sell animals with metabolism between %s and %s"/>
+
+
+		<!-- AI - CASTRATING -->
+
+
+		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="The herdsman will not castrate animals"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="The herdsman will castrate animals"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="The herdsman will not mark animals for castration"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="The herdsman will mark animals for castration"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="The herdsman will castrate animals regardless of diseases"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="The herdsman will only castrate animals with a disease"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="The herdsman will only castrate animals that are %s old"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_age_range" text="The herdsman will only castrate animals that are between %s and %s old"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="The herdsman will only castrate animals with %s quality"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="The herdsman will only castrate animals with quality between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="The herdsman will only castrate animals with %s fertility"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="The herdsman will only castrate animals with fertility between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="The herdsman will only castrate animals with %s health"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_health_range" text="The herdsman will only castrate animals with health between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="The herdsman will only castrate animals with %s productivity"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="The herdsman will only castrate animals with productivity between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="The herdsman will only castrate animals with %s metabolism"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="The herdsman will only castrate animals with metabolism between %s and %s"/>
+
+
+		<!-- AI - NAMING -->
+
+
+		<text name="rl_ui_herdsmanTooltip_naming_enabled_1" text="The herdsman will not name animals"/>
+		<text name="rl_ui_herdsmanTooltip_naming_enabled_2" text="The herdsman will name animals"/>
+
+		<text name="rl_ui_herdsmanTooltip_naming_convention_1" text="The herdsman will name animals randomly"/>
+		<text name="rl_ui_herdsmanTooltip_naming_convention_2" text="The herdsman will name animals alphabetically"/>
+
+
+		<!-- AI - AI -->
+
+
+		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="The herdsman will not AI animals"/>
+		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="The herdsman will AI animals"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="The herdsman will AI up to %s animals per day"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_mark_1" text="The herdsman will not mark animals to be inseminated"/>
+		<text name="rl_ui_herdsmanTooltip_ai_mark_2" text="The herdsman will mark animals to be inseminated"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="The herdsman will AI animals regardless of diseases"/>
+		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="The herdsman will only AI animals with a disease"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_semen" text="The herdsman will use inseminant from %s"/>
+		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="The herdsman will use semen from %s"/>
+		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="The herdsman will use any viable inseminant"/>
+		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="The herdsman will use any viable semen"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_age_equal" text="The herdsman will only AI animals that are %s old"/>
+		<text name="rl_ui_herdsmanTooltip_ai_age_range" text="The herdsman will only AI animals that are between %s and %s old"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="The herdsman will only AI animals with %s quality"/>
+		<text name="rl_ui_herdsmanTooltip_ai_quality_range" text="The herdsman will only AI animals with quality between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="The herdsman will only AI animals with %s fertility"/>
+		<text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="The herdsman will only AI animals with fertility between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_health_equal" text="The herdsman will only AI animals with %s health"/>
+		<text name="rl_ui_herdsmanTooltip_ai_health_range" text="The herdsman will only AI animals with health between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="The herdsman will only AI animals with %s productivity"/>
+		<text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="The herdsman will only AI animals with productivity between %s and %s"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="The herdsman will only AI animals with %s metabolism"/>
+		<text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="The herdsman will only AI animals with metabolism between %s and %s"/>
+
+
+
+
+		<!--  SETTINGS  -->
+
+
+		<text name="rl_settings" text="Bétail Réaliste"/>
+
+		<text name="rl_settings_off" text="Arrêt"/>
+		<text name="rl_settings_on" text="Sur"/>
+
+		<text name="rl_settings_deathEnabled_label" text="Enlèvement d'animaux"/>
+		<text name="rl_settings_deathEnabled_tooltip_1" text="Les animaux ne seront pas retirés pour cause de grossesse, de santé, d'âge ou d'accident."/>
+		<text name="rl_settings_deathEnabled_tooltip_2" text="Les animaux seront retirés pour cause de grossesse, de santé, d'âge ou d'accident."/>
+
+		<text name="rl_settings_accidentsChance_label" text="Le hasard des accidents"/>
+		<text name="rl_settings_accidentsChance_tooltip" text="Modifier la probabilité que des animaux soient retirés à la suite d'accidents aléatoires"/>
+
+		<text name="rl_settings_foodScale_label" text="Balance alimentaire"/>
+		<text name="rl_settings_foodScale_tooltip" text="Modifier la quantité de nourriture consommée par les animaux"/>
+
+		<text name="rl_settings_maxDealerAnimals_label" text="Animaux maximums du croupier"/>
+		<text name="rl_settings_maxDealerAnimals_tooltip" text="Modifier le nombre maximum d'animaux que le marchand d'animaux peut avoir en stock par type d'animal."/>
+
+		<text name="rl_settings_tagColour_label" text="Changer la couleur de l'étiquette"/>
+		<text name="rl_settings_tagColour_tooltip" text="Changer la couleur des marques auriculaires"/>
+		<text name="rl_settings_tagColour_text" text="Changer la couleur de l'étiquette"/>
+
+		<text name="rl_settings_exportCSV_label" text="Exporter au format CSV"/>
+		<text name="rl_settings_exportCSV_tooltip" text="Exporter les statistiques au format CSV"/>
+		<text name="rl_settings_exportCSV_text" text="Exporter au format CSV"/>
+
+		<text name="rl_settings_maxNumMessages_label" text="Maximum Amount of Messages"/>
+		<text name="rl_settings_maxNumMessages_tooltip" text="A higher amount will result in your save folder taking up more space. After this limit is reached, the earliest messages will be deleted."/>
+
+		<text name="rl_settings_diseasesEnabled_label" text="Diseases Enabled"/>
+		<text name="rl_settings_diseasesEnabled_tooltip_1" text="Animals cannot catch or inherit diseases"/>
+		<text name="rl_settings_diseasesEnabled_tooltip_2" text="Animals can catch or inherit diseases"/>
+
+		<text name="rl_settings_diseasesChance_label" text="Disease Chance"/>
+		<text name="rl_settings_diseasesChance_tooltip" text="Change the likelihood of animals contracting diseases"/>
+
+		<text name="rl_settings_useCustomAnimals_label" text="Use Custom Animals"/>
+		<text name="rl_settings_useCustomAnimals_tooltip_1" text="Use RealisticLivestock animal models (requires restart)"/>
+		<text name="rl_settings_useCustomAnimals_tooltip_2" text="Use custom animal models (experimental, requires restart, must be unzipped)"/>
+
+		<text name="rl_settings_animalsXML_label" text="Set Animals XML Path"/>
+		<text name="rl_settings_animalsXML_tooltip" text="Set path to a custom animals XML file"/>
+		<text name="rl_settings_animalsXML_text" text="Set Animals XML Path"/>
+
+
+
+		<!--  HELP  -->
+
+
+		<text name="rl_help_monitors_title" text="Moniteurs"/>
+		<text name="rl_help_monitors_1" text="Pour voir la majorité des statistiques d'un animal, vous devez lui apposer une étiquette de surveillance, ce qui peut être fait dans le menu des animaux (où vous achetez et vendez des animaux). Les étiquettes de surveillance sont également visibles sur l'animal, sur son oreille gauche, à côté de son étiquette d'identification."/>
+		<text name="rl_help_monitors_2" text="La surveillance des étiquettes vous permettra d'obtenir des informations importantes, notamment sur la santé, le poids, la lactation, la production et les besoins en paille, en nourriture et en eau."/>
+		<text name="rl_help_monitors_3" text="L'apposition d'une balise sur un animal vous coûtera un petit abonnement mensuel basé sur l'espèce de l'animal. Si vous décidez de retirer la balise, elle sera retirée au début du mois suivant."/>
+
+		<text name="rl_help_pregnancy_title" text="Grossesse"/>
+		<text name="rl_help_pregnancy_1" text="Les femelles ont toutes besoin d'au moins un mâle pour pouvoir tomber enceintes. Les deux animaux doivent avoir l'âge et la santé requis et doivent appartenir à la même espèce. La reproduction entre races différentes (par exemple : vache holstein et taureau angus) est autorisée."/>
+		<text name="rl_help_pregnancy_2" text="La consanguinité n'est pas autorisée. Si un mâle et une femelle sont directement apparentés, ils ne se reproduiront pas ensemble."/>
+		<text name="rl_help_pregnancy_3" text="Les chances de grossesse d'une femme dépendent de sa fertilité et de celle de l'homme. Une femelle plus fertile a également beaucoup plus de chances de produire plus de descendants à la fois."/>
+		<text name="rl_help_pregnancy_4" text="Une fois qu'une femelle est enceinte, elle commence à porter sa progéniture. Vous pouvez voir la date prévue de la gestation et le nombre de petits en regardant l'animal dans l'enclos ou en cliquant sur lui dans le menu des animaux."/>
+		<text name="rl_help_pregnancy_5" text="À la date prévue, elle donnera naissance à ses bébés. Cependant, les nouveau-nés ont une certaine chance d'être retirés, tout comme la mère si la grossesse se déroule mal. Les nouveau-nés qui naissent dans un enclos surpeuplé sont automatiquement vendus."/>
+
+		<text name="rl_help_production_title" text="Production"/>
+		<text name="rl_help_production_1" text="Les vaches, quelle que soit leur race, ne commencent à produire du lait qu'après avoir mis bas. Une fois qu'elle a mis bas, la vache produit du lait de manière exponentielle pendant 3 mois, puis sa production diminue lentement pendant les 6 mois suivants. 10 mois après la grossesse, la vache cesse de produire du lait jusqu'à sa prochaine grossesse."/>
+		<text name="rl_help_production_2" text="Les moutons produisent de la laine pendant les mois chauds. Pendant les mois froids, en dessous de 12°C, ils ne produiront pas de laine."/>
+		<text name="rl_help_production_3" text="La production de lait, de laine et d'œufs est également influencée par la génétique de l'animal. Un animal ayant une bonne génétique de production produira plus, alors qu'un animal ayant une mauvaise génétique ne produira pas beaucoup."/>
+
+		<text name="rl_help_weight_title" text="Poids"/>
+		<text name="rl_help_weight_1" text="Les animaux ont un certain poids qui dépend de la quantité de nourriture et de boisson qu'ils consomment. Chaque espèce et chaque race a son propre poids moyen, ce qui influe sur le poids de chaque animal."/>
+		<text name="rl_help_weight_2" text="Le poids augmente la valeur de l'animal, et un poids faible réduit ses chances d'être enlevé chaque mois."/>
+
+		<text name="rl_help_genetics_title" text="Génétique"/>
+		<text name="rl_help_genetics_1" text="Chaque animal possède quatre valeurs génétiques différentes : le métabolisme, la fertilité, la santé et la qualité. Les gènes sont mélangés entre la mère et le père, puis transmis à leurs enfants."/>
+		<text name="rl_help_genetics_2" text="Le métabolisme affecte la capacité de l'animal à convertir la nourriture en poids, et affecte la quantité qu'il mange."/>
+		<text name="rl_help_genetics_3" text="La fertilité affecte les chances de l'animal de tomber enceinte ou de mettre une femelle enceinte, ainsi que le nombre de descendants qu'il produira."/>
+		<text name="rl_help_genetics_4" text="La santé a une incidence sur la santé de l'animal et sur ses chances d'être retiré chaque mois. Un animal en meilleure santé génétique aura également une durée de vie plus longue."/>
+		<text name="rl_help_genetics_5" text="La qualité influe sur la valeur de l'animal lui-même. Un animal de qualité supérieure se vendra beaucoup plus cher."/>
+		<text name="rl_help_genetics_6" text="Les bovins, les ovins et les poulets ont également une génétique de production, qui influe sur la quantité de lait, d'œufs ou de laine qu'ils produisent."/>
+
+
+
+		<!--  DISEASES  -->
+
+
+		<text name="rl_ui_immune" text="Immune"/>
+		<text name="rl_ui_startTreatment" text="Start Treatment"/>
+		<text name="rl_ui_resumeTreatment" text="Resume Treatment"/>
+		<text name="rl_ui_stopTreatment" text="Stop Treatment"/>
+		<text name="rl_ui_duration" text="Duration"/>
+		<text name="rl_ui_beingTreated" text="Being treated"/>
+		<text name="rl_ui_notTreated" text="Not treated"/>
+		<text name="rl_ui_carrier" text="Carrier"/>
+
+		<text name="rl_diseases" text="Diseases"/>
+		<text name="rl_disease" text="Disease"/>
+
+		<text name="rl_disease_mastitis" text="Mastitis"/>
+
+		<text name="rl_disease_cvm" text="CVM"/>
+
+		<text name="rl_disease_footAndMouth" text="Foot and Mouth"/>
+
+		<text name="rl_disease_ped" text="Porcine Epidemic Diarrhoea"/>
+
+		<text name="rl_disease_avianFlu" text="Avian Influenza"/>
+
+
+
+		<!--  MESSAGES  -->
+
+
+		<text name="rl_messageTitle_pregnancy" text="Pregnancy"/>
+		<text name="rl_messageTitle_death" text="Removal"/>
+		<text name="rl_messageTitle_death_github" text="Death"/>
+		<text name="rl_messageTitle_disease" text="Disease"/>
+		<text name="rl_messageTitle_name" text="Name"/>
+		<text name="rl_messageTitle_movement" text="Movement"/>
+		<text name="rl_messageTitle_aiManager" text="Herdsman"/>
+		<text name="rl_messageTitle_insemination" text="Artificial Insemination"/>
+
+		<text name="rl_message_pregnancySingle" text="Gave birth to 1 baby"/>
+		<text name="rl_message_pregnancyMultiple" text="Gave birth to %s babies"/>
+		<text name="rl_message_pregnancySold" text="%s babies were sold for %s due to overcrowding"/>
+		<text name="rl_message_pregnancyDied" text="%s babies were removed at birth"/>
+		<text name="rl_message_pregnancyDied_github" text="%s babies died at birth"/>
+		<text name="rl_message_death" text="Removed due to %s"/>
+		<text name="rl_message_death_github" text="Died due to %s"/>
+		<text name="rl_message_diseaseContracted" text="Contracted %s"/>
+		<text name="rl_message_diseaseCured" text="Cured from %s"/>
+		<text name="rl_message_diseaseTreatment_start" text="Started treatment for %s at %s"/>
+		<text name="rl_message_diseaseTreatment_resume" text="Resumed treatment for %s at %s"/>
+		<text name="rl_message_diseaseTreatment_stop" text="Stopped treatment for %s"/>
+		<text name="rl_message_nameChange" text="Name changed from '%s' to '%s'"/>
+		<text name="rl_message_nameAdded" text="Given name '%s'"/>
+		<text name="rl_message_nameDeleted" text="Name '%s' was removed"/>
+		<text name="rl_message_boughtAnimals_single" text="1 animal was bought for %s"/>
+		<text name="rl_message_boughtAnimals_multiple" text="%s animals were bought for %s"/>
+		<text name="rl_message_soldAnimals_single" text="1 animal was sold for %s"/>
+		<text name="rl_message_soldAnimals_multiple" text="%s animals were sold for %s"/>
+		<text name="rl_message_movedAnimalsTo_single" text="1 animals was moved to %s"/>
+		<text name="rl_message_movedAnimalsTo_multiple" text="%s animals were moved to %s"/>
+		<text name="rl_message_movedAnimalsFrom_single" text="1 animal was moved from %s"/>
+		<text name="rl_message_movedAnimalsFrom_multiple" text="%s animals were moved from %s"/>
+		<text name="rl_message_aiManager_boughtAnimals_single" text="Herdsman bought 1 animal for %s"/>
+		<text name="rl_message_aiManager_boughtAnimals_multiple" text="Herdsman bought %s animals for %s"/>
+		<text name="rl_message_aiManager_soldAnimals_single" text="Herdsman sold 1 animal for %s"/>
+		<text name="rl_message_aiManager_soldAnimals_multiple" text="Herdsman sold %s animals for %s"/>
+		<text name="rl_message_aiManager_castrated_single" text="Herdsman castrated 1 animal"/>
+		<text name="rl_message_aiManager_castrated_multiple" text="Herdsman castrated %s animals"/>
+		<text name="rl_message_aiManager_named_single" text="Herdsman named 1 animal"/>
+		<text name="rl_message_aiManager_named_multiple" text="Herdsman named %s animals"/>
+		<text name="rl_message_aiManager_mark_sell_single" text="Herdsman marked 1 animal for selling"/>
+		<text name="rl_message_aiManager_mark_sell_multiple" text="Herdsman marked %s animals for selling"/>
+		<text name="rl_message_aiManager_mark_castrate_single" text="Herdsman marked 1 animal for castrating"/>
+		<text name="rl_message_aiManager_mark_castrate_multiple" text="Herdsman marked %s animals for castrating"/>
+		<text name="rl_message_aiManager_mark_disease_single" text="Herdsman marked 1 animal for treatment"/>
+		<text name="rl_message_aiManager_mark_disease_multiple" text="Herdsman marked %s animals for treatment"/>
+		<text name="rl_message_insemination_success" text="Insemination was successful"/>
+		<text name="rl_message_insemination_fail" text="Insemination was unsuccessful"/>
+		<text name="rl_message_aiManager_mark_ai_single" text="Herdsman marked 1 animal for AI"/>
+		<text name="rl_message_aiManager_mark_ai_multiple" text="Herdsman marked %s animals for AI"/>
+		<text name="rl_message_aiManager_ai_single" text="Herdsman inseminated 1 animal"/>
+		<text name="rl_message_aiManager_ai_multiple" text="Herdsman inseminated %s animals"/>
+
+
+
+		<!--  DEATHS  -->
+
+
+		<text name="rl_death_pregnancy" text="a bad pregnancy"/>
+		<text name="rl_death_health" text="low health"/>
+		<text name="rl_death_age" text="old age"/>
+		<text name="rl_death_accident" text="an accident"/>
+
+
+
+		<text name="rl_ui_dependencies_missing" text="RealisticLivestock requires the following dependencies:"/>
+		<text name="rl_ui_dependency_missing_notInstalled" text="- %s (Not Installed)"/>
+		<text name="rl_ui_dependency_missing_installed" text="- %s (Installed: %s, Minimum Required: %s)"/>
+	</texts>
+</l10n>

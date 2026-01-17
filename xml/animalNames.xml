@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<animalNames>
+	
+	<!-- BOTH GENDERS -->
+	
+	
+	<name value="Admiral"/>
+	<name value="Apple"/>
+	<name value="Bossy"/>
+	<name value="Brownie"/>
+	<name value="Butterscotch"/>
+	<name value="Coco"/>
+	<name value="Choco"/>
+	<name value="Chance"/>
+	<name value="Charlie"/>
+	<name value="Crimson"/>
+	<name value="Dusty"/>
+	<name value="Dakota"/>
+	<name value="Dalton"/>
+	<name value="Ebony"/>
+	<name value="Eclipse"/>
+	<name value="Eco"/>
+	<name value="Emery"/>
+	<name value="Espresso"/>
+	<name value="Freckles"/>
+	<name value="Frosty"/>
+	<name value="Flare"/>
+	<name value="Flipper"/>
+	<name value="Flash"/>
+	<name value="Gizmo"/>
+	<name value="Groovy"/>
+	<name value="Gusty"/>
+	<name value="Hakka"/>
+	<name value="Illusion"/>
+	<name value="Indigo"/>
+	<name value="Inky"/>
+	<name value="Jupiter"/>
+	<name value="Jody"/>
+	<name value="Kismet"/>
+	<name value="Magic"/>
+	<name value="Midnight"/>
+	<name value="Neptune"/>
+	<name value="Nifty"/>
+	<name value="Oni"/>
+	<name value="Onyx"/>
+	<name value="Oreo"/>
+	<name value="Patches"/>
+	<name value="Prickles"/>
+	<name value="Quantum"/>
+	<name value="Quiver"/>
+	<name value="Royal"/>
+	<name value="Racer"/>
+	<name value="Ramsay"/>
+	<name value="Star"/>
+	<name value="Spirit"/>
+	<name value="Stormy"/>
+	<name value="Sam"/>
+	<name value="Shadow"/>
+	<name value="Shadowfax"/>
+	<name value="Shiver"/>
+	<name value="Silver"/>
+	<name value="Simba"/>
+	<name value="Smiff"/>
+	<name value="Sparky"/>
+	<name value="Speckles"/>
+	<name value="Snowball"/>
+	<name value="Spot"/>
+	<name value="Strider"/>
+	<name value="Sunny"/>
+	<name value="Tango"/>
+	<name value="Taylor"/>
+	<name value="Tempo"/>
+	<name value="Twister"/>
+	<name value="Trott"/>
+	<name value="Unagi"/>
+	<name value="Urko"/>
+	<name value="Velocity"/>
+	<name value="Virgo"/>
+	<name value="Whisper"/>
+	<name value="Willow"/>
+	<name value="Wild Eye"/>
+	<name value="Wings"/>
+	<name value="Yesterday"/>
+	<name value="Yago"/>
+	<name value="Zen"/>
+	<name value="Zeplin"/>
+	<name value="Zip"/>
+
+	
+	<!-- FEMALE -->
+	
+	
+	<name value="Amethyst" gender="female"/>
+	<name value="Amber" gender="female"/>
+	<name value="Amy" gender="female"/>
+	<name value="Annabelle" gender="female"/>
+	<name value="Athena" gender="female"/>
+	<name value="Bella" gender="female"/>
+	<name value="Belle" gender="female"/>
+	<name value="Bertha" gender="female"/>
+	<name value="Bessie" gender="female"/>
+	<name value="Betty" gender="female"/>
+	<name value="Bonnie" gender="female"/>
+	<name value="Brownie" gender="female"/>
+	<name value="Bubbles" gender="female"/>
+	<name value="Buttercup" gender="female"/>
+	<name value="Chloe" gender="female"/>
+	<name value="Clarabelle" gender="female"/>
+	<name value="Corizon" gender="female"/>
+	<name value="Cricket" gender="female"/>
+	<name value="Daisy" gender="female"/>
+	<name value="Dolly" gender="female"/>
+	<name value="Dot" gender="female"/>
+	<name value="Dottie" gender="female"/>
+	<name value="Dani" gender="female"/>
+	<name value="Dixie" gender="female"/>
+	<name value="Ella" gender="female"/>
+	<name value="Elsie" gender="female"/>
+	<name value="Ember" gender="female"/>
+	<name value="Emma" gender="female"/>
+	<name value="Epona" gender="female"/>
+	<name value="Fantasia" gender="female"/>
+	<name value="Faith" gender="female"/>
+	<name value="Fay" gender="female"/>
+	<name value="Foxy" gender="female"/>
+	<name value="Gertie" gender="female"/>
+	<name value="Gypsy" gender="female"/>
+	<name value="Gracie" gender="female"/>
+	<name value="Harley" gender="female"/>
+	<name value="Henriette" gender="female"/>
+	<name value="Honey" gender="female"/>
+	<name value="Hope" gender="female"/>
+	<name value="Hannah" gender="female"/>
+	<name value="Kapusta" gender="female"/>
+	<name value="Inca" gender="female"/>
+	<name value="Inka" gender="female"/>
+	<name value="Ivory" gender="female"/>
+	<name value="Jasmine" gender="female"/>
+	<name value="Jazz" gender="female"/>
+	<name value="Kalypso" gender="female"/>
+	<name value="Katelynn" gender="female"/>
+	<name value="Keisha" gender="female"/>
+	<name value="Krystal" gender="female"/>
+	<name value="Luna" gender="female"/>
+	<name value="Lux" gender="female"/>
+	<name value="Lily" gender="female"/>
+	<name value="Lady" gender="female"/>
+	<name value="Lana" gender="female"/>
+	<name value="Liberty" gender="female"/>
+	<name value="Light" gender="female"/>
+	<name value="Lulu" gender="female"/>
+	<name value="Misty" gender="female"/>
+	<name value="Maggie" gender="female"/>
+	<name value="Marshmallow" gender="female"/>
+	<name value="Melody" gender="female"/>
+	<name value="Milky" gender="female"/>
+	<name value="Millie" gender="female"/>
+	<name value="Molly" gender="female"/>
+	<name value="Moolinda" gender="female"/>
+	<name value="Moolissa" gender="female"/>
+	<name value="Muffin" gender="female"/>
+	<name value="Mackenzie" gender="female"/>
+	<name value="Miracle" gender="female"/>
+	<name value="Nan" gender="female"/>
+	<name value="Nellie" gender="female"/>
+	<name value="Nevada" gender="female"/>
+	<name value="Nirvana" gender="female"/>
+	<name value="Ocean" gender="female"/>
+	<name value="Opal" gender="female"/>
+	<name value="Pandora" gender="female"/>
+	<name value="Peach" gender="female"/>
+	<name value="Penelope" gender="female"/>
+	<name value="Penny" gender="female"/>
+	<name value="Phoebe" gender="female"/>
+	<name value="Princess" gender="female"/>
+	<name value="Queen" gender="female"/>
+	<name value="Quinn" gender="female"/>
+	<name value="Ronja" gender="female"/>
+	<name value="Rain" gender="female"/>
+	<name value="Rosy" gender="female"/>
+	<name value="Ruby" gender="female"/>
+	<name value="Sadie" gender="female"/>
+	<name value="Sally" gender="female"/>
+	<name value="Snowflake" gender="female"/>
+	<name value="Sprinkles" gender="female"/>
+	<name value="Sugar" gender="female"/>
+	<name value="Summer" gender="female"/>
+	<name value="Sweetie" gender="female"/>
+	<name value="Twilight" gender="female"/>
+	<name value="Umbra" gender="female"/>
+	<name value="Unity" gender="female"/>
+	<name value="Ursula" gender="female"/>
+	<name value="Utopia" gender="female"/>
+	<name value="Uma" gender="female"/>
+	<name value="Utara" gender="female"/>
+	<name value="Vanilla" gender="female"/>
+	<name value="Vanity" gender="female"/>
+	<name value="Vega" gender="female"/>
+	<name value="Velvet" gender="female"/>
+	<name value="Venus" gender="female"/>
+	<name value="Verona" gender="female"/>
+	<name value="Xena" gender="female"/>
+	<name value="Zia" gender="female"/>
+	
+	
+	<!-- MALE -->
+
+	
+	<name value="Angus" gender="male"/>
+	<name value="Apollo" gender="male"/>
+	<name value="Applejack" gender="male"/>
+	<name value="Apache" gender="male"/>
+	<name value="Ben" gender="male"/>
+	<name value="Biggie" gender="male"/>
+	<name value="Blackjack" gender="male"/>
+	<name value="Blaze" gender="male"/>
+	<name value="Bruno" gender="male"/>
+	<name value="Buddy" gender="male"/>
+	<name value="Bullseye" gender="male"/>
+	<name value="Bully" gender="male"/>
+	<name value="Beast" gender="male"/>
+	<name value="Bandit" gender="male"/>
+	<name value="Bud" gender="male"/>
+	<name value="Bob" gender="male"/>
+	<name value="Bryan" gender="male"/>
+	<name value="Buck" gender="male"/>
+	<name value="Chapter" gender="male"/>
+	<name value="Craig" gender="male"/>
+	<name value="Cowboy" gender="male"/>
+	<name value="Champ" gender="male"/>
+	<name value="Chester" gender="male"/>
+	<name value="Clover" gender="male"/>
+	<name value="Colton" gender="male"/>
+	<name value="Dallas" gender="male"/>
+	<name value="Duke" gender="male"/>
+	<name value="Diego" gender="male"/>
+	<name value="Diesel" gender="male"/>
+	<name value="Duke" gender="male"/>
+	<name value="Earl" gender="male"/>
+	<name value="Edward" gender="male"/>
+	<name value="Elvis" gender="male"/>
+	<name value="Edwin" gender="male"/>
+	<name value="Edgar" gender="male"/>
+	<name value="Excalibur" gender="male"/>
+	<name value="Falcon" gender="male"/>
+	<name value="Fabio" gender="male"/>
+	<name value="Frank" gender="male"/>
+	<name value="Franco" gender="male"/>
+	<name value="Fred" gender="male"/>
+	<name value="Garris" gender="male"/>
+	<name value="Ghost" gender="male"/>
+	<name value="Godfrey" gender="male"/>
+	<name value="Guinness" gender="male"/>
+	<name value="Gulliver" gender="male"/>
+	<name value="Goldfinger" gender="male"/>
+	<name value="Harrison" gender="male"/>
+	<name value="Harry" gender="male"/>
+	<name value="Hartley" gender="male"/>
+	<name value="Harvey" gender="male"/>
+	<name value="Herbie" gender="male"/>
+	<name value="Hercules" gender="male"/>
+	<name value="Houston" gender="male"/>
+	<name value="Icarus" gender="male"/>
+	<name value="Inferno" gender="male"/>
+	<name value="Ishtar" gender="male"/>
+	<name value="Iolanthe" gender="male"/>
+	<name value="Jack" gender="male"/>
+	<name value="Jake" gender="male"/>
+	<name value="James" gender="male"/>
+	<name value="Jacob" gender="male"/>
+	<name value="Jester" gender="male"/>
+	<name value="Jimbo" gender="male"/>
+	<name value="Jimmy" gender="male"/>
+	<name value="Joker" gender="male"/>
+	<name value="Kenny" gender="male"/>
+	<name value="King" gender="male"/>
+	<name value="Kirby" gender="male"/>
+	<name value="Knight" gender="male"/>
+	<name value="Kramer" gender="male"/>
+	<name value="Khan" gender="male"/>
+	<name value="Leonardo" gender="male"/>
+	<name value="Lincoln" gender="male"/>
+	<name value="Lucky" gender="male"/>
+	<name value="Maverick" gender="male"/>
+	<name value="Max" gender="male"/>
+	<name value="Mercury" gender="male"/>
+	<name value="Milo" gender="male"/>
+	<name value="Malcolm" gender="male"/>
+	<name value="Moose" gender="male"/>
+	<name value="Mufasa" gender="male"/>
+	<name value="Napoleon" gender="male"/>
+	<name value="Nate" gender="male"/>
+	<name value="Nelson" gender="male"/>
+	<name value="Nemo" gender="male"/>
+	<name value="Nimbus" gender="male"/>
+	<name value="Nitro" gender="male"/>
+	<name value="Oblivion" gender="male"/>
+	<name value="Odin" gender="male"/>
+	<name value="Odyssey" gender="male"/>
+	<name value="Oliver" gender="male"/>
+	<name value="Ollie" gender="male"/>
+	<name value="Olympus" gender="male"/>
+	<name value="Orson" gender="male"/>
+	<name value="Oscar" gender="male"/>
+	<name value="Poncho" gender="male"/>
+	<name value="Prince" gender="male"/>
+	<name value="Pablo" gender="male"/>
+	<name value="Paladin" gender="male"/>
+	<name value="Phantom" gender="male"/>
+	<name value="Pilgrim" gender="male"/>
+	<name value="Remington" gender="male"/>
+	<name value="Rex" gender="male"/>
+	<name value="Ringo" gender="male"/>
+	<name value="Robin" gender="male"/>
+	<name value="Rogue" gender="male"/>
+	<name value="Rudolph" gender="male"/>
+	<name value="Romeo" gender="male"/>
+	<name value="Rocky" gender="male"/>
+	<name value="Ranger" gender="male"/>
+	<name value="Rusty" gender="male"/>
+	<name value="Rambo" gender="male"/>
+	<name value="Rascal" gender="male"/>
+	<name value="Roswel" gender="male"/>
+	<name value="Ross" gender="male"/>
+	<name value="Scout" gender="male"/>
+	<name value="Santa" gender="male"/>
+	<name value="Spartan" gender="male"/>
+	<name value="Stallion" gender="male"/>
+	<name value="Storm" gender="male"/>
+	<name value="Tesla" gender="male"/>
+	<name value="Toby" gender="male"/>
+	<name value="Ted" gender="male"/>
+	<name value="Temper" gender="male"/>
+	<name value="Tornado" gender="male"/>
+	<name value="Thor" gender="male"/>
+	<name value="Thunder" gender="male"/>
+	<name value="Todd" gender="male"/>
+	<name value="Turbo" gender="male"/>
+	<name value="Turk" gender="male"/>
+	<name value="Trooper" gender="male"/>
+	<name value="Trigger" gender="male"/>
+	<name value="Ulysses" gender="male"/>
+	<name value="Uther" gender="male"/>
+	<name value="Vagabond" gender="male"/>
+	<name value="Viking" gender="male"/>
+	<name value="Waldo" gender="male"/>
+	<name value="Watson" gender="male"/>
+	<name value="Will" gender="male"/>
+	<name value="Winston" gender="male"/>
+	<name value="Wrangler" gender="male"/>
+	<name value="William" gender="male"/>
+	<name value="Xerxes" gender="male"/>
+	<name value="Xiao" gender="male"/>
+	<name value="Xavier" gender="male"/>
+	<name value="Yankee" gender="male"/>
+	<name value="Yoshiko" gender="male"/>
+	<name value="Zack" gender="male"/>
+	<name value="Zeke" gender="male"/>
+	<name value="Zeus" gender="male"/>
+
+	<description value="Spotty"/>
+	<description value="Beautiful"/>
+	<description value="Mean"/>
+	<description value="Big"/>
+	<description value="Massive"/>
+	<description value="Huge"/>
+	<description value="Wonderful"/>
+	<description value="Nice"/>
+	<description value="Lazy"/>
+	<description value="Sleepy"/>
+	<description value="Slow"/>
+	<description value="Fast"/>
+	<description value="Ugly"/>
+	<description value="Cute"/>
+	<description value="Small"/>
+	<description value="Tiny"/>
+	<description value="Strange"/>
+	<description value="Cheerful"/>
+	<description value="Loud"/>
+	<description value="Quiet"/>
+	<description value="Cheery"/>
+	<description value="Moody"/>
+	<description value="Spoiled"/>
+	<description value="Energetic"/>
+	<description value="Sporty"/>
+	<description value="Lovely"/>
+	<description value="Annoying"/>
+	<description value="Friendly"/>
+	<description value="Scary"/>
+</animalNames>

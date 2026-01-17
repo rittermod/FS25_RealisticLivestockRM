@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<CustomShader version="5">
+    <Parameters>
+        <Parameter name="playScale"    target="playScale"    type="float4" group="base"     defaultValue="30 45 8 8"       minValue="0 0 0 0"         maxValue="60 60 64 64"     description="plays atlas animation with speed set in range [X,Y]\nplays over whole atlas\nZ - horizontal size\nW - vertical size"/>
+        <Parameter name="startPosition"    target="startPosition"    type="float" group="base"     defaultValue="0"       minValue="0"         maxValue="1"     description="sets start position"/>
+		<Parameter name="colorScale"                  target="colorScale"                  type="float3" group="base"                 defaultValue="1.0 1.0 1.0"          minValue="0.0 0.0 0.0"              maxValue="10.0 10.0 10.0" template="brandColor" description="multiplied with baseMap"/>
+	</Parameters>
+    <UvUsages>
+        <UvUsage textureName="normalMap"        uvType="uv0" uvScale="1.0"/>
+        <UvUsage textureName="glossMap"         uvType="uv0" uvScale="1.0"/>
+    </UvUsages>
+	<Textures/>
+    <VertexAttributes>
+        <VertexAttribute name="uv1"   group="uv1"/>
+        <VertexAttribute name="color" group="vtxColor"/>
+    </VertexAttributes>
+	<Variations/>
+    <LodLevel startDistance="0">
+        <CodeInjections>
+            <CodeInjection position="OBJECT_PARAMETERS">
+                <![CDATA[
+                    /*
+                    plays atlas animation with speed set in range [ playScale.x, playScale.y ],
+                    starting at startPosition, plays over whole atlas.
+                    playScale.z - horizontal size
+                    playScale.w - vertical size
+                    */
+                    float4 playScale;
+                    float startPosition;
+                    float3 colorScale;
+                ]]>
+            </CodeInjection>
+            <CodeInjection position="LIB_FUNCTION">
+                <![CDATA[
+                // Custom pixel/vertex functions
+                // #include "$data/shaders/sharedFunctions.gsl"
+                // Extra functions related to the subUVShader only
+				
+				float2 getUVAnimatedSubUV1( float2 incomingUVs, bool isSubUVHorizontal, bool isTimeOverLife, float alphaOverLife,
+                           int playSpeed, float atlasesHorizontal, float atlasesVertical, float randomValue ){
+
+                    int  mXsize  = (int)atlasesHorizontal;
+                    int  mYsize  = (int)atlasesVertical;
+                    int  mXYsize = mXsize * mYsize;
+
+                    float2 mOutgoingUV = incomingUVs;
+					
+                        int mFrame = playSpeed;
+                        int mYpos = mFrame / mXsize;
+                        int2 mSlotPos = int2( mFrame - mYpos * (mXsize), mYsize - mYpos - 1 );
+						//incomingUVs.x *= atlasesHorizontal;
+						//incomingUVs.y *= atlasesVertical;
+                        mOutgoingUV = ( (float2)mSlotPos + incomingUVs ) * float2(1.0/atlasesHorizontal,1.0/atlasesVertical);
+						
+                    return mOutgoingUV;
+                }
+                ]]>
+            </CodeInjection>
+			<CodeInjection position="LIB_FUNCTION_FS">
+				<![CDATA[
+                    // Custom pixel functions
+                    #include "$data/shaders/sharedFunctions_fs.gsl"
+                    // Extra functions related to the vehicleShader only
+                ]]>
+			</CodeInjection>
+            <CodeInjection position="GET_DEFAULT_TEXCOORDS_VS">
+                <![CDATA[
+                    float  mRandomValue = object.startPosition;
+                    float2 mDefaultUVs = convertDefaultTexCoords( In, object, In.texCoords0.xy );
+                    return getUVAnimatedSubUV1(mDefaultUVs, false, false, 0.0, (int)object.playScale.x, object.playScale.z, object.playScale.w, mRandomValue);
+                ]]>
+            </CodeInjection>
+			<CodeInjection position="POST_DIFFUSE_COLOR_FS">
+				<![CDATA[
+	                float3 mDiffuseColor   = float3(1.0,1.0,1.0);
+                    #if defined( ALBEDO_MAP )
+                        mDiffuseColor = tex2DSample( baseMap, ALBEDO_MAP_SAMPLER, ALBEDO_MAP_TEXCOORDS).rgb;
+                    #endif
+                    diffuseColor = mDiffuseColor * object.colorScale.rgb;
+                ]]>
+			</CodeInjection>
+        </CodeInjections>
+    </LodLevel>
+</CustomShader>

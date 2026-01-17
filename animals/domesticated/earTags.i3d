@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="earTags.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="10.0.8"/>
+  </Asset>
+
+  <Files>
+    <File fileId="3" filename="colourShader.xml"/>
+    <File fileId="1" filename="earTags_diffuse.dds"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="Material.001" materialId="27" specularColor="1 1 0" customShaderId="3">
+      <Texture fileId="1"/>
+      <CustomParameter name="colorScale" value="0.8 0.7 0"/>
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="earTags.i3d.shapes">
+  </Shapes>
+
+  <Scene>
+    <Shape name="earTag" shapeId="1" nodeId="8" castsShadows="true" receiveShadows="true" doubleSided="true" materialIds="27">
+      <TransformGroup name="back" translation="0.0014762 0 0" rotation="-180 -180 -180" nodeId="9"/>
+      <TransformGroup name="front" translation="-0.001 -8.38843e-10 7.82405e-05" rotation="-180 0 -180" nodeId="10"/>
+    </Shape>
+  </Scene>
+
+</i3D>

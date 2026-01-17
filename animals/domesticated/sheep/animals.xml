@@ -1,0 +1,175 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<animalHusbandry>
+	<animals>
+		<animal radius="0.6" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepLambBaby.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/lamb/sheepLambBaby_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/young/sheepLambBabyAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotionBaby.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheepBaby" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepLamb.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/lamb/sheepLamb_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/young/sheepLambAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotionKid.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheep" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="true">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepEwe.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/ewe/sheepEwe_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/adult/sheepAdultAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotion.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheep" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="0.6" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepLambBaby.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/lamb/sheepLambBaby_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/young/sheepLambBabyAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotionBaby.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheepBaby" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepLamb.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/lamb/sheepLamb_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/young/sheepLambAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotionKid.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheep" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="true">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepEwe.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/ewe/sheepEwe_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/adult/sheepAdultAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotion.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheep" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="0.6" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepLambBaby.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/lamb/sheepLambBaby_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/young/sheepLambBabyAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotionBaby.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheepBaby" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepLamb.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/lamb/sheepLamb_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/young/sheepLambAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotionKid.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheep" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="true">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepEwe.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/ewe/sheepEwe_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/adult/sheepAdultAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotion.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheep" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="0.6" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepLambBaby.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/lamb/sheepLambBaby_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/young/sheepLambBabyAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotionBaby.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheepBaby" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepLamb.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/lamb/sheepLamb_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/young/sheepLambAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotionKid.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheep" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="true">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="sheepEwe.i3d" filenamePosed="$dataS/character/animals/domesticated/sheep/ewe/sheepEwe_posed.i3d" animation="$dataS/character/animals/domesticated/sheep/animations/adult/sheepAdultAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/sheep/locomotion.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellSheep" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="0.4" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="goatBaby.i3d" filenamePosed="$dataS/character/animals/domesticated/goat/goatBaby/goatBaby_posed.i3d" animation="$dataS/character/animals/domesticated/goat/animations/young/goatBabyAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/goat/locomotionBaby.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellGoatBaby" yellMinInterval="13000" yellMaxInterval="30000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="0.5" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.755" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="goatKid.i3d" filenamePosed="$dataS/character/animals/domesticated/goat/goatKid/goatKid_posed.i3d" animation="$dataS/character/animals/domesticated/goat/animations/young/goatKidAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/goat/locomotionKid.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellGoat" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="0.6" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.0" allowMilkingPlace="false" headOffset="0.5" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="true">
+			<statesTimers idleMin="13333" idleMax="26666" sleepMin="120000" sleepMax="180000" restMin="18000" restMax="30000" grazeMin="11666" grazeMax="23332" chewMin="8000" chewMax="16000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="20000"/>
+			<assets filename="goat.i3d" filenamePosed="$dataS/character/animals/domesticated/goat/goat/goat_posed.i3d" animation="$dataS/character/animals/domesticated/goat/animations/adult/goatAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/goat/locomotion.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellGoat" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+	</animals>
+	<sound>
+		<soundGroup name="yellSheep" volume="2.0" indoorVolume="0.3" range="50" innerRange="1">
+			<sample filename="$data/sounds/animals/sheep/anmlSheepYell_01.wav"/>
+			<sample filename="$data/sounds/animals/sheep/anmlSheepYell_02.wav"/>
+			<sample filename="$data/sounds/animals/sheep/anmlSheepYell_03.wav"/>
+			<sample filename="$data/sounds/animals/sheep/anmlSheepYell_04.wav"/>
+		</soundGroup>
+		<soundGroup name="yellSheepBaby" volume="1.0" indoorVolume="0.3" range="50" innerRange="1" pitch="1.2">
+			<sample filename="$data/sounds/animals/sheep/anmlSheepYell_01.wav"/>
+			<sample filename="$data/sounds/animals/sheep/anmlSheepYell_02.wav"/>
+			<sample filename="$data/sounds/animals/sheep/anmlSheepYell_03.wav"/>
+			<sample filename="$data/sounds/animals/sheep/anmlSheepYell_04.wav"/>
+		</soundGroup>
+		<soundGroup name="yellGoat" volume="2.0" indoorVolume="0.3" range="50" innerRange="1">
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_01.wav"/>
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_02.wav"/>
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_03.wav"/>
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_04.wav"/>
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_05.wav"/>
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_06.wav"/>
+		</soundGroup>
+		<soundGroup name="yellGoatBaby" volume="1.0" indoorVolume="0.3" range="50" innerRange="1" pitch="1.15">
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_01.wav"/>
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_02.wav"/>
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_03.wav"/>
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_04.wav"/>
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_05.wav"/>
+			<sample filename="$data/sounds/animals/goat/anmlGoatYell_06.wav"/>
+		</soundGroup>
+		<soundGroup name="eat" volume="0.1" indoorVolume="0.01" range="20" innerRange="1">
+			<sample filename="$data/sounds/animals/cow/anmlCowEatLoop_01.wav"/>
+		</soundGroup>
+		<soundGroup name="walk" volume="1" indoorVolume="0.1" range="12" innerRange="0.4">
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_01.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_02.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_03.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_04.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_05.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_06.wav"/>
+		</soundGroup>
+	</sound>
+</animalHusbandry>

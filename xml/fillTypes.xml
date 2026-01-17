@@ -1,0 +1,141 @@
+<map xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="$data/shared/xml/schema/fillTypes.xsd">
+	<fillTypes>
+
+		<!-- COWS -->
+		
+		<fillType name="BULL_SWISS_BROWN" title="$l10n_fillType_bull_swiss_brown" showOnPriceTable="false">
+			<physics massPerLiter="750.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="4000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_cow.png"/>
+		</fillType>
+		<fillType name="BULL_HOLSTEIN" title="$l10n_fillType_bull_holstein" showOnPriceTable="false">
+			<physics massPerLiter="750.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="4000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_cow.png"/>
+		</fillType>
+		<fillType name="BULL_ANGUS" title="$l10n_fillType_bull_angus" showOnPriceTable="false">
+			<physics massPerLiter="750.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="5000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_cow.png"/>
+		</fillType>
+		<fillType name="BULL_LIMOUSIN" title="$l10n_fillType_bull_limousin" showOnPriceTable="false">
+			<physics massPerLiter="750.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="5000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_cow.png"/>
+		</fillType>
+		<fillType name="COW_HEREFORD" title="$l10n_fillType_cow_hereford" showOnPriceTable="false">
+			<physics massPerLiter="600.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="5000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_cow.png"/>
+		</fillType>
+		<fillType name="BULL_HEREFORD" title="$l10n_fillType_bull_hereford" showOnPriceTable="false">
+			<physics massPerLiter="750.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="5000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_cow.png"/>
+		</fillType>
+
+		<!-- WATER BUFFALOS -->
+
+		<fillType name="BULL_WATERBUFFALO" title="$l10n_fillType_bull_waterbuffalo" showOnPriceTable="false">
+			<physics massPerLiter="750.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="5000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_cow.png"/>
+		</fillType>
+		
+		<!-- PIGS -->
+
+		<fillType name="BOAR_LANDRACE" title="$l10n_fillType_boar_landrace" showOnPriceTable="false">
+			<physics massPerLiter="150.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="3000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_pig.png"/>
+		</fillType>
+		<fillType name="BOAR_BLACK_PIED" title="$l10n_fillType_boar_black_pied" showOnPriceTable="false">
+			<physics massPerLiter="150.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="3000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_pig.png"/>
+		</fillType>
+		<fillType name="BOAR_BERKSHIRE" title="$l10n_fillType_boar_berkshire" showOnPriceTable="false">
+			<physics massPerLiter="150.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="3000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_pig.png"/>
+		</fillType>
+
+		<!-- SHEEP -->
+
+		<fillType name="RAM_LANDRACE" title="$l10n_fillType_ram_landrace" showOnPriceTable="false">
+			<physics massPerLiter="150.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="4000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_sheep.png"/>
+		</fillType>
+		<fillType name="RAM_STEINSCHAF" title="$l10n_fillType_ram_steinschaf" showOnPriceTable="false">
+			<physics massPerLiter="150.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="4000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_sheep.png"/>
+		</fillType>
+		<fillType name="RAM_SWISS_MOUNTAIN" title="$l10n_fillType_ram_swiss_mountain" showOnPriceTable="false">
+			<physics massPerLiter="150.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="4000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_sheep.png"/>
+		</fillType>
+		<fillType name="RAM_BLACK_WELSH" title="$l10n_fillType_ram_black_welsh" showOnPriceTable="false">
+			<physics massPerLiter="150.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="4000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_sheep.png"/>
+		</fillType>
+		
+		<!-- GOATS -->
+		
+		<fillType name="RAM_GOAT" title="$l10n_fillType_ram_goat" showOnPriceTable="false">
+			<physics massPerLiter="5.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="0"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_goat.png"/>
+		</fillType>
+		
+		<!-- HORSES -->
+
+		<fillType name="STALLION_GRAY" title="$l10n_fillType_stallion_gray" showOnPriceTable="false">
+			<physics massPerLiter="600.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="0"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_horse.png"/>
+		</fillType>
+		<fillType name="STALLION_PINTO" title="$l10n_fillType_stallion_pinto" showOnPriceTable="false">
+			<physics massPerLiter="600.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="0"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_horse.png"/>
+		</fillType>
+		<fillType name="STALLION_PALOMINO" title="$l10n_fillType_stallion_palomino" showOnPriceTable="false">
+			<physics massPerLiter="600.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="0"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_horse.png"/>
+		</fillType>
+		<fillType name="STALLION_CHESTNUT" title="$l10n_fillType_stallion_chestnut" showOnPriceTable="false">
+			<physics massPerLiter="600.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="0"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_horse.png"/>
+		</fillType>
+		<fillType name="STALLION_BAY" title="$l10n_fillType_stallion_bay" showOnPriceTable="false">
+			<physics massPerLiter="600.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="0"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_horse.png"/>
+		</fillType>
+		<fillType name="STALLION_BLACK" title="$l10n_fillType_stallion_black" showOnPriceTable="false">
+			<physics massPerLiter="600.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="0"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_horse.png"/>
+		</fillType>
+		<fillType name="STALLION_SEAL_BROWN" title="$l10n_fillType_stallion_seal_brown" showOnPriceTable="false">
+			<physics massPerLiter="600.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="0"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_horse.png"/>
+		</fillType>
+		<fillType name="STALLION_DUN" title="$l10n_fillType_stallion_dun" showOnPriceTable="false">
+			<physics massPerLiter="600.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="0"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_horse.png"/>
+		</fillType>
+		
+	</fillTypes>
+	<fillTypeCategories>
+		<fillTypeCategory name="ANIMAL">COW_ANGUS COW_HOLSTEIN COW_LIMOUSIN COW_SWISS_BROWN BULL_SWISS_BROWN BULL_ANGUS BULL_HOLSTEIN BULL_LIMOUSIN COW_WATERBUFFALO BULL_WATERBUFFALO SHEEP_LANDRACE SHEEP_STEINSCHAF SHEEP_SWISS_MOUNTAIN SHEEP_BLACK_WELSH RAM_LANDRACE RAM_STEINSCHAF RAM_SWISS_MOUNTAIN RAM_BLACK_WELSH PIG_LANDRACE PIG_BERKSHIRE PIG_BLACK_PIED BOAR_LANDRACE BOAR_BERKSHIRE BOAR_BLACK_PIED CHICKEN CHICKEN_ROOSTER GOAT RAM_GOAT HORSE_GRAY HORSE_PINTO HORSE_PALOMINO HORSE_CHESTNUT HORSE_BAY HORSE_BLACK HORSE_SEAL_BROWN HORSE_DUN STALLION_GRAY STALLION_PINTO STALLION_PALOMINO STALLION_CHESTNUT STALLION_BAY STALLION_BLACK STALLION_SEAL_BROWN STALLION_DUN</fillTypeCategory>
+	</fillTypeCategories>
+</map>

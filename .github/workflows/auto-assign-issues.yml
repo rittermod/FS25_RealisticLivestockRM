@@ -1,0 +1,18 @@
+name: Auto-assign issues to owner
+
+on:
+    issues:
+        types:
+            - opened
+
+permissions:
+    issues: write
+
+jobs:
+    assign:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Assign issue to repository owner
+              uses: pozil/auto-assign-issue@v2
+              with:
+                  assignees: ${{ github.repository_owner }}

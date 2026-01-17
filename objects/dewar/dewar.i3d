@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="dewar.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="10.0.8"/>
+  </Asset>
+
+  <Files>
+    <File fileId="2" filename="dewar.dds"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="default" materialId="5" diffuseColor="0.501961 0.501961 0.501961 1">
+    </Material>
+    <Material name="Material.001" materialId="6" specularColor="1 1 0">
+      <Texture fileId="2"/>
+    </Material>
+    <Material name="Material.003" materialId="37" diffuseColor="0.8 0.772549 0.0823529 1" specularColor="0.501961 1 0">
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="dewar.i3d.shapes">
+  </Shapes>
+
+  <Scene>
+    <Shape name="Cylinder.001" shapeId="1" dynamic="true" collisionFilterGroup="0xffffffff" collisionFilterMask="0xffffffff" nodeId="17" castsShadows="false" receiveShadows="false" nonRenderable="true" materialIds="5">
+      <Shape name="Cylinder" shapeId="2" nodeId="18" castsShadows="true" receiveShadows="true" doubleSided="true" materialIds="6">
+        <Shape name="stickyNote_animal" translation="-0.143766 0.327067 0.0232108" shapeId="3" nodeId="19" castsShadows="true" receiveShadows="true" materialIds="37">
+          <Shape name="tape.002" translation="0.143766 -0.327067 -0.0232108" shapeId="4" nodeId="20" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="tape.003" translation="0.143766 -0.327067 -0.0232108" shapeId="5" nodeId="21" castsShadows="true" receiveShadows="true" materialIds="5"/>
+        </Shape>
+        <Shape name="stickyNote_straws" translation="0.000169099 0.270904 0.146153" shapeId="6" nodeId="22" castsShadows="true" receiveShadows="true" materialIds="37">
+          <Shape name="tape" translation="-0.000169099 -0.270904 -0.146153" shapeId="7" nodeId="23" castsShadows="true" receiveShadows="true" materialIds="5"/>
+          <Shape name="tape.001" translation="-0.000169099 -0.270904 -0.146153" shapeId="8" nodeId="24" castsShadows="true" receiveShadows="true" materialIds="5"/>
+        </Shape>
+      </Shape>
+    </Shape>
+  </Scene>
+
+</i3D>

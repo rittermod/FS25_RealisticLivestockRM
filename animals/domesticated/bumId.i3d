@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="bumId.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="10.0.4"/>
+  </Asset>
+
+  <Files>
+    <File fileId="1" filename="bumId_diffuse.dds"/>
+    <File fileId="3" filename="font_normal_white.dds"/>
+    <File fileId="4" filename="offsetUV.xml"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="Material.001" materialId="5" specularColor="1 1 0">
+      <Texture fileId="1"/>
+    </Material>
+    <Material name="Material.001" materialId="6" specularColor="1 1 0" customShaderId="4">
+      <Texture fileId="3"/>
+      <CustomParameter name="playScale" value="0 0 64 1"/>
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="bumId.i3d.shapes">
+  </Shapes>
+
+  <Scene>
+    <Shape name="bumId" shapeId="1" clipDistance="300" nodeId="13" castsShadows="true" receiveShadows="true" nonRenderable="true" materialIds="5">
+      <Shape name="bumId1" shapeId="2" clipDistance="300" nodeId="14" castsShadows="true" receiveShadows="true" materialIds="6"/>
+      <Shape name="bumId2" shapeId="3" clipDistance="300" nodeId="15" castsShadows="true" receiveShadows="true" materialIds="6"/>
+      <Shape name="bumId3" shapeId="4" clipDistance="300" nodeId="16" castsShadows="true" receiveShadows="true" materialIds="6"/>
+      <Shape name="bumId4" shapeId="5" clipDistance="300" nodeId="17" castsShadows="true" receiveShadows="true" materialIds="6"/>
+    </Shape>
+  </Scene>
+
+</i3D>

@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<animalHusbandry>
+	<animals>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius=".5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.4" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="6000" idleMax="12000" sleepMin="120000" sleepMax="180000" restMin="12000" restMax="15000" grazeMin="18000" grazeMax="30000" chewMin="15000" chewMax="20000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="25000"/>
+			<assets filename="pigPigletBaby.i3d" filenamePosed="$dataS/character/animals/domesticated/pig/piglet/pigPigletBaby_posed.i3d" animation="$dataS/character/animals/domesticated/pig/animations/young/pigletBabyAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1>0|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/pig/locomotionBaby.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellBaby" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius=".5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.4" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="6000" idleMax="12000" sleepMin="120000" sleepMax="180000" restMin="12000" restMax="15000" grazeMin="18000" grazeMax="30000" chewMin="15000" chewMax="20000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="25000"/>
+			<assets filename="pigPiglet.i3d" filenamePosed="$dataS/character/animals/domesticated/pig/piglet/pigPiglet_posed.i3d" animation="$dataS/character/animals/domesticated/pig/animations/young/pigletAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1>0|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/pig/locomotionKid.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yell" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius=".5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.4" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="6000" idleMax="12000" sleepMin="120000" sleepMax="180000" restMin="12000" restMax="15000" grazeMin="18000" grazeMax="30000" chewMin="15000" chewMax="20000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="25000"/>
+			<assets filename="pigSow.i3d" filenamePosed="$dataS/character/animals/domesticated/pig/sow/pigSow_posed.i3d" animation="$dataS/character/animals/domesticated/pig/animations/adult/pigAdultAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/pig/locomotion.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yell" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius=".5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.4" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="6000" idleMax="12000" sleepMin="120000" sleepMax="180000" restMin="12000" restMax="15000" grazeMin="18000" grazeMax="30000" chewMin="15000" chewMax="20000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="25000"/>
+			<assets filename="pigPigletBaby.i3d" filenamePosed="$dataS/character/animals/domesticated/pig/piglet/pigPigletBaby_posed.i3d" animation="$dataS/character/animals/domesticated/pig/animations/young/pigletBabyAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1>0|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/pig/locomotionBaby.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellBaby" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius=".5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.4" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="6000" idleMax="12000" sleepMin="120000" sleepMax="180000" restMin="12000" restMax="15000" grazeMin="18000" grazeMax="30000" chewMin="15000" chewMax="20000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="25000"/>
+			<assets filename="pigPiglet.i3d" filenamePosed="$dataS/character/animals/domesticated/pig/piglet/pigPiglet_posed.i3d" animation="$dataS/character/animals/domesticated/pig/animations/young/pigletAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1>0|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/pig/locomotionKid.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yell" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius=".5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.4" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="6000" idleMax="12000" sleepMin="120000" sleepMax="180000" restMin="12000" restMax="15000" grazeMin="18000" grazeMax="30000" chewMin="15000" chewMax="20000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="25000"/>
+			<assets filename="pigSow.i3d" filenamePosed="$dataS/character/animals/domesticated/pig/sow/pigSow_posed.i3d" animation="$dataS/character/animals/domesticated/pig/animations/adult/pigAdultAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/pig/locomotion.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yell" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius=".5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.4" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="6000" idleMax="12000" sleepMin="120000" sleepMax="180000" restMin="12000" restMax="15000" grazeMin="18000" grazeMax="30000" chewMin="15000" chewMax="20000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="25000"/>
+			<assets filename="pigPigletBaby.i3d" filenamePosed="$dataS/character/animals/domesticated/pig/piglet/pigPigletBaby_posed.i3d" animation="$dataS/character/animals/domesticated/pig/animations/young/pigletBabyAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1>0|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/pig/locomotionBaby.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellBaby" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius=".5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.4" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="6000" idleMax="12000" sleepMin="120000" sleepMax="180000" restMin="12000" restMax="15000" grazeMin="18000" grazeMax="30000" chewMin="15000" chewMax="20000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="25000"/>
+			<assets filename="pigPiglet.i3d" filenamePosed="$dataS/character/animals/domesticated/pig/piglet/pigPiglet_posed.i3d" animation="$dataS/character/animals/domesticated/pig/animations/young/pigletAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1>0|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/pig/locomotionKid.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yell" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal radius="1.2" handleThreats="false" threatAwarenessRadius=".5" slowingDistance="0.5" allowMilkingPlace="false" headOffset="0.4" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="false">
+			<statesTimers idleMin="6000" idleMax="12000" sleepMin="120000" sleepMax="180000" restMin="60000" restMax="90000" grazeMin="18000" grazeMax="30000" chewMin="15000" chewMax="20000" eatMin="60000" eatMax="90000" wanderMin="10000" wanderMax="25000"/>
+			<assets filename="pigSow.i3d" filenamePosed="$dataS/character/animals/domesticated/pig/sow/pigSow_posed.i3d" animation="$dataS/character/animals/domesticated/pig/animations/adult/pigAdultAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0">
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/pig/locomotion.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yell" yellMinInterval="8000" yellMaxInterval="20000" yellTimerCrowdScale="0.2"/>
+		</animal>
+	</animals>
+	<sound>
+		<soundGroup name="yell" volume="2.1" indoorVolume="0.3" range="50" innerRange="1">
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_01.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_02.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_03.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_04.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_05.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_06.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_07.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_08.wav"/>
+		</soundGroup>
+		<soundGroup name="yellBaby" volume="2.1" indoorVolume="0.3" range="50" innerRange="1">
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_01.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_02.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_03.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_04.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_05.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_06.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_07.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigYell_08.wav"/>
+		</soundGroup>
+		<soundGroup name="eat" volume="0.15" indoorVolume="0.01" range="20" innerRange="1">
+			<sample filename="$data/sounds/animals/pig/anmlPigEatLoop_01.wav"/>
+		</soundGroup>
+		<soundGroup name="walk" volume="0.85" indoorVolume="0.1" range="12" innerRange="0.4">
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_01.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_02.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_03.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_04.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_05.wav"/>
+			<sample filename="$data/sounds/animals/pig/anmlPigStep_06.wav"/>
+		</soundGroup>
+	</sound>
+</animalHusbandry>
