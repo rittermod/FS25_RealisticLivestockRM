@@ -5,6 +5,6 @@
 		</type>
 	</types>
 	<specializations>
-		<specialization name="aiStraw" className="HandToolAIStraw" filename="src/handTools/specializations/HandToolAIStraw.lua"/>
+		<specialization name="aiStraw" className="HandToolAIStraw" filename="scripts/handTools/specializations/HandToolAIStraw.lua"/>
 	</specializations>
 </handTools>
