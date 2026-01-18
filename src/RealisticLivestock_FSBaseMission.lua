@@ -83,8 +83,40 @@ function RealisticLivestock_FSBaseMission:onStartMission()
     NameInputDialog.register()
     EarTagColourPickerDialog.register()
     AnimalFilterDialog.register()
+    RmMigrationDialog.register()
 
-	RLSettings.applyDefaultSettings()
+    print("FSBaseMission: onStartMission - checking migration state")
+    print("FSBaseMission: g_rmMigrationConflict = " .. tostring(g_rmMigrationConflict))
+    print("FSBaseMission: g_rmPendingMigration = " .. tostring(g_rmPendingMigration))
+    print("FSBaseMission: g_rmMigrationManager = " .. tostring(g_rmMigrationManager))
+
+    -- Handle migration conflict or pending migration (server only)
+    if self:getIsServer() then
+        print("FSBaseMission: Running on server")
+        if g_rmMigrationConflict then
+            -- Show conflict dialog and block mission
+            print("FSBaseMission: Showing conflict dialog")
+            if g_rmMigrationManager ~= nil then
+                g_rmMigrationManager:showConflictDialog()
+            else
+                print("FSBaseMission: ERROR - g_rmMigrationManager is nil!")
+            end
+        elseif g_rmPendingMigration then
+            -- Show migration dialog
+            print("FSBaseMission: Showing migration dialog")
+            if g_rmMigrationManager ~= nil then
+                g_rmMigrationManager:showMigrationDialog()
+            else
+                print("FSBaseMission: ERROR - g_rmMigrationManager is nil!")
+            end
+        else
+            print("FSBaseMission: No migration action needed")
+        end
+    else
+        print("FSBaseMission: Not running on server")
+    end
+
+    RLSettings.applyDefaultSettings()
 
     local temp = self.environment.weather.temperatureUpdater.currentMin or 20
 	local isServer = self:getIsServer() 

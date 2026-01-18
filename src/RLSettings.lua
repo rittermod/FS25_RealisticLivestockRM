@@ -236,14 +236,24 @@ function RLSettings.loadFromXMLFile()
 
 	if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
 
-	local path = g_currentMission.missionInfo.savegameDirectory .. "/rlSettings.xml"
+	local savegameDir = g_currentMission.missionInfo.savegameDirectory
 
-	local xmlFile = XMLFile.loadIfExists("rlSettings", path)
+	-- Try new filename first, fall back to old filename (migration support)
+	local path = savegameDir .. "/rm_RlSettings.xml"
+	local xmlFile = XMLFile.loadIfExists("rm_RlSettings", path)
+	local rootKey = "rm_RlSettings"
+
+	if xmlFile == nil then
+		-- Fall back to legacy filename
+		path = savegameDir .. "/rlSettings.xml"
+		xmlFile = XMLFile.loadIfExists("rlSettings", path)
+		rootKey = "settings"
+	end
 
 	if xmlFile ~= nil then
 
-		local key = "settings"
-			
+		local key = rootKey
+
 		for name, setting in pairs(RLSettings.SETTINGS) do
 
 			if setting.ignore then continue end
@@ -252,7 +262,7 @@ function RLSettings.loadFromXMLFile()
 
 			if setting.state > #setting.values then setting.state = #setting.values end
 
-			if name == "useCustomAnimals" and setting.state == 2 then RLSettings.animalsXMLPath = xmlFile:getString("settings.useCustomAnimals#path") end
+			if name == "useCustomAnimals" and setting.state == 2 then RLSettings.animalsXMLPath = xmlFile:getString(key .. ".useCustomAnimals#path") end
 
 		end
 
@@ -271,17 +281,21 @@ function RLSettings.saveToXMLFile(name, state)
 
 		RLSettings.isSaving = true
 
-		local path = g_currentMission.missionInfo.savegameDirectory .. "/rlSettings.xml"
-		local xmlFile = XMLFile.create("rlSettings", path, "settings")
+		-- Always save to new filename with versioning
+		local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlSettings.xml"
+		local xmlFile = XMLFile.create("rm_RlSettings", path, "rm_RlSettings")
 
 		if xmlFile ~= nil then
+
+			-- Add version attribute for future migrations
+			xmlFile:setInt("rm_RlSettings#version", 1)
 
 			for settingName, setting in pairs(RLSettings.SETTINGS) do
 
 				if setting.ignore then continue end
-				xmlFile:setInt("settings." .. settingName .. "#value", setting.state or setting.default)
+				xmlFile:setInt("rm_RlSettings." .. settingName .. "#value", setting.state or setting.default)
 
-				if settingName == "useCustomAnimals" and setting.state == 2 and RLSettings.animalsXMLPath ~= nil then xmlFile:setString("settings.useCustomAnimals#path", RLSettings.animalsXMLPath) end
+				if settingName == "useCustomAnimals" and setting.state == 2 and RLSettings.animalsXMLPath ~= nil then xmlFile:setString("rm_RlSettings.useCustomAnimals#path", RLSettings.animalsXMLPath) end
 
 			end
 

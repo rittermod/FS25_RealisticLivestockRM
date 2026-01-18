@@ -718,11 +718,19 @@ function AnimalSystem:loadColourConfigurations()
 
     if savegame == nil or savegame.savegameDirectory == nil then return false end
 
-    local xmlFile = XMLFile.loadIfExists("animalSystem", savegame.savegameDirectory .. "/animalSystem.xml")
+    -- Try new filename first, fall back to old filename (migration support)
+    local xmlFile = XMLFile.loadIfExists("rm_RlAnimalSystem", savegame.savegameDirectory .. "/rm_RlAnimalSystem.xml")
+    local rootKey = "rm_RlAnimalSystem"
+
+    if xmlFile == nil then
+        -- Fall back to legacy filename
+        xmlFile = XMLFile.loadIfExists("animalSystem", savegame.savegameDirectory .. "/animalSystem.xml")
+        rootKey = "animalSystem"
+    end
 
     if xmlFile == nil then return false end
 
-    xmlFile:iterate("animalSystem.animalTypes.type", function(_, key)
+    xmlFile:iterate(rootKey .. ".animalTypes.type", function(_, key)
 
         local name = xmlFile:getString(key .. "#name")
         local earTagLeft = xmlFile:getVector(key .. "#earTagLeft", { 0.8, 0.7, 0 })
@@ -748,7 +756,17 @@ function AnimalSystem:loadFromXMLFile()
 
     if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
 
-    local xmlFile = XMLFile.loadIfExists("animalSystem", g_currentMission.missionInfo.savegameDirectory .. "/animalSystem.xml")
+    local savegameDir = g_currentMission.missionInfo.savegameDirectory
+
+    -- Try new filename first, fall back to old filename (migration support)
+    local xmlFile = XMLFile.loadIfExists("rm_RlAnimalSystem", savegameDir .. "/rm_RlAnimalSystem.xml")
+    local rootKey = "rm_RlAnimalSystem"
+
+    if xmlFile == nil then
+        -- Fall back to legacy filename
+        xmlFile = XMLFile.loadIfExists("animalSystem", savegameDir .. "/animalSystem.xml")
+        rootKey = "animalSystem"
+    end
 
     if xmlFile == nil then return false end
 
@@ -756,7 +774,7 @@ function AnimalSystem:loadFromXMLFile()
     local hasData = false
 
 
-    xmlFile:iterate("animalSystem.countries.country", function(_, key)
+    xmlFile:iterate(rootKey .. ".countries.country", function(_, key)
 
         local countryIndex = xmlFile:getInt(key .. "#index")
         
@@ -804,7 +822,7 @@ function AnimalSystem:loadFromXMLFile()
     end)
 
 
-    xmlFile:iterate("animalSystem.animals.animal", function(_, key)
+    xmlFile:iterate(rootKey .. ".animals.animal", function(_, key)
 
         local animal = Animal.loadFromXMLFile(xmlFile, key)
 
@@ -823,7 +841,7 @@ function AnimalSystem:loadFromXMLFile()
     end)
 
 
-    xmlFile:iterate("animalSystem.aiAnimals.animal", function(_, key)
+    xmlFile:iterate(rootKey .. ".aiAnimals.animal", function(_, key)
 
         local animal = Animal.loadFromXMLFile(xmlFile, key)
 
@@ -854,15 +872,21 @@ function AnimalSystem:loadFromXMLFile()
 end
 
 
-function AnimalSystem:saveToXMLFile(path)
+function AnimalSystem:saveToXMLFile(_)
 
-	if path == nil then return end
+    -- Always save to new filename with versioning (ignore path parameter)
+    local savegameDir = g_currentMission.missionInfo.savegameDirectory
+    if savegameDir == nil then return end
 
-    local xmlFile = XMLFile.create("animalSystem", path, "animalSystem")
+    local newPath = savegameDir .. "/rm_RlAnimalSystem.xml"
+    local xmlFile = XMLFile.create("rm_RlAnimalSystem", newPath, "rm_RlAnimalSystem")
     if xmlFile == nil then return end
 
+    -- Add version attribute for future migrations
+    xmlFile:setInt("rm_RlAnimalSystem#version", 1)
 
-    xmlFile:setSortedTable("animalSystem.animalTypes.type", self.types, function (key, type)
+
+    xmlFile:setSortedTable("rm_RlAnimalSystem.animalTypes.type", self.types, function (key, type)
 
         xmlFile:setString(key .. "#name", type.name)
         xmlFile:setVector(key .. "#earTagLeft", type.colours.earTagLeft)
@@ -872,8 +896,8 @@ function AnimalSystem:saveToXMLFile(path)
 
     end)
 
-    
-    xmlFile:setSortedTable("animalSystem.countries.country", self.countries, function (key, country)
+
+    xmlFile:setSortedTable("rm_RlAnimalSystem.countries.country", self.countries, function (key, country)
 
         xmlFile:setInt(key .. "#index", country.index)
 
@@ -881,7 +905,7 @@ function AnimalSystem:saveToXMLFile(path)
 
             local farmKey = string.format("%s.farm(%d)", key, i - 1)
             local farm = country.farms[i]
-            
+
             xmlFile:setInt(farmKey .. "#id", farm.id)
             xmlFile:setFloat(farmKey .. "#quality", farm.quality)
             xmlFile:setFloat(farmKey .. "#semenPrice", farm.semenPrice)
@@ -911,11 +935,11 @@ function AnimalSystem:saveToXMLFile(path)
         for _, animal in pairs(animals) do
             if animal.sale ~= nil and animal.sale.day ~= nil then table.insert(allAnimals, animal) end
         end
-        
+
     end
 
-    
-    xmlFile:setSortedTable("animalSystem.animals.animal", allAnimals, function (key, animal)
+
+    xmlFile:setSortedTable("rm_RlAnimalSystem.animals.animal", allAnimals, function (key, animal)
 
         animal:saveToXMLFile(xmlFile, key)
         xmlFile:setInt(key .. ".sale#day", animal.sale.day)
@@ -930,11 +954,11 @@ function AnimalSystem:saveToXMLFile(path)
     for _, animals in pairs(self.aiAnimals) do
 
         for _, animal in pairs(animals) do table.insert(allAIAnimals, animal) end
-        
+
     end
 
-    
-    xmlFile:setSortedTable("animalSystem.aiAnimals.animal", allAIAnimals, function (key, animal)
+
+    xmlFile:setSortedTable("rm_RlAnimalSystem.aiAnimals.animal", allAIAnimals, function (key, animal)
 
         animal:saveToXMLFile(xmlFile, key)
 

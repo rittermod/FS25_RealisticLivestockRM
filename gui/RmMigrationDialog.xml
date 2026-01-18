@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer"/>
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
+    <GuiElement profile="rm_migrationDialogBg" id="dialogElement">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
+        <ThreePartBitmap profile="fs25_dialogBgTop"/>
+        <ThreePartBitmap profile="fs25_dialogBgBottom"/>
+        <GuiElement profile="fs25_dialogContentContainer">
+            <Text profile="rm_migrationDialogTitle" id="titleElement" text="$l10n_rm_rl_migration_title"/>
+            <Text profile="rm_migrationDialogMessage" id="messageElement" text="$l10n_rm_rl_migration_message"/>
+
+            <GuiElement profile="rm_migrationFileListContainer">
+                <Text profile="rm_migrationFileListLabel" text="$l10n_rm_rl_migration_files_found"/>
+                <Text profile="rm_migrationFileList" id="fileListElement" text=""/>
+            </GuiElement>
+
+        </GuiElement>
+        <BoxLayout profile="fs25_dialogButtonBox">
+            <Button profile="buttonOK" text="$l10n_rm_rl_migration_continue" onClick="onClickContinue" id="continueButton"/>
+            <Button profile="buttonCancel" text="$l10n_rm_rl_migration_quit" onClick="onClickQuit" id="quitButton"/>
+        </BoxLayout>
+    </GuiElement>
+    <GUIProfiles>
+        <Profile name="rm_migrationDialogBg" extends="fs25_dialogBg">
+            <height value="400px"/>
+            <width value="700px"/>
+        </Profile>
+        <Profile name="rm_migrationDialogTitle" extends="fs25_dialogTitle" with="anchorTopCenter">
+            <position value="0px -20px"/>
+        </Profile>
+        <Profile name="rm_migrationDialogMessage" extends="fs25_dialogText" with="anchorTopCenter">
+            <position value="0px -70px"/>
+            <textMaxWidth value="600px"/>
+        </Profile>
+        <Profile name="rm_migrationFileListContainer" extends="baseReference" with="anchorTopCenter">
+            <position value="0px -160px"/>
+            <size value="600px 120px"/>
+        </Profile>
+        <Profile name="rm_migrationFileListLabel" extends="fs25_textDefault" with="anchorTopLeft">
+            <textBold value="true"/>
+            <position value="0px 0px"/>
+        </Profile>
+        <Profile name="rm_migrationFileList" extends="fs25_textDefault" with="anchorTopLeft">
+            <position value="20px -45px"/>
+            <textMaxWidth value="560px"/>
+            <textMaxNumLines value="5"/>
+        </Profile>
+    </GUIProfiles>
+</GUI>
