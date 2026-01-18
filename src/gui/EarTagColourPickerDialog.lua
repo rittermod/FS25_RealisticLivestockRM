@@ -362,7 +362,7 @@ function EarTagColourPickerDialog:update(dT)
 
         setShaderParameter(self.renderNode, "colorScale", baseR, baseG, baseB)
 
-        for _, node in pairs(self.texts[self.context]) do change3DLinkedTextColour(node, textR, textG, textB, 1) end
+        for _, node in pairs(self.texts[self.context]) do RealisticLivestock.change3DLinkedTextColour(node, textR, textG, textB, 1) end
 
         self.colorRender:setRenderDirty()
         self.pendingRenderUpdate = false
@@ -380,39 +380,39 @@ function EarTagColourPickerDialog:setupScene()
 
     local uniqueId, farmId, countryCode, name, birthday = "405070", "109824", "UK", "Little Megan", "05/11/22"
 
-	set3DTextAutoScale(true)
-	set3DTextRemoveSpaces(true)
-	setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
-	setTextAlignment(RenderText.ALIGN_CENTER)
-	setTextColor(0, 0, 0, 1)
-	setTextFont(RealisticLivestock.FONTS.dejavu_sans)
+	RealisticLivestock.set3DTextAutoScale(true)
+	RealisticLivestock.set3DTextRemoveSpaces(true)
+	RealisticLivestock.setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
+	RealisticLivestock.setTextAlignment(RenderText.ALIGN_CENTER)
+	RealisticLivestock.setTextColor(0, 0, 0, 1)
+	RealisticLivestock.setTextFont(RealisticLivestock.FONTS.dejavu_sans)
 
     self.texts.earTagLeft = {
-		["uniqueId"] = create3DLinkedText(node, 0, -0.006, -0.015, 0, 0, 0, 0.035, uniqueId),
-		["farmId"] = create3DLinkedText(node, 0, -0.041, -0.02, 0, 0, 0, 0.05, farmId),
-		["country"] = create3DLinkedText(node, 0, 0.021, -0.015, 0, 0, 0, 0.03, countryCode)
+		["uniqueId"] = RealisticLivestock.create3DLinkedText(node, 0, -0.006, -0.015, 0, 0, 0, 0.035, uniqueId),
+		["farmId"] = RealisticLivestock.create3DLinkedText(node, 0, -0.041, -0.02, 0, 0, 0, 0.05, farmId),
+		["country"] = RealisticLivestock.create3DLinkedText(node, 0, 0.021, -0.015, 0, 0, 0, 0.03, countryCode)
 	}
 
     self.texts.earTagRight = {
-        ["birthday"] = create3DLinkedText(node, 0, 0.018, -0.015, 0, 0, 0, 0.02, birthday)
+        ["birthday"] = RealisticLivestock.create3DLinkedText(node, 0, 0.018, -0.015, 0, 0, 0, 0.02, birthday)
 	}
 
-	setTextFont(RealisticLivestock.FONTS.toms_handwritten)
-	set3DTextWrapWidth(0.14)
-	set3DTextWordsPerLine(1)
-	setTextLineHeightScale(0.75)
+	RealisticLivestock.setTextFont(RealisticLivestock.FONTS.toms_handwritten)
+	RealisticLivestock.set3DTextWrapWidth(0.14)
+	RealisticLivestock.set3DTextWordsPerLine(1)
+	RealisticLivestock.setTextLineHeightScale(0.75)
 	
-	self.texts.earTagRight.name = create3DLinkedText(node, 0, -0.01, -0.015, 0, 0, 0, 0.035, name)
+	self.texts.earTagRight.name = RealisticLivestock.create3DLinkedText(node, 0, -0.01, -0.015, 0, 0, 0, 0.035, name)
 
-	setTextLineHeightScale(1.1)
-	set3DTextWordsPerLine(0)
-	set3DTextAutoScale(false)
-	set3DTextRemoveSpaces(false)
-	setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BASELINE)
-	setTextAlignment(RenderText.ALIGN_LEFT)
-	setTextColor(1, 1, 1, 1)
-	set3DTextWrapWidth(0)
-	setTextFont()
+	RealisticLivestock.setTextLineHeightScale(1.1)
+	RealisticLivestock.set3DTextWordsPerLine(0)
+	RealisticLivestock.set3DTextAutoScale(false)
+	RealisticLivestock.set3DTextRemoveSpaces(false)
+	RealisticLivestock.setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BASELINE)
+	RealisticLivestock.setTextAlignment(RenderText.ALIGN_LEFT)
+	RealisticLivestock.setTextColor(1, 1, 1, 1)
+	RealisticLivestock.set3DTextWrapWidth(0)
+	RealisticLivestock.setTextFont()
 
     setVisibility(self.texts.earTagRight.birthday, false)
     setVisibility(self.texts.earTagRight.name, false)
