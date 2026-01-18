@@ -1,6 +1,6 @@
 <modDesc descVersion="105">
     <author>Ritter</author>
-    <version>0.2.0.0</version>
+    <version>0.3.0.0</version>
     <title>
         <en>Realistic Livestock - RitterMod version</en>
     </title>
@@ -14,6 +14,9 @@ Feel free to use it as you see fit, but please understand that this mod is way l
 
 
 Changelog
+v0.3.0.0:
+- Add Highland Bulls based on Renfordt's PR in 389 Arrow-kb's original mod.
+
 v0.2.0.0:
 - Migrate savegames from Arrow-kb's Realistic Livestock to RitterMod version. To avoid conflits with original mod and other forks of it, this mod uses a different mod ID. Therefore, when you load a savegame that used the original Realistic Livestock mod, you will be prompted to migrate the data to this mod.
 
