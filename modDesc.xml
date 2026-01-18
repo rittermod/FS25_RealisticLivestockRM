@@ -1,6 +1,6 @@
 <modDesc descVersion="105">
     <author>Ritter</author>
-    <version>0.1.0.0</version>
+    <version>0.2.0.0</version>
     <title>
         <en>Realistic Livestock - RitterMod version</en>
     </title>
@@ -10,7 +10,14 @@
 
 The current goal of this version is to keep the core parts of the mod working for my use, and do the occasional fix or improvement that feel is needed. 
 
-Feel free to use it as you see fit, but please understand that this mod is way less ambitious. ]]>
+Feel free to use it as you see fit, but please understand that this mod is way less ambitious. 
+
+
+Changelog
+v0.2.0.0:
+- Migrate savegames from Arrow-kb's Realistic Livestock to RitterMod version. To avoid conflits with original mod and other forks of it, this mod uses a different mod ID. Therefore, when you load a savegame that used the original Realistic Livestock mod, you will be prompted to migrate the data to this mod.
+
+]]>
         </en>
 
     </description>
@@ -78,6 +85,9 @@ Feel free to use it as you see fit, but please understand that this mod is way l
         <sourceFile filename="src/gui/ProfileDialog.lua"/>
         <sourceFile filename="src/gui/RL_InfoDisplayKeyValueBox.lua"/>
         <sourceFile filename="src/gui/RealisticLivestock_InGameMenuAnimalsFrame.lua"/>
+        <sourceFile filename="src/migration/RmMigrationManager.lua"/>
+        <sourceFile filename="src/migration/RmMigrationDialog.lua"/>
+        <sourceFile filename="src/migration/RmItemSystemMigration.lua"/>
         <sourceFile filename="src/handTools/specializations/HandToolHorseBrush.lua"/>
         <sourceFile filename="src/handTools/HandTool.lua"/>
         <sourceFile filename="src/handTools/HandToolSystem.lua"/>

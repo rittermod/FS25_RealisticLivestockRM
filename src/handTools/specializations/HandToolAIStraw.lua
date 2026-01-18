@@ -1,7 +1,7 @@
 HandToolAIStraw = {}
 
 HandToolAIStraw.numHeldStraws = 0
-local specName = "spec_FS25_RealisticLivestock.aiStraw"
+local specName = "spec_FS25_RealisticLivestockRM.aiStraw"
 
 
 function HandToolAIStraw.registerFunctions(handTool)
@@ -61,15 +61,25 @@ function HandToolAIStraw:onPostLoad(savegame)
 	if savegame == nil or savegame.xmlFile == nil then return end
 
 	local xmlFile, key = savegame.xmlFile, savegame.key
-	local animalKey = key .. ".FS25_RealisticLivestock.aiStraw.animal"
 
-	spec.isEmpty = xmlFile:getBool(key .. ".FS25_RealisticLivestock.aiStraw#isEmpty", false)
-	spec.dewarUniqueId = xmlFile:getString(key .. ".FS25_RealisticLivestock.aiStraw#dewarUniqueId")
+	-- Try new namespace first, fall back to old namespace (migration support)
+	local namespace = ".FS25_RealisticLivestockRM.aiStraw"
+	if not xmlFile:hasProperty(key .. namespace) then
+		namespace = ".FS25_RealisticLivestock.aiStraw"  -- Legacy fallback
+	end
+
+	if not xmlFile:hasProperty(key .. namespace) then return end
+
+	local baseKey = key .. namespace
+	local animalKey = baseKey .. ".animal"
+
+	spec.isEmpty = xmlFile:getBool(baseKey .. "#isEmpty", false)
+	spec.dewarUniqueId = xmlFile:getString(baseKey .. "#dewarUniqueId")
 
 	if xmlFile:hasProperty(animalKey) then
 
 		local animal = {}
-		
+
 		animal.country = xmlFile:getInt(animalKey .. "#country")
 		animal.farmId = xmlFile:getString(animalKey .. "#farmId")
 		animal.uniqueId = xmlFile:getString(animalKey .. "#uniqueId")
@@ -77,7 +87,7 @@ function HandToolAIStraw:onPostLoad(savegame)
 		animal.typeIndex = xmlFile:getInt(animalKey .. "#typeIndex")
 		animal.subTypeIndex = xmlFile:getInt(animalKey .. "#subTypeIndex")
 		animal.success = xmlFile:getFloat(animalKey .. "#success")
-		
+
 		animal.genetics = {
 			["metabolism"] = xmlFile:getFloat(animalKey .. ".genetics#metabolism"),
 			["fertility"] = xmlFile:getFloat(animalKey .. ".genetics#fertility"),
@@ -85,7 +95,7 @@ function HandToolAIStraw:onPostLoad(savegame)
 			["quality"] = xmlFile:getFloat(animalKey .. ".genetics#quality"),
 			["productivity"] = xmlFile:getFloat(animalKey .. ".genetics#productivity")
 		}
-		
+
 		self.animal = animal
 
 	end
