@@ -1,21 +1,32 @@
 <modDesc descVersion="105">
     <author>Ritter</author>
-    <version>0.3.0.0</version>
+    <version>0.4.0.0</version>
     <title>
-        <en>Realistic Livestock - RitterMod version</en>
+        <en>Realistic Livestock - Ritter version</en>
     </title>
     <description>
         <en>
             <![CDATA[ This is a modified version of the FS25 Realistic Livestock mod by Arrow-kb who has decided to stop all development of his mods.
 
-The current goal of this version is to keep the core parts of the mod working for my use, and do the occasional fix or improvement that feel is needed. 
+The current goal of this version is to keep the core parts of the mod working for my use, and do the occasional fix or improvement that I feel is needed. 
 
-Feel free to use it as you see fit, but please understand that this mod is way less ambitious. 
+Feel free to use it as you see fit, but please understand that this mod is way less ambitious than the original. 
+
+Main changes from the original mod:
+- Automatically migrate savegame data from Arrow-kb's Realistic Livestock to this version.
+- Added Highland Bulls based on Renfordt's PR 389 in Arrow-kb's original mod.
+- Removed Font Library dependency by inlining the required functionality directly in the mod.
+
 
 
 Changelog
+v0.4.0.0:
+- Remove Font Library dependency by inlining the required functionality directly in the mod.
+- Refactor file loading and source folder.
+- Update mod icon.
+
 v0.3.0.0:
-- Add Highland Bulls based on Renfordt's PR in 389 Arrow-kb's original mod.
+- Add Highland Bulls based on Renfordt's PR 389 in Arrow-kb's original mod.
 
 v0.2.0.0:
 - Migrate savegames from Arrow-kb's Realistic Livestock to RitterMod version. To avoid conflits with original mod and other forks of it, this mod uses a different mod ID. Therefore, when you load a savegame that used the original Realistic Livestock mod, you will be prompted to migrate the data to this mod.
@@ -27,100 +38,7 @@ v0.2.0.0:
     <iconFilename>icon_RealisticLivestock.dds</iconFilename>
     <multiplayer supported="true"/>
     <extraSourceFiles>
-        <sourceFile filename="src/fontlib/RmFontCharacter.lua"/>
-        <sourceFile filename="src/fontlib/RmFontManager.lua"/>
-        <sourceFile filename="src/gui/MPLoadingScreen.lua"/>
-        <sourceFile filename="src/animals/husbandry/cluster/RealisticLivestock_AnimalCluster.lua"/>
-        <sourceFile filename="src/animals/husbandry/cluster/RealisticLivestock_AnimalClusterHusbandry.lua"/>
-        <sourceFile filename="src/animals/husbandry/cluster/RealisticLivestock_AnimalClusterSystem.lua"/>
-        <sourceFile filename="src/animals/husbandry/cluster/VisualAnimal.lua"/>
-        <sourceFile filename="src/animals/husbandry/placeables/PlaceableHusbandry.lua"/>
-        <sourceFile filename="src/animals/husbandry/placeables/PlaceableHusbandryLiquidManure.lua"/>
-        <sourceFile filename="src/animals/husbandry/placeables/PlaceableHusbandryStraw.lua"/>
-        <sourceFile filename="src/animals/husbandry/placeables/PlaceableHusbandryWater.lua"/>
-        <sourceFile filename="src/animals/husbandry/placeables/RealisticLivestock_PlaceableHusbandryAnimals.lua"/>
-        <sourceFile filename="src/animals/husbandry/placeables/RealisticLivestock_PlaceableHusbandryMilk.lua"/>
-        <sourceFile filename="src/animals/husbandry/placeables/RealisticLivestock_PlaceableHusbandryFood.lua"/>
-        <sourceFile filename="src/animals/husbandry/placeables/RealisticLivestock_PlaceableHusbandryPallets.lua"/>
-        <sourceFile filename="src/animals/husbandry/AnimalSystemStateEvent.lua"/>
-        <sourceFile filename="src/animals/husbandry/RealisticLivestock_HusbandrySystem.lua"/>
-        <sourceFile filename="src/animals/husbandry/RealisticLivestock_AnimalNameSystem.lua"/>
-        <sourceFile filename="src/animals/husbandry/RealisticLivestock_AnimalSystem.lua"/>
-        <sourceFile filename="src/animals/shop/controllers/AnimalScreenBase.lua"/>
-        <sourceFile filename="src/animals/shop/controllers/AnimalScreenDealer.lua"/>
-        <sourceFile filename="src/animals/shop/controllers/AnimalScreenDealerFarm.lua"/>
-        <sourceFile filename="src/animals/shop/controllers/AnimalScreenDealerTrailer.lua"/>
-        <sourceFile filename="src/animals/shop/controllers/AnimalScreenTrailer.lua"/>
-        <sourceFile filename="src/animals/shop/controllers/AnimalScreenTrailerFarm.lua"/>
-        <sourceFile filename="src/animals/shop/events/AIAnimalBuyEvent.lua"/>
-        <sourceFile filename="src/animals/shop/events/AIAnimalInseminationEvent.lua"/>
-        <sourceFile filename="src/animals/shop/events/AIAnimalSellEvent.lua"/>
-        <sourceFile filename="src/animals/shop/events/AIBulkMessageEvent.lua"/>
-        <sourceFile filename="src/animals/shop/events/AnimalBuyEvent.lua"/>
-        <sourceFile filename="src/animals/shop/events/AnimalInseminationEvent.lua"/>
-        <sourceFile filename="src/animals/shop/events/AnimalInseminationResultEvent.lua"/>
-        <sourceFile filename="src/animals/shop/events/AnimalMoveEvent.lua"/>
-        <sourceFile filename="src/animals/shop/events/AnimalSellEvent.lua"/>
-        <sourceFile filename="src/animals/shop/events/SemenBuyEvent.lua"/>
-        <sourceFile filename="src/animals/shop/AnimalItemNew.lua"/>
-        <sourceFile filename="src/animals/shop/RealisticLivestock_AnimalItemStock.lua"/>
-        <sourceFile filename="src/events/DewarManagerStateEvent.lua"/>
-        <sourceFile filename="src/events/HusbandryMessageStateEvent.lua"/>
-        <sourceFile filename="src/events/ReturnStrawEvent.lua"/>
-        <sourceFile filename="src/farms/FarmManager.lua"/>
-        <sourceFile filename="src/farms/RealisticLivestock_FarmStats.lua"/>
-        <sourceFile filename="src/fillTypes/RealisticLivestock_FillTypeManager.lua"/>
-        <sourceFile filename="src/gui/elements/DoubleOptionSliderElement.lua"/>
-        <sourceFile filename="src/gui/elements/RenderElement.lua"/>
-        <sourceFile filename="src/gui/elements/TripleOptionElement.lua"/>
-        <sourceFile filename="src/gui/RealisticLivestock_AnimalScreen.lua"/>
-        <sourceFile filename="src/gui/VisualAnimalsDialog.lua"/>
-        <sourceFile filename="src/gui/NameInputDialog.lua"/>
-        <sourceFile filename="src/gui/RealisticLivestockFrame.lua"/>
-        <sourceFile filename="src/gui/AnimalAIDialog.lua"/>
-        <sourceFile filename="src/gui/AnimalFilterDialog.lua"/>
-        <sourceFile filename="src/gui/AnimalInfoDialog.lua"/>
-        <sourceFile filename="src/gui/DiseaseDialog.lua"/>
-        <sourceFile filename="src/gui/EarTagColourPickerDialog.lua"/>
-        <sourceFile filename="src/gui/FileExplorerDialog.lua"/>
-        <sourceFile filename="src/gui/InGameMenuSettingsFrame.lua"/>
-        <sourceFile filename="src/gui/ProfileDialog.lua"/>
-        <sourceFile filename="src/gui/RL_InfoDisplayKeyValueBox.lua"/>
-        <sourceFile filename="src/gui/RealisticLivestock_InGameMenuAnimalsFrame.lua"/>
-        <sourceFile filename="src/migration/RmMigrationManager.lua"/>
-        <sourceFile filename="src/migration/RmMigrationDialog.lua"/>
-        <sourceFile filename="src/migration/RmItemSystemMigration.lua"/>
-        <sourceFile filename="src/handTools/specializations/HandToolHorseBrush.lua"/>
-        <sourceFile filename="src/handTools/HandTool.lua"/>
-        <sourceFile filename="src/handTools/HandToolSystem.lua"/>
-        <sourceFile filename="src/handTools/RLHandTools.lua"/>
-        <sourceFile filename="src/objects/Dewar.lua"/>
-        <sourceFile filename="src/placeables/RealisticLivestock_PlaceableSystem.lua"/>
-        <sourceFile filename="src/player/RealisticLivestock_PlayerHUDUpdater.lua"/>
-        <sourceFile filename="src/player/RealisticLivestock_PlayerInputComponent.lua"/>
-        <sourceFile filename="src/vehicles/specializations/RealisticLivestock_LivestockTrailer.lua"/>
-        <sourceFile filename="src/vehicles/specializations/Rideable.lua"/>
-        <sourceFile filename="src/vehicles/RealisticLivestock_VehicleSystem.lua"/>
-        <sourceFile filename="src/AIAnimalManager.lua"/>
-        <sourceFile filename="src/AIStrawUpdater.lua"/>
-        <sourceFile filename="src/AnimalBirthEvent.lua"/>
-        <sourceFile filename="src/AnimalDeathEvent.lua"/>
-        <sourceFile filename="src/AnimalMonitorEvent.lua"/>
-        <sourceFile filename="src/AnimalNameChangeEvent.lua"/>
-        <sourceFile filename="src/AnimalPregnancyEvent.lua"/>
-        <sourceFile filename="src/AnimalUpdateEvent.lua"/>
-        <sourceFile filename="src/DewarManager.lua"/>
-        <sourceFile filename="src/Disease.lua"/>
-        <sourceFile filename="src/DiseaseManager.lua"/>
-        <sourceFile filename="src/FSCareerMissionInfo.lua"/>
-        <sourceFile filename="src/I18N.lua"/>
-        <sourceFile filename="src/RealisticLivestock.lua"/>
-        <sourceFile filename="src/RealisticLivestock_Animal.lua"/>
-        <sourceFile filename="src/RealisticLivestock_FSBaseMission.lua"/>
-        <sourceFile filename="src/RLConsoleCommandManager.lua"/>
-        <sourceFile filename="src/RLMessage.lua"/>
-        <sourceFile filename="src/RLSettings.lua"/>
-        <sourceFile filename="src/RL_BroadcastSettingsEvent.lua"/>
+        <sourceFile filename="scripts/main.lua"/>
     </extraSourceFiles>
     <l10n filenamePrefix="translations/translation"/>
     <inputBinding>
