@@ -33,7 +33,7 @@ function VisualAnimal:delete()
 
 		for _, nodes in pairs(nodeType) do
 
-			for _, node in pairs(nodes) do delete3DLinkedText(node) end
+			for _, node in pairs(nodes) do RealisticLivestock.delete3DLinkedText(node) end
 
 		end
 
@@ -90,8 +90,8 @@ function VisualAnimal:setBumId()
 
 	self.texts.bumId = {
 		["uniqueId"] = {
-			["top"] = create3DLinkedText(self.nodes.bumId, 0, -0.006, 0, 0, 0, 0, 0.05, string.sub(uniqueId, 3, 4)),
-			["bottom"] = create3DLinkedText(self.nodes.bumId, 0, -0.012, 0, 0, 0, 0, 0.05, string.sub(uniqueId, 5, 6))
+			["top"] = RealisticLivestock.create3DLinkedText(self.nodes.bumId, 0, -0.006, 0, 0, 0, 0, 0.05, string.sub(uniqueId, 3, 4)),
+			["bottom"] = RealisticLivestock.create3DLinkedText(self.nodes.bumId, 0, -0.012, 0, 0, 0, 0, 0.05, string.sub(uniqueId, 5, 6))
 		}
 	}
 
@@ -123,7 +123,7 @@ function VisualAnimal:setEarTagColours(leftTag, leftText, rightTag, rightText)
 			self.leftTextColour = leftText
 		
 			for _, nodes in pairs(self.texts.earTagLeft) do
-				for _, node in pairs(nodes) do change3DLinkedTextColour(node, leftText[1], leftText[2], leftText[3], 1) end
+				for _, node in pairs(nodes) do RealisticLivestock.change3DLinkedTextColour(node, leftText[1], leftText[2], leftText[3], 1) end
 			end
 
 		end
@@ -139,7 +139,7 @@ function VisualAnimal:setEarTagColours(leftTag, leftText, rightTag, rightText)
 			self.rightTextColour = rightText
 		
 			for _, nodes in pairs(self.texts.earTagRight) do
-				for _, node in pairs(nodes) do change3DLinkedTextColour(node, rightText[1], rightText[2], rightText[3], 1) end
+				for _, node in pairs(nodes) do RealisticLivestock.change3DLinkedTextColour(node, rightText[1], rightText[2], rightText[3], 1) end
 			end
 
 		end
@@ -154,7 +154,7 @@ function VisualAnimal:setLeftEarTag()
 	if self.nodes.earTagLeft == nil then return end
 
 	for _, nodes in pairs(self.texts.earTagLeft) do
-		for _, node in pairs(nodes) do delete3DLinkedText(node) end
+		for _, node in pairs(nodes) do RealisticLivestock.delete3DLinkedText(node) end
 	end
 
     local uniqueId = self.animal.uniqueId
@@ -167,31 +167,31 @@ function VisualAnimal:setLeftEarTag()
 	local front = getChild(node, "front")
 	local back = getChild(node, "back")
 	
-	setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
-	setTextAlignment(RenderText.ALIGN_CENTER)
-	setTextColor(colour[1], colour[2], colour[3], 1)
-	setTextFont(RealisticLivestock.FONTS.dejavu_sans)
+	RealisticLivestock.setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
+	RealisticLivestock.setTextAlignment(RenderText.ALIGN_CENTER)
+	RealisticLivestock.setTextColor(colour[1], colour[2], colour[3], 1)
+	RealisticLivestock.setTextFont(RealisticLivestock.FONTS.dejavu_sans)
 
 	self.texts.earTagLeft = {
 		["uniqueId"] = {
-			["back"] = create3DLinkedText(back, 0, -0.006, -0.015, 0, 0, 0, 0.035, uniqueId),
-			["front"] = create3DLinkedText(front, 0, -0.006, -0.015, 0, 0, 0, 0.035, uniqueId)
+			["back"] = RealisticLivestock.create3DLinkedText(back, 0, -0.006, -0.015, 0, 0, 0, 0.035, uniqueId),
+			["front"] = RealisticLivestock.create3DLinkedText(front, 0, -0.006, -0.015, 0, 0, 0, 0.035, uniqueId)
 		},
 		["farmId"] = {
-			["back"] = create3DLinkedText(back, 0, -0.041, -0.02, 0, 0, 0, 0.05, farmId),
-			["front"] = create3DLinkedText(front, 0, -0.041, -0.02, 0, 0, 0, 0.05, farmId)
+			["back"] = RealisticLivestock.create3DLinkedText(back, 0, -0.041, -0.02, 0, 0, 0, 0.05, farmId),
+			["front"] = RealisticLivestock.create3DLinkedText(front, 0, -0.041, -0.02, 0, 0, 0, 0.05, farmId)
 		},
 		["country"] = {
-			["back"] = create3DLinkedText(back, 0, 0.021, -0.015, 0, 0, 0, 0.03, countryCode),
-			["front"] = create3DLinkedText(front, 0, 0.021, -0.015, 0, 0, 0, 0.03, countryCode)
+			["back"] = RealisticLivestock.create3DLinkedText(back, 0, 0.021, -0.015, 0, 0, 0, 0.03, countryCode),
+			["front"] = RealisticLivestock.create3DLinkedText(front, 0, 0.021, -0.015, 0, 0, 0, 0.03, countryCode)
 		}
 	}
 
 	
-	setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BASELINE)
-	setTextAlignment(RenderText.ALIGN_LEFT)
-	setTextColor(1, 1, 1, 1)
-	setTextFont()
+	RealisticLivestock.setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BASELINE)
+	RealisticLivestock.setTextAlignment(RenderText.ALIGN_LEFT)
+	RealisticLivestock.setTextColor(1, 1, 1, 1)
+	RealisticLivestock.setTextFont()
 
 end
 
@@ -201,7 +201,7 @@ function VisualAnimal:setRightEarTag()
 	if self.nodes.earTagRight == nil then return end
 
 	for _, nodes in pairs(self.texts.earTagRight) do
-		for _, node in pairs(nodes) do delete3DLinkedText(node) end
+		for _, node in pairs(nodes) do RealisticLivestock.delete3DLinkedText(node) end
 	end
 	
 	local node = self.nodes.earTagRight
@@ -214,40 +214,40 @@ function VisualAnimal:setRightEarTag()
 	local front = getChild(node, "front")
 	local back = getChild(node, "back")
 
-	set3DTextAutoScale(true)
-	set3DTextRemoveSpaces(true)
-	set3DTextWrapWidth(0.14)
-	setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
-	setTextAlignment(RenderText.ALIGN_CENTER)
-	setTextColor(colour[1], colour[2], colour[3], 1)
-	set3DTextWordsPerLine(1)
-	setTextLineHeightScale(0.75)
-	setTextFont(RealisticLivestock.FONTS.toms_handwritten)
+	RealisticLivestock.set3DTextAutoScale(true)
+	RealisticLivestock.set3DTextRemoveSpaces(true)
+	RealisticLivestock.set3DTextWrapWidth(0.14)
+	RealisticLivestock.setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
+	RealisticLivestock.setTextAlignment(RenderText.ALIGN_CENTER)
+	RealisticLivestock.setTextColor(colour[1], colour[2], colour[3], 1)
+	RealisticLivestock.set3DTextWordsPerLine(1)
+	RealisticLivestock.setTextLineHeightScale(0.75)
+	RealisticLivestock.setTextFont(RealisticLivestock.FONTS.toms_handwritten)
 
 
 	self.texts.earTagRight = {
 		["name"] = {
-			["back"] = create3DLinkedText(back, 0, -0.01, -0.015, 0, 0, 0, 0.035, name),
-			["front"] = create3DLinkedText(front, 0, -0.01, -0.015, 0, 0, 0, 0.035, name)
+			["back"] = RealisticLivestock.create3DLinkedText(back, 0, -0.01, -0.015, 0, 0, 0, 0.035, name),
+			["front"] = RealisticLivestock.create3DLinkedText(front, 0, -0.01, -0.015, 0, 0, 0, 0.035, name)
 		}
 	}
 
-	set3DTextWrapWidth(0)
-	setTextFont(RealisticLivestock.FONTS.dejavu_sans)
+	RealisticLivestock.set3DTextWrapWidth(0)
+	RealisticLivestock.setTextFont(RealisticLivestock.FONTS.dejavu_sans)
 	
 	self.texts.earTagRight.birthday = {
-		["back"] = create3DLinkedText(back, 0, 0.018, -0.015, 0, 0, 0, 0.02, birthdayText),
-		["front"] = create3DLinkedText(front, 0, 0.018, -0.015, 0, 0, 0, 0.02, birthdayText)
+		["back"] = RealisticLivestock.create3DLinkedText(back, 0, 0.018, -0.015, 0, 0, 0, 0.02, birthdayText),
+		["front"] = RealisticLivestock.create3DLinkedText(front, 0, 0.018, -0.015, 0, 0, 0, 0.02, birthdayText)
 	}
 
 	
-	setTextLineHeightScale(1.1)
-	set3DTextWordsPerLine(0)
-	set3DTextAutoScale(false)
-	set3DTextRemoveSpaces(false)
-	setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BASELINE)
-	setTextAlignment(RenderText.ALIGN_LEFT)
-	setTextColor(1, 1, 1, 1)
-	setTextFont()
+	RealisticLivestock.setTextLineHeightScale(1.1)
+	RealisticLivestock.set3DTextWordsPerLine(0)
+	RealisticLivestock.set3DTextAutoScale(false)
+	RealisticLivestock.set3DTextRemoveSpaces(false)
+	RealisticLivestock.setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BASELINE)
+	RealisticLivestock.setTextAlignment(RenderText.ALIGN_LEFT)
+	RealisticLivestock.setTextColor(1, 1, 1, 1)
+	RealisticLivestock.setTextFont()
 
 end

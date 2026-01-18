@@ -403,24 +403,24 @@ function Dewar:updateStrawVisuals()
 
 	local parent = I3DUtil.indexToObject(self.shapeNode, "0|1")
 	
-	set3DTextRemoveSpaces(true)
-	setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
-	setTextAlignment(RenderText.ALIGN_CENTER)
-	setTextColor(1, 0.1, 0.1, 1)
-	set3DTextWordsPerLine(1)
-	setTextLineHeightScale(0.75)
-	setTextFont(RealisticLivestock.FONTS.toms_handwritten)
+	RealisticLivestock.set3DTextRemoveSpaces(true)
+	RealisticLivestock.setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
+	RealisticLivestock.setTextAlignment(RenderText.ALIGN_CENTER)
+	RealisticLivestock.setTextColor(1, 0.1, 0.1, 1)
+	RealisticLivestock.set3DTextWordsPerLine(1)
+	RealisticLivestock.setTextLineHeightScale(0.75)
+	RealisticLivestock.setTextFont(RealisticLivestock.FONTS.toms_handwritten)
 
-	if self.texts.straws ~= nil then delete3DLinkedText(self.texts.straws) end
-	self.texts.straws = create3DLinkedText(parent, 0.003, 0.01, 0.003, 0, math.rad(-90), 0, 0.025, string.format("%s %s", self.straws, self.straws == 1 and "straw" or "straws"))
+	if self.texts.straws ~= nil then RealisticLivestock.delete3DLinkedText(self.texts.straws) end
+	self.texts.straws = RealisticLivestock.create3DLinkedText(parent, 0.003, 0.01, 0.003, 0, math.rad(-90), 0, 0.025, string.format("%s %s", self.straws, self.straws == 1 and "straw" or "straws"))
 	
-	set3DTextRemoveSpaces(false)
-	setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BASELINE)
-	setTextAlignment(RenderText.ALIGN_LEFT)
-	setTextColor(1, 1, 1, 1)
-	set3DTextWordsPerLine(0)
-	setTextLineHeightScale(1.1)
-	setTextFont()
+	RealisticLivestock.set3DTextRemoveSpaces(false)
+	RealisticLivestock.setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BASELINE)
+	RealisticLivestock.setTextAlignment(RenderText.ALIGN_LEFT)
+	RealisticLivestock.setTextColor(1, 1, 1, 1)
+	RealisticLivestock.set3DTextWordsPerLine(0)
+	RealisticLivestock.setTextLineHeightScale(1.1)
+	RealisticLivestock.setTextFont()
 
 end
 
@@ -435,25 +435,25 @@ function Dewar:updateAnimalVisuals()
 	local farmId = self.animal.farmId
 	local uniqueId = self.animal.uniqueId
 	
-	set3DTextRemoveSpaces(true)
-	setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
-	setTextAlignment(RenderText.ALIGN_CENTER)
-	setTextColor(1, 0.1, 0.1, 1)
-	set3DTextWordsPerLine(1)
-	setTextLineHeightScale(1.25)
-	setTextFont(RealisticLivestock.FONTS.toms_handwritten)
+	RealisticLivestock.set3DTextRemoveSpaces(true)
+	RealisticLivestock.setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_MIDDLE)
+	RealisticLivestock.setTextAlignment(RenderText.ALIGN_CENTER)
+	RealisticLivestock.setTextColor(1, 0.1, 0.1, 1)
+	RealisticLivestock.set3DTextWordsPerLine(1)
+	RealisticLivestock.setTextLineHeightScale(1.25)
+	RealisticLivestock.setTextFont(RealisticLivestock.FONTS.toms_handwritten)
 
-	if self.texts.animal ~= nil then delete3DLinkedText(self.texts.animal) end
-	self.texts.animal = create3DLinkedText(parent, -0.01, -0.002, 0.008, 0, math.rad(-170), 0, 0.02, string.format("%s %s %s", country, uniqueId, farmId))
+	if self.texts.animal ~= nil then RealisticLivestock.delete3DLinkedText(self.texts.animal) end
+	self.texts.animal = RealisticLivestock.create3DLinkedText(parent, -0.01, -0.002, 0.008, 0, math.rad(-170), 0, 0.02, string.format("%s %s %s", country, uniqueId, farmId))
 
-	set3DTextAutoScale(false)
-	set3DTextRemoveSpaces(false)
-	setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BASELINE)
-	setTextAlignment(RenderText.ALIGN_LEFT)
-	setTextColor(1, 1, 1, 1)
-	set3DTextWordsPerLine(0)
-	setTextLineHeightScale(1.1)
-	setTextFont()
+	RealisticLivestock.set3DTextAutoScale(false)
+	RealisticLivestock.set3DTextRemoveSpaces(false)
+	RealisticLivestock.setTextVerticalAlignment(RenderText.VERTICAL_ALIGN_BASELINE)
+	RealisticLivestock.setTextAlignment(RenderText.ALIGN_LEFT)
+	RealisticLivestock.setTextColor(1, 1, 1, 1)
+	RealisticLivestock.set3DTextWordsPerLine(0)
+	RealisticLivestock.setTextLineHeightScale(1.1)
+	RealisticLivestock.setTextFont()
 
 end
 

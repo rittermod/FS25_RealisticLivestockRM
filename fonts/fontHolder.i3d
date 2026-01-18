@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+
+<i3D name="fontHolder.i3d" version="1.6" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://i3d.giants.ch/schema/i3d-1.6.xsd">
+  <Asset>
+    <Export program="GIANTS Editor 64bit" version="10.0.9"/>
+  </Asset>
+
+  <Files>
+    <File fileId="2" filename="$data/shared/alphabet/font_specular.png"/>
+    <File fileId="3" filename="alphabetShader.xml"/>
+    <File fileId="4" filename="dejavu_sans/dejavu_sans_alpha.dds"/>
+  </Files>
+
+
+  <Materials>
+    <Material name="fontMP_mat" materialId="5" diffuseColor="0.501961 0.501961 0.501961 1" alphaBlending="true" customShaderId="3" shadingRate="1x2">
+      <Glossmap fileId="2"/>
+      <Custommap name="alphaMap" fileId="4"/>
+      <CustomParameter name="widthAndHeight" value="64 4"/>
+    </Material>
+  </Materials>
+
+
+  <Shapes externalShapesFile="fontHolder.i3d.shapes">
+  </Shapes>
+
+  <Scene>
+    <TransformGroup name="fonts" nodeId="8">
+      <TransformGroup name="template" nodeId="9">
+        <Shape name="template" shapeId="1" clipDistance="15" nodeId="10" castsShadows="false" receiveShadows="false" materialIds="5"/>
+      </TransformGroup>
+    </TransformGroup>
+  </Scene>
+
+</i3D>

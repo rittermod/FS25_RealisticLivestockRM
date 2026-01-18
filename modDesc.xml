@@ -26,10 +26,9 @@ v0.2.0.0:
     </description>
     <iconFilename>icon_RealisticLivestock.dds</iconFilename>
     <multiplayer supported="true"/>
-    <dependencies>
-        <dependency version="1.0.0.7">FS25_FontLibrary</dependency>
-    </dependencies>
     <extraSourceFiles>
+        <sourceFile filename="src/fontlib/RmFontCharacter.lua"/>
+        <sourceFile filename="src/fontlib/RmFontManager.lua"/>
         <sourceFile filename="src/gui/MPLoadingScreen.lua"/>
         <sourceFile filename="src/animals/husbandry/cluster/RealisticLivestock_AnimalCluster.lua"/>
         <sourceFile filename="src/animals/husbandry/cluster/RealisticLivestock_AnimalClusterHusbandry.lua"/>

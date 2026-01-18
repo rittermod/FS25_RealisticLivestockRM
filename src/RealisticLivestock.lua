@@ -3,8 +3,58 @@ RealisticLivestock = {}
 local modDirectory = g_currentModDirectory
 local hasLoaded = false
 
+-- Initialize the font manager (inlined from FontLibrary)
+RealisticLivestock.fontManager = RmFontManager.new(g_currentModDirectory)
+RealisticLivestock.FONTS = RealisticLivestock.fontManager:loadFontsFromXMLFile(g_currentModDirectory .. "fonts/fonts.xml", g_currentModDirectory)
 
-RealisticLivestock.FONTS = g_fontManager:loadFontsFromXMLFile(g_currentModDirectory .. "fonts/fonts.xml", g_currentModDirectory)
+-- Expose font functions in mod namespace (no global pollution)
+RealisticLivestock.setTextFont = function(fontName)
+    RealisticLivestock.fontManager:setTextFont(fontName)
+end
+
+RealisticLivestock.setTextColor = function(r, g, b, a)
+    RealisticLivestock.fontManager:setTextColor(r, g, b, a)
+end
+
+RealisticLivestock.setTextAlignment = function(value)
+    RealisticLivestock.fontManager:setTextAlignment(value)
+end
+
+RealisticLivestock.setTextVerticalAlignment = function(value)
+    RealisticLivestock.fontManager:setTextVerticalAlignment(value)
+end
+
+RealisticLivestock.setTextLineHeightScale = function(heightScale)
+    RealisticLivestock.fontManager:setTextLineHeightScale(heightScale)
+end
+
+RealisticLivestock.set3DTextWrapWidth = function(width)
+    RealisticLivestock.fontManager:set3DTextWrapWidth(width)
+end
+
+RealisticLivestock.set3DTextAutoScale = function(autoScale)
+    RealisticLivestock.fontManager:set3DTextAutoScale(autoScale)
+end
+
+RealisticLivestock.set3DTextRemoveSpaces = function(removeSpaces)
+    RealisticLivestock.fontManager:set3DTextRemoveSpaces(removeSpaces)
+end
+
+RealisticLivestock.set3DTextWordsPerLine = function(numWords)
+    RealisticLivestock.fontManager:set3DTextWordsPerLine(numWords)
+end
+
+RealisticLivestock.create3DLinkedText = function(parent, x, y, z, rx, ry, rz, size, text, fontName)
+    return RealisticLivestock.fontManager:create3DLinkedText(parent, x, y, z, rx, ry, rz, size, text, fontName)
+end
+
+RealisticLivestock.delete3DLinkedText = function(node)
+    RealisticLivestock.fontManager:delete3DLinkedText(node)
+end
+
+RealisticLivestock.change3DLinkedTextColour = function(node, r, g, b, a)
+    RealisticLivestock.fontManager:change3DLinkedTextColour(node, r, g, b, a)
+end
 
 
 RealisticLivestock.MARKS = {
