@@ -74,6 +74,9 @@ source(modDirectory .. "scripts/farms/RealisticLivestock_FarmStats.lua")
 -- SECTION 11: Fill Types
 source(modDirectory .. "scripts/fillTypes/RealisticLivestock_FillTypeManager.lua")
 
+-- SECTION 11b: Breeding Mathematics
+source(modDirectory .. "scripts/BreedingMath.lua")
+
 -- SECTION 12: GUI Elements
 source(modDirectory .. "scripts/gui/elements/DoubleOptionSliderElement.lua")
 source(modDirectory .. "scripts/gui/elements/RenderElement.lua")
