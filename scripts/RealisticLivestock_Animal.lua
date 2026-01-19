@@ -2377,8 +2377,10 @@ function Animal:createPregnancy(childNum, month, year, father)
 
     self.isPregnant = true
 
+    local fatherSubTypeIndex
+
     if father == nil then
-        
+
         father = {
             uniqueId = "-1",
             metabolism = 1.0,
@@ -2388,8 +2390,9 @@ function Animal:createPregnancy(childNum, month, year, father)
             productivity = 1.0
         }
 
-        local fatherSubTypeIndex
+        local eligibleFathers = {}
 
+        -- Collect all eligible fathers
         for _, animal in pairs(self.clusterSystem:getAnimals()) do
 
             if animal.gender ~= "male" or animal.isCastrated or animal.genetics.fertility <= 0 or animal:getIdentifiers() == self.fatherId then continue end
@@ -2401,27 +2404,29 @@ function Animal:createPregnancy(childNum, month, year, father)
 
             local animalType = animal.animalTypeIndex
 
-
             local animalSubType = animal:getSubType()
             local maxFertilityMonth = (animalType == AnimalType.COW and 132) or (animalType == AnimalType.SHEEP and 72) or (animalType == AnimalType.HORSE and 300) or (animalType == AnimalType.CHICKEN and 1000) or (animalType == AnimalType.PIG and 48) or 120
             maxFertilityMonth = maxFertilityMonth * animal.genetics.fertility
 
             if animalSubType.reproductionMinAgeMonth ~= nil and animal:getAge() >= animalSubType.reproductionMinAgeMonth and animal:getAge() < maxFertilityMonth then
-
-                fatherSubTypeIndex = animal.subTypeIndex
-
-                father.uniqueId = animal:getIdentifiers()
-                father.metabolism = animal.genetics.metabolism
-                father.quality = animal.genetics.quality
-                father.health = animal.genetics.health
-                father.fertility = animal.genetics.fertility
-                father.productivity = animal.genetics.productivity or nil
-                father.animal = animal
-
-                break
-
+                table.insert(eligibleFathers, animal)
             end
 
+        end
+
+        -- Random selection from eligible fathers
+        if #eligibleFathers > 0 then
+            local selectedFather = eligibleFathers[math.random(1, #eligibleFathers)]
+
+            fatherSubTypeIndex = selectedFather.subTypeIndex
+
+            father.uniqueId = selectedFather:getIdentifiers()
+            father.metabolism = selectedFather.genetics.metabolism
+            father.quality = selectedFather.genetics.quality
+            father.health = selectedFather.genetics.health
+            father.fertility = selectedFather.genetics.fertility
+            father.productivity = selectedFather.genetics.productivity
+            father.animal = selectedFather
         end
 
     end
@@ -2432,43 +2437,6 @@ function Animal:createPregnancy(childNum, month, year, father)
     self:changeReproduction(self:getReproductionDelta())
 
     local genetics = self.genetics
-
-    local motherMetabolism = genetics.metabolism
-    local fatherMetabolism = father.metabolism
-    local minMetabolism = motherMetabolism >= fatherMetabolism and fatherMetabolism or motherMetabolism
-    local maxMetabolism = motherMetabolism < fatherMetabolism and fatherMetabolism or motherMetabolism
-    if maxMetabolism == minMetabolism then maxMetabolism = maxMetabolism + 0.01 end
-
-    local motherMeat = genetics.quality
-    local fatherMeat = father.quality
-    local minMeat = motherMeat >= fatherMeat and fatherMeat or motherMeat
-    local maxMeat = motherMeat < fatherMeat and fatherMeat or motherMeat
-    if maxMeat == minMeat then maxMeat = maxMeat + 0.01 end
-
-    local motherHealth = genetics.health
-    local fatherHealth = father.health
-    local minHealth = motherHealth >= fatherHealth and fatherHealth or motherHealth
-    local maxHealth = motherHealth < fatherHealth and fatherHealth or motherHealth
-    if maxHealth == minHealth then maxHealth = maxHealth + 0.01 end
-
-    local motherFertility = genetics.fertility
-    local fatherFertility = father.fertility
-    local minFertility = motherFertility >= fatherFertility and fatherFertility or motherFertility
-    local maxFertility = motherFertility < fatherFertility and fatherFertility or motherFertility
-    if maxFertility == minFertility then maxFertility = maxFertility + 0.01 end
-
-    local motherProductivity
-    local fatherProductivity
-    local minProductivity
-    local maxProductivity
-
-    if genetics.productivity ~= nil then
-        motherProductivity = genetics.productivity
-        fatherProductivity = father.productivity or 1
-        minProductivity = motherProductivity >= fatherProductivity and fatherProductivity or motherProductivity
-        maxProductivity = motherProductivity < fatherProductivity and fatherProductivity or motherProductivity
-        if maxProductivity == minProductivity then maxProductivity = maxProductivity + 0.01 end
-    end
 
     local mDiseases, fDiseases = self.diseases, father.animal ~= nil and father.animal.diseases or {}
 
@@ -2514,19 +2482,23 @@ function Animal:createPregnancy(childNum, month, year, father)
 
 
         local child = Animal.new(-1, 100, 0, gender, subTypeIndex, 0, false, false, false, nil, nil, self:getIdentifiers(), father.uniqueId)
-                        
-        local metabolism = math.random(minMetabolism * 100, maxMetabolism * 100) / 100
-        local quality = math.random(minMeat * 100, maxMeat * 100) / 100
-        local healthGenetics = math.random(minHealth * 100, maxHealth * 100) / 100
+
+        -- Use BreedingMath for Gaussian genetic inheritance (allows offspring to exceed parent ranges)
+        local metabolism = BreedingMath.breedOffspring(genetics.metabolism, father.metabolism, { sd = BreedingMath.SD_CONST })
+        local quality = BreedingMath.breedOffspring(genetics.quality, father.quality, { sd = BreedingMath.SD_CONST })
+        local healthGenetics = BreedingMath.breedOffspring(genetics.health, father.health, { sd = BreedingMath.SD_CONST })
 
         local fertility = 0
-        
-        if math.random() > 0.001 then fertility = math.random(minFertility * 100, maxFertility * 100) / 100 end
 
+        if math.random() > 0.001 then
+            fertility = BreedingMath.breedOffspring(genetics.fertility, father.fertility, { sd = BreedingMath.SD_CONST })
+        end
 
         local productivity = nil
-                        
-        if genetics.productivity ~= nil then productivity = math.random(minProductivity * 100, maxProductivity * 100) / 100 end
+
+        if genetics.productivity ~= nil then
+            productivity = BreedingMath.breedOffspring(genetics.productivity, father.productivity or 1, { sd = BreedingMath.SD_CONST })
+        end
 
 
         child:setGenetics({
