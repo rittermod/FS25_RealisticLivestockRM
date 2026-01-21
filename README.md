@@ -16,6 +16,8 @@ Main changes from the original mod:
 
 
 ## Changelog
+v0.4.1.0:
+- Fix crash caused by invalid animal root node in some cases.
 
 v0.4.0.0:
 - Remove Font Library dependency by inlining the required functionality directly in the mod.

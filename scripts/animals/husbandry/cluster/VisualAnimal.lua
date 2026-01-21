@@ -45,6 +45,8 @@ end
 function VisualAnimal:load()
 
 	local nodes = self.nodes
+	if nodes.root == nil or nodes.root == 0 then return end
+
 	local visualData = g_currentMission.animalSystem:getVisualByAge(self.animal.subTypeIndex, self.animal.age)
 
 	if visualData.monitor ~= nil then nodes.monitor = I3DUtil.indexToObject(nodes.root, visualData.monitor) end
