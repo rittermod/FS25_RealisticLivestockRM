@@ -2674,6 +2674,7 @@ function Animal:reproduce(spec, day, month, year, isSaleAnimal)
 
     local sellPrices = {}
     local childrenToRemove = {}
+    local deadChildrenCount = 0
     local birthday = self.pregnancy.expected
     local country = isSaleAnimal and self.birthday.country or RealisticLivestock.getMapCountryIndex()
 
@@ -2699,6 +2700,7 @@ function Animal:reproduce(spec, day, month, year, isSaleAnimal)
             animalsToSell = animalsToSell - 1
 
             table.insert(childrenToRemove, i)
+            deadChildrenCount = deadChildrenCount + 1
 
             child.isDead = true
 
@@ -2734,7 +2736,7 @@ function Animal:reproduce(spec, day, month, year, isSaleAnimal)
 
     end
 
-    if #childrenToRemove > 0 and math.random() >= 0.35 + self.genetics.health * 1.25 then parentDied = true end
+    if deadChildrenCount > 0 and math.random() >= 0.35 + self.genetics.health * 1.25 then parentDied = true end
 
 
     table.sort(sellPrices, sortChildSellPrices)
@@ -2803,7 +2805,7 @@ function Animal:reproduce(spec, day, month, year, isSaleAnimal)
 
     if animalsToSell > 0 then self:addMessage("PREGNANCY_SOLD", { animalsToSell, g_i18n:formatMoney(totalAnimalPrice, 2, true, true) }) end
 
-    if #childrenToRemove > 0 then self:addMessage("PREGNANCY_DIED", { #childrenToRemove }) end
+    if deadChildrenCount > 0 then self:addMessage("PREGNANCY_DIED", { deadChildrenCount }) end
 
     if parentDied then self:die("rl_death_pregnancy") end
 
