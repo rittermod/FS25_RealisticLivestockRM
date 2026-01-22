@@ -15,6 +15,7 @@
 		<text name="animal_descriptionBullFeed" text="Бики їдять траву, сіно та TMR."/>
 		<text name="animal_descriptionBullYoung" text="Це бичок."/>
 		<text name="animal_descriptionBullReproduction" text="Бики, які здорові та старші за 12 місяців, можуть розмножуватись."/>
+		<text name="rl_descriptionCowReproduction" text="Корови, які здорові та старші за 12 місяців, можуть розмножуватись."/>
 
 		<!-- ВОДЯНІ БУЙВОЛИ -->
 		<text name="fillType_bull_waterbuffalo" text="Водяний буйвол"/>
@@ -25,6 +26,7 @@
 		<text name="fillType_boar_black_pied" text="Чорно-рябий кабан"/>
 		<text name="fillType_boar_berkshire" text="Кабан породи Беркшир"/>
 		<text name="animal_descriptionBoarReproduction" text="Кабани, які здорові та старші за 8 місяців, можуть розмножуватись."/>
+		<text name="rl_descriptionPigReproduction" text="Свиноматки, які здорові та старші за 6 місяців, можуть розмножуватись."/>
 		<text name="animal_descriptionBoarFeed" text="Кабани їдять майже все. Їх можна годувати кукурудзою, пшеницею, ячменем, ріпаком, соняшником, соєю, картоплею, сорго та цукровими буряками."/>
 		<text name="animal_descriptionBoarYoung" text="Це пацєтко-самець"/>
 
@@ -37,9 +39,11 @@
 		<text name="animal_descriptionRamFeed" text="Барани їдять траву та сіно."/>
 		<text name="animal_descriptionRamYoung" text="Це ягня-самець."/>
 		<text name="animal_descriptionRamReproduction" text="Барани, які здорові та старші за 5 місяців, можуть розмножуватись."/>
+		<text name="rl_descriptionSheepReproduction" text="Вівці, які здорові та старші за 8 місяців, можуть розмножуватись."/>
 
 		<!-- КОЗИ -->
 		<text name="fillType_ram_goat" text="Козел"/>
+		<text name="rl_descriptionGoatReproduction" text="Кози, які здорові та старші за 16 місяців, можуть розмножуватись."/>
 
 		<!-- КОНІ -->
 		<text name="fillType_stallion" text="Жеребець"/>
@@ -54,6 +58,10 @@
 		<text name="animal_descriptionStallionFeed" text="Жеребці їдять сіно, овес і сорго."/>
 		<text name="animal_descriptionStallionProfit" text="Жеребців можна продавати з прибутком."/>
 		<text name="animal_descriptionStallionReproduction" text="Жеребці, які здорові та старші за 36 місяців, можуть розмножуватись."/>
+		<text name="rl_descriptionHorseReproduction" text="Кобили, які здорові та старші за 22 місяців, можуть розмножуватись."/>
+
+		<!-- КУРИ -->
+		<text name="rl_descriptionChickenReproduction" text="Кури, які здорові та старші за 6 місяців, можуть розмножуватись."/>
 
 		<!-- ІНТЕРФЕЙС КОРИСТУВАЧА -->
 		<text name="input_VisualAnimalsDialog" text="Змінити кількість видимих тварин"/>

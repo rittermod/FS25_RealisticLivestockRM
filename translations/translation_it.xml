@@ -14,6 +14,7 @@
 		<text name="animal_descriptionBullFeed" text="I Tori amano l'erba, il fieno e i mangimi a lunga conservazione"/>
         <text name="animal_descriptionBullYoung" text="Questo è un vitello Maschio"/>
         <text name="animal_descriptionBullReproduction" text="I Tori sani e di età superiore ai 12 mesi possono riprodursi"/>
+        <text name="rl_descriptionCowReproduction" text="Le mucche sane e di età superiore ai 12 mesi possono riprodursi."/>
 
         <!-- BUFALI D'ACQUA -->
 
@@ -26,6 +27,7 @@
         <text name="fillType_boar_black_pied" text="Maiale Nero-Piedizzato"/>
         <text name="fillType_boar_berkshire" text="Maiale del Berkshire"/>
         <text name="animal_descriptionBoarReproduction" text="I maiali sani e di età superiore agli 8 mesi possono riprodursi"/>.
+        <text name="rl_descriptionPigReproduction" text="Le scrofe sane e di età superiore ai 6 mesi possono riprodursi."/>
         <text name="animal_descriptionBoarFeed" text="I maiali mangiano quasi tutto. Possono essere nutriti con mais, frumento, orzo, colza, girasoli, soia, patate, sorgo e barbabietole da zucchero"/>
         <text name="animal_descriptionBoarYoung" text="Questo è un Maialino Maschio"/>
 
@@ -39,10 +41,12 @@
         <text name="animal_descriptionRamFeed" text="I Montoni mangiano erba e fieno."/>
         <text name="animal_descriptionRamYoung" text="Questo è un Agnello Maschio"/>
         <text name="animal_descriptionRamReproduction" text="I Montoni sani e di età superiore ai 5 mesi possono riprodursi"/>
+        <text name="rl_descriptionSheepReproduction" text="Le pecore sane e di età superiore agli 8 mesi possono riprodursi."/>
 
         <!-- CAPRE -->
 
         <text name="fillType_ram_goat" text="Capra Montone" />
+        <text name="rl_descriptionGoatReproduction" text="Le capre sane e di età superiore ai 16 mesi possono riprodursi."/>
 
         <!-- CAVALLI -->
 
@@ -58,6 +62,11 @@
         <text name="animal_descriptionStallionFeed" text="Gli Stalloni amano il fieno, l'avena e il sorgo."/>
         <text name="animal_descriptionStallionProfit" text="Gli Stalloni possono essere venduti per ricavarne un profitto."/>
         <text name="animal_descriptionStallionReproduction" text="Gli Stalloni sani e di età superiore ai 36 mesi possono riprodursi."/>
+        <text name="rl_descriptionHorseReproduction" text="Le giumente sane e di età superiore ai 22 mesi possono riprodursi."/>
+
+        <!-- POLLI -->
+
+        <text name="rl_descriptionChickenReproduction" text="Le galline sane e di età superiore ai 6 mesi possono riprodursi."/>
 
         <!-- UI -->
 

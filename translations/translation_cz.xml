@@ -14,6 +14,7 @@
 		<text name="animal_descriptionBullFeed" text="Býci mají rádi trávu, seno a TMR (směsná krmná dávka)."/>
 		<text name="animal_descriptionBullYoung" text="Toto je tele býčka."/>
 		<text name="animal_descriptionBullReproduction" text="Býci, kteří jsou zdraví a starší 12 měsíců, se mohou rozmnožovat."/>
+		<text name="rl_descriptionCowReproduction" text="Krávy, které jsou zdravé a starší 12 měsíců, se mohou rozmnožovat."/>
 
 		<!-- WATER BUFFALOS -->
 
@@ -26,6 +27,7 @@
 		<text name="fillType_boar_black_pied" text="Černostrakatý vepř"/>
 		<text name="fillType_boar_berkshire" text="Vepř plemene Berkshire"/>
 		<text name="animal_descriptionBoarReproduction" text="Vepři, kteří jsou zdraví a starší 8 měsíců, se mohou rozmnožovat."/>
+		<text name="rl_descriptionPigReproduction" text="Prasnice, které jsou zdravé a starší 6 měsíců, se mohou rozmnožovat."/>
 		<text name="animal_descriptionBoarFeed" text="Vepři žerou téměř všechno. Můžete je krmit kukuřicí, pšenicí, ječmenem, řepkou, slunečnicí, sójou, bramborami, čirokem a cukrovou řepou."/>
 		<text name="animal_descriptionBoarYoung" text="Toto je sele vepře."/>
 
@@ -39,10 +41,12 @@
 		<text name="animal_descriptionRamFeed" text="Berani žerou trávu a seno."/>
 		<text name="animal_descriptionRamYoung" text="Toto je jehně berana."/>
 		<text name="animal_descriptionRamReproduction" text="Berani, kteří jsou zdraví a starší 5 měsíců, se mohou rozmnožovat."/>
+		<text name="rl_descriptionSheepReproduction" text="Ovce, které jsou zdravé a starší 8 měsíců, se mohou rozmnožovat."/>
 
 		<!-- GOATS -->
 
 		<text name="fillType_ram_goat" text="Kozel"/>
+		<text name="rl_descriptionGoatReproduction" text="Kozy, které jsou zdravé a starší 16 měsíců, se mohou rozmnožovat."/>
 
 		<!-- HORSES -->
 
@@ -58,6 +62,11 @@
 		<text name="animal_descriptionStallionFeed" text="Hřebci mají rádi seno, oves a čirok."/>
 		<text name="animal_descriptionStallionProfit" text="Hřebci se dají prodat se ziskem."/>
 		<text name="animal_descriptionStallionReproduction" text="Hřebci, kteří jsou zdraví a starší 36 měsíců, se mohou rozmnožovat."/>
+		<text name="rl_descriptionHorseReproduction" text="Klisny, které jsou zdravé a starší 22 měsíců, se mohou rozmnožovat."/>
+
+		<!-- SLEPICE -->
+
+		<text name="rl_descriptionChickenReproduction" text="Slepice, které jsou zdravé a starší 6 měsíců, se mohou rozmnožovat."/>
 
 
 		<!-- UI -->

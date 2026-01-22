@@ -14,6 +14,7 @@
 		<text name="animal_descriptionBullFeed" text="Boğalar çim, kuru ot ve TKT'yi sever."/>
 		<text name="animal_descriptionBullYoung" text="Bu bir erkek buzağı."/>
 		<text name="animal_descriptionBullReproduction" text="Sağlıklı ve 12 aydan büyük boğalar üreyebilir."/>
+		<text name="rl_descriptionCowReproduction" text="Sağlıklı ve 12 aydan büyük inekler üreyebilir."/>
 
 		<!-- WATER BUFFALOS -->
 
@@ -26,6 +27,7 @@
 		<text name="fillType_boar_black_pied" text="Black-Pied Erkek Domuz"/>
 		<text name="fillType_boar_berkshire" text="Berkshire Erkek Domuz"/>
 		<text name="animal_descriptionBoarReproduction" text="Sağlıklı ve 8 aydan büyük olan domuzlar üreyebilir."/>
+		<text name="rl_descriptionPigReproduction" text="Sağlıklı ve 6 aydan büyük dişi domuzlar üreyebilir."/>
 		<text name="animal_descriptionBoarFeed" text="Domuzlar neredeyse her şeyi yerler. Onları mısır, buğday, arpa, kanola, ayçiçeği, soya fasulyesi, patates, sorgum ve şeker pancarı ile besleyebilirsiniz."/>
 		<text name="animal_descriptionBoarYoung" text="Bu bir erkek domuz yavrusu."/>
 
@@ -39,11 +41,13 @@
 		<text name="animal_descriptionRamFeed" text="Koçlar çim ve kuru ot yer."/>
 		<text name="animal_descriptionRamYoung" text="Bu bir erkek kuzu."/>
 		<text name="animal_descriptionRamReproduction" text="Sağlıklı ve 5 aydan büyük koçlar üreyebilir."/>
+		<text name="rl_descriptionSheepReproduction" text="Sağlıklı ve 8 aydan büyük koyunlar üreyebilir."/>
 
 		<!-- GOATS -->
 
 		<text name="fillType_ram_goat" text="Erkek Keçi"/>
-		
+		<text name="rl_descriptionGoatReproduction" text="Sağlıklı ve 16 aydan büyük dişi keçiler üreyebilir."/>
+
 		<!-- HORSES -->
 		
 		<text name="fillType_stallion" text="Aygır"/>
@@ -58,6 +62,11 @@
 		<text name="animal_descriptionStallionFeed" text="Aygırlar kuru ot, yulaf ve sorgumu sever."/>
 		<text name="animal_descriptionStallionProfit" text="Aygırlar kâr amacıyla satılabilir."/>
 		<text name="animal_descriptionStallionReproduction" text="Sağlıklı ve 36 aydan büyük aygırlar üreyebilir."/>
+		<text name="rl_descriptionHorseReproduction" text="Sağlıklı ve 22 aydan büyük kısraklar üreyebilir."/>
+
+		<!-- TAVUKLAR -->
+
+		<text name="rl_descriptionChickenReproduction" text="Sağlıklı ve 6 aydan büyük tavuklar üreyebilir."/>
 
 
         <!-- UI -->

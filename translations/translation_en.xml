@@ -14,6 +14,7 @@
 		<text name="animal_descriptionBullFeed" text="Bulls like grass, hay and TMR."/>
 		<text name="animal_descriptionBullYoung" text="This is a male calf."/>
 		<text name="animal_descriptionBullReproduction" text="Bulls that are healthy and older than 12 months can reproduce."/>
+		<text name="rl_descriptionCowReproduction" text="Cows that are healthy and older than 12 months can reproduce."/>
 
 		<!-- WATER BUFFALOS -->
 
@@ -26,6 +27,7 @@
 		<text name="fillType_boar_black_pied" text="Black-Pied Boar"/>
 		<text name="fillType_boar_berkshire" text="Berkshire Boar"/>
 		<text name="animal_descriptionBoarReproduction" text="Boars that are healthy and older than 8 months can reproduce."/>
+		<text name="rl_descriptionPigReproduction" text="Sows that are healthy and older than 6 months can reproduce."/>
 		<text name="animal_descriptionBoarFeed" text="Boars eat nearly anything. You can feed them corn, wheat, barley, canola, sunflowers, soybeans, potatoes, sorghum and sugar beets."/>
 		<text name="animal_descriptionBoarYoung" text="This is a male piglet."/>
 
@@ -39,10 +41,12 @@
 		<text name="animal_descriptionRamFeed" text="Rams eat grass and hay."/>
 		<text name="animal_descriptionRamYoung" text="This is a male lamb."/>
 		<text name="animal_descriptionRamReproduction" text="Rams that are healthy and older than 5 months can reproduce."/>
+		<text name="rl_descriptionSheepReproduction" text="Ewes that are healthy and older than 8 months can reproduce."/>
 
 		<!-- GOATS -->
 
 		<text name="fillType_ram_goat" text="Goat Ram"/>
+		<text name="rl_descriptionGoatReproduction" text="Female goats that are healthy and older than 16 months can reproduce."/>
 
 		<!-- HORSES -->
 
@@ -58,6 +62,11 @@
 		<text name="animal_descriptionStallionFeed" text="Stallions like hay, oat and sorghum."/>
 		<text name="animal_descriptionStallionProfit" text="Stallions can be sold for a profit."/>
 		<text name="animal_descriptionStallionReproduction" text="Stallions that are healthy and older than 36 months can reproduce."/>
+		<text name="rl_descriptionHorseReproduction" text="Mares that are healthy and older than 22 months can reproduce."/>
+
+		<!-- CHICKENS -->
+
+		<text name="rl_descriptionChickenReproduction" text="Hens that are healthy and older than 6 months can reproduce."/>
 
 
 		<!-- UI -->

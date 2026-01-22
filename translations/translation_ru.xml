@@ -14,6 +14,7 @@
 		<text name="animal_descriptionBullFeed" text="Быки любят траву, сено и TMR."/>
 		<text name="animal_descriptionBullYoung" text="Это теленок-самец."/>
 		<text name="animal_descriptionBullReproduction" text="Быки, которые здоровы и старше 12 месяцев, могут размножаться."/>
+		<text name="rl_descriptionCowReproduction" text="Коровы, которые здоровы и старше 12 месяцев, могут размножаться."/>
 
 		<!-- ВОДЯНЫЕ БУЙВОЛЫ -->
 
@@ -26,6 +27,7 @@
 		<text name="fillType_boar_black_pied" text="Черно-пегий хряк"/>
 		<text name="fillType_boar_berkshire" text="Беркширский хряк"/>
 		<text name="animal_descriptionBoarReproduction" text="Хряки, которые здоровы и старше 8 месяцев, могут размножаться."/>
+		<text name="rl_descriptionPigReproduction" text="Свиноматки, которые здоровы и старше 6 месяцев, могут размножаться."/>
 		<text name="animal_descriptionBoarFeed" text="Хряки едят почти всё. Вы можете кормить их кукурузой, пшеницей, ячменем, рапсом, подсолнечником, соей, картофелем, сорго и сахарной свеклой."/>
 		<text name="animal_descriptionBoarYoung" text="Это поросенок-самец."/>
 
@@ -39,10 +41,12 @@
 		<text name="animal_descriptionRamFeed" text="Бараны едят траву и сено."/>
 		<text name="animal_descriptionRamYoung" text="Это ягненок-самец."/>
 		<text name="animal_descriptionRamReproduction" text="Бараны, которые здоровы и старше 5 месяцев, могут размножаться."/>
+		<text name="rl_descriptionSheepReproduction" text="Овцы, которые здоровы и старше 8 месяцев, могут размножаться."/>
 
 		<!-- КОЗЫ -->
 
 		<text name="fillType_ram_goat" text="Козел"/>
+		<text name="rl_descriptionGoatReproduction" text="Козы, которые здоровы и старше 16 месяцев, могут размножаться."/>
 
 		<!-- ЛОШАДИ -->
 
@@ -58,6 +62,11 @@
 		<text name="animal_descriptionStallionFeed" text="Жеребцы любят сено, овес и сорго."/>
 		<text name="animal_descriptionStallionProfit" text="Жеребцов можно продать с прибылью."/>
 		<text name="animal_descriptionStallionReproduction" text="Жеребцы, которые здоровы и старше 36 месяцев, могут размножаться."/>
+		<text name="rl_descriptionHorseReproduction" text="Кобылы, которые здоровы и старше 22 месяцев, могут размножаться."/>
+
+		<!-- КУРЫ -->
+
+		<text name="rl_descriptionChickenReproduction" text="Куры, которые здоровы и старше 6 месяцев, могут размножаться."/>
 
 		<!-- ИНТЕРФЕЙС -->
 

@@ -14,6 +14,7 @@
 		<text name="animal_descriptionBullFeed" text="Touros gostam de capim, feno e RMT."/>
 		<text name="animal_descriptionBullYoung" text="Este é um bezerro masculino."/>
 		<text name="animal_descriptionBullReproduction" text="Touros que são saudáveis ​​e mais velhos que 12 meses podem reproduzir."/>
+		<text name="rl_descriptionCowReproduction" text="Vacas que são saudáveis e mais velhas que 12 meses podem reproduzir."/>
 
 		<!-- BÚFALO-ASIÁTICO -->
 
@@ -26,6 +27,7 @@
 		<text name="fillType_boar_black_pied" text="Porco Black-Pied"/>
 		<text name="fillType_boar_berkshire" text="Porco Berkshire"/>
 		<text name="animal_descriptionBoarReproduction" text="Porcos que são saudáveis e mais velhos que 8 meses podem reproduzir."/>
+		<text name="rl_descriptionPigReproduction" text="Porcas que são saudáveis e mais velhas que 6 meses podem reproduzir."/>
 		<text name="animal_descriptionBoarFeed" text="Porcos comem quase tudo. Você pode alimentá-los com milho, trigo, cevada, canola, girassóis, soja, batatas, sorgo e beterraba-sacarina."/>
 		<text name="animal_descriptionBoarYoung" text="Este é um leitão."/>
 
@@ -39,11 +41,13 @@
 		<text name="animal_descriptionRamFeed" text="Carneiros comem capim e feno."/>
 		<text name="animal_descriptionRamYoung" text="Este é um cordeiro macho."/>
 		<text name="animal_descriptionRamReproduction" text="Carneiros que são saudáveis e mais velhos que 5 meses podem reproduzir."/>
+		<text name="rl_descriptionSheepReproduction" text="Ovelhas que são saudáveis e mais velhas que 8 meses podem reproduzir."/>
 
 		<!-- CABRA -->
 
 		<text name="fillType_ram_goat" text="Cabra"/>
-		
+		<text name="rl_descriptionGoatReproduction" text="Cabras fêmeas que são saudáveis e mais velhas que 16 meses podem reproduzir."/>
+
 		<!-- CAVALOS -->
 		
 		<text name="fillType_stallion" text="Garanhão"/>
@@ -58,6 +62,11 @@
 		<text name="animal_descriptionStallionFeed" text="Garanhões gostam de feno, aveia e sorgo."/>
 		<text name="animal_descriptionStallionProfit" text="Garanhões podem ser vendido com lucro."/>
 		<text name="animal_descriptionStallionReproduction" text="Garanhões que são saudáveis e mais velhos que 36 meses podem reproduzir."/>
+		<text name="rl_descriptionHorseReproduction" text="Éguas que são saudáveis e mais velhas que 22 meses podem reproduzir."/>
+
+		<!-- GALINHAS -->
+
+		<text name="rl_descriptionChickenReproduction" text="Galinhas que são saudáveis e mais velhas que 6 meses podem reproduzir."/>
 
 
     <!-- UI -->

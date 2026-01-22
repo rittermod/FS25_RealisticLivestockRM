@@ -23,27 +23,27 @@
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionCowYoung</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="6" visualAnimalIndex="9" image="$dataS/character/animals/domesticated/cow/store_cowSwissBrownKid.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" marker="0|0|0|4">
 					<description>$l10n_animal_descriptionCowMilk</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="12" visualAnimalIndex="1" image="$dataS/character/animals/domesticated/cow/store_cowSwissBrown.png" canBeBought="false" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" noseRing="0|0|0|0|0|0|0|0|0|7" bumId="0|0|0|6" marker="0|0|0|7">
 					<description>$l10n_animal_descriptionCowMilk</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="18" visualAnimalIndex="1" image="$dataS/character/animals/domesticated/cow/store_cowSwissBrown.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" noseRing="0|0|0|0|0|0|0|0|0|7" bumId="0|0|0|6" marker="0|0|0|7">
 					<description>$l10n_animal_descriptionCowMilk</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="12" durationMonth="10" minHealthFactor="0.75"/>
@@ -172,27 +172,27 @@
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionCowYoung</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="6" visualAnimalIndex="10" image="$dataS/character/animals/domesticated/cow/store_cowHolsteinKid.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" marker="0|0|0|4">
 					<description>$l10n_animal_descriptionCowMilk</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="12" visualAnimalIndex="2" image="$dataS/character/animals/domesticated/cow/store_cowHolstein.png" canBeBought="false" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" noseRing="0|0|0|0|0|0|0|0|0|7" bumId="0|0|0|6" marker="0|0|0|7">
 					<description>$l10n_animal_descriptionCowMilk</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="18" visualAnimalIndex="2" image="$dataS/character/animals/domesticated/cow/store_cowHolstein.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" noseRing="0|0|0|0|0|0|0|0|0|7" bumId="0|0|0|6" marker="0|0|0|7">
 					<description>$l10n_animal_descriptionCowMilk</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="12" durationMonth="10" minHealthFactor="0.75"/>
@@ -322,27 +322,27 @@
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionCowYoung</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="6" visualAnimalIndex="11" name="$l10n_animal_visual_kid" image="$dataS/character/animals/domesticated/cow/store_cowAngusKid.png" monitor="0|0|0|0|0|0|0|0|0|1|0|1" canBeBought="true" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" marker="0|0|0|4">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="12" visualAnimalIndex="3" name="$l10n_animal_visual_adult" image="$dataS/character/animals/domesticated/cow/store_cowAngus.png" canBeBought="false" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" noseRing="0|0|0|0|0|0|0|0|0|7" bumId="0|0|0|6" marker="0|0|0|7">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="18" visualAnimalIndex="3" name="$l10n_animal_visual_adult" image="$dataS/character/animals/domesticated/cow/store_cowAngus.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" noseRing="0|0|0|0|0|0|0|0|0|7" bumId="0|0|0|6" marker="0|0|0|7">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="12" durationMonth="10" minHealthFactor="0.75"/>
@@ -471,27 +471,27 @@
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionCowYoung</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="6" visualAnimalIndex="12" name="$l10n_animal_visual_kid" image="$dataS/character/animals/domesticated/cow/store_cowLimousinKid.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" marker="0|0|0|4">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="12" visualAnimalIndex="4" name="$l10n_animal_visual_adult" image="$dataS/character/animals/domesticated/cow/store_cowLimousin.png" canBeBought="false" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" noseRing="0|0|0|0|0|0|0|0|0|7" bumId="0|0|0|6" marker="0|0|0|7">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="18" visualAnimalIndex="4" name="$l10n_animal_visual_adult" image="$dataS/character/animals/domesticated/cow/store_cowLimousin.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" noseRing="0|0|0|0|0|0|0|0|0|7" bumId="0|0|0|6" marker="0|0|0|7">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="12" durationMonth="10" minHealthFactor="0.75"/>
@@ -620,27 +620,27 @@
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionCowYoung</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="6" visualAnimalIndex="17" name="$l10n_animal_visual_kid" image="$dataS/character/animals/domesticated/cow/store_cowLimousinKid.png" monitor="0|0|0|0|0|0|0|0|0|1|0|1" canBeBought="true" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" marker="0|0|0|4">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="12" visualAnimalIndex="16" name="$l10n_animal_visual_adult" image="$dataS/character/animals/domesticated/cow/store_cowLimousin.png" canBeBought="false" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" noseRing="0|0|0|0|0|0|0|0|0|7" bumId="0|0|0|6" marker="0|0|0|7">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="18" visualAnimalIndex="16" name="$l10n_animal_visual_adult" image="$dataS/character/animals/domesticated/cow/store_cowLimousin.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0" noseRing="0|0|0|0|0|0|0|0|0|7" bumId="0|0|0|6" marker="0|0|0|7">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="12" durationMonth="10" minHealthFactor="0.75"/>
@@ -769,27 +769,27 @@
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionBuffaloYoung</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="6" visualAnimalIndex="20" name="$l10n_animal_visual_kid" image="$dataS/character/animals/domesticated/cow/store_highlandCattleKid.png" canBeBought="true">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="12" visualAnimalIndex="21" name="$l10n_animal_visual_adult" image="$dataS/character/animals/domesticated/cow/store_highlandCattle.png" canBeBought="false">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 				<visual minAge="18" visualAnimalIndex="21" name="$l10n_animal_visual_adult" image="$dataS/character/animals/domesticated/cow/store_highlandCattle.png" canBeBought="true">
 					<description>$l10n_animal_descriptionCowProfit</description>
 					<description>$l10n_animal_descriptionCowFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionCowReproduction</description>
+					<description>$l10n_rl_descriptionCowReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="12" durationMonth="10" minHealthFactor="0.75"/>
@@ -1076,21 +1076,21 @@
 					<description>$l10n_animal_descriptionPigFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionPigYoung</description>
-					<description>$l10n_animal_descriptionPigReproduction</description>
+					<description>$l10n_rl_descriptionPigReproduction</description>
 				</visual>
 				<visual minAge="3" visualAnimalIndex="2" image="$dataS/character/animals/domesticated/pig/store_pigLandraceKid.png" canBeBought="true" monitor="0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionPigProfit</description>
 					<description>$l10n_animal_descriptionPigFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionPigYoung</description>
-					<description>$l10n_animal_descriptionPigReproduction</description>
+					<description>$l10n_rl_descriptionPigReproduction</description>
 				</visual>
 				<visual minAge="6" visualAnimalIndex="3" image="$dataS/character/animals/domesticated/pig/store_pigLandrace.png" canBeBought="false" monitor="0|0|0|0|0|0|0|0|0|0|1|0|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|0|1|0|0|0" earTagRight="0|0|0|0|0|0|0|0|0|0|2|0|0|0">
 					<description>$l10n_animal_descriptionPigProfit</description>
 					<description>$l10n_animal_descriptionPigFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionPigReproduction</description>
+					<description>$l10n_rl_descriptionPigReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="6" durationMonth="4" minHealthFactor="0.75"/>
@@ -1205,21 +1205,21 @@
 					<description>$l10n_animal_descriptionPigFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionPigYoung</description>
-					<description>$l10n_animal_descriptionPigReproduction</description>
+					<description>$l10n_rl_descriptionPigReproduction</description>
 				</visual>
 				<visual minAge="3" visualAnimalIndex="5" image="$dataS/character/animals/domesticated/pig/store_pigBlackPiedKid.png" canBeBought="true" monitor="0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionPigProfit</description>
 					<description>$l10n_animal_descriptionPigFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionPigYoung</description>
-					<description>$l10n_animal_descriptionPigReproduction</description>
+					<description>$l10n_rl_descriptionPigReproduction</description>
 				</visual>
 				<visual minAge="6" visualAnimalIndex="6" image="$dataS/character/animals/domesticated/pig/store_pigBlackPied.png" canBeBought="false" monitor="0|0|0|0|0|0|0|0|0|0|1|0|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|0|1|0|0|0" earTagRight="0|0|0|0|0|0|0|0|0|0|2|0|0|0">
 					<description>$l10n_animal_descriptionPigProfit</description>
 					<description>$l10n_animal_descriptionPigFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionPigReproduction</description>
+					<description>$l10n_rl_descriptionPigReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="6" durationMonth="4" minHealthFactor="0.75"/>
@@ -1334,21 +1334,21 @@
 					<description>$l10n_animal_descriptionPigFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionPigYoung</description>
-					<description>$l10n_animal_descriptionPigReproduction</description>
+					<description>$l10n_rl_descriptionPigReproduction</description>
 				</visual>
 				<visual minAge="3" visualAnimalIndex="8" image="$dataS/character/animals/domesticated/pig/store_pigBerkshireKid.png" canBeBought="true" monitor="0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionPigProfit</description>
 					<description>$l10n_animal_descriptionPigFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionPigYoung</description>
-					<description>$l10n_animal_descriptionPigReproduction</description>
+					<description>$l10n_rl_descriptionPigReproduction</description>
 				</visual>
 				<visual minAge="6" visualAnimalIndex="9" image="$dataS/character/animals/domesticated/pig/store_pigBerkshire.png" canBeBought="false" monitor="0|0|0|0|0|0|0|0|0|0|1|0|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|0|1|0|0|0" earTagRight="0|0|0|0|0|0|0|0|0|0|2|0|0|0">
 					<description>$l10n_animal_descriptionPigProfit</description>
 					<description>$l10n_animal_descriptionPigFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionPigReproduction</description>
+					<description>$l10n_rl_descriptionPigReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="6" durationMonth="4" minHealthFactor="0.75"/>
@@ -1480,21 +1480,21 @@
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionSheepYoung</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 				<visual minAge="3" visualAnimalIndex="2" image="$dataS/character/animals/domesticated/sheep/store_sheepLandraceKid.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionSheepProfit</description>
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionSheepYoung</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 				<visual minAge="8" visualAnimalIndex="3" image="$dataS/character/animals/domesticated/sheep/store_sheepLandrace.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionSheepProfit</description>
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="8" durationMonth="5" minHealthFactor="0.75"/>
@@ -1613,21 +1613,21 @@
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionSheepYoung</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 				<visual minAge="3" visualAnimalIndex="5" image="$dataS/character/animals/domesticated/sheep/store_sheepSteinschafKid.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionSheepProfit</description>
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionSheepYoung</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 				<visual minAge="8" visualAnimalIndex="6" image="$dataS/character/animals/domesticated/sheep/store_sheepSteinschaf.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionSheepProfit</description>
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="8" durationMonth="5" minHealthFactor="0.75"/>
@@ -1746,21 +1746,21 @@
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionSheepYoung</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 				<visual minAge="3" visualAnimalIndex="8" image="$dataS/character/animals/domesticated/sheep/store_sheepSwissMountainKid.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionSheepProfit</description>
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionSheepYoung</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 				<visual minAge="8" visualAnimalIndex="9" image="$dataS/character/animals/domesticated/sheep/store_sheepSwissMountain.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionSheepProfit</description>
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="8" durationMonth="5" minHealthFactor="0.75"/>
@@ -1879,21 +1879,21 @@
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionSheepYoung</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 				<visual minAge="3" visualAnimalIndex="11" image="$dataS/character/animals/domesticated/sheep/store_sheepBlackWelshKid.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionSheepProfit</description>
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionSheepYoung</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 				<visual minAge="8" visualAnimalIndex="12" image="$dataS/character/animals/domesticated/sheep/store_sheepBlackWelsh.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionSheepProfit</description>
 					<description>$l10n_animal_descriptionSheepFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionSheepReproduction</description>
+					<description>$l10n_rl_descriptionSheepReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="8" durationMonth="5" minHealthFactor="0.75"/>
@@ -2012,21 +2012,21 @@
 					<description>$l10n_animal_descriptionGoatFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionSheepYoung</description>
-					<description>$l10n_animal_descriptionGoatReproduction</description>
+					<description>$l10n_rl_descriptionGoatReproduction</description>
 				</visual>
 				<visual minAge="3" visualAnimalIndex="14" image="$dataS/character/animals/domesticated/goat/store_goatKid.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionGoatProfit</description>
 					<description>$l10n_animal_descriptionGoatFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionSheepYoung</description>
-					<description>$l10n_animal_descriptionGoatReproduction</description>
+					<description>$l10n_rl_descriptionGoatReproduction</description>
 				</visual>
 				<visual minAge="12" visualAnimalIndex="15" image="$dataS/character/animals/domesticated/goat/store_goat.png" canBeBought="true" monitor="0|0|0|0|0|0|0|0|0|1|0|1" earTagLeft="0|0|0|0|0|0|0|0|0|1|0|0" earTagRight="0|0|0|0|0|0|0|0|0|2|0|0">
 					<description>$l10n_animal_descriptionGoatProfit</description>
 					<description>$l10n_animal_descriptionGoatFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionGoatReproduction</description>
+					<description>$l10n_rl_descriptionGoatReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="16" durationMonth="5" minHealthFactor="0.75"/>
@@ -2152,7 +2152,7 @@
 					<description>$l10n_animal_descriptionHorseFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionHorseRiding</description>
-					<description>$l10n_animal_descriptionHorseReproduction</description>
+					<description>$l10n_rl_descriptionHorseReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="22" durationMonth="11" minHealthFactor="0.75"/>
@@ -2246,7 +2246,7 @@
 					<description>$l10n_animal_descriptionHorseFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionHorseRiding</description>
-					<description>$l10n_animal_descriptionHorseReproduction</description>
+					<description>$l10n_rl_descriptionHorseReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="22" durationMonth="11" minHealthFactor="0.75"/>
@@ -2340,7 +2340,7 @@
 					<description>$l10n_animal_descriptionHorseFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionHorseRiding</description>
-					<description>$l10n_animal_descriptionHorseReproduction</description>
+					<description>$l10n_rl_descriptionHorseReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="22" durationMonth="11" minHealthFactor="0.75"/>
@@ -2434,7 +2434,7 @@
 					<description>$l10n_animal_descriptionHorseFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionHorseRiding</description>
-					<description>$l10n_animal_descriptionHorseReproduction</description>
+					<description>$l10n_rl_descriptionHorseReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="22" durationMonth="11" minHealthFactor="0.75"/>
@@ -2528,7 +2528,7 @@
 					<description>$l10n_animal_descriptionHorseFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionHorseRiding</description>
-					<description>$l10n_animal_descriptionHorseReproduction</description>
+					<description>$l10n_rl_descriptionHorseReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="22" durationMonth="11" minHealthFactor="0.75"/>
@@ -2622,7 +2622,7 @@
 					<description>$l10n_animal_descriptionHorseFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionHorseRiding</description>
-					<description>$l10n_animal_descriptionHorseReproduction</description>
+					<description>$l10n_rl_descriptionHorseReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="22" durationMonth="11" minHealthFactor="0.75"/>
@@ -2716,7 +2716,7 @@
 					<description>$l10n_animal_descriptionHorseFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionHorseRiding</description>
-					<description>$l10n_animal_descriptionHorseReproduction</description>
+					<description>$l10n_rl_descriptionHorseReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="22" durationMonth="11" minHealthFactor="0.75"/>
@@ -2810,7 +2810,7 @@
 					<description>$l10n_animal_descriptionHorseFeed</description>
 					<description>$l10n_animal_descriptionWater</description>
 					<description>$l10n_animal_descriptionHorseRiding</description>
-					<description>$l10n_animal_descriptionHorseReproduction</description>
+					<description>$l10n_rl_descriptionHorseReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="22" durationMonth="11" minHealthFactor="0.75"/>
@@ -2921,13 +2921,13 @@
 					<description>$l10n_animal_descriptionChickenProfit</description>
 					<description>$l10n_animal_descriptionChickenFeed</description>
 					<description>$l10n_animal_descriptionChickenYoung</description>
-					<description>$l10n_animal_descriptionChickenReproduction</description>
+					<description>$l10n_rl_descriptionChickenReproduction</description>
 				</visual>
 				<visual minAge="6" visualAnimalIndex="1" image="$dataS/character/animals/domesticated/chicken/store_chickenHen.png" canBeBought="true">
 					<description>$l10n_animal_descriptionChickenProfit</description>
 					<description>$l10n_animal_descriptionChickenFeed</description>
 					<description>$l10n_animal_descriptionMature</description>
-					<description>$l10n_animal_descriptionChickenReproduction</description>
+					<description>$l10n_rl_descriptionChickenReproduction</description>
 				</visual>
 			</visuals>
 			<reproduction minAgeMonth="6" durationMonth="2" minHealthFactor="0.75"/>
@@ -2978,7 +2978,7 @@
 					<description>$l10n_animal_descriptionChickenRooster</description>
 					<description>$l10n_animal_descriptionChickenFeed</description>
 					<description>$l10n_animal_descriptionChickenYoung</description>
-					<description>$l10n_animal_descriptionChickenReproduction</description>
+					<description>$l10n_rl_descriptionChickenReproduction</description>
 				</visual>
 				<visual minAge="6" visualAnimalIndex="2" image="$dataS/character/animals/domesticated/chicken/store_chickenRooster.png" canBeBought="true">
 					<description>$l10n_animal_descriptionChickenRooster</description>

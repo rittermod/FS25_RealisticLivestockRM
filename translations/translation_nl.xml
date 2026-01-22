@@ -14,6 +14,7 @@
 		<text name="animal_descriptionBullFeed" text="Stieren houden van gras, hooi and CGR."/>
 		<text name="animal_descriptionBullYoung" text="Dit is een mannelijk kalf."/>
 		<text name="animal_descriptionBullReproduction" text="Stieren die gezond zijn en ouder dan 12 maanden kunnen zich voortplanten."/>
+		<text name="rl_descriptionCowReproduction" text="Koeien die gezond zijn en ouder dan 12 maanden kunnen zich voortplanten."/>
 
 		<!-- WATER BUFFALOS -->
 
@@ -26,6 +27,7 @@
 		<text name="fillType_boar_black_pied" text="Bentheimer Zwijn"/>
 		<text name="fillType_boar_berkshire" text="Berkshire Zwijn"/>
 		<text name="animal_descriptionBoarReproduction" text="Zwijnen die gezond zijn en ouder dan 8 maanden kunnen zich voortplanten."/>
+		<text name="rl_descriptionPigReproduction" text="Zeugen die gezond zijn en ouder dan 6 maanden kunnen zich voortplanten."/>
 		<text name="animal_descriptionBoarFeed" text="Zwijnen eten bijna alles: maïs, tarwe, gerst, koolzaad, zonnebloemen, sojabonen, aardappelen en suikerbieten."/>
 		<text name="animal_descriptionBoarYoung" text="Dit is een mannelijk biggetje"/>
 
@@ -39,10 +41,12 @@
 		<text name="animal_descriptionRamFeed" text="Rammen eten gras en hooi."/>
 		<text name="animal_descriptionRamYoung" text="Dit is een mannelijk lammetje."/>
 		<text name="animal_descriptionRamReproduction" text="Rammen die gezond zijn en ouder dan 5 maanden kunnen zich voortplanten."/>
+		<text name="rl_descriptionSheepReproduction" text="Ooien die gezond zijn en ouder dan 8 maanden kunnen zich voortplanten."/>
 
 		<!-- GOATS -->
 
 		<text name="fillType_ram_goat" text="Bok"/>
+		<text name="rl_descriptionGoatReproduction" text="Geiten die gezond zijn en ouder dan 16 maanden kunnen zich voortplanten."/>
 
 		<!-- HORSES -->
 
@@ -58,6 +62,11 @@
 		<text name="animal_descriptionStallionFeed" text="Hengsten houden van hooi, haver en sorghum."/>
 		<text name="animal_descriptionStallionProfit" text="Je kunt hengsten verkopen voor winst."/>
 		<text name="animal_descriptionStallionReproduction" text="Hengsten die gezond zijn en ouder dan 36 maanden kunnen zich voortplanten."/>
+		<text name="rl_descriptionHorseReproduction" text="Merries die gezond zijn en ouder dan 22 maanden kunnen zich voortplanten."/>
+
+		<!-- KIPPEN -->
+
+		<text name="rl_descriptionChickenReproduction" text="Kippen die gezond zijn en ouder dan 6 maanden kunnen zich voortplanten."/>
 
 
 		<!-- UI -->

@@ -14,6 +14,7 @@
         <text name="animal_descriptionBullFeed" text="Tyre kan lide græs, hø og TMR."/>
         <text name="animal_descriptionBullYoung" text="Dette er en han-kalv."/>
         <text name="animal_descriptionBullReproduction" text="Tyre, der er raske og ældre end 12 måneder, kan reproducere."/>
+        <text name="rl_descriptionCowReproduction" text="Køer, der er raske og ældre end 12 måneder, kan reproducere."/>
 
         <!-- VANDBUFALOER -->
 
@@ -26,6 +27,7 @@
         <text name="fillType_boar_black_pied" text="Sort-fodet Orne"/>
         <text name="fillType_boar_berkshire" text="Berkshire Orne"/>
         <text name="animal_descriptionBoarReproduction" text="Orner, der er raske og ældre end 8 måneder, kan reproducere."/>
+        <text name="rl_descriptionPigReproduction" text="Søer, der er raske og ældre end 6 måneder, kan reproducere."/>
         <text name="animal_descriptionBoarFeed" text="Orner spiser næsten alt. Du kan fodre dem med majs, hvede, byg, raps, solsikker, sojabønner, kartofler, sorghum og sukkerroer."/>
         <text name="animal_descriptionBoarYoung" text="Dette er en han-grisling."/>
 
@@ -39,10 +41,12 @@
         <text name="animal_descriptionRamFeed" text="Vædre spiser græs og hø."/>
         <text name="animal_descriptionRamYoung" text="Dette er en han-lam."/>
         <text name="animal_descriptionRamReproduction" text="Vædre, der er raske og ældre end 5 måneder, kan reproducere."/>
+        <text name="rl_descriptionSheepReproduction" text="Får, der er raske og ældre end 8 måneder, kan reproducere."/>
 
         <!-- Geder -->
 
         <text name="fillType_ram_goat" text="Ged Væder"/>
+        <text name="rl_descriptionGoatReproduction" text="Geder, der er raske og ældre end 16 måneder, kan reproducere."/>
 
         <!-- HESTE -->
 
@@ -58,6 +62,11 @@
         <text name="animal_descriptionStallionFeed" text="Hingste kan lide hø, havre og sorghum."/>
         <text name="animal_descriptionStallionProfit" text="Hingste kan sælges for profit."/>
         <text name="animal_descriptionStallionReproduction" text="Hingste, der er sunde og ældre end 36 måneder, kan reproducere."/>
+        <text name="rl_descriptionHorseReproduction" text="Hopper, der er raske og ældre end 22 måneder, kan reproducere."/>
+
+        <!-- HØNS -->
+
+        <text name="rl_descriptionChickenReproduction" text="Høner, der er raske og ældre end 6 måneder, kan reproducere."/>
 
         <!-- UI -->
 

@@ -15,6 +15,7 @@
 		<text name="animal_descriptionBullFeed" text="Sonnit syövät mielellään ruohoa, heinää ja TMR-rehua."/>
 		<text name="animal_descriptionBullYoung" text="Tämä on urospuolinen vasikka."/>
 		<text name="animal_descriptionBullReproduction" text="Terveet, vähintään 12 kuukauden ikäiset sonnit voivat lisääntyä."/>
+		<text name="rl_descriptionCowReproduction" text="Terveet, vähintään 12 kuukauden ikäiset lehmät voivat lisääntyä."/>
 
 		<!-- WATER BUFFALOS -->
 
@@ -27,6 +28,7 @@
 		<text name="fillType_boar_black_pied" text="Bunte Bentheimer Schwein -karju"/>
 		<text name="fillType_boar_berkshire" text="Berkshire-karju"/>
 		<text name="animal_descriptionBoarReproduction" text="Terveet, vähintään 8 kuukauden ikäiset karjut voivat lisääntyä."/>
+		<text name="rl_descriptionPigReproduction" text="Terveet, vähintään 6 kuukauden ikäiset emakot voivat lisääntyä."/>
 		<text name="animal_descriptionBoarFeed" text="Karjut syövät lähes mitä tahansa. Niille voi syöttää maissia, vehnää, ohraa, rypsiä, auringonkukkia, soijapapuja, perunoita, durraa ja sokerijuurikkaita."/>
 		<text name="animal_descriptionBoarYoung" text="Tämä on urospuolinen porsas."/>
 
@@ -40,11 +42,13 @@
 		<text name="animal_descriptionRamFeed" text="Pässit syövät ruohoa ja heinää."/>
 		<text name="animal_descriptionRamYoung" text="Tämä on urospuolinen karitsa."/>
 		<text name="animal_descriptionRamReproduction" text="Terveet, vähintään 5 kuukauden ikäiset pässit voivat lisääntyä."/>
+		<text name="rl_descriptionSheepReproduction" text="Terveet, vähintään 8 kuukauden ikäiset uuhet voivat lisääntyä."/>
 
 		<!-- GOATS -->
 
 		<text name="fillType_ram_goat" text="Pukki"/>
-		
+		<text name="rl_descriptionGoatReproduction" text="Terveet, vähintään 16 kuukauden ikäiset vuohet voivat lisääntyä."/>
+
 		<!-- HORSES -->
 
 		<text name="fillType_stallion" text="Ori"/>
@@ -59,6 +63,11 @@
 		<text name="animal_descriptionStallionFeed" text="Orit pitävät heinästä, kaurasta ja durrasta."/>
 		<text name="animal_descriptionStallionProfit" text="Orit voidaan myydä voitolla."/>
 		<text name="animal_descriptionStallionReproduction" text="Terveet, vähintään 36 kuukauden ikäiset orit voivat lisääntyä."/>
+		<text name="rl_descriptionHorseReproduction" text="Terveet, vähintään 22 kuukauden ikäiset tammat voivat lisääntyä."/>
+
+		<!-- KANAT -->
+
+		<text name="rl_descriptionChickenReproduction" text="Terveet, vähintään 6 kuukauden ikäiset kanat voivat lisääntyä."/>
 
 
         <!-- UI -->

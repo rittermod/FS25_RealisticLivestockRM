@@ -14,6 +14,7 @@
 		<text name="animal_descriptionBullFeed" text="Les taureaux aiment l'herbe, le foin et le TMR."/>
 		<text name="animal_descriptionBullYoung" text="Il s'agit d'un veau mâle."/>
 		<text name="animal_descriptionBullReproduction" text="Les taureaux en bonne santé et âgés de plus de 12 mois peuvent se reproduire."/>
+		<text name="rl_descriptionCowReproduction" text="Les vaches en bonne santé et âgées de plus de 12 mois peuvent se reproduire."/>
 
 		<!-- WATER BUFFALOS -->
 
@@ -26,6 +27,7 @@
 		<text name="fillType_boar_black_pied" text="Sanglier à Pied Noir"/>
 		<text name="fillType_boar_berkshire" text="Sanglier du Berkshire"/>
 		<text name="animal_descriptionBoarReproduction" text="Les verrats en bonne santé et âgés de plus de 8 mois peuvent se reproduire."/>
+		<text name="rl_descriptionPigReproduction" text="Les truies en bonne santé et âgées de plus de 6 mois peuvent se reproduire."/>
 		<text name="animal_descriptionBoarFeed" text="Les sangliers mangent presque n'importe quoi. Vous pouvez leur donner du maïs, du blé, de l'orge, du canola, du tournesol, du soja, des pommes de terre, du sorgho et des betteraves sucrières."/>
 		<text name="animal_descriptionBoarYoung" text="Il s'agit d'un porcelet mâle."/>
 
@@ -39,11 +41,13 @@
 		<text name="animal_descriptionRamFeed" text="Les béliers mangent de l'herbe et du foin."/>
 		<text name="animal_descriptionRamYoung" text="Il s'agit d'un agneau mâle."/>
 		<text name="animal_descriptionRamReproduction" text="Les béliers en bonne santé et âgés de plus de 5 mois peuvent se reproduire."/>
+		<text name="rl_descriptionSheepReproduction" text="Les brebis en bonne santé et âgées de plus de 8 mois peuvent se reproduire."/>
 
 		<!-- GOATS -->
 
 		<text name="fillType_ram_goat" text="Chèvre bélier"/>
-		
+		<text name="rl_descriptionGoatReproduction" text="Les chèvres en bonne santé et âgées de plus de 16 mois peuvent se reproduire."/>
+
 		<!-- HORSES -->
 		
 		<text name="fillType_stallion" text="Étalon"/>
@@ -58,6 +62,11 @@
 		<text name="animal_descriptionStallionFeed" text="Les étalons aiment le foin, l'avoine et le sorgho."/>
 		<text name="animal_descriptionStallionProfit" text="Les étalons peuvent être vendus avec profit."/>
 		<text name="animal_descriptionStallionReproduction" text="Les étalons en bonne santé et âgés de plus de 36 mois peuvent se reproduire."/>
+		<text name="rl_descriptionHorseReproduction" text="Les juments en bonne santé et âgées de plus de 22 mois peuvent se reproduire."/>
+
+		<!-- CHICKENS -->
+
+		<text name="rl_descriptionChickenReproduction" text="Les poules en bonne santé et âgées de plus de 6 mois peuvent se reproduire."/>
 
 
         <!-- UI -->
