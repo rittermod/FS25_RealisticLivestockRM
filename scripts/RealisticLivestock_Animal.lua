@@ -21,7 +21,14 @@ function Animal.new(age, health, monthsSinceLastBirth, gender, subTypeIndex, rep
     self.monthsSinceLastBirth = monthsSinceLastBirth or 0
     self.gender = gender or "female"
     self.subTypeIndex = subTypeIndex or 1
-    self.subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex).name or "COW_SWISS_BROWN"
+    local subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
+
+    if subType == nil then
+        self.subTypeIndex = 1
+        subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
+    end
+
+    self.subType = (subType ~= nil and subType.name) or "UNKNOWN"
     self.reproduction = reproduction or 0
     self.isParent = isParent or false
     self.isPregnant = isPregnant or false
@@ -39,11 +46,11 @@ function Animal.new(age, health, monthsSinceLastBirth, gender, subTypeIndex, rep
     self.genetics = genetics
     self.impregnatedBy = impregnatedBy
 
-    self.animalTypeIndex = g_currentMission.animalSystem:getTypeIndexBySubTypeIndex(self.subTypeIndex)
+    self.animalTypeIndex = g_currentMission.animalSystem:getTypeIndexBySubTypeIndex(self.subTypeIndex) or 1
     local subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
-    local targetWeight = subType.targetWeight
+    local targetWeight = subType ~= nil and subType.targetWeight or 0
 
-    self.breed = subType.breed or "UNKNOWN"
+    self.breed = (subType ~= nil and subType.breed) or "UNKNOWN"
 
     if genetics == nil then
     
@@ -706,6 +713,7 @@ end
 function Animal:writeStream(streamId, connection)
 
     streamWriteUInt8(streamId, self.subTypeIndex)
+    streamWriteString(streamId, self.subType or "")
     streamWriteUInt16(streamId, self.age)
     streamWriteFloat32(streamId, self.health)
     streamWriteFloat32(streamId, self.reproduction)
@@ -778,6 +786,7 @@ function Animal:writeStream(streamId, connection)
             streamWriteFloat32(streamId, child.health)
             streamWriteString(streamId, child.gender)
             streamWriteUInt8(streamId, child.subTypeIndex)
+            streamWriteString(streamId, child.subType or "")
             streamWriteString(streamId, child.motherId)
             streamWriteString(streamId, child.fatherId)
 
@@ -864,9 +873,25 @@ end
 function Animal:readStream(streamId, connection)
 
     self.subTypeIndex = streamReadUInt8(streamId)
+    local subTypeName = streamReadString(streamId)
 
-    self.subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex).name
-    self.animalTypeIndex = g_currentMission.animalSystem:getTypeIndexBySubTypeIndex(self.subTypeIndex)
+    local subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
+
+    if subType == nil and subTypeName ~= nil and subTypeName ~= "" then
+        local mappedIndex = g_currentMission.animalSystem:getSubTypeIndexByName(subTypeName)
+        if mappedIndex ~= nil then
+            self.subTypeIndex = mappedIndex
+            subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
+        end
+    end
+
+    if subType == nil then
+        self.subTypeIndex = 1
+        subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
+    end
+
+    self.subType = (subType ~= nil and subType.name) or "UNKNOWN"
+    self.animalTypeIndex = g_currentMission.animalSystem:getTypeIndexBySubTypeIndex(self.subTypeIndex) or 1
 
     self.age = streamReadUInt16(streamId)
     self.health = streamReadFloat32(streamId)
@@ -942,8 +967,14 @@ function Animal:readStream(streamId, connection)
             local health = streamReadFloat32(streamId)
             local gender = streamReadString(streamId)
             local subTypeIndex = streamReadUInt8(streamId)
+            local subTypeName = streamReadString(streamId)
             local motherId = streamReadString(streamId)
             local fatherId = streamReadString(streamId)
+
+            if subTypeName ~= nil and subTypeName ~= "" and g_currentMission.animalSystem:getSubTypeByIndex(subTypeIndex) == nil then
+                local mappedIndex = g_currentMission.animalSystem:getSubTypeIndexByName(subTypeName)
+                if mappedIndex ~= nil then subTypeIndex = mappedIndex end
+            end
 
             local genetics = {}
 
@@ -1089,6 +1120,7 @@ end
 function Animal:writeStreamUnborn(streamId, connection)
 
     streamWriteUInt8(streamId, self.subTypeIndex)
+    streamWriteString(streamId, self.subType or "")
 
     streamWriteFloat32(streamId, self.health)
     streamWriteString(streamId, self.gender)
@@ -1125,9 +1157,25 @@ end
 function Animal:readStreamUnborn(streamId, connection)
 
     self.subTypeIndex = streamReadUInt8(streamId)
+    local subTypeName = streamReadString(streamId)
 
-    self.subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex).name
-    self.animalTypeIndex = g_currentMission.animalSystem:getTypeIndexBySubTypeIndex(self.subTypeIndex)
+    local subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
+
+    if subType == nil and subTypeName ~= nil and subTypeName ~= "" then
+        local mappedIndex = g_currentMission.animalSystem:getSubTypeIndexByName(subTypeName)
+        if mappedIndex ~= nil then
+            self.subTypeIndex = mappedIndex
+            subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
+        end
+    end
+
+    if subType == nil then
+        self.subTypeIndex = 1
+        subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
+    end
+
+    self.subType = (subType ~= nil and subType.name) or "UNKNOWN"
+    self.animalTypeIndex = g_currentMission.animalSystem:getTypeIndexBySubTypeIndex(self.subTypeIndex) or 1
 
     self.health = streamReadFloat32(streamId)
     self.gender = streamReadString(streamId)
