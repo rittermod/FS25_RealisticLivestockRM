@@ -6,8 +6,16 @@ local modDirectory = g_currentModDirectory
 
 local function getDaysInMonth(month)
     local daysPerMonth = RealisticLivestock ~= nil and RealisticLivestock.DAYS_PER_MONTH or nil
-    if daysPerMonth == nil then return 1 end
-    return daysPerMonth[month] or 1
+    if daysPerMonth == nil then
+        Logging.warning("RealisticLivestock: DAYS_PER_MONTH not available, using fallback of 1")
+        return 1
+    end
+    local days = daysPerMonth[month]
+    if days == nil then
+        Logging.warning("RealisticLivestock: No days defined for month %d, using fallback of 1", month)
+        return 1
+    end
+    return days
 end
 
 

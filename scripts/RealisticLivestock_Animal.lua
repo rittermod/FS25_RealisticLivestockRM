@@ -1,6 +1,35 @@
 Animal = {}
 local Animal_mt = Class(Animal)
 
+--- Resolves subType by index, with fallback to name lookup or default index 1
+-- @param subTypeIndex number The initial subType index
+-- @param subTypeName string|nil Optional subType name for fallback lookup
+-- @return number resolvedIndex, table|nil subType, string resolvedName
+function Animal.resolveSubType(subTypeIndex, subTypeName)
+    local animalSystem = g_currentMission.animalSystem
+    local subType = animalSystem:getSubTypeByIndex(subTypeIndex)
+
+    -- Try name-based lookup if index failed and name provided
+    if subType == nil and subTypeName ~= nil and subTypeName ~= "" then
+        local mappedIndex = animalSystem:getSubTypeIndexByName(subTypeName)
+        if mappedIndex ~= nil then
+            subTypeIndex = mappedIndex
+            subType = animalSystem:getSubTypeByIndex(subTypeIndex)
+            Logging.info("RealisticLivestock: Resolved subType '%s' from name (index %d)", subTypeName, subTypeIndex)
+        end
+    end
+
+    -- Final fallback to index 1
+    if subType == nil then
+        Logging.warning("RealisticLivestock: subTypeIndex %d not found, falling back to 1", subTypeIndex)
+        subTypeIndex = 1
+        subType = animalSystem:getSubTypeByIndex(subTypeIndex)
+    end
+
+    local resolvedName = (subType ~= nil and subType.name) or "UNKNOWN"
+    return subTypeIndex, subType, resolvedName
+end
+
 
 function Animal.new(age, health, monthsSinceLastBirth, gender, subTypeIndex, reproduction, isParent, isPregnant, isLactating, clusterSystem, id, motherId, fatherId, pos, name, dirt, fitness, riding, farmId, weight, genetics, impregnatedBy, variation, children, monitor, isCastrated, diseases, recentlyBoughtByAI, marks, insemination)
 
@@ -20,15 +49,8 @@ function Animal.new(age, health, monthsSinceLastBirth, gender, subTypeIndex, rep
     self.health = health or 0
     self.monthsSinceLastBirth = monthsSinceLastBirth or 0
     self.gender = gender or "female"
-    self.subTypeIndex = subTypeIndex or 1
-    local subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
-
-    if subType == nil then
-        self.subTypeIndex = 1
-        subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
-    end
-
-    self.subType = (subType ~= nil and subType.name) or "UNKNOWN"
+    local subType
+    self.subTypeIndex, subType, self.subType = Animal.resolveSubType(subTypeIndex or 1, nil)
     self.reproduction = reproduction or 0
     self.isParent = isParent or false
     self.isPregnant = isPregnant or false
@@ -47,9 +69,7 @@ function Animal.new(age, health, monthsSinceLastBirth, gender, subTypeIndex, rep
     self.impregnatedBy = impregnatedBy
 
     self.animalTypeIndex = g_currentMission.animalSystem:getTypeIndexBySubTypeIndex(self.subTypeIndex) or 1
-    local subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
     local targetWeight = subType ~= nil and subType.targetWeight or 0
-
     self.breed = (subType ~= nil and subType.breed) or "UNKNOWN"
 
     if genetics == nil then
@@ -872,25 +892,9 @@ end
 
 function Animal:readStream(streamId, connection)
 
-    self.subTypeIndex = streamReadUInt8(streamId)
+    local subTypeIndex = streamReadUInt8(streamId)
     local subTypeName = streamReadString(streamId)
-
-    local subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
-
-    if subType == nil and subTypeName ~= nil and subTypeName ~= "" then
-        local mappedIndex = g_currentMission.animalSystem:getSubTypeIndexByName(subTypeName)
-        if mappedIndex ~= nil then
-            self.subTypeIndex = mappedIndex
-            subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
-        end
-    end
-
-    if subType == nil then
-        self.subTypeIndex = 1
-        subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
-    end
-
-    self.subType = (subType ~= nil and subType.name) or "UNKNOWN"
+    self.subTypeIndex, _, self.subType = Animal.resolveSubType(subTypeIndex, subTypeName)
     self.animalTypeIndex = g_currentMission.animalSystem:getTypeIndexBySubTypeIndex(self.subTypeIndex) or 1
 
     self.age = streamReadUInt16(streamId)
@@ -966,15 +970,12 @@ function Animal:readStream(streamId, connection)
 
             local health = streamReadFloat32(streamId)
             local gender = streamReadString(streamId)
-            local subTypeIndex = streamReadUInt8(streamId)
-            local subTypeName = streamReadString(streamId)
+            local childSubTypeIndex = streamReadUInt8(streamId)
+            local childSubTypeName = streamReadString(streamId)
             local motherId = streamReadString(streamId)
             local fatherId = streamReadString(streamId)
 
-            if subTypeName ~= nil and subTypeName ~= "" and g_currentMission.animalSystem:getSubTypeByIndex(subTypeIndex) == nil then
-                local mappedIndex = g_currentMission.animalSystem:getSubTypeIndexByName(subTypeName)
-                if mappedIndex ~= nil then subTypeIndex = mappedIndex end
-            end
+            childSubTypeIndex = Animal.resolveSubType(childSubTypeIndex, childSubTypeName)
 
             local genetics = {}
 
@@ -987,7 +988,7 @@ function Animal:readStream(streamId, connection)
 
             if productivity ~= nil then genetics.productivity = productivity end
 
-            local child = Animal.new(0, health, 0, gender, subTypeIndex, 0, false, false, false, nil, nil, motherId, fatherId, nil, nil, nil, nil, nil, nil, nil, genetics)
+            local child = Animal.new(0, health, 0, gender, childSubTypeIndex, 0, false, false, false, nil, nil, motherId, fatherId, nil, nil, nil, nil, nil, nil, nil, genetics)
 
             table.insert(pregnancy.pregnancies, child)
 
@@ -1156,25 +1157,9 @@ end
 
 function Animal:readStreamUnborn(streamId, connection)
 
-    self.subTypeIndex = streamReadUInt8(streamId)
+    local subTypeIndex = streamReadUInt8(streamId)
     local subTypeName = streamReadString(streamId)
-
-    local subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
-
-    if subType == nil and subTypeName ~= nil and subTypeName ~= "" then
-        local mappedIndex = g_currentMission.animalSystem:getSubTypeIndexByName(subTypeName)
-        if mappedIndex ~= nil then
-            self.subTypeIndex = mappedIndex
-            subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
-        end
-    end
-
-    if subType == nil then
-        self.subTypeIndex = 1
-        subType = g_currentMission.animalSystem:getSubTypeByIndex(self.subTypeIndex)
-    end
-
-    self.subType = (subType ~= nil and subType.name) or "UNKNOWN"
+    self.subTypeIndex, _, self.subType = Animal.resolveSubType(subTypeIndex, subTypeName)
     self.animalTypeIndex = g_currentMission.animalSystem:getTypeIndexBySubTypeIndex(self.subTypeIndex) or 1
 
     self.health = streamReadFloat32(streamId)
