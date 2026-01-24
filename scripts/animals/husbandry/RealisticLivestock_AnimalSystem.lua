@@ -4,6 +4,21 @@ local modName = g_currentModName
 local modDirectory = g_currentModDirectory
 
 
+local function getDaysInMonth(month)
+    local daysPerMonth = RealisticLivestock ~= nil and RealisticLivestock.DAYS_PER_MONTH or nil
+    if daysPerMonth == nil then
+        Logging.warning("RealisticLivestock: DAYS_PER_MONTH not available, using fallback of 1")
+        return 1
+    end
+    local days = daysPerMonth[month]
+    if days == nil then
+        Logging.warning("RealisticLivestock: No days defined for month %d, using fallback of 1", month)
+        return 1
+    end
+    return days
+end
+
+
 table.insert(FinanceStats.statNames, "monitorSubscriptions")
 FinanceStats.statNameToIndex["monitorSubscriptions"] = #FinanceStats.statNames
 
@@ -1170,7 +1185,7 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
 
     if month > 12 then month = month - 12 end
 
-    local day = 1 + math.floor((environment.currentDayInPeriod - 1) * (RealisticLivestock.DAYS_PER_MONTH[month] / environment.daysPerPeriod))
+    local day = 1 + math.floor((environment.currentDayInPeriod - 1) * (getDaysInMonth(month) / environment.daysPerPeriod))
     local year = environment.currentYear
 
 
@@ -1253,7 +1268,7 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
             expectedYear = expectedYear + 1
         end
 
-        local expectedDay = math.random(1, RealisticLivestock.DAYS_PER_MONTH[expectedMonth])
+        local expectedDay = math.random(1, getDaysInMonth(expectedMonth))
 
         if #children > 0 then
 
@@ -1515,7 +1530,7 @@ function AnimalSystem:onDayChanged()
     if month > 12 then month = month - 12 end
 
     local daysPerPeriod = environment.daysPerPeriod
-    local day = 1 + math.floor((currentDayInPeriod - 1) * (RealisticLivestock.DAYS_PER_MONTH[month] / daysPerPeriod))
+    local day = 1 + math.floor((currentDayInPeriod - 1) * (getDaysInMonth(month) / daysPerPeriod))
     local year = environment.currentYear
 
     for _, animals in pairs(self.animals) do
