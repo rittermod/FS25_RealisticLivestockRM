@@ -16,6 +16,11 @@ Main changes from the original mod:
 
 
 ## Changelog
+v0.4.2.0:
+- Fix multiplayer sync issues when subTypeIndex differs between server/client (PR by killemth)
+- Add fallback for days per month calculation during early load (PR by killemth)
+- Refactor subType resolution into helper function with logging
+
 v0.4.1.0:
 - Fix crash caused by invalid animal root node in some cases.
 - Fix death message count for auto-sold newborns
