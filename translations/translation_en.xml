@@ -651,7 +651,7 @@
 		<!-- MIGRATION -->
 
 		<text name="rm_rl_conflict_title" text="Mod Conflict Detected"/>
-		<text name="rm_rl_conflict_message" text="Both 'Realistic Livestock' and 'Realistic Livestock - RitterMod version' are enabled. Please disable 'Realistic Livestock' (FS25_RealisticLivestock) to continue. The RitterMod version will migrate your saved data."/>
+		<text name="rm_rl_mod_conflict_message" text="The following mod(s) conflict with 'Realistic Livestock - Ritter version' and cannot be used together: %s &#10;&#10;Please disable the conflicting mod(s) and restart the game."/>
 
 		<text name="rm_rl_migration_title" text="Data Migration Notice"/>
 		<text name="rm_rl_migration_message" text="Previous Realistic Livestock data was found in this savegame. Your settings, animal data, Dewars, and AI Straw hand tools will be automatically migrated to Realistic Livestock - RitterMod version when the game saves."/>
