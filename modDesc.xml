@@ -1,8 +1,9 @@
 <modDesc descVersion="105">
     <author>Ritter</author>
-    <version>0.4.2.0</version>
+    <version>0.5.0.0</version>
     <title>
         <en>Realistic Livestock - Ritter version</en>
+        <it>Allevamento Realistico - Versione Ritter</it>
     </title>
     <description>
         <en>
@@ -16,10 +17,18 @@ Main changes from the original mod:
 - Automatically migrate savegame data from Arrow-kb's Realistic Livestock to this version.
 - Added Highland Bulls based on Renfordt's PR 389 in Arrow-kb's original mod.
 - Removed Font Library dependency by inlining the required functionality directly in the mod.
+- Improved genetic inheritance with natural variation - offspring can now exceed or fall below parent trait values.
 
 
 
 Changelog
+
+v0.5.0.0:
+- Randomize father selection during breeding - eligible males are now chosen randomly instead of always the first one
+- Improve genetic inheritance with natural variation - offspring can now exceed or fall below parent trait values
+- Fix wrong text shown for straw in monitor menu
+- Detect conflicting mods (e.g., MoreVisualAnimals) and show a unified conflict dialog at startup
+- Add Italian translation (community contribution by @FirenzeIT)
 
 v0.4.2.0:
 - Fix multiplayer sync issues when subTypeIndex differs between server/client (PR by killemth)
@@ -44,7 +53,51 @@ v0.2.0.0:
 
 ]]>
         </en>
+        <it>
+            <![CDATA[ Questa è una versione modificata del mod FS25 Realistic Livestock di Arrow-kb, che ha deciso di interrompere completamente lo sviluppo dei suoi mod.
 
+L'obiettivo attuale di questa versione è mantenere funzionanti le parti principali del mod per il mio utilizzo personale, e applicare occasionalmente correzioni o miglioramenti quando lo ritengo necessario.
+
+Sentiti libero di usarlo come preferisci, ma tieni presente che questo mod è molto meno ambizioso dell'originale.
+
+Modifiche principali rispetto al mod originale:
+- Migrazione automatica dei dati di salvataggio dal Realistic Livestock di Arrow-kb a questa versione.
+- Aggiunti i tori Highland basati sulla PR 389 di Renfordt nel mod originale di Arrow-kb.
+- Rimossa la dipendenza da Font Library integrando direttamente nel mod le funzionalità necessarie.
+- Migliorata l'ereditarietà genetica con variazione naturale - la prole può ora superare o scendere sotto i valori dei tratti dei genitori.
+
+Changelog
+
+v0.5.0.0:
+- Randomizzazione della selezione del padre durante la riproduzione - i maschi idonei vengono ora scelti casualmente invece del primo disponibile
+- Migliorata l'ereditarietà genetica con variazione naturale - la prole può ora superare o scendere sotto i valori dei tratti dei genitori
+- Corretto il testo errato per la paglia nel menu monitor
+- Rilevamento dei mod in conflitto (es. MoreVisualAnimals) con finestra di dialogo unificata all'avvio
+- Aggiunta traduzione italiana (contributo della community di @FirenzeIT)
+
+v0.4.2.0:
+- Corretti problemi di sincronizzazione multiplayer quando il subTypeIndex differisce tra server e client (PR di killemth)
+- Aggiunto fallback per il calcolo dei giorni per mese durante il caricamento iniziale (PR di killemth)
+- Rifattorizzata la risoluzione del subType in funzione helper con logging
+
+v0.4.1.0:
+- Corretto crash causato da un nodo radice animale non valido in alcuni casi.
+- Corretta la conta dei messaggi di morte per i neonati venduti automaticamente.
+- Corretto il testo errato relativo al momento in cui le femmine possono riprodursi.
+
+v0.4.0.0:
+- Rimossa la dipendenza da Font Library integrando direttamente nel mod le funzionalità necessarie.
+- Rifattorizzato il caricamento dei file e la cartella sorgente.
+- Aggiornata l'icona del mod.
+
+v0.3.0.0:
+- Aggiunti i tori Highland basati sulla PR 389 di Renfordt nel mod originale di Arrow-kb.
+
+v0.2.0.0:
+- Migrazione dei salvataggi dal Realistic Livestock di Arrow-kb alla versione RitterMod. Per evitare conflitti con il mod originale e altri fork, questo mod utilizza un ID diverso. Pertanto, quando carichi un salvataggio che utilizzava la mod Realistic Livestock originale, ti verrà richiesto di migrare i dati a questo mod.
+
+]]>
+        </it>
     </description>
     <iconFilename>icon_RealisticLivestock.dds</iconFilename>
     <multiplayer supported="true"/>
