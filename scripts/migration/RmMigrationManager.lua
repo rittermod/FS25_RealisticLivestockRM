@@ -35,6 +35,11 @@ RmMigrationManager.OLD_FILES = {
     "animalSystem.xml"
 }
 
+-- Mods that conflict with ours (e.g., extracted subsets of original Realistic Livestock)
+RmMigrationManager.CONFLICTING_MODS = {
+    "FS25_MoreVisualAnimals",
+}
+
 -- Global instance
 g_rmMigrationManager = nil
 
@@ -77,46 +82,50 @@ end
 
 
 --[[
-    Check if the old RealisticLivestock mod is also ENABLED and LOADED
-    If both mods are loaded, this causes conflicts
-    Returns true if conflict detected (old mod is enabled)
+    Check if any conflicting mods are ENABLED and LOADED.
+    Collects ALL conflicts into self.conflictingMods so they can be shown
+    in a single dialog (avoiding multiple restart cycles).
+    Returns true if any conflict detected.
 
     Note: g_modNameToDirectory contains ALL mods in the folder (enabled or not)
           g_modIsLoaded contains only mods that are actually enabled and loaded
 ]]
 function RmMigrationManager:checkModConflict()
-    print("RmMigrationManager: Checking for mod conflict...")
-    print("RmMigrationManager: Looking for mod: " .. tostring(RmMigrationManager.OLD_MOD_NAME))
+    print("RmMigrationManager: Checking for mod conflicts...")
 
-    -- Debug: print enabled/loaded mods
-    if g_modIsLoaded ~= nil then
-        print("RmMigrationManager: Enabled mods (g_modIsLoaded):")
-        for modName, isLoaded in pairs(g_modIsLoaded) do
-            if isLoaded then
-                print("  - " .. tostring(modName))
-            end
-        end
-    else
+    if g_modIsLoaded == nil then
         print("RmMigrationManager: g_modIsLoaded is nil!")
+        return false
     end
 
-    -- Check if old mod is ENABLED (not just present in folder)
-    -- g_modIsLoaded[modName] returns true only if the mod is enabled and loaded
-    local oldModLoaded = g_modIsLoaded ~= nil and g_modIsLoaded[RmMigrationManager.OLD_MOD_NAME] == true
+    local found = {}
 
-    print("RmMigrationManager: Old mod enabled and loaded: " .. tostring(oldModLoaded))
+    -- Check old mod (original Realistic Livestock)
+    if g_modIsLoaded[RmMigrationManager.OLD_MOD_NAME] == true then
+        table.insert(found, RmMigrationManager.OLD_MOD_NAME)
+    end
 
-    if oldModLoaded then
+    -- Check known conflicting mods
+    for _, modName in ipairs(RmMigrationManager.CONFLICTING_MODS) do
+        if g_modIsLoaded[modName] == true then
+            table.insert(found, modName)
+        end
+    end
+
+    if #found > 0 then
+        print("RmMigrationManager: Conflicting mods found: " .. table.concat(found, ", "))
+        self.conflictingMods = found
         g_rmMigrationConflict = true
         return true
     end
 
+    print("RmMigrationManager: No conflicts detected")
     return false
 end
 
 
 --[[
-    Show conflict dialog and block mission loading.
+    Show conflict dialog listing ALL conflicting mods and block mission loading.
     Uses a short timer delay to ensure the dialog is shown after the game
     has fully transitioned to gameplay state, similar to how Courseplay
     shows its version dialog.
@@ -132,12 +141,15 @@ function RmMigrationManager:showConflictDialog()
         print("RmMigrationManager: Timer fired, showing conflict dialog now")
 
         local title = g_i18n:getText("rm_rl_conflict_title")
-        local message = g_i18n:getText("rm_rl_conflict_message")
-        local text = title .. "\n\n" .. message
+        local modList = ""
+        for _, modName in ipairs(self.conflictingMods) do
+            modList = modList .. "\n- " .. modName
+        end
+        local message = string.format(g_i18n:getText("rm_rl_mod_conflict_message"), modList)
 
-        InfoDialog.show(text, function()
+        InfoDialog.show(title .. "\n\n" .. message, function()
             print("RmMigrationManager: User acknowledged conflict, restarting game")
-            -- Restart the game so user can disable the conflicting mod
+            -- Restart the game so user can disable the conflicting mod(s)
             doRestart(false, "")
         end, self)
     end)
