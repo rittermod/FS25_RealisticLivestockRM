@@ -3,6 +3,7 @@
     <version>0.4.2.0</version>
     <title>
         <en>Realistic Livestock - Ritter version</en>
+        <it>Allevamento Realistico - Versione Ritter</it>
     </title>
     <description>
         <en>
@@ -44,7 +45,38 @@ v0.2.0.0:
 
 ]]>
         </en>
+        <it>
+            <![CDATA[ Questa è una versione modificata del mod FS25 Realistic Livestock di Arrow-kb, che ha deciso di interrompere completamente lo sviluppo dei suoi mod.
 
+L'obiettivo attuale di questa versione è mantenere funzionanti le parti principali del mod per il mio utilizzo personale, e applicare occasionalmente correzioni o miglioramenti quando lo ritengo necessario.
+
+Sentiti libero di usarlo come preferisci, ma tieni presente che questo mod è molto meno ambizioso dell'originale.
+
+Modifiche principali rispetto al mod originale:
+- Migrazione automatica dei dati di salvataggio dal Realistic Livestock di Arrow-kb a questa versione.
+- Aggiunti i tori Highland basati sulla PR 389 di Renfordt nel mod originale di Arrow-kb.
+- Rimossa la dipendenza da Font Library integrando direttamente nel mod le funzionalità necessarie.
+
+Changelog
+
+v0.4.1.0:
+- Corretto crash causato da un nodo radice animale non valido in alcuni casi.
+- Corretta la conta dei messaggi di morte per i neonati venduti automaticamente.
+- Corretto il testo errato relativo al momento in cui le femmine possono riprodursi.
+
+v0.4.0.0:
+- Rimossa la dipendenza da Font Library integrando direttamente nel mod le funzionalità necessarie.
+- Rifattorizzato il caricamento dei file e la cartella sorgente.
+- Aggiornata l'icona del mod.
+
+v0.3.0.0:
+- Aggiunti i tori Highland basati sulla PR 389 di Renfordt nel mod originale di Arrow-kb.
+
+v0.2.0.0:
+- Migrazione dei salvataggi dal Realistic Livestock di Arrow-kb alla versione RitterMod. Per evitare conflitti con il mod originale e altri fork, questo mod utilizza un ID diverso. Pertanto, quando carichi un salvataggio che utilizzava la mod Realistic Livestock originale, ti verrà richiesto di migrare i dati a questo mod.
+
+]]>
+        </it>
     </description>
     <iconFilename>icon_RealisticLivestock.dds</iconFilename>
     <multiplayer supported="true"/>
