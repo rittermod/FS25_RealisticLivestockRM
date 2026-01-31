@@ -22,6 +22,7 @@ v0.5.0.0:
 - Improve genetic inheritance with natural variation - offspring can now exceed or fall below parent trait values
 - Fix wrong text shown for straw in monitor menu
 - Detect conflicting mods (e.g., MoreVisualAnimals) and show a unified conflict dialog at startup
+- Add Italian translation (community contribution by @FirenzeIT)
 
 v0.4.2.0:
 - Fix multiplayer sync issues when subTypeIndex differs between server/client (PR by killemth)

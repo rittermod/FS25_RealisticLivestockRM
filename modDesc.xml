@@ -17,6 +17,7 @@ Main changes from the original mod:
 - Automatically migrate savegame data from Arrow-kb's Realistic Livestock to this version.
 - Added Highland Bulls based on Renfordt's PR 389 in Arrow-kb's original mod.
 - Removed Font Library dependency by inlining the required functionality directly in the mod.
+- Improved genetic inheritance with natural variation - offspring can now exceed or fall below parent trait values.
 
 
 
@@ -27,6 +28,7 @@ v0.5.0.0:
 - Improve genetic inheritance with natural variation - offspring can now exceed or fall below parent trait values
 - Fix wrong text shown for straw in monitor menu
 - Detect conflicting mods (e.g., MoreVisualAnimals) and show a unified conflict dialog at startup
+- Add Italian translation (community contribution by @FirenzeIT)
 
 v0.4.2.0:
 - Fix multiplayer sync issues when subTypeIndex differs between server/client (PR by killemth)
@@ -71,6 +73,7 @@ v0.5.0.0:
 - Migliorata l'ereditarietà genetica con variazione naturale - la prole può ora superare o scendere sotto i valori dei tratti dei genitori
 - Corretto il testo errato per la paglia nel menu monitor
 - Rilevamento dei mod in conflitto (es. MoreVisualAnimals) con finestra di dialogo unificata all'avvio
+- Aggiunta traduzione italiana (contributo della community di @FirenzeIT)
 
 v0.4.2.0:
 - Corretti problemi di sincronizzazione multiplayer quando il subTypeIndex differisce tra server e client (PR di killemth)
