@@ -1,6 +1,6 @@
 <modDesc descVersion="105">
     <author>Ritter</author>
-    <version>0.4.2.0</version>
+    <version>0.5.0.0</version>
     <title>
         <en>Realistic Livestock - Ritter version</en>
         <it>Allevamento Realistico - Versione Ritter</it>
@@ -21,6 +21,12 @@ Main changes from the original mod:
 
 
 Changelog
+
+v0.5.0.0:
+- Randomize father selection during breeding - eligible males are now chosen randomly instead of always the first one
+- Improve genetic inheritance with natural variation - offspring can now exceed or fall below parent trait values
+- Fix wrong text shown for straw in monitor menu
+- Detect conflicting mods (e.g., MoreVisualAnimals) and show a unified conflict dialog at startup
 
 v0.4.2.0:
 - Fix multiplayer sync issues when subTypeIndex differs between server/client (PR by killemth)
@@ -56,8 +62,20 @@ Modifiche principali rispetto al mod originale:
 - Migrazione automatica dei dati di salvataggio dal Realistic Livestock di Arrow-kb a questa versione.
 - Aggiunti i tori Highland basati sulla PR 389 di Renfordt nel mod originale di Arrow-kb.
 - Rimossa la dipendenza da Font Library integrando direttamente nel mod le funzionalità necessarie.
+- Migliorata l'ereditarietà genetica con variazione naturale - la prole può ora superare o scendere sotto i valori dei tratti dei genitori.
 
 Changelog
+
+v0.5.0.0:
+- Randomizzazione della selezione del padre durante la riproduzione - i maschi idonei vengono ora scelti casualmente invece del primo disponibile
+- Migliorata l'ereditarietà genetica con variazione naturale - la prole può ora superare o scendere sotto i valori dei tratti dei genitori
+- Corretto il testo errato per la paglia nel menu monitor
+- Rilevamento dei mod in conflitto (es. MoreVisualAnimals) con finestra di dialogo unificata all'avvio
+
+v0.4.2.0:
+- Corretti problemi di sincronizzazione multiplayer quando il subTypeIndex differisce tra server e client (PR di killemth)
+- Aggiunto fallback per il calcolo dei giorni per mese durante il caricamento iniziale (PR di killemth)
+- Rifattorizzata la risoluzione del subType in funzione helper con logging
 
 v0.4.1.0:
 - Corretto crash causato da un nodo radice animale non valido in alcuni casi.

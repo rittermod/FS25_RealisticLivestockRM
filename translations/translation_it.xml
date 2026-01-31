@@ -597,5 +597,9 @@
 <text name="rl_ui_dependency_missing_notInstalled" text="- %s (Non installato)"/>
 <text name="rl_ui_dependency_missing_installed" text="- %s (Installato: %s, Minimo richiesto: %s)"/>
 
+<!-- CONFLICTS -->
+
+<text name="rm_rl_mod_conflict_message" text="I seguenti mod sono in conflitto con 'Realistic Livestock - Versione Ritter' e non possono essere usati insieme: %s &#10;&#10;Disattivare i mod in conflitto e riavviare il gioco."/>
+
     </texts>
 </l10n>

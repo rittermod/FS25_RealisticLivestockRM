@@ -13,9 +13,16 @@ Main changes from the original mod:
 - Automatically migrate savegame data from Arrow-kb's Realistic Livestock to this version.
 - Added Highland Bulls based on Renfordt's PR 389 in Arrow-kb's original mod.
 - Removed Font Library dependency by inlining the required functionality directly in the mod.
+- Improved genetic inheritance with natural variation - offspring can now exceed or fall below parent trait values.
 
 
 ## Changelog
+v0.5.0.0:
+- Randomize father selection during breeding - eligible males are now chosen randomly instead of always the first one
+- Improve genetic inheritance with natural variation - offspring can now exceed or fall below parent trait values
+- Fix wrong text shown for straw in monitor menu
+- Detect conflicting mods (e.g., MoreVisualAnimals) and show a unified conflict dialog at startup
+
 v0.4.2.0:
 - Fix multiplayer sync issues when subTypeIndex differs between server/client (PR by killemth)
 - Add fallback for days per month calculation during early load (PR by killemth)
