@@ -69,4 +69,4 @@ It **also means** that **anyone, including me, can reuse and build opon any chan
 
 And **remember**: Any vioation of this might not be intentional or malicious. People might simply not understand the implications of what they agreed to when they started building upon the mod with this license.
 
-(I am not a OSS licensing lawyer, but most likeley neither are you. This is my understanding of the GPL-3 license as it applies to this mod. If you have **QUALIFIED** legal knowledge, and not armchair legal knowlege, that contradicts what I say here, please let me know.)
+(I am not a OSS licensing lawyer, but most likeley neither are you. This is my understanding of the GPL-3 license as it applies to this mod. If you have **QUALIFIED** legal knowledge, and not armchair legal knowledge, that contradicts what I say here, please let me know.)
