@@ -50,7 +50,8 @@ This mod is released under GPL-3 license. See the [LICENSE](LICENSE) file for de
 
 # About reuse, modification and building upon the original Realistic Livestock mod by Arrow-kb
 
-TL;DR: The original Realistic Livestock mod by Arrow-kb is open source GPL-3 licensed. Anyone can freely use, modify, and redistribute it as long as they: give credit, keep the same GPL-3 license, and share their changes openly. No one can restrict reuse.
+> [!NOTE]
+> TL;DR: The original Realistic Livestock mod by Arrow-kb is open source GPL-3 licensed. Anyone can freely use, modify, and redistribute it as long as they: give credit, keep the same GPL-3 license, and share their changes openly. No one can restrict reuse.
 
 
 
@@ -62,7 +63,7 @@ The original Realistic Livestock mod by Arrow-kb is released under GPL-3 license
 
 This means that **anyone can use, and build upon, any modification I make** in this Ritter version of the Realistic Livestock mod **without any prior consent** or similar **from me, as long as they too comply with the GPL-3 license terms**, attibute me for the changes I have made AND release their modified code/mod under the same GPL-3 license for any changes/additions they have made.
 
-It **also means** that **anyone, including me, can reuse and build opon any changes made by others** to the mod **without any prior consent** or similar **from the authors of those modifications, as long as they again comply with the GPL-3 license terms**, attribute the original authors, and still release the code/mod under the same GPL-3 license for any changes they have made. 
+It **also means** that **anyone, including me, can reuse and build opon any changes made by others** to the mod **without any prior consent** or similar **from the authors of those modifications** since their changes to the mod are also licensed under the same GPL-3. 
 
 **Nobody can say, "No, this is my code, you can not reuse it".** The GPL-3 license ensures that the code/mod and any mod built on it will always remain free and open for anyone to use, modify, and distribute under the same GPL-3 license terms. There might at some point a discussion about when is a mod no longer a "mod built on the original mod" but that is way over my paygrade.
 
