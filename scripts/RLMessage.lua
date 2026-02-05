@@ -203,5 +203,31 @@ RLMessage = {
 		["text"] = "aiManager_mark_ai_multiple",
 		["title"] = "aiManager",
 		["importance"] = 3
+	},
+	-- Daily summary message types (RIT-165)
+	["DAILY_BIRTHS_SUMMARY"] = {
+		["text"] = "dailyBirthsSummary",
+		["title"] = "pregnancy",
+		["importance"] = 2
+	},
+	["DAILY_DEATHS_SUMMARY"] = {
+		["text"] = "dailyDeathsSummary",
+		["title"] = "death",
+		["importance"] = 1
+	},
+	["DAILY_SALES_SUMMARY"] = {
+		["text"] = "dailySalesSummary",
+		["title"] = "movement",
+		["importance"] = 2
+	},
+	["DAILY_OVERCROWDING_SUMMARY"] = {
+		["text"] = "dailyOvercrowdingSummary",
+		["title"] = "pregnancy",
+		["importance"] = 1  -- High importance as warning signal
+	},
+	["DAILY_PURCHASES_SUMMARY"] = {
+		["text"] = "dailyPurchasesSummary",
+		["title"] = "movement",
+		["importance"] = 2
 	}
 }

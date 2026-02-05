@@ -17,6 +17,10 @@ Main changes from the original mod:
 
 
 ## Changelog
+
+v0.6.0.0-dev:
+- Add optional daily summary mode for message log to reduce noise on large farms (new setting: Message Log Detail)
+
 v0.5.0.0:
 - Randomize father selection during breeding - eligible males are now chosen randomly instead of always the first one
 - Improve genetic inheritance with natural variation - offspring can now exceed or fall below parent trait values

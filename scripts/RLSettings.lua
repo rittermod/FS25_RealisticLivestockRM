@@ -181,8 +181,18 @@ RLSettings.SETTINGS = {
 		["callback"] = RealisticLivestock_PlaceableHusbandryAnimals.onSettingChanged
 	},
 
-	["diseasesEnabled"] = {
+	["messageSummary"] = {
 		["index"] = 8,
+		["type"] = "BinaryOption",
+		["dynamicTooltip"] = true,
+		["default"] = 1,  -- Individual (current behavior) as default
+		["binaryType"] = "offOn",
+		["values"] = { false, true },
+		["callback"] = RLMessageAggregator.onSettingChanged
+	},
+
+	["diseasesEnabled"] = {
+		["index"] = 9,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
 		["default"] = 2,
@@ -192,7 +202,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["diseasesChance"] = {
-		["index"] = 9,
+		["index"] = 10,
 		["type"] = "MultiTextOption",
 		["default"] = 4,
 		["valueType"] = "float",
@@ -205,7 +215,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["useCustomAnimals"] = {
-		["index"] = 10,
+		["index"] = 11,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
 		["default"] = 1,
@@ -215,7 +225,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["animalsXML"] = {
-		["index"] = 10,
+		["index"] = 11,
 		["type"] = "Button",
 		["ignore"] = true,
 		["callback"] = RLSettings.onClickChangeAnimalsXML,
