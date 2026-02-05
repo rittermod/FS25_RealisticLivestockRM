@@ -6,6 +6,7 @@ function RealisticLivestock_PlaceableHusbandryAnimals.registerFunctions(placeabl
 	SpecializationUtil.registerFunction(placeable, "getHasUnreadRLMessages", PlaceableHusbandryAnimals.getHasUnreadRLMessages)
 	SpecializationUtil.registerFunction(placeable, "getRLMessages", PlaceableHusbandryAnimals.getRLMessages)
 	SpecializationUtil.registerFunction(placeable, "addRLMessage", PlaceableHusbandryAnimals.addRLMessage)
+	SpecializationUtil.registerFunction(placeable, "addRLMessageDirect", PlaceableHusbandryAnimals.addRLMessageDirect)
 	SpecializationUtil.registerFunction(placeable, "deleteRLMessage", PlaceableHusbandryAnimals.deleteRLMessage)
 	SpecializationUtil.registerFunction(placeable, "getNextRLMessageUniqueId", PlaceableHusbandryAnimals.getNextRLMessageUniqueId)
 	SpecializationUtil.registerFunction(placeable, "setNextRLMessageUniqueId", PlaceableHusbandryAnimals.setNextRLMessageUniqueId)
@@ -36,7 +37,8 @@ function PlaceableHusbandryAnimals:getRLMessages()
 end
 
 
-function PlaceableHusbandryAnimals:addRLMessage(id, animal, args, date, uniqueId, isLoading)
+-- Direct message insertion, bypassing the aggregator
+function PlaceableHusbandryAnimals:addRLMessageDirect(id, animal, args, date, uniqueId, isLoading)
 
     local spec = self.spec_husbandryAnimals
 
@@ -72,6 +74,18 @@ function PlaceableHusbandryAnimals:addRLMessage(id, animal, args, date, uniqueId
 
     spec.unreadMessages = true
 
+end
+
+
+-- Main message entry point - routes through aggregator when in summary mode
+function PlaceableHusbandryAnimals:addRLMessage(id, animal, args, date, uniqueId, isLoading)
+    if isLoading then
+        -- Loading from save - bypass aggregator
+        self:addRLMessageDirect(id, animal, args, date, uniqueId, isLoading)
+    else
+        -- Route through aggregator (handles summary mode check)
+        RLMessageAggregator.queueMessage(self, id, animal, args, date)
+    end
 end
 
 

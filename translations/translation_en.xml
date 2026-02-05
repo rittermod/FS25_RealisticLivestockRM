@@ -497,6 +497,10 @@
 		<text name="rl_settings_maxNumMessages_label" text="Maximum Amount of Messages"/>
 		<text name="rl_settings_maxNumMessages_tooltip" text="A higher amount will result in your save folder taking up more space. After this limit is reached, the earliest messages will be deleted."/>
 
+		<text name="rl_settings_messageSummary_label" text="Message Log Summaries"/>
+		<text name="rl_settings_messageSummary_tooltip_1" text="Off: Individual messages for each event"/>
+		<text name="rl_settings_messageSummary_tooltip_2" text="On: Daily summaries per husbandry (reduces log noise)"/>
+
 		<text name="rl_settings_diseasesEnabled_label" text="Diseases Enabled"/>
 		<text name="rl_settings_diseasesEnabled_tooltip_1" text="Animals cannot catch or inherit diseases"/>
 		<text name="rl_settings_diseasesEnabled_tooltip_2" text="Animals can catch or inherit diseases"/>
@@ -630,6 +634,13 @@
 		<text name="rl_message_aiManager_mark_ai_multiple" text="Herdsman marked %s animals for AI"/>
 		<text name="rl_message_aiManager_ai_single" text="Herdsman inseminated 1 animal"/>
 		<text name="rl_message_aiManager_ai_multiple" text="Herdsman inseminated %s animals"/>
+
+		<!-- Daily summary messages -->
+		<text name="rl_message_dailyBirthsSummary" text="%s animals were born at %s"/>
+		<text name="rl_message_dailyDeathsSummary" text="%s animals died at %s - %s"/>
+		<text name="rl_message_dailySalesSummary" text="Sold %s animals at %s for %s"/>
+		<text name="rl_message_dailyOvercrowdingSummary" text="Overcrowding: sold %s newborns at %s for %s"/>
+		<text name="rl_message_dailyPurchasesSummary" text="Bought %s animals at %s for %s"/>
 
 
 

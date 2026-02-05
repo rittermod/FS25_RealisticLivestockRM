@@ -117,6 +117,7 @@ function RealisticLivestock_FSBaseMission:onStartMission()
     end
 
     RLSettings.applyDefaultSettings()
+    RLMessageAggregator.initialize()
 
     local temp = self.environment.weather.temperatureUpdater.currentMin or 20
 	local isServer = self:getIsServer() 
