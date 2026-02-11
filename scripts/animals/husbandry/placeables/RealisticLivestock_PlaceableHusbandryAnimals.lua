@@ -254,124 +254,124 @@ PlaceableHusbandryAnimals.addAnimals = Utils.overwrittenFunction(PlaceableHusban
 
 
 function RealisticLivestock_PlaceableHusbandryAnimals:onDayChanged()
+    RmSafeUtils.safeCall("PlaceableHusbandryAnimals:onDayChanged", function()
 
-    local minTemp =  math.floor(g_currentMission.environment.weather.temperatureUpdater.currentMin)
+        local minTemp = math.floor(g_currentMission.environment.weather.temperatureUpdater.currentMin)
 
-    local environment = g_currentMission.environment
-    local month = environment.currentPeriod + 2
-    local currentDayInPeriod = environment.currentDayInPeriod
+        local environment = g_currentMission.environment
+        local month = environment.currentPeriod + 2
+        local currentDayInPeriod = environment.currentDayInPeriod
 
-    if month > 12 then month = month - 12 end
+        if month > 12 then month = month - 12 end
 
-    local daysPerPeriod = environment.daysPerPeriod
-    local day = 1 + math.floor((currentDayInPeriod - 1) * (RealisticLivestock.DAYS_PER_MONTH[month] / daysPerPeriod))
-    local year = environment.currentYear
+        local daysPerPeriod = environment.daysPerPeriod
+        local day = 1 + math.floor((currentDayInPeriod - 1) * (RealisticLivestock.DAYS_PER_MONTH[month] / daysPerPeriod))
+        local year = environment.currentYear
 
-    local spec = self.spec_husbandryAnimals
-    local animals = spec.clusterSystem:getAnimals()
+        local spec = self.spec_husbandryAnimals
+        local animals = spec.clusterSystem:getAnimals()
 
-    local totalChildren, deadParents, childrenToSell, childrenToSellMoney, lowHealthDeaths, oldAgeDeaths, randomDeaths, randomDeathsMoney = 0, 0, 0, 0, 0, 0, 0, 0
+        local totalChildren, deadParents, childrenToSell, childrenToSellMoney, lowHealthDeaths, oldAgeDeaths, randomDeaths, randomDeathsMoney = 0, 0, 0, 0, 0, 0, 0, 0
 
-    for _, animal in ipairs(animals) do
+        for _, animal in ipairs(animals) do
 
-        if animal.monthsSinceLastBirth == nil then
-            animal.monthsSinceLastBirth = 0
-        end
-
-        if animal.isParent == nil then
-            animal.isParent = false
-        end
-
-        local a, b, c, d, e, f, g, h = animal:onDayChanged(spec, self.isServer, day, month, year, currentDayInPeriod, daysPerPeriod)
-
-        totalChildren = totalChildren + a
-        deadParents = deadParents + b
-        childrenToSell = childrenToSell + c
-        childrenToSellMoney = childrenToSellMoney + d
-        lowHealthDeaths = lowHealthDeaths + e
-        oldAgeDeaths = oldAgeDeaths + f
-        randomDeaths = randomDeaths + g
-        randomDeathsMoney = randomDeathsMoney + h
-
-    end
-
-    if self.isServer then
-
-        if childrenToSell > 0 and childrenToSellMoney > 0 then
-            local farmIndex = spec:getOwnerFarmId()
-            local farm = g_farmManager:getFarmById(farmIndex)
-
-            --if self.isServer then
-                g_currentMission:addMoneyChange(childrenToSellMoney, farmIndex, MoneyType.SOLD_ANIMALS, true)
-            --else
-                --g_client:getServerConnection():sendEvent(MoneyChangeEvent.new(childrenToSellMoney, MoneyType.SOLD_ANIMALS, farmIndex))
-            --end
-
-            if farm ~= nil then
-                farm:changeBalance(childrenToSellMoney, MoneyType.SOLD_ANIMALS)
+            if animal.monthsSinceLastBirth == nil then
+                animal.monthsSinceLastBirth = 0
             end
+
+            if animal.isParent == nil then
+                animal.isParent = false
+            end
+
+            local a, b, c, d, e, f, g, h = RmSafeUtils.safeAnimalCall(animal, "onDayChanged", function()
+                return animal:onDayChanged(spec, self.isServer, day, month, year, currentDayInPeriod, daysPerPeriod)
+            end, {0, 0, 0, 0, 0, 0, 0, 0})
+
+            totalChildren = totalChildren + (a or 0)
+            deadParents = deadParents + (b or 0)
+            childrenToSell = childrenToSell + (c or 0)
+            childrenToSellMoney = childrenToSellMoney + (d or 0)
+            lowHealthDeaths = lowHealthDeaths + (e or 0)
+            oldAgeDeaths = oldAgeDeaths + (f or 0)
+            randomDeaths = randomDeaths + (g or 0)
+            randomDeathsMoney = randomDeathsMoney + (h or 0)
+
         end
 
-        if randomDeaths > 0 then
+        if self.isServer then
 
-            local farmIndex = spec:getOwnerFarmId()
-            local farm = g_farmManager:getFarmById(farmIndex)
+            if childrenToSell > 0 and childrenToSellMoney > 0 then
+                local farmIndex = spec:getOwnerFarmId()
+                local farm = g_farmManager:getFarmById(farmIndex)
 
-            if randomDeathsMoney > 0 then
-
-                --if self.isServer then
-                    g_currentMission:addMoneyChange(randomDeathsMoney, farmIndex, MoneyType.SOLD_ANIMALS, true)
-                --else
-                    --g_client:getServerConnection():sendEvent(MoneyChangeEvent.new(randomDeathsMoney, MoneyType.SOLD_ANIMALS, farmIndex))
-                --end
+                g_currentMission:addMoneyChange(childrenToSellMoney, farmIndex, MoneyType.SOLD_ANIMALS, true)
 
                 if farm ~= nil then
-                    farm:changeBalance(randomDeathsMoney, MoneyType.SOLD_ANIMALS)
+                    farm:changeBalance(childrenToSellMoney, MoneyType.SOLD_ANIMALS)
+                end
+            end
+
+            if randomDeaths > 0 then
+
+                local farmIndex = spec:getOwnerFarmId()
+                local farm = g_farmManager:getFarmById(farmIndex)
+
+                if randomDeathsMoney > 0 then
+
+                    g_currentMission:addMoneyChange(randomDeathsMoney, farmIndex, MoneyType.SOLD_ANIMALS, true)
+
+                    if farm ~= nil then
+                        farm:changeBalance(randomDeathsMoney, MoneyType.SOLD_ANIMALS)
+                    end
+
                 end
 
             end
 
+            spec.aiAnimalManager:onDayChanged()
+
         end
-        
-        spec.aiAnimalManager:onDayChanged()
 
-    end
+        spec.minTemp = minTemp
 
-    spec.minTemp = minTemp
+        if randomDeaths > 0 or oldAgeDeaths > 0 or lowHealthDeaths > 0 or deadParents > 0 or totalChildren > 0 then spec.clusterHusbandry:updateVisuals() end
 
-    if randomDeaths > 0 or oldAgeDeaths > 0 or lowHealthDeaths > 0 or deadParents > 0 or totalChildren > 0 then spec.clusterHusbandry:updateVisuals() end
+        self:raiseActive()
 
-    self:raiseActive()
+        if self:getHasUnreadRLMessages() and g_localPlayer ~= nil and g_localPlayer.farmId == self:getOwnerFarmId() then
 
-    if self:getHasUnreadRLMessages() and g_localPlayer ~= nil and g_localPlayer.farmId == self:getOwnerFarmId() then
+            g_currentMission:addIngameNotification(FSBaseMission.INGAME_NOTIFICATION_CRITICAL, string.format(g_i18n:getText("rl_ui_unreadMessages"), self:getName()))
 
-        g_currentMission:addIngameNotification(FSBaseMission.INGAME_NOTIFICATION_CRITICAL, string.format(g_i18n:getText("rl_ui_unreadMessages"), self:getName()))
+        end
 
-    end
-
+    end)
 end
 
 PlaceableHusbandryAnimals.onDayChanged = Utils.overwrittenFunction(PlaceableHusbandryAnimals.onDayChanged, RealisticLivestock_PlaceableHusbandryAnimals.onDayChanged)
 
 
 function RealisticLivestock_PlaceableHusbandryAnimals:onPeriodChanged(_)
+    RmSafeUtils.safeCall("PlaceableHusbandryAnimals:onPeriodChanged", function()
 
-    if self.isServer then
+        if self.isServer then
 
-		local animals = self.spec_husbandryAnimals.clusterSystem:getClusters()
-        local totalTreatmentCost = 0
+            local animals = self.spec_husbandryAnimals.clusterSystem:getClusters()
+            local totalTreatmentCost = 0
 
-        for _, animal in pairs(animals) do
-            local treatmentCost = animal:onPeriodChanged()
-            totalTreatmentCost = totalTreatmentCost + treatmentCost
+            for _, animal in pairs(animals) do
+                local treatmentCost = RmSafeUtils.safeAnimalCall(animal, "onPeriodChanged", function()
+                    return animal:onPeriodChanged()
+                end, {0})
+                totalTreatmentCost = totalTreatmentCost + (treatmentCost or 0)
+            end
+
+            if totalTreatmentCost > 0 then g_currentMission:addMoneyChange(totalTreatmentCost, self.spec_husbandryAnimals:getOwnerFarmId(), MoneyType.MEDICINE, true) end
+
+            g_diseaseManager:calculateTransmission(animals)
+
         end
 
-        if totalTreatmentCost > 0 then g_currentMission:addMoneyChange(totalTreatmentCost, self.spec_husbandryAnimals:getOwnerFarmId(), MoneyType.MEDICINE, true) end
-
-        g_diseaseManager:calculateTransmission(animals)
-
-    end
-
+    end)
 end
 
 PlaceableHusbandryAnimals.onPeriodChanged = Utils.overwrittenFunction(PlaceableHusbandryAnimals.onPeriodChanged, RealisticLivestock_PlaceableHusbandryAnimals.onPeriodChanged)

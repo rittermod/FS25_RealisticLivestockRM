@@ -16,6 +16,9 @@ source(modDirectory .. "scripts/fontlib/RmFontManager.lua")
 -- SECTION 2: GUI Loading Screen
 source(modDirectory .. "scripts/gui/MPLoadingScreen.lua")
 
+-- SECTION 2b: Utilities
+source(modDirectory .. "scripts/utils/RmSafeUtils.lua")
+
 -- SECTION 3: Animal Husbandry - Cluster System
 source(modDirectory .. "scripts/animals/husbandry/cluster/RealisticLivestock_AnimalCluster.lua")
 source(modDirectory .. "scripts/animals/husbandry/cluster/RealisticLivestock_AnimalClusterHusbandry.lua")

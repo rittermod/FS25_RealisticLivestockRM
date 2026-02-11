@@ -1522,122 +1522,134 @@ end
 
 
 function AnimalSystem:onDayChanged()
+    RmSafeUtils.safeCall("AnimalSystem:onDayChanged", function()
 
-    local environment = g_currentMission.environment
-    local month = environment.currentPeriod + 2
-    local currentDayInPeriod = environment.currentDayInPeriod
+        local environment = g_currentMission.environment
+        local month = environment.currentPeriod + 2
+        local currentDayInPeriod = environment.currentDayInPeriod
 
-    if month > 12 then month = month - 12 end
+        if month > 12 then month = month - 12 end
 
-    local daysPerPeriod = environment.daysPerPeriod
-    local day = 1 + math.floor((currentDayInPeriod - 1) * (getDaysInMonth(month) / daysPerPeriod))
-    local year = environment.currentYear
+        local daysPerPeriod = environment.daysPerPeriod
+        local day = 1 + math.floor((currentDayInPeriod - 1) * (getDaysInMonth(month) / daysPerPeriod))
+        local year = environment.currentYear
 
-    for _, animals in pairs(self.animals) do
-
-        for _, animal in pairs(animals) do
-
-            animal.reserved = false
-
-            animal:onDayChanged(nil, self.isServer, day, month, year, currentDayInPeriod, daysPerPeriod, true)
-
-        end
-
-    end
-
-    for _, animals in pairs(self.aiAnimals) do
-
-        for _, animal in pairs(animals) do animal:onDayChanged(nil, self.isServer, day, month, year, currentDayInPeriod, daysPerPeriod, true) end
-
-    end
-
-end
-
-
-function AnimalSystem:onPeriodChanged()
-
-    for _, animals in pairs(self.animals) do
-
-        for _, animal in pairs(animals) do
-
-            animal:onPeriodChanged()
-
-        end
-
-    end
-
-    for _, animals in pairs(self.aiAnimals) do
-
-        for _, animal in pairs(animals) do
-
-            animal:onPeriodChanged()
-
-        end
-
-    end
-
-    if self.isServer then
-
-        local monitorCosts = {}
-
-        for _, placeable in pairs(g_currentMission.husbandrySystem.placeables) do
-
-            local animals = placeable:getClusters()
-            local ownerFarmId = placeable:getOwnerFarmId()
+        for _, animals in pairs(self.animals) do
 
             for _, animal in pairs(animals) do
 
-                if not animal.monitor.active and not animal.monitor.removed then continue end
+                animal.reserved = false
 
-                if animal.monitor.removed and not animal.monitor.active then
-
-                    local visualData = self:getVisualByAge(animal.subTypeIndex, animal.age)
-
-                    if visualData.monitor ~= nil and animal.idFull ~= nil and animal.idFull ~= "1-1" then
-
-                        local sep = string.find(animal.idFull, "-")
-                        local husbandry = tonumber(string.sub(animal.idFull, 1, sep - 1))
-                        local animalId = tonumber(string.sub(animal.idFull, sep + 1))
-
-                        if husbandry ~= 0 and animalId ~= 0 then
-
-                            local rootNode = getAnimalRootNode(husbandry, animalId)
-
-                            if rootNode ~= 0 then
-
-                                local monitorNode = I3DUtil.indexToObject(rootNode, visualData.monitor)
-
-                                if monitorNode ~= nil and monitorNode ~= 0 then setVisibility(monitorNode, false) end
-
-                            end
-
-                        end
-
-                    end
-                    
-                    animal.monitor.removed = false
-
-                end
-
-                if monitorCosts[ownerFarmId] == nil then monitorCosts[ownerFarmId] = 0 end
-
-                monitorCosts[ownerFarmId] = monitorCosts[ownerFarmId] + animal.monitor.fee
+                RmSafeUtils.safeAnimalCall(animal, "AnimalSystem:onDayChanged", function()
+                    animal:onDayChanged(nil, self.isServer, day, month, year, currentDayInPeriod, daysPerPeriod, true)
+                end)
 
             end
 
         end
 
-        for ownerFarmId, cost in pairs(monitorCosts) do
+        for _, animals in pairs(self.aiAnimals) do
 
-            local ownerFarm = g_farmManager:getFarmById(ownerFarmId)
-
-            g_currentMission:addMoneyChange(0 - cost, ownerFarmId, MoneyType.MONITOR_SUBSCRIPTIONS, true)
-            ownerFarm:changeBalance(0 - cost, MoneyType.MONITOR_SUBSCRIPTIONS)
+            for _, animal in pairs(animals) do
+                RmSafeUtils.safeAnimalCall(animal, "AnimalSystem:onDayChanged(ai)", function()
+                    animal:onDayChanged(nil, self.isServer, day, month, year, currentDayInPeriod, daysPerPeriod, true)
+                end)
+            end
 
         end
 
-    end
+    end)
+end
 
+
+function AnimalSystem:onPeriodChanged()
+    RmSafeUtils.safeCall("AnimalSystem:onPeriodChanged", function()
+
+        for _, animals in pairs(self.animals) do
+
+            for _, animal in pairs(animals) do
+                RmSafeUtils.safeAnimalCall(animal, "onPeriodChanged", function()
+                    animal:onPeriodChanged()
+                end)
+            end
+
+        end
+
+        for _, animals in pairs(self.aiAnimals) do
+
+            for _, animal in pairs(animals) do
+                RmSafeUtils.safeAnimalCall(animal, "onPeriodChanged", function()
+                    animal:onPeriodChanged()
+                end)
+            end
+
+        end
+
+        if self.isServer then
+
+            local monitorCosts = {}
+
+            for _, placeable in pairs(g_currentMission.husbandrySystem.placeables) do
+
+                local animals = placeable:getClusters()
+                local ownerFarmId = placeable:getOwnerFarmId()
+
+                for _, animal in pairs(animals) do
+
+                    if animal.monitor == nil then continue end
+
+                    if not animal.monitor.active and not animal.monitor.removed then continue end
+
+                    if animal.monitor.removed and not animal.monitor.active then
+
+                        local visualData = self:getVisualByAge(animal.subTypeIndex, animal.age)
+
+                        if visualData.monitor ~= nil and animal.idFull ~= nil and animal.idFull ~= "1-1" then
+
+                            local sep = string.find(animal.idFull, "-")
+                            local husbandry = tonumber(string.sub(animal.idFull, 1, sep - 1))
+                            local animalId = tonumber(string.sub(animal.idFull, sep + 1))
+
+                            if husbandry ~= 0 and animalId ~= 0 then
+
+                                local rootNode = getAnimalRootNode(husbandry, animalId)
+
+                                if rootNode ~= 0 then
+
+                                    local monitorNode = I3DUtil.indexToObject(rootNode, visualData.monitor)
+
+                                    if monitorNode ~= nil and monitorNode ~= 0 then setVisibility(monitorNode, false) end
+
+                                end
+
+                            end
+
+                        end
+
+                        animal.monitor.removed = false
+
+                    end
+
+                    if monitorCosts[ownerFarmId] == nil then monitorCosts[ownerFarmId] = 0 end
+
+                    monitorCosts[ownerFarmId] = monitorCosts[ownerFarmId] + animal.monitor.fee
+
+                end
+
+            end
+
+            for ownerFarmId, cost in pairs(monitorCosts) do
+
+                local ownerFarm = g_farmManager:getFarmById(ownerFarmId)
+
+                g_currentMission:addMoneyChange(0 - cost, ownerFarmId, MoneyType.MONITOR_SUBSCRIPTIONS, true)
+                ownerFarm:changeBalance(0 - cost, MoneyType.MONITOR_SUBSCRIPTIONS)
+
+            end
+
+        end
+
+    end)
 end
 
 
