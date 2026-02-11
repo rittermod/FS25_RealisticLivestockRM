@@ -486,6 +486,10 @@
 		<text name="rl_settings_resetDealer_tooltip" text="Remove all the dealer's animals and replenish the stock with new animals"/>
 		<text name="rl_settings_resetDealer_text" text="Reset Animal Dealer"/>
 
+		<text name="rl_settings_resetAIAnimals_label" text="Reset AI Animals"/>
+		<text name="rl_settings_resetAIAnimals_tooltip" text="Remove all AI animals available for artificial insemination and replenish with new randomly generated animals"/>
+		<text name="rl_settings_resetAIAnimals_text" text="Reset AI Animals"/>
+
 		<text name="rl_settings_tagColour_label" text="Change Tag Colour"/>
 		<text name="rl_settings_tagColour_tooltip" text="Change the colour of ear tags"/>
 		<text name="rl_settings_tagColour_text" text="Change Tag Colour"/>

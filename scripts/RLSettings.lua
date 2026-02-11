@@ -158,22 +158,29 @@ RLSettings.SETTINGS = {
 		["callback"] = AnimalSystem.onClickResetDealer
 	},
 
-	["tagColour"] = {
+	["resetAIAnimals"] = {
 		["index"] = 6,
+		["type"] = "Button",
+		["ignore"] = true,
+		["callback"] = AnimalSystem.onClickResetAIAnimals
+	},
+
+	["tagColour"] = {
+		["index"] = 7,
 		["type"] = "Button",
 		["ignore"] = true,
 		["callback"] = RLSettings.onClickTagColour
 	},
 
 	["exportCSV"] = {
-		["index"] = 7,
+		["index"] = 8,
 		["type"] = "Button",
 		["ignore"] = true,
 		["callback"] = RLSettings.onClickExportCSV
 	},
 
 	["maxNumMessages"] = {
-		["index"] = 7,
+		["index"] = 8,
 		["type"] = "MultiTextOption",
 		["default"] = 5,
 		["valueType"] = "int",
@@ -182,7 +189,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["messageSummary"] = {
-		["index"] = 8,
+		["index"] = 9,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
 		["default"] = 1,  -- Individual (current behavior) as default
@@ -192,7 +199,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["diseasesEnabled"] = {
-		["index"] = 9,
+		["index"] = 10,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
 		["default"] = 2,
@@ -202,7 +209,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["diseasesChance"] = {
-		["index"] = 10,
+		["index"] = 11,
 		["type"] = "MultiTextOption",
 		["default"] = 4,
 		["valueType"] = "float",
@@ -215,7 +222,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["useCustomAnimals"] = {
-		["index"] = 11,
+		["index"] = 12,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
 		["default"] = 1,
@@ -225,7 +232,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["animalsXML"] = {
-		["index"] = 11,
+		["index"] = 12,
 		["type"] = "Button",
 		["ignore"] = true,
 		["callback"] = RLSettings.onClickChangeAnimalsXML,
