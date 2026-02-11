@@ -2183,6 +2183,10 @@ function Animal:onPeriodChanged()
 
     self.monthsSinceLastBirth = self.monthsSinceLastBirth + 1
 
+    if self.isLactating and self.monthsSinceLastBirth >= 10 then
+        self.isLactating = false
+    end
+
     local totalTreatmentCost = 0
 
     for i = #self.diseases, 1, -1 do
@@ -2328,7 +2332,6 @@ function Animal:onDayChanged(spec, isServer, day, month, year, currentDayInPerio
                 if self.impregnatedBy.health == nil then self.impregnatedBy.health = self.genetics.health end
                 if self.impregnatedBy.fertility == nil then self.impregnatedBy.fertility = self.genetics.fertility end
 
-                self.isLactating = false
                 self.isPregnant = false
 
                 local parentDied = false
@@ -3216,7 +3219,6 @@ function Animal:updateOutput(temp)
                 local factor = 0.8
 
                 if monthsSinceLastBirth >= 10 or not self.isLactating or not self.isParent then
-                    self.isLactating = false
                     factor = 0
                 elseif monthsSinceLastBirth <= 3 then
                     factor = factor + (monthsSinceLastBirth / 6)
@@ -3240,7 +3242,6 @@ function Animal:updateOutput(temp)
             local productivity = self.genetics.productivity or 1
 
             if monthsSinceLastBirth >= 10 or not self.isLactating or not self.isParent then
-                self.isLactating = false
                 factor = 0
             elseif monthsSinceLastBirth <= 3 then
                 factor = factor + (monthsSinceLastBirth / 6)
