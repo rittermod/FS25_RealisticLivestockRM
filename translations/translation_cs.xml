@@ -1,0 +1,675 @@
+<l10n>
+	<texts>
+		<!-- COWS -->
+
+		<text name="fillType_bull" text="公牛"/>
+		<text name="fillType_bull_swiss_brown" text="瑞士褐牛公牛"/>
+		<text name="fillType_bull_holstein" text="荷斯坦公牛"/>
+		<text name="fillType_bull_angus" text="安格斯公牛"/>
+		<text name="fillType_bull_limousin" text="利穆赞公牛"/>
+		<text name="fillType_cow_hereford" text="海福特牛"/>
+		<text name="fillType_bull_hereford" text="赫里福德公牛"/>
+		<text name="fillType_cow_highland_cattle" text="Highland Cattle"/>
+		<text name="fillType_bull_highland_cattle" text="Highland Cattle Bull"/>
+		<text name="animal_descriptionBullFeed" text="公牛喜食牧草、干草和全混合日粮。"/>
+		<text name="animal_descriptionBullYoung" text="这是雄性犊牛。"/>
+		<text name="animal_descriptionBullReproduction" text="健康且月龄超过12个月的公牛可以繁殖。"/>
+		<text name="rl_descriptionCowReproduction" text="Cows that are healthy and older than 12 months can reproduce."/>
+
+		<!-- WATER BUFFALOS -->
+
+		<text name="fillType_bull_waterbuffalo" text="水牛公牛"/>
+
+		<!-- PIGS -->
+
+		<text name="fillType_boar" text="公猪"/>
+		<text name="fillType_boar_landrace" text="长白公猪"/>
+		<text name="fillType_boar_black_pied" text="黑白花公猪"/>
+		<text name="fillType_boar_berkshire" text="巴克夏公猪"/>
+		<text name="animal_descriptionBoarReproduction" text="健康且月龄超过8个月的公猪可以繁殖。"/>
+		<text name="rl_descriptionPigReproduction" text="Sows that are healthy and older than 6 months can reproduce."/>
+		<text name="animal_descriptionBoarFeed" text="公猪几乎什么都吃。您可以喂食玉米、小麦、大麦、油菜、向日葵、大豆、马铃薯、高粱和甜菜。"/>
+		<text name="animal_descriptionBoarYoung" text="这是雄性仔猪。"/>
+
+		<!-- SHEEP -->
+
+		<text name="fillType_ram" text="公羊"/>
+		<text name="fillType_ram_landrace" text="本特海姆地方种公羊"/>
+		<text name="fillType_ram_steinschaf" text="阿尔卑斯石羊公羊"/>
+		<text name="fillType_ram_black_welsh" text="威尔士黑面公羊"/>
+		<text name="fillType_ram_swiss_mountain" text="瑞士黑褐山公羊"/>
+		<text name="animal_descriptionRamFeed" text="公羊喜食牧草和干草。"/>
+		<text name="animal_descriptionRamYoung" text="这是雄性羔羊。"/>
+		<text name="animal_descriptionRamReproduction" text="健康且月龄超过5个月的公羊可以繁殖。"/>
+		<text name="rl_descriptionSheepReproduction" text="Ewes that are healthy and older than 8 months can reproduce."/>
+
+		<!-- GOATS -->
+
+		<text name="fillType_ram_goat" text="山羊公羊"/>
+		<text name="rl_descriptionGoatReproduction" text="Female goats that are healthy and older than 16 months can reproduce."/>
+
+		<!-- HORSES -->
+
+		<text name="fillType_stallion" text="种马"/>
+		<text name="fillType_stallion_gray" text="灰色种马"/>
+		<text name="fillType_stallion_pinto" text="花马种马"/>
+		<text name="fillType_stallion_palomino" text="帕洛米诺种马"/>
+		<text name="fillType_stallion_chestnut" text="栗色种马"/>
+		<text name="fillType_stallion_bay" text="枣红色种马"/>
+		<text name="fillType_stallion_black" text="黑色种马"/>
+		<text name="fillType_stallion_seal_brown" text="海豹褐色种马"/>
+		<text name="fillType_stallion_dun" text="沙毛种马"/>
+		<text name="animal_descriptionStallionFeed" text="种马喜食干草、燕麦和高粱。"/>
+		<text name="animal_descriptionStallionProfit" text="种马可以出售获利。"/>
+		<text name="animal_descriptionStallionReproduction" text="健康且月龄超过36个月的种马可以繁殖。"/>
+		<text name="rl_descriptionHorseReproduction" text="Mares that are healthy and older than 22 months can reproduce."/>
+
+		<!-- CHICKENS -->
+
+		<text name="rl_descriptionChickenReproduction" text="Hens that are healthy and older than 6 months can reproduce."/>
+
+
+		<!-- UI -->
+
+
+		<text name="input_VisualAnimalsDialog" text="更改可视动物数量"/>
+		<text name="rl_button_apply" text="应用"/>
+		<text name="rl_button_confirm" text="确认"/>
+		<text name="rl_button_recommended" text="推荐"/>
+		<text name="rl_button_cancel" text="取消"/>
+		<text name="rl_button_random" text="随机"/>
+		<text name="rl_dialog_title" text="设置最大可视动物数量"/>
+
+		<text name="rl_ui_unhealthy" text="健康状况过差"/>
+		<text name="rl_ui_unhealthyBracketed" text="否（健康状况过差）"/>
+		<text name="rl_ui_noMaleAnimal" text="无合适雄性动物"/>
+		<text name="rl_ui_noMaleAnimalBracketed" text="否（无合适雄性动物）"/>
+		<text name="rl_ui_recoveringLastBirth" text="上次分娩后恢复中"/>
+		<text name="rl_ui_recoveringLastBirthBracketed" text="否（上次分娩后恢复中）"/>
+		<text name="rl_ui_tooYoung" text="过于年幼"/>
+		<text name="rl_ui_tooYoungBracketed" text="否（过于年幼）"/>
+		<text name="rl_ui_pregnant" text="怀孕"/>
+		<text name="rl_ui_lactating" text="哺乳期"/>
+		<text name="rl_ui_canReproduce" text="可繁殖"/>
+		<text name="rl_ui_impregnatedBy" text="受精于"/>
+		<text name="rl_ui_unknown" text="未知"/>
+		<text name="rl_ui_yes" text="是"/>
+		<text name="rl_ui_no" text="否"/>
+		<text name="rl_ui_mother" text="母亲"/>
+		<text name="rl_ui_father" text="父亲"/>
+		<text name="rl_ui_uniqueId" text="唯一ID"/>
+		<text name="rl_ui_farmId" text="农场ID"/>
+		<text name="rl_ui_gender" text="性别"/>
+		<text name="rl_ui_male" text="雄性"/>
+		<text name="rl_ui_female" text="雌性"/>
+		<text name="rl_ui_weight" text="体重"/>
+		<text name="rl_ui_targetWeight" text="目标体重"/>
+		<text name="rl_ui_value" text="价值"/>
+		<text name="rl_ui_valuePerKilo" text="每公斤价值"/>
+		<text name="rl_ui_genetics" text="遗传学"/>
+		<text name="rl_ui_overall" text="总体"/>
+		<text name="rl_ui_rename" text="重命名"/>
+		<text name="rl_ui_cantFindAnimal" text="无法找到动物"/>
+		<text name="rl_ui_maleNumImpregnatable" text="圈舍内可受孕动物数量"/>
+
+		<text name="rl_ui_breederQuality" text="育种质量"/>
+		<text name="rl_ui_birthday" text="出生日期"/>
+		<text name="rl_ui_pregnancyExpected" text="预计"/>
+		<text name="rl_ui_pregnancyExpecting" text="预计产仔数"/>
+		<text name="rl_ui_pregnancyBaby" text="头"/>
+		<text name="rl_ui_pregnancyBabies" text="头"/>
+		<text name="rl_ui_animalOrigin" text="来源"/>
+		<text name="rl_ui_months" text="个月"/>
+		<text name="rl_ui_month" text="个月"/>
+		<text name="rl_ui_years" text="年"/>
+		<text name="rl_ui_year" text="年"/>
+
+		<text name="rl_ui_milk" text="产奶量"/>
+		<text name="rl_ui_wool" text="产毛量"/>
+		<text name="rl_ui_eggs" text="产蛋量"/>
+		<text name="rl_ui_metabolism" text="新陈代谢"/>
+		<text name="rl_ui_meat" text="品质"/>
+		<text name="rl_ui_meat_github" text="肉品质"/>
+		<text name="rl_ui_quality" text="品质"/>
+		<text name="rl_ui_quality_github" text="肉品质"/>
+		<text name="rl_ui_health" text="健康状况"/>
+		<text name="rl_ui_fertility" text="繁殖力"/>
+
+		<text name="rl_ui_genetics_infertile" text="不育"/>
+		<text name="rl_ui_genetics_extremelyLow" text="极低"/>
+		<text name="rl_ui_genetics_veryLow" text="很低"/>
+		<text name="rl_ui_genetics_low" text="低"/>
+		<text name="rl_ui_genetics_average" text="中等"/>
+		<text name="rl_ui_genetics_high" text="高"/>
+		<text name="rl_ui_genetics_veryHigh" text="很高"/>
+		<text name="rl_ui_genetics_extremelyHigh" text="极高"/>
+		<text name="rl_ui_genetics_highest" text="最高"/>
+
+		<text name="rl_ui_genetics_extremelyBad" text="极差"/>
+		<text name="rl_ui_genetics_veryBad" text="很差"/>
+		<text name="rl_ui_genetics_bad" text="差"/>
+		<text name="rl_ui_genetics_good" text="良好"/>
+		<text name="rl_ui_genetics_veryGood" text="很好"/>
+		<text name="rl_ui_genetics_extremelyGood" text="极好"/>
+
+		<text name="rl_ui_buySelected" text="购买选中"/>
+		<text name="rl_ui_sellSelected" text="出售选中"/>
+		<text name="rl_ui_moveSelected" text="移动选中"/>
+		<text name="rl_ui_buyConfirmation" text="确定要以 %s 的价格购买 %s 头动物吗？" tag="format"/>
+		<text name="rl_ui_sellConfirmation" text="确定要以 %s 的价格出售 %s 头动物吗？" tag="format"/>
+		<text name="rl_ui_moveConfirmation" text="确定要移动 %s 头动物吗？" tag="format"/>
+		<text name="rl_ui_buyBulkResult" text="以 %s 的价格购买了 %s 头动物" tag="format"/>
+		<text name="rl_ui_sellBulkResult" text="以 %s 的价格出售了 %s 头动物" tag="format"/>
+		<text name="rl_ui_moveBulkResult" text="移动了 %s 头动物" tag="format"/>
+
+		<text name="rl_ui_monitor" text="监测器"/>
+		<text name="rl_ui_monitorSubscriptions" text="监测器订阅"/>
+		<text name="finance_monitorSubscriptions" text="监测器订阅"/>
+		<text name="rl_ui_monitorFee" text="监测费用"/>
+		<text name="rl_ui_applyMonitor" text="安装监测器"/>
+		<text name="rl_ui_removeMonitor" text="移除监测器"/>
+		<text name="rl_ui_input_food" text="饲料"/>
+		<text name="rl_ui_input_water" text="饮水"/>
+		<text name="rl_ui_input_straw" text="垫草"/>
+		<text name="rl_ui_output_milk" text="牛奶"/>
+		<text name="rl_ui_output_manure" text="粪肥"/>
+		<text name="rl_ui_output_liquidManure" text="液肥"/>
+		<text name="rl_ui_output_pallets_eggs" text="鸡蛋"/>
+		<text name="rl_ui_output_pallets_wool" text="羊毛"/>
+		<text name="rl_ui_output_pallets_goatMilk" text="羊奶"/>
+		<text name="rl_ui_amountPerDay" text="%.0fL / day" tag="format"/>
+		<text name="rl_ui_feePerMonth" text="%s / month" tag="format"/>
+
+		<text name="rl_ui_animalType" text="类型"/>
+		<text name="rl_ui_amountMonitored" text="已监测"/>
+		<text name="rl_ui_production" text="产品"/>
+		<text name="rl_ui_applyAllMonitor" text="安装所有监测器"/>
+		<text name="rl_ui_removeAllMonitor" text="移除所有监测器"/>
+		<text name="rl_ui_fee" text="费用"/>
+
+		<text name="rl_ui_leftEarTag" text="左耳标"/>
+		<text name="rl_ui_rightEarTag" text="右耳标"/>
+		<text name="rl_ui_backgroundColour" text="背景颜色"/>
+		<text name="rl_ui_backgroundHue" text="背景色调"/>
+		<text name="rl_ui_backgroundRgb" text="背景RGB"/>
+		<text name="rl_ui_textColour" text="文字颜色"/>
+		<text name="rl_ui_textHue" text="文字色调"/>
+		<text name="rl_ui_textRgb" text="文字RGB"/>
+
+		<text name="rl_ui_formatMonths" text="%s个月"/>
+		<text name="rl_ui_formatMonth" text="%s个月"/>
+		<text name="rl_ui_notPregnant" text="未怀孕"/>
+		<text name="rl_ui_any" text="任意"/>
+		<text name="rl_ui_pregnancy" text="妊娠"/>
+		<text name="rl_ui_productivity" text="生产力"/>
+		<text name="rl_ui_selectAll" text="全选"/>
+		<text name="rl_ui_selectNone" text="全不选"/>
+		<text name="rl_ui_filters" text="筛选器"/>
+		<text name="rl_ui_doesntHaveName" text="未命名"/>
+		<text name="rl_ui_doesHaveName" text="已命名"/>
+
+
+
+		<text name="rl_ui_castrated" text="已阉割"/>
+		<text name="rl_ui_castrate" text="阉割"/>
+
+		<text name="rl_ui_importance" text="重要性"/>
+		<text name="rl_ui_type" text="类型"/>
+		<text name="rl_ui_date" text="日期"/>
+		<text name="rl_ui_message" text="消息"/>
+		<text name="rl_ui_messages" text="消息"/>
+		<text name="rl_ui_unknownCauses" text="未知原因"/>
+		<text name="rl_ui_messageNumber" text="%s-%s，共%s条"/>
+		<text name="rl_ui_deleteMessage" text="删除消息"/>
+		<text name="rl_ui_unreadMessages" text="畜牧场'%s'有未读消息！"/>
+		<text name="rl_ui_herdsman" text="牧工"/>
+		<text name="rl_ui_budget" text="预算"/>
+		<text name="rl_ui_budgetType" text="预算类型"/>
+		<text name="rl_ui_fixed" text="固定"/>
+		<text name="rl_ui_percentage" text="百分比"/>
+		<text name="rl_ui_maxAnimals" text="最大动物数"/>
+		<text name="rl_ui_infinite" text="无限"/>
+		<text name="rl_ui_herdsmanRecentlyBought" text="近期牧工采购"/>
+		<text name="rl_ui_previousWage" text="先前工资"/>
+		<text name="rl_ui_herdsmanWages" text="牧工工资"/>
+		<text name="finance_herdsmanWages" text="牧工工资"/>
+		<text name="rl_ui_medicine" text="兽药"/>
+		<text name="finance_medicine" text="兽药"/>
+		<text name="rl_ui_semenPurchase" text="购买精液"/>
+		<text name="rl_ui_semenPurchase_github" text="购买精液"/>
+		<text name="finance_semenPurchase" text="购买精液"/>
+		<text name="finance_semenPurchase_github" text="购买精液"/>
+		<text name="rl_ui_noDiseases" text="无疾病"/>
+		<text name="rl_ui_onlyDiseases" text="仅患病"/>
+		<text name="rl_ui_naming" text="命名"/>
+		<text name="rl_ui_alphabetical" text="按字母顺序"/>
+		<text name="rl_ui_breed" text="品种"/>
+		<text name="rl_ui_dontMark" text="不标记"/>
+		<text name="rl_ui_mark" text="标记"/>
+		<text name="rl_ui_unmark" text="取消标记"/>
+		<text name="rl_ui_favourite" text="收藏"/>
+		<text name="rl_ui_unFavourite" text="取消收藏"/>
+		<text name="rl_ui_quantity" text="数量"/>
+		<text name="rl_ui_dewar" text="液氮罐"/>
+		<text name="rl_ui_semenPurchase_successful" text="成功购买人工精液。您可以在商店领取"/>
+		<text name="rl_ui_semenPurchase_successful_github" text="成功购买精液。您可以在商店领取"/>
+		<text name="rl_ui_semenPurchase_unsuccessful" text="无法购买人工精液"/>
+		<text name="rl_ui_semenPurchase_unsuccessful_github" text="无法购买精液"/>
+		<text name="rl_ui_earTag" text="耳标"/>
+		<text name="rl_ui_species" text="物种"/>
+		<text name="rl_ui_strawSingle" text="支"/>
+		<text name="rl_ui_strawMultiple" text="支"/>
+		<text name="rl_ui_artificialInsemination" text="人工授精"/>
+		<text name="rl_ui_semenPurchaseNoPermission" text="您没有交易动物或购买精液的权限"/>
+		<text name="rl_ui_semenPurchaseNoPermission_github" text="您没有交易动物或购买精液的权限"/>
+		<text name="rl_ui_semenPurchaseNoMoney" text="您的资金不足以购买此精液"/>
+		<text name="rl_ui_semenPurchaseNoMoney_github" text="您的资金不足以购买此精液"/>
+		<text name="rl_ui_takeStraw" text="取用精液"/>
+		<text name="rl_ui_inseminateAnimal" text="为%s授精"/>
+		<text name="rl_ui_inseminate" text="授精"/>
+		<text name="rl_ui_strawEmpty" text="此支精液为空"/>
+		<text name="rl_ui_averageSuccessColon" text="平均成功率："/>
+		<text name="rl_ui_averageSuccess" text="平均成功率"/>
+		<text name="rl_ui_success" text="成功率"/>
+		<text name="rl_ui_save" text="保存"/>
+		<text name="rl_ui_load" text="加载"/>
+		<text name="rl_ui_saveProfile" text="保存配置"/>
+		<text name="rl_ui_loadProfile" text="加载配置"/>
+
+		<text name="rl_ui_healthy" text="健康"/>
+		<text name="rl_ui_hasDisease" text="患病"/>
+		<text name="rl_ui_diseasedAnimals" text="患病动物"/>
+
+
+		<text name="rl_insemination_male" text="仅雌性动物可进行人工授精"/>
+		<text name="rl_insemination_pregnant" text="此动物已怀孕"/>
+		<text name="rl_insemination_animalType" text="动物必须与父本属同一物种"/>
+		<text name="rl_insemination_inseminated" text="此动物已完成人工授精"/>
+		<text name="rl_insemination_recovering" text="此动物仍在恢复期"/>
+		<text name="rl_insemination_father" text="禁止近亲繁殖"/>
+		<text name="rl_insemination_young" text="此动物过于年幼，无法进行人工授精"/>
+
+
+		<text name="rl_mark_aiManager_sell" text="牧工标记待售"/>
+		<text name="rl_mark_aiManager_castrate" text="牧工标记待阉割"/>
+		<text name="rl_mark_aiManager_disease" text="牧工标记待治疗"/>
+		<text name="rl_mark_aiManager_ai" text="牧工标记待授精"/>
+		<text name="rl_mark_player" text="玩家标记"/>
+
+
+		<!-- AI - BUYING -->
+
+
+		<text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="牧工不会购买动物"/>
+		<text name="rl_ui_herdsmanTooltip_buy_enabled_2" text="牧工会购买动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="采购预算为固定金额"/>
+		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="采购预算为农场资金的百分比"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="牧工每日最多支出%s"/>
+		<text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="牧工每日最多支出农场资金的%s"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="牧工每日最多购买%s头动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_breed" text="牧工仅购买%s动物"/>
+		<text name="rl_ui_herdsmanTooltip_buy_breed_any" text="牧工会购买任何品种"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="牧工仅购买无疾病动物"/>
+		<text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="牧工会购买动物，无论是否患病"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_gender_1" text="牧工仅购买雌性动物"/>
+		<text name="rl_ui_herdsmanTooltip_buy_gender_2" text="牧工会购买雌性和雄性动物"/>
+		<text name="rl_ui_herdsmanTooltip_buy_gender_3" text="牧工仅购买雄性动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_age_equal" text="牧工仅购买%s月龄的动物"/>
+		<text name="rl_ui_herdsmanTooltip_buy_age_range" text="牧工仅购买%s至%s月龄的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="牧工仅购买%s品质的动物"/>
+		<text name="rl_ui_herdsmanTooltip_buy_quality_range" text="牧工仅购买品质在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="牧工仅购买%s繁殖力的动物"/>
+		<text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="牧工仅购买繁殖力在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_health_equal" text="牧工仅购买%s健康状况的动物"/>
+		<text name="rl_ui_herdsmanTooltip_buy_health_range" text="牧工仅购买健康状况在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="牧工仅购买%s生产力的动物"/>
+		<text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="牧工仅购买生产力在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="牧工仅购买%s新陈代谢的动物"/>
+		<text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="牧工仅购买新陈代谢在%s至%s之间的动物"/>
+
+
+		<!-- AI - SELLING -->
+
+
+		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="牧工不会出售动物"/>
+		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="牧工会出售动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="牧工每日最多出售%s头动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_mark_1" text="牧工不会标记待售动物"/>
+		<text name="rl_ui_herdsmanTooltip_sell_mark_2" text="牧工会标记待售动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="牧工会出售动物，无论是否患病"/>
+		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="牧工仅出售患病动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_gender_1" text="牧工仅出售雌性动物"/>
+		<text name="rl_ui_herdsmanTooltip_sell_gender_2" text="牧工会出售雌性和雄性动物"/>
+		<text name="rl_ui_herdsmanTooltip_sell_gender_3" text="牧工仅出售雄性动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_age_equal" text="牧工仅出售%s月龄的动物"/>
+		<text name="rl_ui_herdsmanTooltip_sell_age_range" text="牧工仅出售%s至%s月龄的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="牧工仅出售%s品质的动物"/>
+		<text name="rl_ui_herdsmanTooltip_sell_quality_range" text="牧工仅出售品质在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="牧工仅出售%s繁殖力的动物"/>
+		<text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="牧工仅出售繁殖力在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_health_equal" text="牧工仅出售%s健康状况的动物"/>
+		<text name="rl_ui_herdsmanTooltip_sell_health_range" text="牧工仅出售健康状况在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="牧工仅出售%s生产力的动物"/>
+		<text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="牧工仅出售生产力在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="牧工仅出售%s新陈代谢的动物"/>
+		<text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="牧工仅出售新陈代谢在%s至%s之间的动物"/>
+
+
+		<!-- AI - CASTRATING -->
+
+
+		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="牧工不会阉割动物"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="牧工会阉割动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="牧工不会标记待阉割动物"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="牧工会标记待阉割动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="牧工会阉割动物，无论是否患病"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="牧工仅阉割患病动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="牧工仅阉割%s月龄的动物"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_age_range" text="牧工仅阉割%s至%s月龄的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="牧工仅阉割%s品质的动物"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="牧工仅阉割品质在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="牧工仅阉割%s繁殖力的动物"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="牧工仅阉割繁殖力在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="牧工仅阉割%s健康状况的动物"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_health_range" text="牧工仅阉割健康状况在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="牧工仅阉割%s生产力的动物"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="牧工仅阉割生产力在%s至%s之间的动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="牧工仅阉割%s新陈代谢的动物"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="牧工仅阉割新陈代谢在%s至%s之间的动物"/>
+
+
+		<!-- AI - NAMING -->
+
+
+		<text name="rl_ui_herdsmanTooltip_naming_enabled_1" text="牧工不会为动物命名"/>
+		<text name="rl_ui_herdsmanTooltip_naming_enabled_2" text="牧工会为动物命名"/>
+
+		<text name="rl_ui_herdsmanTooltip_naming_convention_1" text="牧工会随机命名动物"/>
+		<text name="rl_ui_herdsmanTooltip_naming_convention_2" text="牧工会按字母顺序命名动物"/>
+
+
+		<!-- AI - AI -->
+
+
+		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="牧工不会进行人工授精"/>
+		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="牧工会进行人工授精"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="牧工每日最多为%s头动物授精"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_mark_1" text="牧工不会标记待授精动物"/>
+		<text name="rl_ui_herdsmanTooltip_ai_mark_2" text="牧工会标记待授精动物"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="牧工会进行授精，无论是否患病"/>
+		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="牧工仅对患病动物进行授精"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_semen" text="牧工将使用%s的精液"/>
+		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="牧工将使用%s的精液"/>
+		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="牧工会使用任何可用精液"/>
+		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="牧工会使用任何可用精液"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_age_equal" text="牧工仅对%s月龄的动物授精"/>
+		<text name="rl_ui_herdsmanTooltip_ai_age_range" text="牧工仅对%s至%s月龄的动物授精"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="牧工仅对%s品质的动物授精"/>
+		<text name="rl_ui_herdsmanTooltip_ai_quality_range" text="牧工仅对品质在%s至%s之间的动物授精"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="牧工仅对%s繁殖力的动物授精"/>
+		<text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="牧工仅对繁殖力在%s至%s之间的动物授精"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_health_equal" text="牧工仅对%s健康状况的动物授精"/>
+		<text name="rl_ui_herdsmanTooltip_ai_health_range" text="牧工仅对健康状况在%s至%s之间的动物授精"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="牧工仅对%s生产力的动物授精"/>
+		<text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="牧工仅对生产力在%s至%s之间的动物授精"/>
+
+		<text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="牧工仅对%s新陈代谢的动物授精"/>
+		<text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="牧工仅对新陈代谢在%s至%s之间的动物授精"/>
+
+
+
+		<!--  SETTINGS  -->
+
+
+		<text name="rl_settings" text="真实畜牧"/>
+
+		<text name="rl_settings_off" text="关闭"/>
+		<text name="rl_settings_on" text="开启"/>
+
+		<text name="rl_settings_deathEnabled_label" text="动物移除"/>
+		<text name="rl_settings_deathEnabled_label_github" text="动物死亡"/>
+		<text name="rl_settings_deathEnabled_tooltip_1" text="动物不会因妊娠、健康、年龄或事故而被移除"/>
+		<text name="rl_settings_deathEnabled_tooltip_1_github" text="动物不会因怀孕、健康、年龄或事故而死亡"/>
+		<text name="rl_settings_deathEnabled_tooltip_2" text="动物会因妊娠、健康、年龄或事故而被移除"/>
+		<text name="rl_settings_deathEnabled_tooltip_2_github" text="动物会因怀孕、健康、年龄或事故而死亡"/>
+
+		<text name="rl_settings_accidentsChance_label" text="事故概率"/>
+		<text name="rl_settings_accidentsChance_tooltip" text="调整因随机事故导致动物移除的几率"/>
+		<text name="rl_settings_accidentsChance_tooltip_github" text="改变动物因随机事故死亡的可能性"/>
+
+		<text name="rl_settings_foodScale_label" text="饲料比例"/>
+		<text name="rl_settings_foodScale_tooltip" text="调整动物采食量"/>
+
+		<text name="rl_settings_maxDealerAnimals_label" text="经销商最大动物数"/>
+		<text name="rl_settings_maxDealerAnimals_tooltip" text="调整动物经销商每种动物类型的最大库存数量"/>
+
+		<text name="rl_settings_resetDealer_label" text="Reset Animal Dealer"/>
+		<text name="rl_settings_resetDealer_tooltip" text="移除所有经销商的动物并补充新动物的库存"/>
+		<text name="rl_settings_resetDealer_text" text="重置动物经销商"/>
+
+		<text name="rl_settings_tagColour_label" text="更改标签颜色"/>
+		<text name="rl_settings_tagColour_tooltip" text="更改耳标颜色"/>
+		<text name="rl_settings_tagColour_text" text="更改耳标颜色"/>
+
+		<text name="rl_settings_exportCSV_label" text="导出为CSV"/>
+		<text name="rl_settings_exportCSV_tooltip" text="将统计信息导出为CSV"/>
+		<text name="rl_settings_exportCSV_text" text="导出为CSV"/>
+
+		<text name="rl_settings_maxNumMessages_label" text="最大消息数量"/>
+		<text name="rl_settings_maxNumMessages_tooltip" text="数量较大会导致存档文件夹占用更多空间。达到此限制后，最早的消息将被删除。"/>
+
+		<text name="rl_settings_messageSummary_label" text="Message Log Summaries"/>
+		<text name="rl_settings_messageSummary_tooltip_1" text="Off: Individual messages for each event"/>
+		<text name="rl_settings_messageSummary_tooltip_2" text="On: Daily summaries per husbandry (reduces log noise)"/>
+
+		<text name="rl_settings_diseasesEnabled_label" text="启用疾病"/>
+		<text name="rl_settings_diseasesEnabled_tooltip_1" text="动物不会感染或遗传疾病"/>
+		<text name="rl_settings_diseasesEnabled_tooltip_2" text="动物会感染或遗传疾病"/>
+
+		<text name="rl_settings_diseasesChance_label" text="疾病概率"/>
+		<text name="rl_settings_diseasesChance_tooltip" text="调整动物感染疾病的几率"/>
+
+		<text name="rl_settings_useCustomAnimals_label" text="使用自定义动物"/>
+		<text name="rl_settings_useCustomAnimals_tooltip_1" text="使用真实畜牧动物模型（需要重启）"/>
+		<text name="rl_settings_useCustomAnimals_tooltip_2" text="使用自定义动物模型（需要重启，必须解压）"/>
+
+		<text name="rl_settings_animalsXML_label" text="设置动物XML路径"/>
+		<text name="rl_settings_animalsXML_tooltip" text="设置自定义动物XML文件路径"/>
+		<text name="rl_settings_animalsXML_text" text="设置动物XML路径"/>
+
+
+
+		<!--  HELP  -->
+
+
+		<text name="rl_help_monitors_title" text="监测器"/>
+		<text name="rl_help_monitors_1" text="要查看动物的大部分统计数据，您需要为其安装监测标签，这可以通过动物菜单（购买和出售动物的地方）完成。监测标签也会在动物身上显示，位于左耳ID标签旁边。"/>
+		<text name="rl_help_monitors_2" text="监测标签将为您显示重要信息，包括健康状况、体重、哺乳期、产量以及垫草、饲料和饮水需求。"/>
+		<text name="rl_help_monitors_3" text="为动物安装标签将根据动物物种收取少量月费。如果您选择移除标签，将在下个月初移除。"/>
+
+		<text name="rl_help_pregnancy_title" text="妊娠"/>
+		<text name="rl_help_pregnancy_1" text="所有雌性动物都需要至少1头雄性动物才能怀孕。两种动物都必须达到合适的月龄和健康状况，并且必须属于同一物种。允许不同品种间繁殖（例如：荷斯坦奶牛和安格斯公牛）。"/>
+		<text name="rl_help_pregnancy_2" text="不允许近亲繁殖。如果雄性和雌性有直接亲缘关系，它们将不会交配。"/>
+		<text name="rl_help_pregnancy_3" text="雌性怀孕的几率取决于它和雄性的繁殖力。繁殖力较高的雌性一次产下更多后代的几率也显著更高。"/>
+		<text name="rl_help_pregnancy_4" text="雌性怀孕后，开始孕育后代。您可以通过在圈舍中查看动物或在动物菜单中点击它来查看预计分娩日期和后代数量。"/>
+		<text name="rl_help_pregnancy_5" text="当到达预产期时，它将产下幼崽。然而，新生幼崽有一定几率被移除，如果妊娠过程不顺利，母畜也会被移除。在过度拥挤的圈舍中出生的新生幼崽将自动出售。"/>
+
+		<text name="rl_help_production_title" text="生产"/>
+		<text name="rl_help_production_1" text="任何品种的奶牛只有在分娩后才会开始产奶。分娩后，奶牛会在3个月内呈指数级产奶，随后6个月产量缓慢下降。妊娠10个月后，奶牛将停止产奶，直到下一次妊娠。"/>
+		<text name="rl_help_production_2" text="绵羊在温暖的月份产毛。在寒冷月份，低于12°C时，它们不会产毛。"/>
+		<text name="rl_help_production_3" text="奶、毛和蛋产量还受动物遗传基因的影响。具有良好生产遗传基因的动物产量更高，而遗传基因较差的动物产量很低。"/>
+
+		<text name="rl_help_weight_title" text="体重"/>
+		<text name="rl_help_weight_1" text="动物有特定体重，受采食和饮水影响。每个物种和品种都有其平均体重，影响每头动物的体重。"/>
+		<text name="rl_help_weight_2" text="体重增加动物价值，低体重影响其每月被移除的几率。"/>
+
+		<text name="rl_help_genetics_title" text="遗传学"/>
+		<text name="rl_help_genetics_1" text="每头动物有4种不同的遗传值：新陈代谢、繁殖力、健康状况和品质。遗传基因在父母间混合后传递给后代。"/>
+		<text name="rl_help_genetics_2" text="新陈代谢影响动物将饲料转化为体重的能力，并影响其采食量。"/>
+		<text name="rl_help_genetics_3" text="繁殖力影响动物受孕或使雌性受孕的几率，以及它将产生的后代数量。"/>
+		<text name="rl_help_genetics_4" text="健康状况影响动物的健康及其每月被移除的几率。具有较高健康遗传基因的动物寿命也更长。"/>
+		<text name="rl_help_genetics_5" text="品质影响动物本身的价值，较高品质的动物售价更高。"/>
+		<text name="rl_help_genetics_6" text="Cattle, sheep and chicken also have production genetics, which affects how much milk/eggs/wool they produce."/>
+
+
+
+		<!--  DISEASES  -->
+
+
+		<text name="rl_ui_immune" text="免疫"/>
+		<text name="rl_ui_startTreatment" text="开始治疗"/>
+		<text name="rl_ui_resumeTreatment" text="继续治疗"/>
+		<text name="rl_ui_stopTreatment" text="停止治疗"/>
+		<text name="rl_ui_duration" text="持续时间"/>
+		<text name="rl_ui_beingTreated" text="治疗中"/>
+		<text name="rl_ui_notTreated" text="未治疗"/>
+		<text name="rl_ui_carrier" text="携带者"/>
+
+		<text name="rl_diseases" text="疾病"/>
+		<text name="rl_disease" text="疾病"/>
+
+		<text name="rl_disease_mastitis" text="乳腺炎"/>
+
+		<text name="rl_disease_cvm" text="CVM"/>
+
+		<text name="rl_disease_footAndMouth" text="口蹄疫"/>
+
+		<text name="rl_disease_ped" text="猪流行性腹泻"/>
+
+		<text name="rl_disease_avianFlu" text="禽流感"/>
+
+
+
+		<!--  MESSAGES  -->
+
+
+		<text name="rl_messageTitle_pregnancy" text="妊娠"/>
+		<text name="rl_messageTitle_death" text="移除"/>
+		<text name="rl_messageTitle_death_github" text="死亡"/>
+		<text name="rl_messageTitle_disease" text="疾病"/>
+		<text name="rl_messageTitle_name" text="名称"/>
+		<text name="rl_messageTitle_movement" text="移动"/>
+		<text name="rl_messageTitle_aiManager" text="牧工"/>
+		<text name="rl_messageTitle_insemination" text="人工授精"/>
+
+		<text name="rl_message_pregnancySingle" text="产下1头幼崽"/>
+		<text name="rl_message_pregnancyMultiple" text="产下%s头幼崽"/>
+		<text name="rl_message_pregnancySold" text="因过度拥挤，%s头幼崽以%s的价格被出售"/>
+		<text name="rl_message_pregnancyDied" text="%s头幼崽在出生时被移除"/>
+		<text name="rl_message_pregnancyDied_github" text="%s babies died at birth"/>
+		<text name="rl_message_death" text="移除原因 %s"/>
+		<text name="rl_message_death_github" text="死亡原因 %s"/>
+		<text name="rl_message_diseaseContracted" text="感染%s"/>
+		<text name="rl_message_diseaseCured" text="治愈%s"/>
+		<text name="rl_message_diseaseTreatment_start" text="开始治疗%s于%s"/>
+		<text name="rl_message_diseaseTreatment_resume" text="继续治疗%s于%s"/>
+		<text name="rl_message_diseaseTreatment_stop" text="停止治疗%s"/>
+		<text name="rl_message_nameChange" text="名称从'%s'更改为'%s'"/>
+		<text name="rl_message_nameAdded" text="命名为'%s'"/>
+		<text name="rl_message_nameDeleted" text="名称'%s'已被移除"/>
+		<text name="rl_message_boughtAnimals_single" text="以%s的价格购买了1头动物"/>
+		<text name="rl_message_boughtAnimals_multiple" text="以%s的价格购买了%s头动物"/>
+		<text name="rl_message_soldAnimals_single" text="以%s的价格出售了1头动物"/>
+		<text name="rl_message_soldAnimals_multiple" text="以%s的价格出售了%s头动物"/>
+		<text name="rl_message_movedAnimalsTo_single" text="1头动物被移至%s"/>
+		<text name="rl_message_movedAnimalsTo_multiple" text="%s头动物被移至%s"/>
+		<text name="rl_message_movedAnimalsFrom_single" text="1头动物从%s移出"/>
+		<text name="rl_message_movedAnimalsFrom_multiple" text="%s头动物从%s移出"/>
+		<text name="rl_message_aiManager_boughtAnimals_single" text="牧工以%s的价格购买了1头动物"/>
+		<text name="rl_message_aiManager_boughtAnimals_multiple" text="牧工以%s的价格购买了%s头动物"/>
+		<text name="rl_message_aiManager_soldAnimals_single" text="牧工以%s的价格出售了1头动物"/>
+		<text name="rl_message_aiManager_soldAnimals_multiple" text="牧工以%s的价格出售了%s头动物"/>
+		<text name="rl_message_aiManager_castrated_single" text="牧工阉割了1头动物"/>
+		<text name="rl_message_aiManager_castrated_multiple" text="牧工阉割了%s头动物"/>
+		<text name="rl_message_aiManager_named_single" text="牧工命名了1头动物"/>
+		<text name="rl_message_aiManager_named_multiple" text="牧工命名了%s头动物"/>
+		<text name="rl_message_aiManager_mark_sell_single" text="牧工标记了1头待售动物"/>
+		<text name="rl_message_aiManager_mark_sell_multiple" text="牧工标记了%s头待售动物"/>
+		<text name="rl_message_aiManager_mark_castrate_single" text="牧工标记了1头待阉割动物"/>
+		<text name="rl_message_aiManager_mark_castrate_multiple" text="牧工标记了%s头待阉割动物"/>
+		<text name="rl_message_aiManager_mark_disease_single" text="牧工标记了1头待治疗动物"/>
+		<text name="rl_message_aiManager_mark_disease_multiple" text="牧工标记了%s头待治疗动物"/>
+		<text name="rl_message_insemination_success" text="授精成功"/>
+		<text name="rl_message_insemination_fail" text="授精失败"/>
+		<text name="rl_message_aiManager_mark_ai_single" text="牧工标记了1头待授精动物"/>
+		<text name="rl_message_aiManager_mark_ai_multiple" text="牧工标记了%s头待授精动物"/>
+		<text name="rl_message_aiManager_ai_single" text="牧工为1头动物授精"/>
+		<text name="rl_message_aiManager_ai_multiple" text="牧工为%s头动物授精"/>
+
+		<!-- Daily summary messages -->
+		<text name="rl_message_dailyBirthsSummary" text="%s animals were born at %s"/>
+		<text name="rl_message_dailyDeathsSummary" text="%s animals died at %s - %s"/>
+		<text name="rl_message_dailySalesSummary" text="Sold %s animals at %s for %s"/>
+		<text name="rl_message_dailyOvercrowdingSummary" text="Overcrowding: sold %s newborns at %s for %s"/>
+		<text name="rl_message_dailyPurchasesSummary" text="Bought %s animals at %s for %s"/>
+
+
+
+		<!--  DEATHS  -->
+
+
+		<text name="rl_death_pregnancy" text="妊娠异常"/>
+		<text name="rl_death_health" text="健康状况差"/>
+		<text name="rl_death_age" text="年龄"/>
+		<text name="rl_death_accident" text="事故"/>
+
+
+
+		<text name="rl_ui_dependencies_missing" text="RealisticLivestock requires the following dependencies:"/>
+		<text name="rl_ui_dependency_missing_notInstalled" text="- %s (Not Installed)"/>
+		<text name="rl_ui_dependency_missing_installed" text="- %s (Installed: %s, Minimum Required: %s)"/>
+
+
+		<!-- MIGRATION -->
+
+		<text name="rm_rl_conflict_title" text="Mod Conflict Detected"/>
+		<text name="rm_rl_mod_conflict_message" text="The following mod(s) conflict with 'Realistic Livestock - Ritter version' and cannot be used together: %s &#10;&#10;Please disable the conflicting mod(s) and restart the game."/>
+
+		<text name="rm_rl_migration_title" text="Data Migration Notice"/>
+		<text name="rm_rl_migration_message" text="Previous Realistic Livestock data was found in this savegame. Your settings, animal data, Dewars, and AI Straw hand tools will be automatically migrated to Realistic Livestock - RitterMod version when the game saves."/>
+		<text name="rm_rl_migration_files_found" text="Data files found:"/>
+		<text name="rm_rl_migration_continue" text="Continue"/>
+		<text name="rm_rl_migration_quit" text="Quit"/>
+
+
+	</texts>
+</l10n>

@@ -7,8 +7,9 @@
 		<Parameter name="colorScale"                  target="colorScale"                  type="float3" group="base"                 defaultValue="1.0 1.0 1.0"          minValue="0.0 0.0 0.0"              maxValue="10.0 10.0 10.0" template="brandColor" description="multiplied with baseMap"/>
 	</Parameters>
     <UvUsages>
-        <UvUsage textureName="normalMap"        uvType="uv0" uvScale="1.0"/>
-        <UvUsage textureName="glossMap"         uvType="uv0" uvScale="1.0"/>
+        <UvUsage textureName="normalMap"           uvType="uv0" uvScale="1.0"/>
+        <UvUsage textureName="glossMap"            uvType="uv0" uvScale="1.0"/>
+        <UvUsage textureName="mLedPanelMaskMap"    uvType="uv0" uvScale="1.0"/>
     </UvUsages>
 	<Textures/>
     <VertexAttributes>
