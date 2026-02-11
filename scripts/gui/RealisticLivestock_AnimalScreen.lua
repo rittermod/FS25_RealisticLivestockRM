@@ -2319,6 +2319,26 @@ function AnimalScreen:onApplyFilters(filters, filteredItems)
 end
 
 
+function AnimalScreen:reapplyFilters()
+
+    if self.filters == nil then
+        self.filteredItems = nil
+        return
+    end
+
+    if self.isBuyMode then
+        self.controller:initSourceItems()
+    else
+        self.controller:initTargetItems()
+    end
+
+    local animalTypeIndex = self.sourceSelectorStateToAnimalType[self.sourceSelector:getState()]
+    local items = self.isBuyMode and self.controller:getSourceItems(animalTypeIndex, self.isBuyMode) or self.controller:getTargetItems()
+    self.filteredItems = AnimalFilterDialog.applyFilters(items, self.filters, self.isBuyMode)
+
+end
+
+
 function RealisticLivestock_AnimalScreen:getPrice()
 
     local animalIndex
@@ -2437,13 +2457,7 @@ function RealisticLivestock_AnimalScreen:onSourceActionFinished(_, error, text)
 
 	local dialogType = error and DialogElement.TYPE_WARNING or DialogElement.TYPE_INFO
 
-    if self.filteredItems ~= nil then
-
-        local item = self.filteredItems[self.sourceList.selectedIndex]
-
-        if item ~= nil then table.remove(self.filteredItems, self.sourceList.selectedIndex) end
-
-    end
+    self:reapplyFilters()
 
 	InfoDialog.show(text, self.updateScreen, self, dialogType, nil, nil, true)
 
@@ -2456,13 +2470,7 @@ function RealisticLivestock_AnimalScreen:onTargetActionFinished(_, error, text)
 
 	local dialogType = error and DialogElement.TYPE_WARNING or DialogElement.TYPE_INFO
 
-    if self.filteredItems ~= nil then
-
-        local item = self.filteredItems[self.sourceList.selectedIndex]
-
-        if item ~= nil then table.remove(self.filteredItems, self.sourceList.selectedIndex) end
-
-    end
+    self:reapplyFilters()
 
 	InfoDialog.show(text, self.updateScreen, self, dialogType, nil, nil, true)
 
@@ -2475,22 +2483,7 @@ function AnimalScreen:onSourceBulkActionFinished(error, text, indexes)
 
     local dialogType = error and DialogElement.TYPE_WARNING or DialogElement.TYPE_INFO
 
-    if self.filteredItems ~= nil then
-
-        for _, index in pairs(indexes) do
-
-            for i, item in pairs(self.filteredItems) do
-
-                if item.originalIndex == index then
-                    table.remove(self.filteredItems, i)
-                    break
-                end
-
-            end
-
-        end
-
-    end
+    self:reapplyFilters()
 
 	InfoDialog.show(text, self.updateScreen, self, dialogType, nil, nil, true)
 
@@ -2501,22 +2494,7 @@ function AnimalScreen:onTargetBulkActionFinished(error, text, indexes)
 
     local dialogType = error and DialogElement.TYPE_WARNING or DialogElement.TYPE_INFO
 
-    if self.filteredItems ~= nil then
-
-        for _, index in pairs(indexes) do
-
-            for i, item in pairs(self.filteredItems) do
-
-                if item.originalIndex == index then
-                    table.remove(self.filteredItems, i)
-                    break
-                end
-
-            end
-
-        end
-
-    end
+    self:reapplyFilters()
 
 	InfoDialog.show(text, self.updateScreen, self, dialogType, nil, nil, true)
 

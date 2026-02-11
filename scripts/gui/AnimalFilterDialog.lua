@@ -438,74 +438,7 @@ function AnimalFilterDialog:onClickOk()
 
     end
 
-    for i = #self.items, 1, -1 do
-
-        local item = self.items[i]
-        local animal = item.animal or item.cluster
-        local meetsFilters = true
-
-        for _, filter in pairs(self.filters) do
-
-            if filter.requiresMonitor and not animal.monitor.active and not animal.monitor.removed then continue end
-
-            if filter.template == "sliderTemplate" then
-
-                local value
-
-                if filter.isLayered then
-
-                    value = animal
-
-                    for _, target in pairs(filter.target) do value = value[target] end
-
-                elseif filter.isFunction then
-
-                    value = animal[filter.target](animal)
-
-                    if filter.name == "Value" and self.isBuyMode then value = value * 1.075 end
-
-                else
-
-                    value = animal[filter.target]
-
-                end
-
-                if value < filter.min or value > filter.max then
-                    meetsFilters = false
-                    break
-                end
-
-            end
-
-
-            if filter.template == "binaryOptionTemplate" then
-
-                local Value
-
-                if filter.isFunction then
-                    
-                    value = animal[filter.target](animal)
-
-                else
-
-                    value = animal[filter.target]
-
-                end
-
-                if value ~= filter.value then
-                    meetsFilters = false
-                    break
-                end
-
-            end
-
-        end
-
-        self.items[i].originalIndex = i
-
-        if not meetsFilters then table.remove(self.items, i) end
-
-    end
+    self.items = AnimalFilterDialog.applyFilters(self.items, self.filters, self.isBuyMode)
 
     if self.callback ~= nil then
 
@@ -638,6 +571,84 @@ function AnimalFilterDialog:populateCellForItemInSection(list, section, index, c
 
     end
     
+end
+
+
+function AnimalFilterDialog.applyFilters(items, filters, isBuyMode)
+
+    local result = {}
+
+    for i, item in ipairs(items) do
+
+        local animal = item.animal or item.cluster
+        local meetsFilters = true
+
+        for _, filter in pairs(filters) do
+
+            if filter.requiresMonitor and not animal.monitor.active and not animal.monitor.removed then continue end
+
+            if filter.template == "sliderTemplate" then
+
+                local value
+
+                if filter.isLayered then
+
+                    value = animal
+
+                    for _, target in pairs(filter.target) do value = value[target] end
+
+                elseif filter.isFunction then
+
+                    value = animal[filter.target](animal)
+
+                    if filter.name == "Value" and isBuyMode then value = value * 1.075 end
+
+                else
+
+                    value = animal[filter.target]
+
+                end
+
+                if value < filter.min or value > filter.max then
+                    meetsFilters = false
+                    break
+                end
+
+            end
+
+
+            if filter.template == "binaryOptionTemplate" then
+
+                local value
+
+                if filter.isFunction then
+
+                    value = animal[filter.target](animal)
+
+                else
+
+                    value = animal[filter.target]
+
+                end
+
+                if value ~= filter.value then
+                    meetsFilters = false
+                    break
+                end
+
+            end
+
+        end
+
+        if meetsFilters then
+            item.originalIndex = i
+            table.insert(result, item)
+        end
+
+    end
+
+    return result
+
 end
 
 
