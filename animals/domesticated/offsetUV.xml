@@ -9,9 +9,11 @@
     <UvUsages>
         <UvUsage textureName="normalMap"           uvType="uv0" uvScale="1.0"/>
         <UvUsage textureName="glossMap"            uvType="uv0" uvScale="1.0"/>
-        <UvUsage textureName="mLedPanelMaskMap"    uvType="uv0" uvScale="1.0"/>
+        <UvUsage textureName="mLedPanelMaskMap"    uvType="uv1" uvScale="1.0"/>
     </UvUsages>
-	<Textures/>
+	<Textures>
+        <Texture name="mLedPanelMaskMap" defaultColorProfile="linearRGB" defaultFilename="$data/maps/textures/shared/ledPanel_mask.png"/>
+    </Textures>
     <VertexAttributes>
         <VertexAttribute name="uv1"   group="uv1"/>
         <VertexAttribute name="color" group="vtxColor"/>
