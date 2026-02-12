@@ -45,9 +45,8 @@ Cows produce milk **only while lactating** (10 months after giving birth). Non-l
 *Water Buffalo milk stays flat regardless of age — very low output compared to other breeds.*
 
 ```mermaid
-%%{init: {"themeVariables": {"xyChart": {"backgroundColor": "#f8f8f8", "titleColor": "#333333", "xAxisLabelColor": "#333333", "xAxisTitleColor": "#333333", "xAxisTickColor": "#333333", "xAxisLineColor": "#333333", "yAxisLabelColor": "#333333", "yAxisTitleColor": "#333333", "yAxisTickColor": "#333333", "yAxisLineColor": "#333333", "plotColorPalette": "#2e7d32"}}}}%%
+%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#2e7d32"}}}}%%
 xychart-beta
-    title "Typical Milk Production Over Lifespan (Swiss Brown, Lactating)"
     x-axis "Age (months)" [12, 24, 36, 48, 60, 72]
     y-axis "Litres / day" 0 --> 300
     line [180, 218, 255, 207, 158, 110]

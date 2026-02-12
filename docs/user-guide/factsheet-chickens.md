@@ -38,9 +38,8 @@ Hens lay eggs regardless of whether a rooster is present — a rooster is only n
 *Egg production peaks at 12 months and holds steady until 48 months, then declines to zero by 72 months (6 years). Genetics cause large variation between individual hens. Avian Influenza stops ALL egg production.*
 
 ```mermaid
-%%{init: {"themeVariables": {"xyChart": {"backgroundColor": "#f8f8f8", "titleColor": "#333333", "xAxisLabelColor": "#333333", "xAxisTitleColor": "#333333", "xAxisTickColor": "#333333", "xAxisLineColor": "#333333", "yAxisLabelColor": "#333333", "yAxisTitleColor": "#333333", "yAxisTickColor": "#333333", "yAxisLineColor": "#333333", "plotColorPalette": "#e65100"}}}}%%
+%%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#e65100"}}}}%%
 xychart-beta
-    title "Typical Egg Production Over Lifespan (Average Hen)"
     x-axis "Age (months)" [6, 12, 24, 36, 48, 60, 72]
     y-axis "Eggs / day" 0 --> 6
     line [1, 5, 5, 5, 5, 3, 0]
