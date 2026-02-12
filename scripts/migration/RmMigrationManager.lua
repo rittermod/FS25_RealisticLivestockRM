@@ -38,6 +38,7 @@ RmMigrationManager.OLD_FILES = {
 -- Mods that conflict with ours (e.g., extracted subsets of original Realistic Livestock)
 RmMigrationManager.CONFLICTING_MODS = {
     "FS25_MoreVisualAnimals",
+    "FS25_EnhancedLivestock"
 }
 
 -- Global instance
@@ -53,7 +54,6 @@ function RmMigrationManager.new()
     self.savegameDir = nil
     return self
 end
-
 
 function RmMigrationManager:initialize(overrideSavegameDir)
     -- Allow override of savegame directory (used for early migration before g_currentMission is ready)
@@ -74,12 +74,10 @@ function RmMigrationManager:initialize(overrideSavegameDir)
     return true
 end
 
-
 -- Set the savegame directory directly (for early migration)
 function RmMigrationManager:setSavegameDir(savegameDir)
     self.savegameDir = savegameDir
 end
-
 
 --[[
     Check if any conflicting mods are ENABLED and LOADED.
@@ -123,7 +121,6 @@ function RmMigrationManager:checkModConflict()
     return false
 end
 
-
 --[[
     Show conflict dialog listing ALL conflicting mods and block mission loading.
     Uses a short timer delay to ensure the dialog is shown after the game
@@ -155,7 +152,6 @@ function RmMigrationManager:showConflictDialog()
     end)
 end
 
-
 --[[
     Check if migration is needed
     Returns true if:
@@ -184,7 +180,6 @@ function RmMigrationManager:shouldMigrate()
 
     return true
 end
-
 
 --[[
     Get list of old data files that exist
@@ -239,7 +234,6 @@ function RmMigrationManager:getOldDataFiles()
     return files
 end
 
-
 --[[
     Check if items.xml has old mod references (className/modName)
     This is different from namespace migration - this is about the item registration itself
@@ -271,7 +265,6 @@ function RmMigrationManager:hasOldItemsData()
     xmlFile:delete()
     return hasOldData
 end
-
 
 --[[
     Check if handTools.xml has old mod references in filename attribute
@@ -306,7 +299,6 @@ function RmMigrationManager:hasOldHandToolsData()
     xmlFile:delete()
     return hasOldData
 end
-
 
 --[[
     Show migration dialog to user.
