@@ -8,6 +8,7 @@ The current goal of this version is to keep the core parts of the mod working fo
 
 Feel free to use it as you see fit, but please understand that this mod is way less ambitious than the original.
 
+**[User Documentation](docs/user-guide/overview.md)** — Guides and per-species factsheets covering genetics, breeding, diseases, production, and settings.
 
 Main changes from the original mod:
 - Automatically migrate savegame data from Arrow-kb's Realistic Livestock to this version.
