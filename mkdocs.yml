@@ -1,0 +1,52 @@
+site_name: Realistic Livestock RM
+site_description: User documentation for the Realistic Livestock RM mod for Farming Simulator 25
+site_url: https://rittermod.github.io/FS25_RealisticLivestockRM/
+
+repo_url: https://github.com/rittermod/FS25_RealisticLivestockRM
+repo_name: FS25_RealisticLivestockRM
+
+docs_dir: docs/user-guide
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: green
+      accent: light green
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: green
+      accent: light green
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.tooltips
+
+markdown_extensions:
+  - admonition
+  - tables
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+
+nav:
+  - Home: index.md
+  - Overview: overview.md
+  - Factsheets:
+      - Cattle: factsheet-cattle.md
+      - Pigs: factsheet-pigs.md
+      - Sheep & Goats: factsheet-sheep.md
+      - Horses: factsheet-horses.md
+      - Chickens: factsheet-chickens.md
+  - Guides:
+      - Genetics: guide-genetics.md
+      - Breeding & Reproduction: guide-breeding.md
+      - Diseases: guide-diseases.md
+  - Settings Reference: reference-settings.md
