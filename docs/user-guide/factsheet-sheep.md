@@ -214,24 +214,6 @@ Goats follow the same offspring pattern as sheep — twins become common at prim
 
 *Sheep have the shortest lifespan among large livestock. Old age deaths can begin as soon as breeding ends. Death can be toggled off in settings.*
 
-```mermaid
-gantt
-    title Sheep & Goat Lifecycle Timeline
-    dateFormat YYYY-MM-DD
-    axisFormat %Y
-
-    section Ewe / Doe
-    Ewe breeding (8–120 mo)          :active, 2000-09-01, 2010-01-01
-    Doe breeding (16–120 mo)         :active, 2001-05-01, 2010-01-01
-    Old age risk (120–144 mo)        :crit,   2010-01-01, 2012-01-01
-
-    section Ram
-    Ram breeding (5–72 mo)           :active, 2000-06-01, 2006-01-01
-    Old age risk (120–144 mo)        :crit,   2010-01-01, 2012-01-01
-```
-
-*Timeline shows key phases. Birth = Year 0. Rams stop breeding at 6 years — well before ewes and does stop at 10 years. Old age risk begins right when female breeding ends.*
-
 ---
 
 ## Diseases

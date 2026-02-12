@@ -38,6 +38,7 @@ Hens lay eggs regardless of whether a rooster is present — a rooster is only n
 *Egg production peaks at 12 months and holds steady until 48 months, then declines to zero by 72 months (6 years). Genetics cause large variation between individual hens. Avian Influenza stops ALL egg production.*
 
 ```mermaid
+%%{init: {"themeVariables": {"xyChart": {"backgroundColor": "#f8f8f8", "titleColor": "#333333", "xAxisLabelColor": "#333333", "xAxisTitleColor": "#333333", "xAxisTickColor": "#333333", "xAxisLineColor": "#333333", "yAxisLabelColor": "#333333", "yAxisTitleColor": "#333333", "yAxisTickColor": "#333333", "yAxisLineColor": "#333333", "plotColorPalette": "#e65100"}}}}%%
 xychart-beta
     title "Typical Egg Production Over Lifespan (Average Hen)"
     x-axis "Age (months)" [6, 12, 24, 36, 48, 60, 72]
@@ -129,25 +130,6 @@ Chickens can produce large broods, but the chance of no offspring is always sign
 | Maximum lifespan | ~96 months (8 years) |
 
 *Chickens have the shortest lifespan. Old age deaths can begin while hens are still laying eggs. Breeding success drops sharply with age — old hens rarely hatch chicks. Death can be toggled off in settings.*
-
-```mermaid
-gantt
-    title Chicken Lifecycle Timeline
-    dateFormat YYYY-MM-DD
-    axisFormat %Y
-
-    section Hen
-    Breeding window (6+ mo)           :active, 2000-07-01, 2008-01-01
-    Peak egg production (12–48 mo)    :done,   2001-01-01, 2004-01-01
-    Egg production ends (~72 mo)      :        2004-01-01, 2006-01-01
-    Old age risk (60–96 mo)           :crit,   2005-01-01, 2008-01-01
-
-    section Rooster
-    Breeding (6+ mo, no age limit)    :active, 2000-07-01, 2008-01-01
-    Old age risk (60–96 mo)           :crit,   2005-01-01, 2008-01-01
-```
-
-*Timeline shows key phases. Birth = Year 0. Notice that old age deaths can start at 5 years while hens still produce eggs until 6 years — sell aging hens before they die.*
 
 ---
 

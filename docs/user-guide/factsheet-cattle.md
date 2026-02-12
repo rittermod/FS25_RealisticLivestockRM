@@ -45,14 +45,7 @@ Cows produce milk **only while lactating** (10 months after giving birth). Non-l
 *Water Buffalo milk stays flat regardless of age — very low output compared to other breeds.*
 
 ```mermaid
----
-config:
-    xyChart:
-        xAxis:
-            labelFontSize: 12
-        yAxis:
-            labelFontSize: 12
----
+%%{init: {"themeVariables": {"xyChart": {"backgroundColor": "#f8f8f8", "titleColor": "#333333", "xAxisLabelColor": "#333333", "xAxisTitleColor": "#333333", "xAxisTickColor": "#333333", "xAxisLineColor": "#333333", "yAxisLabelColor": "#333333", "yAxisTitleColor": "#333333", "yAxisTickColor": "#333333", "yAxisLineColor": "#333333", "plotColorPalette": "#2e7d32"}}}}%%
 xychart-beta
     title "Typical Milk Production Over Lifespan (Swiss Brown, Lactating)"
     x-axis "Age (months)" [12, 24, 36, 48, 60, 72]
@@ -225,24 +218,6 @@ All cattle breeds share the same reproduction rules:
 | Maximum lifespan | ~240 months (20 years) |
 
 *Death can be toggled off in settings. Accidents can happen at any age (affected by weather).*
-
-```mermaid
-gantt
-    title Cattle Lifecycle Timeline
-    dateFormat YYYY-MM-DD
-    axisFormat %Y
-
-    section Cow
-    Breeding window (12–132 mo)       :active, 2001-01-01, 2011-01-01
-    Peak milk production (24–72 mo)   :done,   2002-01-01, 2006-01-01
-    Old age risk (180–240 mo)         :crit,   2015-01-01, 2020-01-01
-
-    section Bull
-    Breeding window (12–132 mo)       :active, 2001-01-01, 2011-01-01
-    Old age risk (180–240 mo)         :crit,   2015-01-01, 2020-01-01
-```
-
-*Timeline shows key phases in a cow's and bull's life. Birth = Year 0. Breeding window is when the animal can reproduce. Old age risk is when natural death becomes increasingly likely.*
 
 ---
 

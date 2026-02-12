@@ -143,23 +143,6 @@ Horses have a very long fertile period but fertility declines gradually:
 
 *Horses live the longest of all animals. A well-cared-for horse can provide 20+ years of service. Death can be toggled off in settings.*
 
-```mermaid
-gantt
-    title Horse Lifecycle Timeline
-    dateFormat YYYY-MM-DD
-    axisFormat %Y
-
-    section Mare
-    Breeding window (22–264 mo)       :active, 2001-11-01, 2022-01-01
-    Old age risk (300–360 mo)         :crit,   2025-01-01, 2030-01-01
-
-    section Stallion
-    Breeding window (36–300 mo)       :active, 2003-01-01, 2025-01-01
-    Old age risk (300–360 mo)         :crit,   2025-01-01, 2030-01-01
-```
-
-*Timeline shows key phases in a horse's life. Birth = Year 0. Horses have the longest lifespan — over 20 years of breeding potential before old age risk begins.*
-
 ---
 
 ## Diseases

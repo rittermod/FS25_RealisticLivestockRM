@@ -153,23 +153,6 @@ Pigs produce only manure and liquid manure — no milk, wool, or eggs. Their val
 
 *Death can be toggled off in settings. Accidents can happen at any age (affected by weather).*
 
-```mermaid
-gantt
-    title Pig Lifecycle Timeline
-    dateFormat YYYY-MM-DD
-    axisFormat %Y
-
-    section Sow
-    Breeding window (6–96 mo)         :active, 2000-07-01, 2008-01-01
-    Old age risk (180–240 mo)         :crit,   2015-01-01, 2020-01-01
-
-    section Boar
-    Breeding window (8–48 mo)         :active, 2000-09-01, 2004-01-01
-    Old age risk (180–240 mo)         :crit,   2015-01-01, 2020-01-01
-```
-
-*Timeline shows key phases in a pig's life. Birth = Year 0. Notice the boar's breeding window ends at just 4 years — plan male replacements early!*
-
 ---
 
 ## Diseases

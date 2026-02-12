@@ -146,6 +146,7 @@ Milk output varies within the lactation period:
 *Peak milk production occurs around month 2–3 after birth. See the cattle and sheep factsheets for specific breed output ranges.*
 
 ```mermaid
+%%{init: {"themeVariables": {"xyChart": {"backgroundColor": "#f8f8f8", "titleColor": "#333333", "xAxisLabelColor": "#333333", "xAxisTitleColor": "#333333", "xAxisTickColor": "#333333", "xAxisLineColor": "#333333", "yAxisLabelColor": "#333333", "yAxisTitleColor": "#333333", "yAxisTickColor": "#333333", "yAxisLineColor": "#333333", "plotColorPalette": "#1565c0"}}}}%%
 xychart-beta
     title "Lactation Phase Curve (10-Month Cycle)"
     x-axis "Months After Birth" [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
