@@ -148,6 +148,7 @@ Milk output varies within the lactation period:
 ```mermaid
 %%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#1565c0"}}}}%%
 xychart-beta
+    title "Lactation Curve"
     x-axis "Months After Birth" [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     y-axis "Milk Output (%)" 0 --> 100
     line [0, 60, 95, 100, 90, 75, 60, 45, 30, 15, 0]

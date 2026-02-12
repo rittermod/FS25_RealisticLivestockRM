@@ -40,6 +40,7 @@ Hens lay eggs regardless of whether a rooster is present — a rooster is only n
 ```mermaid
 %%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#e65100"}}}}%%
 xychart-beta
+    title "Hen Egg Production (average genetics)"
     x-axis "Age (months)" [6, 12, 24, 36, 48, 60, 72]
     y-axis "Eggs / day" 0 --> 6
     line [1, 5, 5, 5, 5, 3, 0]

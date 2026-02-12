@@ -25,11 +25,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm install -g @mermaid-js/mermaid-cli
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.x'
 
-      - run: pip install mkdocs-material
+      - run: pip install mkdocs-material mkdocs-mermaid-to-svg
 
       - run: mkdocs build
 

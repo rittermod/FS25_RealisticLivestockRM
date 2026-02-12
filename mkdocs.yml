@@ -27,14 +27,27 @@ theme:
     - navigation.top
     - content.tooltips
 
+plugins:
+  - search
+  - mermaid-to-svg:
+      renderer: mmdc
+      mermaid_config:
+        theme: base
+        themeVariables:
+          xyChart:
+            backgroundColor: "#f8f8f8"
+            titleColor: "#333333"
+            xAxisLabelColor: "#333333"
+            xAxisTitleColor: "#333333"
+            yAxisLabelColor: "#333333"
+            yAxisTitleColor: "#333333"
+            xAxisLineColor: "#666666"
+            yAxisLineColor: "#666666"
+
 markdown_extensions:
   - admonition
   - tables
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.superfences
 
 nav:
   - Home: index.md
