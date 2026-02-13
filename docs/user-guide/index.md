@@ -33,7 +33,7 @@ If you previously used the original [FS25 Realistic Livestock](https://github.co
 |---|---|
 | **Game** | Farming Simulator 25 |
 | **Multiplayer** | Supported (server-authoritative) |
-| **Known conflicts** | FS25_MoreVisualAnimals, FS25_EnhancedLivestock |
+| **Known conflicts** | FS25_MoreVisualAnimals, FS25_EnhancedLivestock, FS25_EnhancedAnimalSystem |
 
 If a conflicting mod is detected, the game will show a warning dialog at startup.
 
