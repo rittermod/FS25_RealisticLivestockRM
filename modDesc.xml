@@ -19,7 +19,7 @@ Main changes from the original mod:
 - Removed Font Library dependency by inlining the required functionality directly in the mod.
 - Improved genetic inheritance with natural variation - offspring can now exceed or fall below parent trait values.
 
-
+Source code, issue tracker and docs: https://github.com/rittermod/FS25_RealisticLivestockRM
 
 Changelog
 
