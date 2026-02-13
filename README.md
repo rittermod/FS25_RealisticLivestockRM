@@ -19,13 +19,14 @@ Main changes from the original mod:
 
 ## Changelog
 
-v0.6.0.0-dev:
+v0.6.0.0:
+- Add user guides and facksheets
+- Add optional daily summary mode for message log to reduce noise on large farms (new setting: Message Log Summaries)
 - Added "Reset AI Animals" button to settings to regenerate the AI straw catalog with new randomly generated animals
 - Fix potential milk production loss that could occur when birth errors were silently caught
 - Fix potential game freeze when selling animals with an active filter
 - Fix potential mod errors blocking crop growth and other periodic game updates
 - Fix texture warning for LED panel mask map
-- Add optional daily summary mode for message log to reduce noise on large farms (new setting: Message Log Summaries)
 - Add Danish translation update and Chinese translation (community contributions)
 
 v0.5.0.0:
