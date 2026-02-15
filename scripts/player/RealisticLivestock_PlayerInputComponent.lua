@@ -121,3 +121,103 @@ function RealisticLivestock_PlayerInputComponent.onFinishedRideBlending(superFun
 end
 
 PlayerInputComponent.onFinishedRideBlending = Utils.overwrittenFunction(PlayerInputComponent.onFinishedRideBlending, RealisticLivestock_PlayerInputComponent.onFinishedRideBlending)
+
+
+-- Fix MP horse riding/cleaning: Base game events use streamWriteInt32 for
+-- clusterId, but RL uses string identifiers ("farmId uniqueId").
+
+function AnimalRidingEvent:writeStream(streamId, _)
+    NetworkUtil.writeNodeObject(streamId, self.husbandry)
+    streamWriteString(streamId, tostring(self.clusterId))
+    NetworkUtil.writeNodeObject(streamId, self.player)
+end
+
+function AnimalRidingEvent:readStream(streamId, _)
+    self.husbandry = NetworkUtil.readNodeObject(streamId)
+    self.clusterId = streamReadString(streamId)
+    self.player = NetworkUtil.readNodeObject(streamId)
+    self:run(nil)
+end
+
+function AnimalCleanEvent:writeStream(streamId, _)
+    NetworkUtil.writeNodeObject(streamId, self.husbandry)
+    streamWriteString(streamId, tostring(self.clusterId))
+    streamWriteUIntN(streamId, self.delta, AnimalClusterHorse.NUM_BITS_DIRT)
+end
+
+function AnimalCleanEvent:readStream(streamId, connection)
+    self.husbandry = NetworkUtil.readNodeObject(streamId)
+    self.clusterId = streamReadString(streamId)
+    self.delta = streamReadUIntN(streamId, AnimalClusterHorse.NUM_BITS_DIRT)
+    self:run(connection)
+end
+
+function AnimalCleanEvent:run(connection)
+    if self.husbandry ~= nil then
+        local cluster = self.husbandry:getClusterById(self.clusterId)
+        if cluster ~= nil and cluster.changeDirt ~= nil then
+            cluster:changeDirt(-self.delta)
+        end
+    end
+
+    -- RL Animal:changeDirt() doesn't sync to clients (no raiseUpdate).
+    -- If on server, broadcast to all clients so they update their local dirt.
+    if connection ~= nil and not connection:getIsServer() then
+        g_server:broadcastEvent(AnimalCleanEvent.new(self.husbandry, self.clusterId, self.delta))
+    end
+end
+
+
+-- Fix MP horse riding: Rideable:onWriteStream writes cluster via
+-- RL Animal:writeStream (huge payload), but Rideable:onReadStream creates
+-- AnimalClusterHorse and reads via AnimalClusterHorse:readStream (tiny payload).
+-- Stream misalignment causes playerToEnter to never be read on the client.
+-- Override to write/read cluster in AnimalClusterHorse-compatible format.
+
+function Rideable:onWriteStream(streamId, connection)
+    local spec = self.spec_rideable
+
+    if not connection:getIsServer() then
+        streamWriteBool(streamId, spec.isOnGround)
+    end
+
+    local cluster = spec.cluster
+    if streamWriteBool(streamId, cluster ~= nil) then
+        streamWriteUIntN(streamId, cluster:getSubTypeIndex(), AnimalCluster.NUM_BITS_SUB_TYPE)
+        -- Write in AnimalClusterHorse format (not RL Animal format)
+        -- Base AnimalCluster fields:
+        streamWriteUIntN(streamId, cluster.numAnimals or 1, AnimalCluster.NUM_BITS_NUM_ANIMALS)
+        streamWriteUIntN(streamId, math.floor(cluster.age or 0), AnimalCluster.NUM_BITS_AGE)
+        streamWriteUIntN(streamId, math.floor(cluster.health or 0), AnimalCluster.NUM_BITS_HEALTH)
+        streamWriteUIntN(streamId, math.floor(cluster.reproduction or 0), AnimalCluster.NUM_BITS_REPRODUCTION)
+        -- AnimalClusterHorse fields:
+        streamWriteString(streamId, cluster.name or "")
+        streamWriteUIntN(streamId, math.floor(cluster.fitness or 0), AnimalClusterHorse.NUM_BITS_FITNESS)
+        streamWriteUIntN(streamId, math.floor(cluster.riding or 0), AnimalClusterHorse.NUM_BITS_RIDING)
+        streamWriteUIntN(streamId, math.floor(cluster.dirt or 0), AnimalClusterHorse.NUM_BITS_DIRT)
+    end
+
+    if streamWriteBool(streamId, spec.playerToEnter ~= nil) then
+        NetworkUtil.writeNodeObject(streamId, spec.playerToEnter)
+    end
+end
+
+-- Also fix update stream: server writes via RL Animal (no writeUpdateStream method),
+-- but client reads via AnimalClusterHorse:readUpdateStream (expects fitness/riding/dirt).
+
+function Rideable:onWriteUpdateStream(streamId, connection, _)
+    local spec = self.spec_rideable
+    if connection:getIsServer() then
+        streamWriteFloat32(streamId, spec.inputValues.axisSteerSend)
+        streamWriteUInt8(streamId, spec.inputValues.currentGait)
+    else
+        streamWriteFloat32(streamId, spec.haltTimer)
+        local cluster = spec.cluster
+        if streamWriteBool(streamId, cluster ~= nil) then
+            -- Write AnimalClusterHorse update format: fitness, riding, dirt
+            streamWriteUIntN(streamId, math.floor(cluster.fitness or 0), AnimalClusterHorse.NUM_BITS_FITNESS)
+            streamWriteUIntN(streamId, math.floor(cluster.riding or 0), AnimalClusterHorse.NUM_BITS_RIDING)
+            streamWriteUIntN(streamId, math.floor(cluster.dirt or 0), AnimalClusterHorse.NUM_BITS_DIRT)
+        end
+    end
+end

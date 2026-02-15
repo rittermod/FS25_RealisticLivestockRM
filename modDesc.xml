@@ -1,6 +1,6 @@
 <modDesc descVersion="106">
     <author>Ritter</author>
-    <version>0.6.0.1</version>
+    <version>0.6.1.0-dev</version>
     <title>
         <en>Realistic Livestock - Ritter version</en>
         <it>Allevamento Realistico - Versione Ritter</it>
@@ -22,6 +22,10 @@ Main changes from the original mod:
 Source code, issue tracker and docs: https://github.com/rittermod/FS25_RealisticLivestockRM
 
 Changelog
+
+v0.6.1.0-dev:
+- Fix black screen when multiplayer client tries to ride a horse
+- Fix multiplayer client unable to clean horses
 
 v0.6.0.0:
 - Add user guides and factsheets
