@@ -1,78 +1,86 @@
 <l10n>
-	<texts>
-		<!-- COWS -->
-		
-		<text name="fillType_bull" text="Boğa"/>
-		<text name="fillType_bull_swiss_brown" text="Montofon Boğa"/>
-		<text name="fillType_bull_holstein" text="Holstein Boğa"/>
-		<text name="fillType_bull_angus" text="Angus Boğa"/>
-		<text name="fillType_bull_limousin" text="Limuzin Boğa"/>
-		<text name="fillType_cow_hereford" text="Hereford"/>
-		<text name="fillType_bull_hereford" text="Hereford Bull"/>
-		<text name="fillType_cow_highland_cattle" text="Highland Sığırı"/>
-		<text name="fillType_bull_highland_cattle" text="Highland Boğası"/>
-		<text name="animal_descriptionBullFeed" text="Boğalar çim, kuru ot ve TKT'yi sever."/>
-		<text name="animal_descriptionBullYoung" text="Bu bir erkek buzağı."/>
-		<text name="animal_descriptionBullReproduction" text="Sağlıklı ve 12 aydan büyük boğalar üreyebilir."/>
-		<text name="rl_descriptionCowReproduction" text="Sağlıklı ve 12 aydan büyük inekler üreyebilir."/>
+    <texts>
+        <!-- COWS -->
 
-		<!-- WATER BUFFALOS -->
+        <text name="fillType_bull" text="Boğa"/>
+        <text name="fillType_bull_swiss_brown" text="Kahverengi İsviçre Boğası"/>
+        <text name="fillType_bull_holstein" text="Holstein Boğası"/>
+        <text name="fillType_bull_angus" text="Angus Boğası"/>
+        <text name="fillType_bull_limousin" text="Limuzin Boğası"/>
+        <text name="fillType_cow_hereford" text="Hereford"/>
+        <text name="fillType_bull_hereford" text="Hereford Boğası"/>
+        <text name="fillType_cow_highland_cattle" text="İskoç Sığırı"/>
+        <text name="fillType_bull_highland_cattle" text="İskoç Sığırı Boğası"/>
+        <text name="animal_descriptionBullFeed" text="Boğalar çim, kuru ot ve TMR severler."/>
+        <text name="animal_descriptionBullYoung" text="Bu erkek bir buzağıdır."/>
+        <text name="animal_descriptionBullReproduction" text="12 aylıktan büyük ve sağlıklı boğalar üreyebilir."/>
+        <text name="rl_descriptionCowReproduction" text="12 aylıktan büyük ve sağlıklı inekler üreyebilir."/>
 
-		<text name="fillType_bull_waterbuffalo" text="Manda Boğası"/>
+        <!-- WATER BUFFALOS -->
 
-		<!-- PIGS -->
-		
-		<text name="fillType_boar" text="Erkek Domuz"/>
-		<text name="fillType_boar_landrace" text="Landrace Erkek Domuz"/>
-		<text name="fillType_boar_black_pied" text="Black-Pied Erkek Domuz"/>
-		<text name="fillType_boar_berkshire" text="Berkshire Erkek Domuz"/>
-		<text name="animal_descriptionBoarReproduction" text="Sağlıklı ve 8 aydan büyük olan domuzlar üreyebilir."/>
-		<text name="rl_descriptionPigReproduction" text="Sağlıklı ve 6 aydan büyük dişi domuzlar üreyebilir."/>
-		<text name="animal_descriptionBoarFeed" text="Domuzlar neredeyse her şeyi yerler. Onları mısır, buğday, arpa, kanola, ayçiçeği, soya fasulyesi, patates, sorgum ve şeker pancarı ile besleyebilirsiniz."/>
-		<text name="animal_descriptionBoarYoung" text="Bu bir erkek domuz yavrusu."/>
+        <text name="fillType_bull_waterbuffalo" text="Manda Boğası"/>
 
-		<!-- SHEEP -->
-		
-		<text name="fillType_ram" text="Koç"/>
-		<text name="fillType_ram_landrace" text="Yerli Bentheim Koç"/>
-		<text name="fillType_ram_steinschaf" text="Steinschaf Koç"/>
-		<text name="fillType_ram_black_welsh" text="Siyah Galli Koç"/>
-		<text name="fillType_ram_swiss_mountain" text="İsviçre Siyah-Kahverengi Dağ Koç"/>
-		<text name="animal_descriptionRamFeed" text="Koçlar çim ve kuru ot yer."/>
-		<text name="animal_descriptionRamYoung" text="Bu bir erkek kuzu."/>
-		<text name="animal_descriptionRamReproduction" text="Sağlıklı ve 5 aydan büyük koçlar üreyebilir."/>
-		<text name="rl_descriptionSheepReproduction" text="Sağlıklı ve 8 aydan büyük koyunlar üreyebilir."/>
+        <!-- PIGS -->
 
-		<!-- GOATS -->
+        <text name="fillType_boar" text="Erkek Domuz"/>
+        <text name="fillType_boar_landrace" text="Landrace Erkek Domuzu"/>
+        <text name="fillType_boar_black_pied" text="Black-Pied Erkek Domuzu"/>
+        <text name="fillType_boar_berkshire" text="Berkshire Erkek Domuzu"/>
+        <text name="animal_descriptionBoarReproduction" text="8 aylıktan büyük ve sağlıklı erkek domuzlar üreyebilir."/>
+        <text name="rl_descriptionPigReproduction" text="6 aylıktan büyük ve sağlıklı dişi domuzlar üreyebilir."/>
+        <text name="animal_descriptionBoarFeed" text="Erkek domuzlar neredeyse her şeyi yer. Mısır, buğday, arpa, kanola, ayçiçeği, soya fasulyesi, patates, sorgum ve şeker pancarı ile besleyebilirsiniz."/>
+        <text name="animal_descriptionBoarYoung" text="Bu erkek bir yavru domuzdur."/>
 
-		<text name="fillType_ram_goat" text="Erkek Keçi"/>
-		<text name="rl_descriptionGoatReproduction" text="Sağlıklı ve 16 aydan büyük dişi keçiler üreyebilir."/>
+        <!-- SHEEP -->
 
-		<!-- HORSES -->
-		
-		<text name="fillType_stallion" text="Aygır"/>
-		<text name="fillType_stallion_gray" text="Gri Aygır"/>
-		<text name="fillType_stallion_pinto" text="Pinto Aygır"/>
-		<text name="fillType_stallion_palomino" text="Palomino Aygır"/>
-		<text name="fillType_stallion_chestnut" text="Chestnut Aygır"/>
-		<text name="fillType_stallion_bay" text="Bay Aygır"/>
-		<text name="fillType_stallion_black" text="Siyah Aygır"/>
-		<text name="fillType_stallion_seal_brown" text="Seal Brown Aygır"/>
-		<text name="fillType_stallion_dun" text="Dun Aygır"/>
-		<text name="animal_descriptionStallionFeed" text="Aygırlar kuru ot, yulaf ve sorgumu sever."/>
-		<text name="animal_descriptionStallionProfit" text="Aygırlar kâr amacıyla satılabilir."/>
-		<text name="animal_descriptionStallionReproduction" text="Sağlıklı ve 36 aydan büyük aygırlar üreyebilir."/>
-		<text name="rl_descriptionHorseReproduction" text="Sağlıklı ve 22 aydan büyük kısraklar üreyebilir."/>
+        <text name="fillType_ram" text="Koç"/>
+        <text name="fillType_ram_landrace" text="Bentheim Landrace Koçu"/>
+        <text name="fillType_ram_steinschaf" text="Steinschaf Koçu"/>
+        <text name="fillType_ram_black_welsh" text="Siyah Galler Dağ Koçu"/>
+        <text name="fillType_ram_swiss_mountain" text="İsviçre Siyah-Kahverengi Dağ Koçu"/>
+        <text name="animal_descriptionRamFeed" text="Koçlar çim ve kuru ot yerler."/>
+        <text name="animal_descriptionRamYoung" text="Bu erkek bir kuzudur."/>
+        <text name="animal_descriptionRamReproduction" text="5 aylıktan büyük ve sağlıklı koçlar üreyebilir."/>
+        <text name="rl_descriptionSheepReproduction" text="8 aylıktan büyük ve sağlıklı koyunlar üreyebilir."/>
 
-		<!-- TAVUKLAR -->
+        <!-- GOATS -->
+
+        <text name="fillType_ram_goat" text="Teke"/>
+        <text name="rl_descriptionGoatReproduction" text="16 aylıktan büyük ve sağlıklı keçiler üreyebilir."/>
+
+        <!-- HORSES -->
+
+        <text name="fillType_stallion" text="Aygır"/>
+        <text name="fillType_stallion_gray" text="Gri Aygır"/>
+        <text name="fillType_stallion_pinto" text="Pinto Aygır"/>
+        <text name="fillType_stallion_palomino" text="Palomino Aygır"/>
+        <text name="fillType_stallion_chestnut" text="Chestnut Aygır"/>
+        <text name="fillType_stallion_bay" text="Bay Aygır"/>
+        <text name="fillType_stallion_black" text="Siyah Aygır"/>
+        <text name="fillType_stallion_seal_brown" text="Seal Brown Aygır"/> 
+        <text name="fillType_stallion_dun" text="Dun Aygır"/>
+        <text name="animal_descriptionStallionFeed" text="Aygırlar kuru ot, yulaf ve sorgum severler."/>
+        <text name="animal_descriptionStallionProfit" text="Aygırlar kar amacıyla satılabilir."/>
+        <text name="animal_descriptionStallionReproduction" text="36 aylıktan büyük ve sağlıklı aygırlar üreyebilir."/>
+        <text name="rl_descriptionHorseReproduction" text="22 aylıktan büyük ve sağlıklı kısraklar üreyebilir."/>
+
+        <!-- CHICKENS -->
 
 		<text name="rl_descriptionChickenReproduction" text="Sağlıklı ve 6 aydan büyük tavuklar üreyebilir."/>
 
 
         <!-- UI -->
 
-		
-        <text name="input_VisualAnimalsDialog" text="Görüntülenen Hayvan Sayısını Değiştir"/>
+
+        <text name="input_VisualAnimalsDialog" text="Görsel Hayvanların Miktarını Değiştir"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Hayvan Ekranını Aç"/>
+        <text name="input_RL_MARK" text="Hayvanı İşaretle/İşaretini Kaldır"/>
+        <text name="input_RL_MONITOR" text="Monitör Ekle/Çıkar"/>
+        <text name="input_RL_AI" text="Suni Tohumlama"/>
+        <text name="input_RL_CASTRATE" text="Hayvanı Kısırlaştır"/>
+        <text name="input_RL_DISEASES" text="Hayvan Hastalıkları"/>
+        <text name="input_RL_SELECT" text="Hayvanı Seç/Seçimi Kaldır"/>
+        <text name="rl_ui_openAnimalScreen" text="Hayvanları Yönet"/>
         <text name="rl_button_apply" text="Uygula"/>
         <text name="rl_button_confirm" text="Onayla"/>
         <text name="rl_button_recommended" text="Önerilen"/>
@@ -84,21 +92,21 @@
         <text name="rl_ui_unhealthyBracketed" text="Hayır (çok sağlıksız)"/>
         <text name="rl_ui_noMaleAnimal" text="Uygun erkek hayvan yok"/>
         <text name="rl_ui_noMaleAnimalBracketed" text="Hayır (uygun erkek hayvan yok)"/>
-        <text name="rl_ui_recoveringLastBirth" text="Son doğumdan sonra iyileşme"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Hayır (son doğumdan sonra iyileşme)"/>
+        <text name="rl_ui_recoveringLastBirth" text="Son doğumundan toparlanıyor"/>
+        <text name="rl_ui_recoveringLastBirthBracketed" text="Hayır (son doğumundan toparlanıyor)"/>
         <text name="rl_ui_tooYoung" text="Çok genç"/>
         <text name="rl_ui_tooYoungBracketed" text="Hayır (çok genç)"/>
         <text name="rl_ui_pregnant" text="Hamile"/>
         <text name="rl_ui_lactating" text="Süt Salgılama"/>
         <text name="rl_ui_canReproduce" text="Üreyebilir"/>
-        <text name="rl_ui_impregnatedBy" text="Tarafından Hamile"/>
+        <text name="rl_ui_impregnatedBy" text="Gebe bırakan"/>
         <text name="rl_ui_unknown" text="Bilinmiyor"/>
         <text name="rl_ui_yes" text="Evet"/>
         <text name="rl_ui_no" text="Hayır"/>
         <text name="rl_ui_mother" text="Anne"/>
         <text name="rl_ui_father" text="Baba"/>
-        <text name="rl_ui_uniqueId" text="Benzersiz ID"/>
-        <text name="rl_ui_farmId" text="Çiftlik ID"/>
+        <text name="rl_ui_uniqueId" text="Benzersiz Kimlik"/>
+        <text name="rl_ui_farmId" text="Çiftlik Kimliği"/>
         <text name="rl_ui_gender" text="Cinsiyet"/>
         <text name="rl_ui_male" text="Erkek"/>
         <text name="rl_ui_female" text="Dişi"/>
@@ -106,678 +114,687 @@
 		<text name="rl_ui_targetWeight" text="Hedef Ağırlık"/>
         <text name="rl_ui_value" text="Değer"/>
         <text name="rl_ui_valuePerKilo" text="Kg. Başına Değer"/>
-		<text name="rl_ui_genetics" text="Genetik"/>
+        <text name="rl_ui_genetics" text="Genetik"/>
 		<text name="rl_ui_overall" text="Toplam"/>
 		<text name="rl_ui_rename" text="İsim Değiştir"/>
-		<text name="rl_ui_cantFindAnimal" text="Hayvan bulunamadı"/>
-		<text name="rl_ui_maleNumImpregnatable" text="Ağılda hamile olmayan hayvanlar"/>
-		
-		<text name="rl_ui_breederQuality" text="Damızlık Kalitesi"/>
-		<text name="rl_ui_birthday" text="Doğum Günü"/>
-		<text name="rl_ui_pregnancyExpected" text="Beklenen"/>
-		<text name="rl_ui_pregnancyExpecting" text="Beklenti"/>
-		<text name="rl_ui_pregnancyBaby" text="yavru"/>
-		<text name="rl_ui_pregnancyBabies" text="yavrular"/>
-		<text name="rl_ui_animalOrigin" text="Menşei"/>
-		<text name="rl_ui_months" text="aylık"/>
-		<text name="rl_ui_month" text="ay"/>
+        <text name="rl_ui_cantFindAnimal" text="Hayvan bulunamadı"/>
+        <text name="rl_ui_maleNumImpregnatable" text="Ağıldaki döllenebilir hayvanlar"/>
+
+        <text name="rl_ui_breederQuality" text="Damızlık Kalitesi"/>
+        <text name="rl_ui_birthday" text="Doğum Günü"/>
+        <text name="rl_ui_pregnancyExpected" text="Beklenen"/>
+        <text name="rl_ui_pregnancyExpecting" text="Bekleniyor"/>
+        <text name="rl_ui_pregnancyBaby" text="bebek"/>
+        <text name="rl_ui_pregnancyBabies" text="bebekler"/>
+        <text name="rl_ui_animalOrigin" text="Köken"/>
+        <text name="rl_ui_months" text="ay"/>
+        <text name="rl_ui_month" text="ay"/>
 		<text name="rl_ui_years" text="yaşında"/>
-		<text name="rl_ui_year" text="yıl"/>
+        <text name="rl_ui_year" text="yıl"/>
 
-		<text name="rl_ui_milk" text="Süt üretimi"/>
-		<text name="rl_ui_wool" text="Yün üretimi"/>
-		<text name="rl_ui_eggs" text="Yumurta üretimi"/>
-		<text name="rl_ui_metabolism" text="Metabolizma"/>
-		<text name="rl_ui_meat" text="Kalite"/>
-		<text name="rl_ui_health" text="Sağlık"/>
-		<text name="rl_ui_fertility" text="Doğurganlık"/>
+        <text name="rl_ui_milk" text="Süt üretimi"/>
+        <text name="rl_ui_wool" text="Yün üretimi"/>
+        <text name="rl_ui_eggs" text="Yumurta üretimi"/>
+        <text name="rl_ui_metabolism" text="Metabolizma"/>
+        <text name="rl_ui_meat" text="Kalite"/>
+        <text name="rl_ui_meat_github" text="Et Kalitesi"/>
+        <text name="rl_ui_quality" text="Kalite"/>
+        <text name="rl_ui_quality_github" text="Et Kalitesi"/>
+        <text name="rl_ui_health" text="Sağlık"/>
+        <text name="rl_ui_fertility" text="Doğurganlık"/>
 
-		<text name="rl_ui_genetics_infertile" text="Infertile"/>
-		<text name="rl_ui_genetics_extremelyLow" text="Aşırı düşük"/>
-		<text name="rl_ui_genetics_veryLow" text="Çok düşük"/>
-		<text name="rl_ui_genetics_low" text="Düşük"/>
-		<text name="rl_ui_genetics_average" text="Ortalama"/>
-		<text name="rl_ui_genetics_high" text="Yüksek"/>
-		<text name="rl_ui_genetics_veryHigh" text="Çok yüksek"/>
-		<text name="rl_ui_genetics_extremelyHigh" text="Aşırı yüksek"/>
+        <text name="rl_ui_genetics_infertile" text="Kısır"/>
+        <text name="rl_ui_genetics_extremelyLow" text="Aşırı düşük"/>
+        <text name="rl_ui_genetics_veryLow" text="Çok düşük"/>
+        <text name="rl_ui_genetics_low" text="Düşük"/>
+        <text name="rl_ui_genetics_average" text="Ortalama"/>
+        <text name="rl_ui_genetics_high" text="Yüksek"/>
+        <text name="rl_ui_genetics_veryHigh" text="Çok yüksek"/>
+        <text name="rl_ui_genetics_extremelyHigh" text="Aşırı yüksek"/>
+        <text name="rl_ui_genetics_highest" text="En yüksek"/>
 
-		<text name="rl_ui_genetics_extremelyBad" text="Aşırı kötü"/>
-		<text name="rl_ui_genetics_veryBad" text="Çok kötü"/>
-		<text name="rl_ui_genetics_bad" text="Kötü"/>
-		<text name="rl_ui_genetics_good" text="İyi"/>
-		<text name="rl_ui_genetics_veryGood" text="Çok iyi"/>
-		<text name="rl_ui_genetics_extremelyGood" text="Aşırı iyi"/>
-		
-		<text name="rl_ui_buySelected" text="Seçilenleri satın al"/>
-		<text name="rl_ui_sellSelected" text="Seçilenleri sat"/>
-		<text name="rl_ui_moveSelected" text="Seçilenleri gönder"/>
-		<text name="rl_ui_buyConfirmation" text="Satın almak istediğine emin misin ? %s hayvan için %s?" tag="format"/>
-		<text name="rl_ui_sellConfirmation" text="Satmak istediğine emin misin ? %s hayvan için %s??" tag="format"/>
-		<text name="rl_ui_moveConfirmation" text="Emin misin %s hayvan gönderilecek?" tag="format"/>
-		<text name="rl_ui_buyBulkResult" text="%s hayvan için ödendi %s" tag="format"/>
-		<text name="rl_ui_sellBulkResult" text="%s hayvan %s için satıldı" tag="format"/>
-		<text name="rl_ui_moveBulkResult" text="%s hayvan gönderildi" tag="format"/>
-		<text name="rl_ui_moveTab" text="Move"/>
-		<text name="rl_ui_moveSingle" text="Move"/>
-		<text name="rl_ui_moveSelectDestination" text="Select Destination"/>
-		<text name="rl_ui_moveNoDestinations" text="No destinations available for this animal type."/>
-		<text name="rl_ui_moveEPPAgeFormat" text="ages %d-%d mo" tag="format"/>/
-		<text name="rl_ui_moveValidSummary" text="%d animal(s) will be moved" tag="format"/>
-		<text name="rl_ui_moveRejectedAge" text="%d animal(s) skipped: does not meet age requirement (%d-%d months)" tag="format"/>
-		<text name="rl_ui_moveRejectedCapacity" text="%d animal(s) skipped: not enough space at destination" tag="format"/>
-		<text name="rl_ui_moveAllRejected" text="No animals can be moved to this destination."/>
-		<text name="rl_ui_moveBulkConfirmTitle" text="Move Animals"/>
-		<text name="rl_ui_moveErrorNoPermission" text="You don't have permission to move animals here."/>
-		<text name="rl_ui_moveErrorNotSupported" text="This destination doesn't support this animal type."/>
-		<text name="rl_ui_moveErrorNoSpace" text="Not enough space at the destination."/>/
+        <text name="rl_ui_genetics_extremelyBad" text="Aşırı kötü"/>
+        <text name="rl_ui_genetics_veryBad" text="Çok kötü"/>
+        <text name="rl_ui_genetics_bad" text="Kötü"/>
+        <text name="rl_ui_genetics_good" text="İyi"/>
+        <text name="rl_ui_genetics_veryGood" text="Çok iyi"/>
+        <text name="rl_ui_genetics_extremelyGood" text="Aşırı iyi"/>
 
-		<text name="rl_ui_monitor" text="İzleme"/>
-		<text name="rl_ui_monitorSubscriptions" text="İzleme Aboneliği"/>
-		<text name="finance_monitorSubscriptions" text="İzleme Aboneliği"/>
-		<text name="rl_ui_monitorFee" text="İzleme ücreti"/>
-		<text name="rl_ui_applyMonitor" text="İzle"/>
-		<text name="rl_ui_removeMonitor" text="İzlemeyi Kaldır"/>
-		<text name="rl_ui_input_food" text="Besin"/>
-		<text name="rl_ui_input_water" text="Su"/>
-		<text name="rl_ui_input_straw" text="Saman"/>
-		<text name="rl_ui_output_milk" text="Süt"/>
-		<text name="rl_ui_output_manure" text="Doğal Gübre"/>
-		<text name="rl_ui_output_liquidManure" text="Sıvı Gübre"/>
-		<text name="rl_ui_output_pallets_eggs" text="Yumurta"/>
-		<text name="rl_ui_output_pallets_wool" text="Yün"/>
+        <text name="rl_ui_buySelected" text="Seçilenleri satın al"/>
+        <text name="rl_ui_sellSelected" text="Seçilenleri sat"/>
+        <text name="rl_ui_moveSelected" text="Seçilenleri taşı"/>
+        <text name="rl_ui_buyConfirmation" text="%s hayvanı %s karşılığında satın almak istediğinizden emin misiniz?" tag="format"/>
+        <text name="rl_ui_buyPartialConfirmation" text="Seçilen %d hayvandan %d kadarını %s karşılığında satın almak istiyor musunuz?" tag="format"/>
+        <text name="rl_ui_buySkippedNotSupported" text="%d hayvan bu tesis tarafından desteklenmiyor" tag="format"/>
+        <text name="rl_ui_buyAllRejected" text="Seçilen hayvanların hiçbiri bu tesise satın alınamaz."/>
+        <text name="rl_ui_sellConfirmation" text="%s hayvanı %s karşılığında satmak istediğinizden emin misiniz?" tag="format"/>
+        <text name="rl_ui_moveConfirmation" text="%s hayvanı taşımak istediğinizden emin misiniz?" tag="format"/>
+        <text name="rl_ui_buyBulkResult" text="%s hayvan %s karşılığında satın alındı" tag="format"/>
+        <text name="rl_ui_sellBulkResult" text="%s hayvan %s karşılığında satıldı" tag="format"/>
+        <text name="rl_ui_moveBulkResult" text="%s hayvan taşındı" tag="format"/>
+        <text name="rl_ui_moveTab" text="Taşı"/>
+        <text name="rl_ui_moveSingle" text="Taşı"/>
+        <text name="rl_ui_moveSelectDestination" text="Hedef Seçin"/>
+        <text name="rl_ui_moveNoDestinations" text="Bu hayvan türü için kullanılabilir hedef yok."/>
+        <text name="rl_ui_moveEPPAgeFormat" text="%d-%d aylık" tag="format"/>
+        <text name="rl_ui_moveValidSummary" text="%d hayvan taşınacak" tag="format"/>
+        <text name="rl_ui_moveRejectedAge" text="%d hayvan atlandı: yaş gereksinimini karşılamıyor (%d-%d ay)" tag="format"/>
+        <text name="rl_ui_moveRejectedCapacity" text="%d hayvan atlandı: hedefte yeterli yer yok" tag="format"/>
+        <text name="rl_ui_moveAllRejected" text="Bu hedefe hiçbir hayvan taşınamaz."/>
+        <text name="rl_ui_moveBulkConfirmTitle" text="Hayvanları Taşı"/>
+        <text name="rl_ui_moveErrorNoPermission" text="Buraya hayvan taşıma izniniz yok."/>
+        <text name="rl_ui_moveErrorNotSupported" text="Bu hedef bu hayvan türünü desteklemiyor."/>
+        <text name="rl_ui_moveErrorNoSpace" text="Hedefte yeterli yer yok."/>
+
+        <text name="rl_ui_monitor" text="İzleme"/>
+        <text name="rl_ui_monitorSubscriptions" text="İzleme Aboneliği"/>
+        <text name="finance_monitorSubscriptions" text="İzleme Aboneliği"/>
+        <text name="rl_ui_monitorFee" text="İzleme ücreti"/>
+        <text name="rl_ui_applyMonitor" text="İzle"/>
+        <text name="rl_ui_removeMonitor" text="İzlemeyi Kaldır"/>
+		<text name="rl_ui_removingMonitor" text="Kaldırılıyor..."/>
+        <text name="rl_ui_input_food" text="Yem"/>
+        <text name="rl_ui_input_water" text="Su"/>
+        <text name="rl_ui_input_straw" text="Saman"/>
+        <text name="rl_ui_output_milk" text="Süt"/>
+        <text name="rl_ui_output_manure" text="Katı Gübre"/>
+        <text name="rl_ui_output_liquidManure" text="Sıvı Gübre"/>
+        <text name="rl_ui_output_pallets_eggs" text="Yumurta"/>
+        <text name="rl_ui_output_pallets_wool" text="Yün"/>
 		<text name="rl_ui_output_pallets_goatMilk" text="Keçi Sütü"/>
-		<text name="rl_ui_amountPerDay" text="%.0fL / gün" tag="format"/>
-		<text name="rl_ui_feePerMonth" text="%s / ay" tag="format"/>
-		
-		<text name="rl_ui_animalType" text="Tür"/>
+        <text name="rl_ui_amountPerDay" text="%.0fL / gün" tag="format"/>
+        <text name="rl_ui_feePerMonth" text="%s / ay" tag="format"/>
+
+        <text name="rl_ui_animalType" text="Tür"/>
 		<text name="rl_ui_amountMonitored" text="İzlendi"/>
-		<text name="rl_ui_production" text="Ürünler"/>
-		<text name="rl_ui_applyAllMonitor" text="Tüm İzlenenlere Uygula"/>
-		<text name="rl_ui_removeAllMonitor" text="Tüm İzlenenleri Kaldır"/>
-		<text name="rl_ui_fee" text="Fee"/>
-
-		<text name="rl_ui_leftEarTag" text="Left Ear Tag"/>
-		<text name="rl_ui_rightEarTag" text="Right Ear Tag"/>
-		<text name="rl_ui_backgroundColour" text="Background Colour"/>
-		<text name="rl_ui_backgroundHue" text="Background Hue"/>
-		<text name="rl_ui_backgroundRgb" text="Background RGB"/>
-		<text name="rl_ui_textColour" text="Text Colour"/>
-		<text name="rl_ui_textHue" text="Text Hue"/>
-		<text name="rl_ui_textRgb" text="Text RGB"/>
-
-		<text name="rl_ui_formatMonths" text="%s months"/>
-		<text name="rl_ui_formatMonth" text="%s month"/>
-		<text name="rl_ui_notPregnant" text="Not Pregnant"/>
-		<text name="rl_ui_any" text="Any"/>
-		<text name="rl_ui_pregnancy" text="Pregnancy"/>
-		<text name="rl_ui_productivity" text="Productivity"/>
-		<text name="rl_ui_selectAll" text="Select All"/>
-		<text name="rl_ui_selectNone" text="Select None"/>
-		<text name="rl_ui_filters" text="Filters"/>
-		<text name="rl_ui_doesntHaveName" text="No Name"/>
-		<text name="rl_ui_doesHaveName" text="Has Name"/>
-
-
-
-		<text name="rl_ui_castrated" text="Castrated"/>
-		<text name="rl_ui_castrate" text="Castrate"/>
-		<text name="rl_ui_importance" text="Importance"/>
-		<text name="rl_ui_type" text="Type"/>
-		<text name="rl_ui_date" text="Date"/>
-		<text name="rl_ui_message" text="Message"/>
-		<text name="rl_ui_messages" text="Messages"/>
-		<text name="rl_ui_unknownCauses" text="unknown causes"/>
-		<text name="rl_ui_messageNumber" text="%s-%s of %s"/>
-		<text name="rl_ui_deleteMessage" text="Delete Message"/>
-		<text name="rl_ui_unreadMessages" text="Husbandry '%s' has unread messages!"/>
-		<text name="rl_ui_herdsman" text="Herdsman"/>
-		<text name="rl_ui_budget" text="Budget"/>
-		<text name="rl_ui_budgetType" text="Budget Type"/>
-		<text name="rl_ui_fixed" text="Fixed"/>
-		<text name="rl_ui_percentage" text="Percentage"/>
-		<text name="rl_ui_maxAnimals" text="Max Animals"/>
-		<text name="rl_ui_infinite" text="Infinite"/>
-		<text name="rl_ui_herdsmanRecentlyBought" text="Recent Herdsman Purchase"/>
-		<text name="rl_ui_previousWage" text="Previous Wage"/>
-		<text name="rl_ui_herdsmanWages" text="Herdsman Wages"/>
-		<text name="finance_herdsmanWages" text="Herdsman Wages"/>
-		<text name="rl_ui_medicine" text="Medicine"/>
-		<text name="finance_medicine" text="Medicine"/>
-		<text name="rl_ui_semenPurchase" text="Inseminant Purchase"/>
-		<text name="rl_ui_semenPurchase_github" text="Semen Purchase"/>
-		<text name="finance_semenPurchase" text="Inseminant Purchase"/>
-		<text name="finance_semenPurchase_github" text="Semen Purchase"/>
-		<text name="rl_ui_noDiseases" text="No Diseases"/>
-		<text name="rl_ui_onlyDiseases" text="Only Diseases"/>
-		<text name="rl_ui_naming" text="Naming"/>
-		<text name="rl_ui_alphabetical" text="Alphabetical"/>
-		<text name="rl_ui_breed" text="Breed"/>
-		<text name="rl_ui_dontMark" text="Don't Mark"/>
-		<text name="rl_ui_mark" text="Mark"/>
-		<text name="rl_ui_unmark" text="Unmark"/>
-		<text name="rl_ui_favourite" text="Favourite"/>
-		<text name="rl_ui_unFavourite" text="Unfavourite"/>
-		<text name="rl_ui_quantity" text="Quantity"/>
-		<text name="rl_ui_dewar" text="Dewar"/>
-		<text name="rl_ui_semenPurchase_successful" text="Artificial inseminant successfully purchased. You can pick it up at the store"/>
-		<text name="rl_ui_semenPurchase_successful_github" text="Semen successfully purchased. You can pick it up at the store"/>
-		<text name="rl_ui_semenPurchase_unsuccessful" text="Artificial inseminant could not be purchased"/>
-		<text name="rl_ui_semenPurchase_unsuccessful_github" text="Semen could not be purchased"/>
-		<text name="rl_ui_earTag" text="Ear Tag"/>
-		<text name="rl_ui_species" text="Species"/>
-		<text name="rl_ui_strawSingle" text="Straw"/>
-		<text name="rl_ui_strawMultiple" text="Straws"/>
-		<text name="rl_ui_artificialInsemination" text="Artificial Insemination"/>
-		<text name="rl_ui_semenPurchaseNoPermission" text="You don't have to permission to trade animals or purchase inseminant."/>
-		<text name="rl_ui_semenPurchaseNoPermission_github" text="You don't have to permission to trade animals or purchase semen."/>
-		<text name="rl_ui_semenPurchaseNoMoney" text="You don't have enough money to purchase this inseminant."/>
-		<text name="rl_ui_semenPurchaseNoMoney_github" text="You don't have enough money to purchase this semen."/>
-		<text name="rl_ui_takeStraw" text="Take Straw"/>
-		<text name="rl_ui_inseminateAnimal" text="Inseminate %s"/>
-		<text name="rl_ui_inseminate" text="Inseminate"/>
-		<text name="rl_ui_strawEmpty" text="This straw is empty"/>
-		<text name="rl_ui_averageSuccessColon" text="Average Success: "/>
-		<text name="rl_ui_averageSuccess" text="Average Success"/>
-		<text name="rl_ui_success" text="Success"/>
-		<text name="rl_ui_save" text="Save"/>
-		<text name="rl_ui_load" text="Load"/>
-		<text name="rl_ui_saveProfile" text="Save Profile"/>
-		<text name="rl_ui_loadProfile" text="Load Profile"/>
-
-		<text name="rl_ui_healthy" text="Healthy"/>
-		<text name="rl_ui_hasDisease" text="Has Disease"/>
-		<text name="rl_ui_diseasedAnimals" text="Diseased Animals"/>
-
-
-		<text name="rl_insemination_male" text="Only females can be artificially inseminated"/>
-		<text name="rl_insemination_pregnant" text="This animal is already pregnant"/>
-		<text name="rl_insemination_animalType" text="Animal must be of the same species as the father"/>
-		<text name="rl_insemination_inseminated" text="This animal has already been artificially inseminated"/>
-		<text name="rl_insemination_recovering" text="This animal is still recovering from its previous pregnancy"/>
-		<text name="rl_insemination_father" text="Inbreeding is not permitted"/>
-		<text name="rl_insemination_young" text="This animal is too young to be artificially inseminated"/>
+        <text name="rl_ui_production" text="Ürünler"/>
+        <text name="rl_ui_applyAllMonitor" text="Tüm İzlenenlere Uygula"/>
+        <text name="rl_ui_removeAllMonitor" text="Tüm İzlenenleri Kaldır"/>
+		<text name="rl_ui_removingAllMonitor" text="Hepsini Kaldırıyor..."/>
+        <text name="rl_ui_fee" text="Ücret"/>
+
+        <text name="rl_ui_leftEarTag" text="Sol Kulak Küpesi"/>
+        <text name="rl_ui_rightEarTag" text="Sağ Kulak Küpesi"/>
+        <text name="rl_ui_backgroundColour" text="Arka Plan Rengi"/>
+        <text name="rl_ui_backgroundHue" text="Arka Plan Tonu"/>
+        <text name="rl_ui_backgroundRgb" text="Arka Plan RGB"/>
+        <text name="rl_ui_textColour" text="Metin Rengi"/>
+        <text name="rl_ui_textHue" text="Metin Tonu"/>
+        <text name="rl_ui_textRgb" text="Metin RGB"/>
+
+        <text name="rl_ui_formatMonths" text="%s ay"/>
+        <text name="rl_ui_formatMonth" text="%s ay"/>
+        <text name="rl_ui_notPregnant" text="Hamile Değil"/>
+        <text name="rl_ui_any" text="Herhangi biri"/>
+        <text name="rl_ui_pregnancy" text="Hamilelik"/>
+        <text name="rl_ui_productivity" text="Verimlilik"/>
+        <text name="rl_ui_selectAll" text="Tümünü Seç"/>
+        <text name="rl_ui_selectNone" text="Hiçbirini Seçme"/>
+        <text name="rl_ui_filters" text="Filtreler"/>
+        <text name="rl_ui_doesntHaveName" text="İsim Yok"/>
+        <text name="rl_ui_doesHaveName" text="İsim Var"/>
+
+
+
+        <text name="rl_ui_castrated" text="Kısırlaştırılmış"/>
+        <text name="rl_ui_castrate" text="Kısırlaştır"/>
+
+        <text name="rl_ui_importance" text="Önem"/>
+        <text name="rl_ui_type" text="Tür"/>
+        <text name="rl_ui_date" text="Tarih"/>
+        <text name="rl_ui_message" text="Mesaj"/>
+        <text name="rl_ui_messages" text="Mesajlar"/>
+        <text name="rl_ui_unknownCauses" text="bilinmeyen nedenler"/>
+        <text name="rl_ui_messageNumber" text="%s-%s / %s"/>
+        <text name="rl_ui_deleteMessage" text="Mesajı Sil"/>
+        <text name="rl_ui_unreadMessages" text="'%s' için okunmamış mesajlar var!"/>
+        <text name="rl_ui_herdsman" text="Çoban"/>
+        <text name="rl_ui_budget" text="Bütçe"/>
+        <text name="rl_ui_budgetType" text="Bütçe Türü"/>
+        <text name="rl_ui_fixed" text="Sabit"/>
+        <text name="rl_ui_percentage" text="Yüzde"/>
+        <text name="rl_ui_maxAnimals" text="Maks Hayvan"/>
+        <text name="rl_ui_infinite" text="Sınırsız"/>
+        <text name="rl_ui_herdsmanRecentlyBought" text="Yakın Zamandaki Çoban Satın Alımı"/>
+        <text name="rl_ui_previousWage" text="Önceki Maaş"/>
+        <text name="rl_ui_herdsmanWages" text="Çoban Maaşları"/>
+        <text name="finance_herdsmanWages" text="Çoban Maaşları"/>
+        <text name="rl_ui_medicine" text="İlaç"/>
+        <text name="finance_medicine" text="İlaç"/>
+        <text name="rl_ui_semenPurchase" text="Suni Tohumlama Alımı"/>
+        <text name="rl_ui_semenPurchase_github" text="Sperma Alımı"/>
+        <text name="finance_semenPurchase" text="Suni Tohumlama Alımı"/>
+        <text name="finance_semenPurchase_github" text="Sperma Alımı"/>
+        <text name="rl_ui_noDiseases" text="Hastalık Yok"/>
+        <text name="rl_ui_onlyDiseases" text="Sadece Hastalıklar"/>
+        <text name="rl_ui_naming" text="İsimlendirme"/>
+        <text name="rl_ui_alphabetical" text="Alfabetik"/>
+        <text name="rl_ui_breed" text="Irk"/>
+        <text name="rl_ui_dontMark" text="İşaretleme"/>
+        <text name="rl_ui_mark" text="İşaretle"/>
+        <text name="rl_ui_unmark" text="İşaretini Kaldır"/>
+        <text name="rl_ui_favourite" text="Favorilere Ekle"/>
+        <text name="rl_ui_unFavourite" text="Favorilerden Çıkar"/>
+        <text name="rl_ui_quantity" text="Miktar"/>
+        <text name="rl_ui_dewar" text="Sperma Tankı"/>
+        <text name="rl_ui_semenPurchase_successful" text="Suni tohumlama başarıyla satın alındı. Mağazadan teslim alabilirsiniz"/>
+        <text name="rl_ui_semenPurchase_successful_github" text="Sperma başarıyla satın alındı. Mağazadan teslim alabilirsiniz"/>
+        <text name="rl_ui_semenPurchase_unsuccessful" text="Suni tohumlama satın alınamadı"/>
+        <text name="rl_ui_semenPurchase_unsuccessful_github" text="Sperma satın alınamadı"/>
+        <text name="rl_ui_earTag" text="Kulak Küpesi"/>
+        <text name="rl_ui_species" text="Tür"/>
+        <text name="rl_ui_strawSingle" text="Sperma Tüpü"/>
+        <text name="rl_ui_strawMultiple" text="Separma Tüpleri"/>
+        <text name="rl_ui_artificialInsemination" text="Suni Tohumlama"/>
+        <text name="rl_ui_semenPurchaseNoPermission" text="Hayvan ticareti yapma veya suni tohumlama satın alma izniniz yok."/>
+        <text name="rl_ui_semenPurchaseNoPermission_github" text="Hayvan ticareti yapma veya sperma satın alma izniniz yok."/>
+        <text name="rl_ui_semenPurchaseNoMoney" text="Bu suni tohumlamayı satın almak için yeterli paranız yok."/>
+        <text name="rl_ui_semenPurchaseNoMoney_github" text="Bu spermayı satın almak için yeterli paranız yok."/>
+        <text name="rl_ui_takeStraw" text="Sperma Tüpü Al"/>
+        <text name="rl_ui_inseminateAnimal" text="%s Tohumla"/>
+        <text name="rl_ui_inseminate" text="Tohumla"/>
+        <text name="rl_ui_strawEmpty" text="Bu tüp boş"/>
+        <text name="rl_ui_averageSuccessColon" text="Ortalama Başarı: "/>
+        <text name="rl_ui_averageSuccess" text="Ortalama Başarı"/>
+        <text name="rl_ui_success" text="Başarılı"/>
+        <text name="rl_ui_save" text="Kaydet"/>
+        <text name="rl_ui_load" text="Yükle"/>
+        <text name="rl_ui_saveProfile" text="Profili Kaydet"/>
+        <text name="rl_ui_loadProfile" text="Profili Yükle"/>
+
+        <text name="rl_ui_healthy" text="Sağlıklı"/>
+        <text name="rl_ui_hasDisease" text="Hastalığı Var"/>
+        <text name="rl_ui_diseasedAnimals" text="Hastalıklı Hayvanlar"/>
+
+
+        <text name="rl_insemination_male" text="Sadece dişiler suni olarak tohumlanabilir"/>
+        <text name="rl_insemination_pregnant" text="Bu hayvan zaten hamile"/>
+        <text name="rl_insemination_animalType" text="Hayvan, babayla aynı türden olmalıdır"/>
+        <text name="rl_insemination_inseminated" text="Bu hayvan zaten suni olarak tohumlanmış"/>
+        <text name="rl_insemination_recovering" text="Bu hayvan hala önceki hamileliğinden toparlanıyor"/>
+        <text name="rl_insemination_father" text="Akraba evliliğine (çiftleştirmeye) izin verilmez"/>
+        <text name="rl_insemination_young" text="Bu hayvan suni olarak tohumlanmak için çok genç"/>
 
 
-		<text name="rl_mark_aiManager_sell" text="Herdsman marked for selling"/>
-		<text name="rl_mark_aiManager_castrate" text="Herdsman marked for castrating"/>
-		<text name="rl_mark_aiManager_disease" text="Herdsman marked for treating"/>
-		<text name="rl_mark_aiManager_ai" text="Herdsman marked for artificial insemination"/>
-		<text name="rl_mark_player" text="Marked by player"/>
+        <text name="rl_mark_aiManager_sell" text="Çoban satılması için işaretledi"/>
+        <text name="rl_mark_aiManager_castrate" text="Çoban kısırlaştırılması için işaretledi"/>
+        <text name="rl_mark_aiManager_disease" text="Çoban tedavi edilmesi için işaretledi"/>
+        <text name="rl_mark_aiManager_ai" text="Çoban suni tohumlamak için işaretledi"/>
+        <text name="rl_mark_player" text="Oyuncu tarafından işaretlendi"/>
 
 
-		<!-- AI - BUYING -->
+        <!-- AI - BUYING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="The herdsman will not purchase animals"/>
-		<text name="rl_ui_herdsmanTooltip_buy_enabled_2" text="The herdsman will purchase animals"/>
+        <text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="Çoban hayvan satın almayacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_enabled_2" text="Çoban hayvan satın alacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Purchasing budget is a fixed amount"/>
-		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Purchasing budget is a percentage of your farm's money"/>
+        <text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Satın alma bütçesi sabit bir tutar"/>
+        <text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Satın alma bütçesi çiftliğinizin parasının bir yüzdesi"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="The herdsman will spend up to %s per day"/>
-		<text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="The herdsman will spend up to %s of your farm's money per day"/>
+        <text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="Çoban günde en fazla %s harcayacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="Çoban günde çiftliğinizin parasının en fazla %s kadarını harcayacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="The herdsman will buy up to %s animals per day"/>
+        <text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="Çoban günde en fazla %s hayvan satın alacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_breed" text="The herdsman will only buy %s animals"/>
-		<text name="rl_ui_herdsmanTooltip_buy_breed_any" text="The herdsman will buy any breed"/>
+        <text name="rl_ui_herdsmanTooltip_buy_breed" text="Çoban sadece %s cinsi hayvan satın alacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_breed_any" text="Çoban herhangi bir cins satın alacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="The herdsman will only purchase animals without any diseases"/>
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="The herdsman will purchase animals regardless of diseases"/>
+        <text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="Çoban sadece hastalığı olmayan hayvanları satın alacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="Çoban hastalıklara bakılmaksızın hayvan satın alacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_gender_1" text="The herdsman will only purchase female animals"/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_2" text="The herdsman will purchase female and male animals"/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_3" text="The herdsman will only purchase male animals"/>
+        <text name="rl_ui_herdsmanTooltip_buy_gender_1" text="Çoban sadece dişi hayvanları satın alacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_gender_2" text="Çoban dişi ve erkek hayvanları satın alacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_gender_3" text="Çoban sadece erkek hayvanları satın alacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_age_equal" text="The herdsman will only purchase animals that are %s old"/>
-		<text name="rl_ui_herdsmanTooltip_buy_age_range" text="The herdsman will only purchase animals that are between %s and %s old"/>
+        <text name="rl_ui_herdsmanTooltip_buy_age_equal" text="Çoban sadece %s aylık/yaşında hayvanları satın alacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_age_range" text="Çoban sadece %s ile %s aylık/yaşında olan hayvanları satın alacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="The herdsman will only purchase animals with %s quality"/>
-		<text name="rl_ui_herdsmanTooltip_buy_quality_range" text="The herdsman will only purchase animals with quality between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="Çoban sadece %s kalitesindeki hayvanları satın alacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_quality_range" text="Çoban sadece kalitesi %s ile %s arasında olan hayvanları satın alacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="The herdsman will only purchase animals with %s fertility"/>
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="The herdsman will only purchase animals with fertility between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="Çoban sadece %s doğurganlığa sahip hayvanları satın alacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="Çoban sadece doğurganlığı %s ile %s arasında olan hayvanları satın alacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_health_equal" text="The herdsman will only purchase animals with %s health"/>
-		<text name="rl_ui_herdsmanTooltip_buy_health_range" text="The herdsman will only purchase animals with health between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_buy_health_equal" text="Çoban sadece %s sağlığa sahip hayvanları satın alacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_health_range" text="Çoban sadece sağlığı %s ile %s arasında olan hayvanları satın alacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="The herdsman will only purchase animals with %s productivity"/>
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="The herdsman will only purchase animals with productivity between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="Çoban sadece %s üretkenliğe sahip hayvanları satın alacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="Çoban sadece üretkenliği %s ile %s arasında olan hayvanları satın alacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="The herdsman will only purchase animals with %s metabolism"/>
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="The herdsman will only purchase animals with metabolism between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="Çoban sadece %s metabolizmaya sahip hayvanları satın alacak"/>
+        <text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="Çoban sadece metabolizması %s ile %s arasında olan hayvanları satın alacak"/>
 
 
-		<!-- AI - SELLING -->
+        <!-- AI - SELLING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="The herdsman will not sell animals"/>
-		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="The herdsman will sell animals"/>
+        <text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Çoban hayvan satmayacak"/>
+        <text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Çoban hayvan satacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="The herdsman will sell up to %s animals per day"/>
+        <text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="Çoban günde en fazla %s hayvan satacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_mark_1" text="The herdsman will not mark animals to be sold"/>
-		<text name="rl_ui_herdsmanTooltip_sell_mark_2" text="The herdsman will mark animals to be sold"/>
+        <text name="rl_ui_herdsmanTooltip_sell_mark_1" text="Çoban satılacak hayvanları işaretlemeyecek"/>
+        <text name="rl_ui_herdsmanTooltip_sell_mark_2" text="Çoban satılacak hayvanları işaretleyecek"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="The herdsman will sell animals regardless of diseases"/>
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="The herdsman will only sell animals with a disease"/>
+        <text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="Çoban hastalıklara bakılmaksızın hayvan satacak"/>
+        <text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="Çoban sadece hastalığı olan hayvanları satacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_gender_1" text="The herdsman will only sell female animals"/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_2" text="The herdsman will sell female and male animals"/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_3" text="The herdsman will only sell male animals"/>
+        <text name="rl_ui_herdsmanTooltip_sell_gender_1" text="Çoban sadece dişi hayvanları satacak"/>
+        <text name="rl_ui_herdsmanTooltip_sell_gender_2" text="Çoban dişi ve erkek hayvanları satacak"/>
+        <text name="rl_ui_herdsmanTooltip_sell_gender_3" text="Çoban sadece erkek hayvanları satacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_age_equal" text="The herdsman will only sell animals that are %s old"/>
-		<text name="rl_ui_herdsmanTooltip_sell_age_range" text="The herdsman will only sell animals that are between %s and %s old"/>
+        <text name="rl_ui_herdsmanTooltip_sell_age_equal" text="Çoban sadece %s aylık/yaşında hayvanları satacak"/>
+        <text name="rl_ui_herdsmanTooltip_sell_age_range" text="Çoban sadece %s ile %s aylık/yaşında olan hayvanları satacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="The herdsman will only sell animals with %s quality"/>
-		<text name="rl_ui_herdsmanTooltip_sell_quality_range" text="The herdsman will only sell animals with quality between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="Çoban sadece %s kalitesindeki hayvanları satacak"/>
+        <text name="rl_ui_herdsmanTooltip_sell_quality_range" text="Çoban sadece kalitesi %s ile %s arasında olan hayvanları satacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="The herdsman will only sell animals with %s fertility"/>
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="The herdsman will only sell animals with fertility between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="Çoban sadece %s doğurganlığa sahip hayvanları satacak"/>
+        <text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="Çoban sadece doğurganlığı %s ile %s arasında olan hayvanları satacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_health_equal" text="The herdsman will only sell animals with %s health"/>
-		<text name="rl_ui_herdsmanTooltip_sell_health_range" text="The herdsman will only sell animals with health between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_sell_health_equal" text="Çoban sadece %s sağlığa sahip hayvanları satacak"/>
+        <text name="rl_ui_herdsmanTooltip_sell_health_range" text="Çoban sadece sağlığı %s ile %s arasında olan hayvanları satacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="The herdsman will only sell animals with %s productivity"/>
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="The herdsman will only sell animals with productivity between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="Çoban sadece %s üretkenliğe sahip hayvanları satacak"/>
+        <text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="Çoban sadece üretkenliği %s ile %s arasında olan hayvanları satacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="The herdsman will only sell animals with %s metabolism"/>
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="The herdsman will only sell animals with metabolism between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="Çoban sadece %s metabolizmaya sahip hayvanları satacak"/>
+        <text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="Çoban sadece metabolizması %s ile %s arasında olan hayvanları satacak"/>
 
 
-		<!-- AI - CASTRATING -->
+        <!-- AI - CASTRATING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="The herdsman will not castrate animals"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="The herdsman will castrate animals"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Çoban hayvanları kısırlaştırmayacak"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Çoban hayvanları kısırlaştıracak"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="The herdsman will not mark animals for castration"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="The herdsman will mark animals for castration"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="Çoban hayvanları kısırlaştırılmak üzere işaretlemeyecek"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="Çoban hayvanları kısırlaştırılmak üzere işaretleyecek"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="The herdsman will castrate animals regardless of diseases"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="The herdsman will only castrate animals with a disease"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="Çoban hastalıklara bakılmaksızın hayvanları kısırlaştıracak"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="Çoban sadece hastalığı olan hayvanları kısırlaştıracak"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="The herdsman will only castrate animals that are %s old"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_age_range" text="The herdsman will only castrate animals that are between %s and %s old"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="Çoban sadece %s aylık/yaşında hayvanları kısırlaştıracak"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_age_range" text="Çoban sadece %s ile %s aylık/yaşında olan hayvanları kısırlaştıracak"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="The herdsman will only castrate animals with %s quality"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="The herdsman will only castrate animals with quality between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="Çoban sadece %s kalitesindeki hayvanları kısırlaştıracak"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="Çoban sadece kalitesi %s ile %s arasında olan hayvanları kısırlaştıracak"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="The herdsman will only castrate animals with %s fertility"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="The herdsman will only castrate animals with fertility between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="Çoban sadece %s doğurganlığa sahip hayvanları kısırlaştıracak"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="Çoban sadece doğurganlığı %s ile %s arasında olan hayvanları kısırlaştıracak"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="The herdsman will only castrate animals with %s health"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_health_range" text="The herdsman will only castrate animals with health between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="Çoban sadece %s sağlığa sahip hayvanları kısırlaştıracak"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_health_range" text="Çoban sadece sağlığı %s ile %s arasında olan hayvanları kısırlaştıracak"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="The herdsman will only castrate animals with %s productivity"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="The herdsman will only castrate animals with productivity between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="Çoban sadece %s üretkenliğe sahip hayvanları kısırlaştıracak"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="Çoban sadece üretkenliği %s ile %s arasında olan hayvanları kısırlaştıracak"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="The herdsman will only castrate animals with %s metabolism"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="The herdsman will only castrate animals with metabolism between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="Çoban sadece %s metabolizmaya sahip hayvanları kısırlaştıracak"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="Çoban sadece metabolizması %s ile %s arasında olan hayvanları kısırlaştıracak"/>
 
 
-		<!-- AI - NAMING -->
+        <!-- AI - NAMING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_naming_enabled_1" text="The herdsman will not name animals"/>
-		<text name="rl_ui_herdsmanTooltip_naming_enabled_2" text="The herdsman will name animals"/>
+        <text name="rl_ui_herdsmanTooltip_naming_enabled_1" text="Çoban hayvanları isimlendirmeyecek"/>
+        <text name="rl_ui_herdsmanTooltip_naming_enabled_2" text="Çoban hayvanları isimlendirecek"/>
 
-		<text name="rl_ui_herdsmanTooltip_naming_convention_1" text="The herdsman will name animals randomly"/>
-		<text name="rl_ui_herdsmanTooltip_naming_convention_2" text="The herdsman will name animals alphabetically"/>
+        <text name="rl_ui_herdsmanTooltip_naming_convention_1" text="Çoban hayvanları rastgele isimlendirecek"/>
+        <text name="rl_ui_herdsmanTooltip_naming_convention_2" text="Çoban hayvanları alfabetik olarak isimlendirecek"/>
 
 
-		<!-- AI - AI -->
+        <!-- AI - AI -->
 
 
-		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="The herdsman will not AI animals"/>
-		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="The herdsman will AI animals"/>
+        <text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Çoban hayvanlara suni tohumlama yapmayacak"/>
+        <text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Çoban hayvanlara suni tohumlama yapacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="The herdsman will AI up to %s animals per day"/>
+        <text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="Çoban günde en fazla %s hayvana suni tohumlama yapacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_mark_1" text="The herdsman will not mark animals to be inseminated"/>
-		<text name="rl_ui_herdsmanTooltip_ai_mark_2" text="The herdsman will mark animals to be inseminated"/>
+        <text name="rl_ui_herdsmanTooltip_ai_mark_1" text="Çoban tohumlanacak hayvanları işaretlemeyecek"/>
+        <text name="rl_ui_herdsmanTooltip_ai_mark_2" text="Çoban tohumlanacak hayvanları işaretleyecek"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="The herdsman will AI animals regardless of diseases"/>
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="The herdsman will only AI animals with a disease"/>
+        <text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="Çoban hastalıklara bakılmaksızın hayvanlara suni tohumlama yapacak"/>
+        <text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="Çoban sadece hastalığı olan hayvanlara suni tohumlama yapacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_semen" text="The herdsman will use inseminant from %s"/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="The herdsman will use semen from %s"/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="The herdsman will use any viable inseminant"/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="The herdsman will use any viable semen"/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen" text="Çoban %s'den alınan suni tohumlamayı kullanacak"/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_github" text="Çoban %s'den alınan spermayı kullanacak"/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_any" text="Çoban uygun olan herhangi bir suni tohumlamayı kullanacak"/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="Çoban uygun olan herhangi bir spermayı kullanacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_age_equal" text="The herdsman will only AI animals that are %s old"/>
-		<text name="rl_ui_herdsmanTooltip_ai_age_range" text="The herdsman will only AI animals that are between %s and %s old"/>
+        <text name="rl_ui_herdsmanTooltip_ai_age_equal" text="Çoban sadece %s aylık/yaşında hayvanlara suni tohumlama yapacak"/>
+        <text name="rl_ui_herdsmanTooltip_ai_age_range" text="Çoban sadece %s ile %s aylık/yaşında olan hayvanlara suni tohumlama yapacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="The herdsman will only AI animals with %s quality"/>
-		<text name="rl_ui_herdsmanTooltip_ai_quality_range" text="The herdsman will only AI animals with quality between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="Çoban sadece %s kalitesindeki hayvanlara suni tohumlama yapacak"/>
+        <text name="rl_ui_herdsmanTooltip_ai_quality_range" text="Çoban sadece kalitesi %s ile %s arasında olan hayvanlara suni tohumlama yapacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="The herdsman will only AI animals with %s fertility"/>
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="The herdsman will only AI animals with fertility between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="Çoban sadece %s doğurganlığa sahip hayvanlara suni tohumlama yapacak"/>
+        <text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="Çoban sadece doğurganlığı %s ile %s arasında olan hayvanlara suni tohumlama yapacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_health_equal" text="The herdsman will only AI animals with %s health"/>
-		<text name="rl_ui_herdsmanTooltip_ai_health_range" text="The herdsman will only AI animals with health between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_ai_health_equal" text="Çoban sadece %s sağlığa sahip hayvanlara suni tohumlama yapacak"/>
+        <text name="rl_ui_herdsmanTooltip_ai_health_range" text="Çoban sadece sağlığı %s ile %s arasında olan hayvanlara suni tohumlama yapacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="The herdsman will only AI animals with %s productivity"/>
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="The herdsman will only AI animals with productivity between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="Çoban sadece %s üretkenliğe sahip hayvanlara suni tohumlama yapacak"/>
+        <text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="Çoban sadece üretkenliği %s ile %s arasında olan hayvanlara suni tohumlama yapacak"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="The herdsman will only AI animals with %s metabolism"/>
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="The herdsman will only AI animals with metabolism between %s and %s"/>
+        <text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="Çoban sadece %s metabolizmaya sahip hayvanlara suni tohumlama yapacak"/>
+        <text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="Çoban sadece metabolizması %s ile %s arasında olan hayvanlara suni tohumlama yapacak"/>
 
 
 
-		<!--  SETTINGS  -->
-		
+        <!--  SETTINGS  -->
+
 
 		<text name="rl_settings" text="Gerçekçi Hayvancılık"/>
 
-		<text name="rl_settings_off" text="Kapalı"/>
-		<text name="rl_settings_on" text="Açık"/>
+        <text name="rl_settings_off" text="Kapalı"/>
+        <text name="rl_settings_on" text="Açık"/>
 
-		<text name="rl_settings_deathEnabled_label" text="Hayvan Kaldırma"/>
-		<text name="rl_settings_deathEnabled_tooltip_1" text="Hayvanlar hamilelik, sağlık, yaş veya kaza nedeniyle kaldırılmayacak"/>
-		<text name="rl_settings_deathEnabled_tooltip_2" text="Hayvanlar hamilelik, sağlık, yaş veya kaza nedeniyle kaldırılacak"/>
+        <text name="rl_settings_deathEnabled_label" text="Hayvanın Kaldırılması"/>
+        <text name="rl_settings_deathEnabled_label_github" text="Hayvanın Ölümü"/>
+        <text name="rl_settings_deathEnabled_tooltip_1" text="Hayvanlar hamilelik, sağlık, yaş veya kazalar nedeniyle kaldırılmayacak"/>
+        <text name="rl_settings_deathEnabled_tooltip_1_github" text="Hayvanlar hamilelik, sağlık, yaş veya kazalar nedeniyle ölmeyecek"/>
+        <text name="rl_settings_deathEnabled_tooltip_2" text="Hayvanlar hamilelik, sağlık, yaş veya kazalar nedeniyle kaldırılacak"/>
+        <text name="rl_settings_deathEnabled_tooltip_2_github" text="Hayvanlar hamilelik, sağlık, yaş veya kazalar nedeniyle ölecek"/>
 
-		<text name="rl_settings_accidentsChance_label" text="Kaza Olasılığı"/>
-		<text name="rl_settings_accidentsChance_tooltip" text="Hayvanların rastgele kazalar nedeniyle kaldırılma olasılığını değiştirin"/>
+        <text name="rl_settings_accidentsChance_label" text="Kaza İhtimali"/>
+        <text name="rl_settings_accidentsChance_tooltip" text="Rastgele kazalar nedeniyle hayvanların kaldırılma olasılığını değiştirin"/>
+        <text name="rl_settings_accidentsChance_tooltip_github" text="Rastgele kazalar nedeniyle hayvanların ölme olasılığını değiştirin"/>
 
-		<text name="rl_settings_foodScale_label" text="Gıda Ölçeği"/>
-		<text name="rl_settings_foodScale_tooltip" text="Hayvanlar tarafından yenen yiyecek miktarını değiştir"/>
+        <text name="rl_settings_foodScale_label" text="Yem Ölçeği"/>
+        <text name="rl_settings_foodScale_tooltip" text="Hayvanlar tarafından yenilen yem miktarını değiştirin"/>
 
 		<text name="rl_settings_maxDealerAnimals_label" text="Maksimum Bayi Hayvanları"/>
 		<text name="rl_settings_maxDealerAnimals_tooltip" text="Hayvan satıcısının hayvan türü başına stokta bulunduracağı maksimum hayvan sayısını değiştirin"/>
-		
+
 		<text name="rl_settings_resetDealer_label" text="Hayvan bayisini sıfırla"/>
 		<text name="rl_settings_resetDealer_tooltip" text="Satıcının tüm hayvanlarını çıkarın ve stoğu yeni hayvanlarla doldurun"/>
 		<text name="rl_settings_resetDealer_text" text="Hayvan Bayisini Sıfırla"/>
 
-		<text name="rl_settings_tagColour_label" text="Change Tag Colour"/>
-		<text name="rl_settings_tagColour_tooltip" text="Change the colour of ear tags"/>
-		<text name="rl_settings_tagColour_text" text="Change Tag Colour"/>
-
-		<text name="rl_settings_exportCSV_label" text="Export To CSV"/>
-		<text name="rl_settings_exportCSV_tooltip" text="Export stats to CSV"/>
-		<text name="rl_settings_exportCSV_text" text="Export To CSV"/>
-
-		<text name="rl_settings_maxNumMessages_label" text="Maximum Amount of Messages"/>
-		<text name="rl_settings_maxNumMessages_tooltip" text="A higher amount will result in your save folder taking up more space. After this limit is reached, the earliest messages will be deleted."/>
-
-		<text name="rl_settings_diseasesEnabled_label" text="Diseases Enabled"/>
-		<text name="rl_settings_diseasesEnabled_tooltip_1" text="Animals cannot catch or inherit diseases"/>
-		<text name="rl_settings_diseasesEnabled_tooltip_2" text="Animals can catch or inherit diseases"/>
-
-		<text name="rl_settings_diseasesChance_label" text="Disease Chance"/>
-		<text name="rl_settings_diseasesChance_tooltip" text="Change the likelihood of animals contracting diseases"/>
-
-		<text name="rl_settings_useCustomAnimals_label" text="Use Custom Animals"/>
-		<text name="rl_settings_useCustomAnimals_tooltip_1" text="Use RealisticLivestock animal models (requires restart)"/>
-		<text name="rl_settings_useCustomAnimals_tooltip_2" text="Use custom animal models (experimental, requires restart, must be unzipped)"/>
-
-		<text name="rl_settings_animalsXML_label" text="Set Animals XML Path"/>
-		<text name="rl_settings_animalsXML_tooltip" text="Set path to a custom animals XML file"/>
-		<text name="rl_settings_animalsXML_text" text="Set Animals XML Path"/>
-		
-		
-		
-		<!--  HELP  -->
-
-
-		<text name="rl_help_monitors_title" text="İzleme"/>
-		<text name="rl_help_monitors_1" text="Bir hayvanın istatistiklerinin çoğunu görmek için, ona bir izleme etiketi uygulamanız gerekir; bunu hayvan menüsünden (hayvan alıp sattığınız yer) yapabilirsiniz. İzleme etiketleri ayrıca görsel olarak hayvanın üzerinde, sol kulağında kimlik etiketinin yanında gösterilir."/>
-		<text name="rl_help_monitors_2" text="Etiketleri izlediğinizde, sağlık, ağırlık, emzirme, üretim ve saman, yiyecek ve su gereksinimleri dahil olmak üzere önemli bilgiler size gösterilecektir."/>
-		<text name="rl_help_monitors_3" text="Bir hayvana etiket uygulamak, hayvanın türüne bağlı olarak size küçük bir aylık aboneliğe mal olacaktır. Etiketi kaldırmayı seçerseniz, etiket bir sonraki ayın başında kaldırılacaktır."/>
-		
-		<text name="rl_help_pregnancy_title" text="Hamilelik"/>
-		<text name="rl_help_pregnancy_1" text="Dişi hayvanların hepsinin potansiyel olarak hamile kalabilmesi için en az 1 erkek hayvana ihtiyacı vardır. Her iki hayvan da doğru yaşta ve sağlıkta olmalı ve aynı türden olmalıdır. Farklı ırklar arasında üremeye izin verilir (örneğin: holstein ineği ve angus boğası)."/>
-		<text name="rl_help_pregnancy_2" text="Akraba evliliklerine izin verilmez. Eğer bir erkek ve bir dişi doğrudan akraba ise, birlikte üremeyeceklerdir."/>
-		<text name="rl_help_pregnancy_3" text="Bir dişinin hamile kalma şansı hem kendisinin hem de erkeğin doğurganlığına bağlıdır. Daha yüksek doğurganlığa sahip bir dişinin aynı anda daha fazla yavru üretme şansı da önemli ölçüde daha yüksektir."/>
-		<text name="rl_help_pregnancy_4" text="Bir dişi hamile kaldığında yavrularını taşımaya başlayacaktır. Beklenen gebelik tarihini ve yavru sayısını ağıldaki hayvana bakarak veya hayvan menüsünde üzerine tıklayarak görebilirsiniz."/>
-		<text name="rl_help_pregnancy_5" text="İnekler doğum tarihine ulaştığında yavrularını dünyaya getirecektir. Ancak, hamileliğin kötü gitmesi durumunda annenin olduğu gibi yeni doğanların da belirli bir kaldırılma şansı vardır. Aşırı kalabalık bir ağılda doğan yavrular otomatik olarak satılacaktır."/>
-
-		<text name="rl_help_production_title" text="Üretim"/>
-		<text name="rl_help_production_1" text="Her türden inek ancak doğum yaptıktan sonra süt üretmeye başlayacaktır. İnek doğum yaptıktan sonra 3 ay boyunca katlanarak süt üretecek, ardından sonraki 6 ay boyunca üretimi yavaşça düşecektir. Hamilelikten 10 ay sonra, inek bir sonraki hamileliğine kadar süt üretimini durduracaktır."/>
-		<text name="rl_help_production_2" text="Koyunlar sıcak aylarda yün üretecektir. Soğuk aylarda, 12C'nin altında, yün üretmeyecekler."/>
-		<text name="rl_help_production_3" text="Süt, yün ve yumurta üretimi hayvanın genetiğinden de etkilenir. İyi üretim genetiğine sahip bir hayvan daha fazla üretirken, kötü genetiğe sahip bir hayvan hiç üretmeyecektir."/>
-		
-		<text name="rl_help_weight_title" text="Ağırlık"/>
-		<text name="rl_help_weight_1" text="Hayvanların belirli bir ağırlığı vardır ve bu ağırlık ne kadar yiyip içtiklerinden etkilenir. Her türün ve ırkın kendi ortalama ağırlığı vardır ve bu da her hayvanın ağırlığını etkiler."/>
-		<text name="rl_help_weight_2" text="Ağırlık hayvanın değerini artırır ve düşük ağırlık her ay kaldırılma şansını etkiler."/>
-		
-		<text name="rl_help_genetics_title" text="Genetik"/>
-		<text name="rl_help_genetics_1" text="Her hayvanın 4 farklı genetik değeri vardır; metabolizma, doğurganlık, sağlık ve kalite. Genetik anne ve baba arasında karıştırılır ve daha sonra çocuklarına aktarılır."/>
-		<text name="rl_help_genetics_2" text="Metabolizma, hayvanın gıdayı ağırlığa dönüştürme kabiliyetini ve yediği miktarı etkiler."/>
-		<text name="rl_help_genetics_3" text="Doğurganlık, hayvanın hamile kalma veya bir dişiyi hamile bırakma şansını ve üreteceği yavru sayısını etkiler."/>
-		<text name="rl_help_genetics_4" text="Sağlık, hayvanın sağlığını ve her ay kaldırılma şansını etkiler. Daha sağlıklı genetiğe sahip bir hayvanın ömrü de daha uzun olacaktır."/>
-		<text name="rl_help_genetics_5" text="Kalite hayvanın kendi değerini etkiler, daha kaliteli bir hayvan çok daha fazla fiyata satılacaktır."/>
-		<text name="rl_help_genetics_6" text="Sığır, koyun ve tavuğun da üretim genetiği vardır ve bu da ne kadar süt/yumurta/yün ürettiklerini etkiler."/>
-
-
-
-		<!--  DISEASES  -->
-
-
-		<text name="rl_ui_immune" text="Immune"/>
-		<text name="rl_ui_startTreatment" text="Start Treatment"/>
-		<text name="rl_ui_resumeTreatment" text="Resume Treatment"/>
-		<text name="rl_ui_stopTreatment" text="Stop Treatment"/>
-		<text name="rl_ui_duration" text="Duration"/>
-		<text name="rl_ui_beingTreated" text="Being treated"/>
-		<text name="rl_ui_notTreated" text="Not treated"/>
-		<text name="rl_ui_carrier" text="Carrier"/>
-
-		<text name="rl_diseases" text="Diseases"/>
-		<text name="rl_disease" text="Disease"/>
-
-		<text name="rl_disease_mastitis" text="Mastitis"/>
-
-		<text name="rl_disease_cvm" text="CVM"/>
-
-		<text name="rl_disease_footAndMouth" text="Foot and Mouth"/>
-
-		<text name="rl_disease_ped" text="Porcine Epidemic Diarrhoea"/>
-
-		<text name="rl_disease_avianFlu" text="Avian Influenza"/>
-
-
-
-		<!--  MESSAGES  -->
-
-
-		<text name="rl_messageTitle_pregnancy" text="Pregnancy"/>
-		<text name="rl_messageTitle_death" text="Removal"/>
-		<text name="rl_messageTitle_death_github" text="Death"/>
-		<text name="rl_messageTitle_disease" text="Disease"/>
-		<text name="rl_messageTitle_name" text="Name"/>
-		<text name="rl_messageTitle_movement" text="Movement"/>
-		<text name="rl_messageTitle_aiManager" text="Herdsman"/>
-		<text name="rl_messageTitle_insemination" text="Artificial Insemination"/>
-
-		<text name="rl_message_pregnancySingle" text="Gave birth to 1 baby"/>
-		<text name="rl_message_pregnancyMultiple" text="Gave birth to %s babies"/>
-		<text name="rl_message_pregnancySold" text="%s babies were sold for %s due to overcrowding"/>
-		<text name="rl_message_pregnancyDied" text="%s babies were removed at birth"/>
-		<text name="rl_message_pregnancyDied_github" text="%s babies died at birth"/>
-		<text name="rl_message_death" text="Removed due to %s"/>
-		<text name="rl_message_death_github" text="Died due to %s"/>
-		<text name="rl_message_diseaseContracted" text="Contracted %s"/>
-		<text name="rl_message_diseaseCured" text="Cured from %s"/>
-		<text name="rl_message_diseaseTreatment_start" text="Started treatment for %s at %s"/>
-		<text name="rl_message_diseaseTreatment_resume" text="Resumed treatment for %s at %s"/>
-		<text name="rl_message_diseaseTreatment_stop" text="Stopped treatment for %s"/>
-		<text name="rl_message_nameChange" text="Name changed from '%s' to '%s'"/>
-		<text name="rl_message_nameAdded" text="Given name '%s'"/>
-		<text name="rl_message_nameDeleted" text="Name '%s' was removed"/>
-		<text name="rl_message_boughtAnimals_single" text="1 animal was bought for %s"/>
-		<text name="rl_message_boughtAnimals_multiple" text="%s animals were bought for %s"/>
-		<text name="rl_message_soldAnimals_single" text="1 animal was sold for %s"/>
-		<text name="rl_message_soldAnimals_multiple" text="%s animals were sold for %s"/>
-		<text name="rl_message_movedAnimalsTo_single" text="1 animal was moved to %s"/>
-		<text name="rl_message_movedAnimalsTo_multiple" text="%s animals were moved to %s"/>
-		<text name="rl_message_movedAnimalsFrom_single" text="1 animal was moved from %s"/>
-		<text name="rl_message_movedAnimalsFrom_multiple" text="%s animals were moved from %s"/>
-		<text name="rl_message_aiManager_boughtAnimals_single" text="Herdsman bought 1 animal for %s"/>
-		<text name="rl_message_aiManager_boughtAnimals_multiple" text="Herdsman bought %s animals for %s"/>
-		<text name="rl_message_aiManager_soldAnimals_single" text="Herdsman sold 1 animal for %s"/>
-		<text name="rl_message_aiManager_soldAnimals_multiple" text="Herdsman sold %s animals for %s"/>
-		<text name="rl_message_aiManager_castrated_single" text="Herdsman castrated 1 animal"/>
-		<text name="rl_message_aiManager_castrated_multiple" text="Herdsman castrated %s animals"/>
-		<text name="rl_message_aiManager_named_single" text="Herdsman named 1 animal"/>
-		<text name="rl_message_aiManager_named_multiple" text="Herdsman named %s animals"/>
-		<text name="rl_message_aiManager_mark_sell_single" text="Herdsman marked 1 animal for selling"/>
-		<text name="rl_message_aiManager_mark_sell_multiple" text="Herdsman marked %s animals for selling"/>
-		<text name="rl_message_aiManager_mark_castrate_single" text="Herdsman marked 1 animal for castrating"/>
-		<text name="rl_message_aiManager_mark_castrate_multiple" text="Herdsman marked %s animals for castrating"/>
-		<text name="rl_message_aiManager_mark_disease_single" text="Herdsman marked 1 animal for treatment"/>
-		<text name="rl_message_aiManager_mark_disease_multiple" text="Herdsman marked %s animals for treatment"/>
-		<text name="rl_message_insemination_success" text="Insemination was successful"/>
-		<text name="rl_message_insemination_fail" text="Insemination was unsuccessful"/>
-		<text name="rl_message_aiManager_mark_ai_single" text="Herdsman marked 1 animal for AI"/>
-		<text name="rl_message_aiManager_mark_ai_multiple" text="Herdsman marked %s animals for AI"/>
-		<text name="rl_message_aiManager_ai_single" text="Herdsman inseminated 1 animal"/>
-		<text name="rl_message_aiManager_ai_multiple" text="Herdsman inseminated %s animals"/>
-
-
-
-		<!--  DEATHS  -->
-
-
-		<text name="rl_death_pregnancy" text="a bad pregnancy"/>
-		<text name="rl_death_health" text="low health"/>
-		<text name="rl_death_age" text="old age"/>
-		<text name="rl_death_accident" text="an accident"/>
-
-
-
-		<text name="rl_ui_dependencies_missing" text="RealisticLivestock requires the following dependencies:"/>
-		<text name="rl_ui_dependency_missing_notInstalled" text="- %s (Not Installed)"/>
-		<text name="rl_ui_dependency_missing_installed" text="- %s (Installed: %s, Minimum Required: %s)"/>
-        <!-- Added missing translations -->
-        <text name="input_RL_AI" text="Yapay tohumlama"/>
-        <text name="input_RL_CASTRATE" text="Hayvanı Hadım Et"/>
-        <text name="input_RL_DISEASES" text="Hayvan Hastalıkları"/>
-        <text name="input_RL_MARK" text="Hayvanı İşaretle/İşareti Kaldır"/>
-        <text name="input_RL_MONITOR" text="Monitör Uygula/Kaldır"/>
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Hayvan Ekranını Aç"/>
-        <text name="input_RL_SELECT" text="Hayvanı Seç/Seçimi Kaldır"/>
-        <text name="rl_message_dailyBirthsSummary" text="%s hayvan %s'de doğdu"/>
-        <text name="rl_message_dailyDeathsSummary" text="%s hayvan %s'de öldü - %s"/>
-        <text name="rl_message_dailyOvercrowdingSummary" text="Aşırı kalabalık: %s yeni doğan %s'de %s'ye satıldı"/>
-        <text name="rl_message_dailyPurchasesSummary" text="%s'de %s hayvan %s'ye satın alındı"/>
-        <text name="rl_message_dailySalesSummary" text="%s'de %s hayvan %s'ye satıldı"/>
-        <text name="rl_settings_accidentsChance_tooltip_github" text="Hayvanların rastgele kazalar nedeniyle ölme olasılığını değiştirin"/>
-        <text name="rl_settings_deathEnabled_label_github" text="Hayvan Ölümü"/>
-        <text name="rl_settings_deathEnabled_tooltip_1_github" text="Hayvanlar hamilelik, sağlık, yaş veya kazalar nedeniyle ölmeyecek"/>
-        <text name="rl_settings_deathEnabled_tooltip_2_github" text="Hayvanlar hamilelik, sağlık, yaş veya kazalar nedeniyle ölecek"/>
-        <text name="rl_settings_messageSummary_label" text="Mesaj Günlüğü Özetleri"/>
-        <text name="rl_settings_messageSummary_tooltip_1" text="Kapalı: Her olay için ayrı mesajlar"/>
-        <text name="rl_settings_messageSummary_tooltip_2" text="Açık: Çiftlik başına günlük özetler (günlük gürültüsünü azaltır)"/>
         <text name="rl_settings_resetAIAnimals_label" text="Yapay Zeka Hayvanlarını Sıfırla"/>
+        <text name="rl_settings_resetAIAnimals_tooltip" text="Suni tohumlama için mevcut tüm AI (yapay zeka) hayvanlarını kaldırın ve rastgele oluşturulmuş yeni hayvanlarla yenileyin"/>
         <text name="rl_settings_resetAIAnimals_text" text="Yapay Zeka Hayvanlarını Sıfırla"/>
-        <text name="rl_settings_resetAIAnimals_tooltip" text="Yapay tohumlama için mevcut tüm yapay zeka hayvanlarını kaldırın ve rastgele oluşturulmuş yeni hayvanlarla doldurun"/>
-        <text name="rl_ui_genetics_highest" text="En Yüksek"/>
-        <text name="rl_ui_meat_github" text="Et Kalitesi"/>
-        <text name="rl_ui_openAnimalScreen" text="Hayvanları Yönet"/>
-        <text name="rl_ui_quality" text="Kalite"/>
-        <text name="rl_ui_quality_github" text="Et Kalitesi"/>
-        <text name="rl_ui_removingAllMonitor" text="Tümü kaldırılıyor..."/>
-        <text name="rl_ui_removingMonitor" text="Kaldırılıyor..."/>
-        <text name="rm_rl_conflict_title" text="Mod çakışması tespit edildi"/>
-        <text name="rm_rl_migration_continue" text="Devam et"/>
-        <text name="rm_rl_migration_files_found" text="Bulunan veri dosyaları:"/>
-        <text name="rm_rl_migration_message" text="Bu kayıtlı oyunda önceki Realistic Livestock verileri bulundu. Ayarlarınız, hayvan verileri, Dewarlar ve AI Straw el aletleri, oyun kaydedildiğinde otomatik olarak Realistic Livestock - RitterMod sürümüne taşınacaktır."/>
-        <text name="rm_rl_migration_quit" text="Çıkış"/>
-        <text name="rm_rl_migration_title" text="Veri taşıma bildirimi"/>
-        <text name="rm_rl_mod_conflict_message" text="Aşağıdaki mod(lar) 'Realistic Livestock - Ritter version' ile çakışıyor ve birlikte kullanılamaz: %s &#10;&#10;Lütfen çakışan mod(ları) devre dışı bırakın ve oyunu yeniden başlatın."/>
 
-        <text name="rl_mod_warn_title" text="Mod Compatibility Warning"/>
-        <text name="rl_mod_warn_message" text="The following mod(s) loaded with Realistic Livestock RM may cause issues:%s&#10;&#10;See %s for details. The game will continue."/>
+        <text name="rl_settings_tagColour_label" text="Küpe Rengini Değiştir"/>
+        <text name="rl_settings_tagColour_tooltip" text="Kulak küpelerinin rengini değiştirin"/>
+        <text name="rl_settings_tagColour_text" text="Küpe Rengini Değiştir"/>
+
+        <text name="rl_settings_exportCSV_label" text="CSV Olarak Dışa Aktar"/>
+        <text name="rl_settings_exportCSV_tooltip" text="İstatistikleri CSV olarak dışa aktar"/>
+        <text name="rl_settings_exportCSV_text" text="CSV Olarak Dışa Aktar"/>
+
+        <text name="rl_settings_maxNumMessages_label" text="Maksimum Mesaj Sayısı"/>
+        <text name="rl_settings_maxNumMessages_tooltip" text="Daha yüksek bir miktar, kayıt (save) klasörünüzün daha fazla yer kaplamasına neden olur. Bu sınıra ulaşıldıktan sonra en eski mesajlar silinir."/>
+
+        <text name="rl_settings_messageSummary_label" text="Mesaj Günlüğü Özetleri"/>
+        <text name="rl_settings_messageSummary_tooltip_1" text="Kapalı: Her etkinlik için ayrı mesajlar"/>
+        <text name="rl_settings_messageSummary_tooltip_2" text="Açık: Ağıl başına günlük özetler (günlük gürültüsünü azaltır)"/>
+
+        <text name="rl_settings_diseasesEnabled_label" text="Hastalıklar Açık"/>
+        <text name="rl_settings_diseasesEnabled_tooltip_1" text="Hayvanlar hastalığa yakalanamaz veya kalıtsal yolla geçiremez"/>
+        <text name="rl_settings_diseasesEnabled_tooltip_2" text="Hayvanlar hastalığa yakalanabilir veya kalıtsal yolla geçirebilir"/>
+
+        <text name="rl_settings_diseasesChance_label" text="Hastalık İhtimali"/>
+        <text name="rl_settings_diseasesChance_tooltip" text="Hayvanların hastalıklara yakalanma olasılığını değiştirin"/>
+
+        <text name="rl_settings_useCustomAnimals_label" text="Özel Hayvanları Kullan"/>
+        <text name="rl_settings_useCustomAnimals_tooltip_1" text="RealisticLivestock hayvan modellerini kullanın (yeniden başlatma gerektirir)"/>
+        <text name="rl_settings_useCustomAnimals_tooltip_2" text="Özel hayvan modelleri kullanın (yeniden başlatma gerektirir, zip'ten çıkarılmış olmalıdır)"/>
+
+        <text name="rl_settings_animalsXML_label" text="Hayvanlar XML Yolunu Ayarla"/>
+        <text name="rl_settings_animalsXML_tooltip" text="Özel bir animals XML dosyasının yolunu ayarlayın"/>
+        <text name="rl_settings_animalsXML_text" text="Hayvanlar XML Yolunu Ayarla"/>
+
+        <text name="rl_settings_geneticsDisplay_label" text="Genetik Ekranı"/>
+        <text name="rl_settings_geneticsDisplay_tooltip" text="Hayvan isimlerinde sayısal genetik değerleri gösterin"/>
+        <text name="rl_settings_geneticsDisplay_texts_1" text="Kapalı"/>
+        <text name="rl_settings_geneticsDisplay_texts_2" text="Kısa"/>
+        <text name="rl_settings_geneticsDisplay_texts_3" text="Uzun"/>
+        <text name="rl_settings_geneticsPosition_label" text="Genetik Konumu"/>
+        <text name="rl_settings_geneticsPosition_tooltip" text="Genetik ismin neresinde gösterileceği"/>
+        <text name="rl_settings_geneticsPosition_texts_1" text="Önek"/>
+        <text name="rl_settings_geneticsPosition_texts_2" text="Sonek"/>
+        <text name="rl_settings_sortByGenetics_label" text="Genetiğe Göre Sırala"/>
+        <text name="rl_settings_sortByGenetics_tooltip_1" text="Hayvanlar tür ve yaşa göre sıralanır"/>
+        <text name="rl_settings_sortByGenetics_tooltip_2" text="Hayvanlar genetiğe göre sıralanır (önce en yüksek)"/>
+
+
+
+        <!--  HELP  -->
+
+
+        <text name="rl_help_monitors_title" text="Monitörler"/>
+        <text name="rl_help_monitors_1" text="Bir hayvanın istatistiklerinin büyük bir bölümünü görebilmek için, hayvan menüsü (hayvanları alıp sattığınız yer) üzerinden hayvana bir monitör (izleme) küpesi takmanız gerekir. İzleme küpeleri ayrıca hayvanda, kimlik küpesinin (ID) yanındaki sol kulağında görsel olarak da gösterilir."/>
+        <text name="rl_help_monitors_2" text="İzleme küpeleri, sağlık, ağırlık, emzirme, üretim ve saman, yem ile su gereksinimleri dahil olmak üzere önemli bilgilerin size gösterilmesini sağlar."/>
+        <text name="rl_help_monitors_3" text="Bir hayvana küpe takmak, hayvanın türüne bağlı olarak size küçük bir aylık abonelik ücretine mal olur. Küpeyi çıkarmayı seçerseniz, küpe bir sonraki ayın başında çıkarılır."/>
+
+        <text name="rl_help_pregnancy_title" text="Hamilelik"/>
+        <text name="rl_help_pregnancy_1" text="Dişi hayvanların potansiyel olarak hamile kalabilmeleri için en az 1 erkek hayvana ihtiyaçları vardır. Her iki hayvan da doğru yaşta ve sağlıkta olmalı ve aynı türden gelmelidir. Farklı ırklar arasında üremeye (örneğin: holstein inek ve angus boğa) izin verilir."/>
+        <text name="rl_help_pregnancy_2" text="Akraba melezlemesine (yakın akrabaların çiftleştirilmesine) izin verilmez. Bir erkek ve dişi doğrudan akraba ise birlikte üremezler."/>
+        <text name="rl_help_pregnancy_3" text="Bir dişinin hamile kalma şansı, hem kendi hem de erkeğin doğurganlığına bağlıdır. Doğurganlığı daha yüksek olan bir dişinin bir kerede daha fazla yavru üretme şansı da önemli ölçüde daha yüksektir."/>
+        <text name="rl_help_pregnancy_4" text="Bir dişi hamile kaldığında, yavrusunu taşımaya başlayacaktır. Ağıldaki hayvana bakarak veya hayvan menüsünden üzerine tıklayarak beklenen hamilelik tarihini ve yavruların sayısını görebilirsiniz."/>
+        <text name="rl_help_pregnancy_5" text="Doğum tarihi geldiğinde yavrularını doğuracaktır. Ancak, hamilelik kötü giderse, annede olduğu gibi yenidoğanların da kaybedilme şansı vardır. Aşırı kalabalık bir ağılda doğan yenidoğanlar otomatik olarak satılacaktır."/>
+
+        <text name="rl_help_production_title" text="Üretim"/>
+        <text name="rl_help_production_1" text="Herhangi bir ırktan inekler ancak doğum yaptıktan sonra süt vermeye başlarlar. İnek doğum yaptıktan sonra 3 ay boyunca üstel olarak (artan ivmeyle) süt üretir, ardından üretimi sonraki 6 ay boyunca yavaş yavaş düşer. Hamilelikten 10 ay sonra inek bir sonraki hamileliğine kadar süt vermeyi bırakır."/>
+        <text name="rl_help_production_2" text="Koyunlar sıcak aylarda yün üretir. 12C'nin (derece) altındaki soğuk aylarda yün üretmezler."/>
+        <text name="rl_help_production_3" text="Süt, yün ve yumurta üretimi, hayvanın genetiğinden de etkilenir. İyi üretim genetiğine sahip bir hayvan daha fazlasını üretirken, kötü genetiğe sahip bir hayvan neredeyse hiç üretmez."/>
+
+        <text name="rl_help_weight_title" text="Ağırlık"/>
+        <text name="rl_help_weight_1" text="Hayvanların ne kadar yiyip içtiklerinden etkilenen belirli bir ağırlıkları vardır. Her türün ve ırkın, her bir hayvanın ağırlığını etkileyen kendi ortalama ağırlığı bulunur."/>
+        <text name="rl_help_weight_2" text="Ağırlık, hayvanın değerini artırır ve düşük bir ağırlık, her ay kaybedilme (kaldırılma) şansını etkiler."/>
+
+        <text name="rl_help_genetics_title" text="Genetik"/>
+        <text name="rl_help_genetics_1" text="Her hayvanın 4 farklı genetik değeri vardır; metabolizma, doğurganlık, sağlık ve kalite. Genetik anne ve baba arasında karıştırılır ve ardından çocuklarına geçer."/>
+        <text name="rl_help_genetics_2" text="Metabolizma, hayvanın yemi ağırlığa çevirme yeteneğini etkiler ve ne kadar yediğini etkiler."/>
+        <text name="rl_help_genetics_3" text="Doğurganlık, hayvanın hamile kalma veya bir dişiyi hamile bırakma şansını ve üreteceği yavru sayısını etkiler."/>
+        <text name="rl_help_genetics_4" text="Sağlık, hayvanın sağlığını ve her ay kaybedilme şansını etkiler. Sağlık genetiği daha yüksek bir hayvanın ömrü de daha uzun olacaktır."/>
+        <text name="rl_help_genetics_5" text="Kalite, hayvanın kendi değerini etkiler, daha yüksek kalitede bir hayvan çok daha fazlasına satılır."/>
+        <text name="rl_help_genetics_6" text="Sığır, koyun ve tavuğun ayrıca ne kadar süt/yumurta/yün ürettiklerini etkileyen üretim genetiği de vardır."/>
+
+
+
+        <!--  DISEASES  -->
+
+
+        <text name="rl_ui_immune" text="Bağışık"/>
+        <text name="rl_ui_startTreatment" text="Tedaviyi Başlat"/>
+        <text name="rl_ui_resumeTreatment" text="Tedaviye Devam Et"/>
+        <text name="rl_ui_stopTreatment" text="Tedaviyi Durdur"/>
+        <text name="rl_ui_duration" text="Süre"/>
+        <text name="rl_ui_beingTreated" text="Tedavi ediliyor"/>
+        <text name="rl_ui_notTreated" text="Tedavi edilmiyor"/>
+        <text name="rl_ui_carrier" text="Taşıyıcı"/>
+
+        <text name="rl_diseases" text="Hastalıklar"/>
+        <text name="rl_disease" text="Hastalık"/>
+
+        <text name="rl_disease_mastitis" text="Mastit (Meme İltihabı)"/>
+        <text name="rl_disease_cvm" text="CVM"/>
+        <text name="rl_disease_footAndMouth" text="Şap Hastalığı"/>
+        <text name="rl_disease_ped" text="Domuz Epidemik İshali"/>
+        <text name="rl_disease_avianFlu" text="Kuş Gribi"/>
+
+
+
+        <!--  MESSAGES  -->
+
+
+        <text name="rl_messageTitle_pregnancy" text="Hamilelik"/>
+        <text name="rl_messageTitle_death" text="Ölüm"/>
+        <text name="rl_messageTitle_death_github" text="Ölüm"/>
+        <text name="rl_messageTitle_disease" text="Hastalık"/>
+        <text name="rl_messageTitle_name" text="İsim"/>
+        <text name="rl_messageTitle_movement" text="Haraket (Taşıma)"/>
+        <text name="rl_messageTitle_aiManager" text="Çoban"/>
+        <text name="rl_messageTitle_insemination" text="Suni Tohumlama"/>
+
+        <text name="rl_message_pregnancySingle" text="1 yavru dünyaya getirdi"/>
+        <text name="rl_message_pregnancyMultiple" text="%s yavru dünyaya getirdi"/>
+        <text name="rl_message_pregnancySold" text="Aşırı kalabalıktan dolayı %s yavru %s karşılığında satıldı"/>
+        <text name="rl_message_pregnancyDied" text="%s yavru doğumda öldü"/>
+        <text name="rl_message_pregnancyDied_github" text="%s yavru doğumda öldü"/>
+        <text name="rl_message_death" text="%s nedeniyle kaldırıldı"/>
+        <text name="rl_message_death_github" text="%s nedeniyle öldü"/>
+        <text name="rl_message_diseaseContracted" text="%s hastalığına yakalandı"/>
+        <text name="rl_message_diseaseCured" text="%s hastalığından kurtuldu"/>
+        <text name="rl_message_diseaseTreatment_start" text="Saat %s'de %s için tedavi başladı"/>
+        <text name="rl_message_diseaseTreatment_resume" text="Saat %s'de %s için tedaviye devam edildi"/>
+        <text name="rl_message_diseaseTreatment_stop" text="%s için tedavi durduruldu"/>
+        <text name="rl_message_nameChange" text="İsim '%s'den '%s'e değiştirildi"/>
+        <text name="rl_message_nameAdded" text="'%s' ismi verildi"/>
+        <text name="rl_message_nameDeleted" text="'%s' adı kaldırıldı"/>
+        <text name="rl_message_boughtAnimals_single" text="1 hayvan %s karşılığında satın alındı"/>
+        <text name="rl_message_boughtAnimals_multiple" text="%s hayvan %s karşılığında satın alındı"/>
+        <text name="rl_message_soldAnimals_single" text="1 hayvan %s karşılığında satıldı"/>
+        <text name="rl_message_soldAnimals_multiple" text="%s hayvan %s karşılığında satıldı"/>
+        <text name="rl_message_movedAnimalsTo_single" text="1 hayvan %s'ye taşındı"/>
+        <text name="rl_message_movedAnimalsTo_multiple" text="%s hayvan %s'ye taşındı"/>
+        <text name="rl_message_movedAnimalsFrom_single" text="1 hayvan %s'den taşındı"/>
+        <text name="rl_message_movedAnimalsFrom_multiple" text="%s hayvan %s'den taşındı"/>
+        <text name="rl_message_aiManager_boughtAnimals_single" text="Çoban 1 hayvanı %s karşılığında satın aldı"/>
+        <text name="rl_message_aiManager_boughtAnimals_multiple" text="Çoban %s hayvanı %s karşılığında satın aldı"/>
+        <text name="rl_message_aiManager_soldAnimals_single" text="Çoban 1 hayvanı %s karşılığında sattı"/>
+        <text name="rl_message_aiManager_soldAnimals_multiple" text="Çoban %s hayvanı %s karşılığında sattı"/>
+        <text name="rl_message_aiManager_castrated_single" text="Çoban 1 hayvanı kısırlaştırdı"/>
+        <text name="rl_message_aiManager_castrated_multiple" text="Çoban %s hayvanı kısırlaştırdı"/>
+        <text name="rl_message_aiManager_named_single" text="Çoban 1 hayvanı isimlendirdi"/>
+        <text name="rl_message_aiManager_named_multiple" text="Çoban %s hayvanı isimlendirdi"/>
+        <text name="rl_message_aiManager_mark_sell_single" text="Çoban 1 hayvanı satılmak üzere işaretledi"/>
+        <text name="rl_message_aiManager_mark_sell_multiple" text="Çoban %s hayvanı satılmak üzere işaretledi"/>
+        <text name="rl_message_aiManager_mark_castrate_single" text="Çoban 1 hayvanı kısırlaştırmak üzere işaretledi"/>
+        <text name="rl_message_aiManager_mark_castrate_multiple" text="Çoban %s hayvanı kısırlaştırmak üzere işaretledi"/>
+        <text name="rl_message_aiManager_mark_disease_single" text="Çoban 1 hayvanı tedavi edilmek üzere işaretledi"/>
+        <text name="rl_message_aiManager_mark_disease_multiple" text="Çoban %s hayvanı tedavi edilmek üzere işaretledi"/>
+        <text name="rl_message_insemination_success" text="Tohumlama başarılı oldu"/>
+        <text name="rl_message_insemination_fail" text="Tohumlama başarısız oldu"/>
+        <text name="rl_message_aiManager_mark_ai_single" text="Çoban 1 hayvanı suni tohumlama için işaretledi"/>
+        <text name="rl_message_aiManager_mark_ai_multiple" text="Çoban %s hayvanı suni tohumlama için işaretledi"/>
+        <text name="rl_message_aiManager_ai_single" text="Çoban 1 hayvanı tohumladı"/>
+        <text name="rl_message_aiManager_ai_multiple" text="Çoban %s hayvanı tohumladı"/>
+
+        <!-- Daily summary messages -->
+        <text name="rl_message_dailyBirthsSummary" text="%s hayvan doğdu: %s"/>
+        <text name="rl_message_dailyDeathsSummary" text="%s hayvan öldü: %s - %s"/>
+        <text name="rl_message_dailySalesSummary" text="%s hayvanı %s'da %s karşılığında sattı"/>
+        <text name="rl_message_dailyOvercrowdingSummary" text="Aşırı Kalabalık: %s yenidoğanı %s'da %s karşılığında sattı"/>
+        <text name="rl_message_dailyPurchasesSummary" text="%s hayvanı %s'da %s karşılığında satın aldı"/>
+
+
+
+        <!--  DEATHS  -->
+
+
+        <text name="rl_death_pregnancy" text="kötü bir hamilelik"/>
+        <text name="rl_death_health" text="düşük sağlık"/>
+        <text name="rl_death_age" text="yaşlılık"/>
+        <text name="rl_death_accident" text="bir kaza"/>
+
+
+
+        <text name="rl_ui_dependencies_missing" text="RealisticLivestock şu bağımlılıkları gerektirir:"/>
+        <text name="rl_ui_dependency_missing_notInstalled" text="- %s (Yüklü Değil)"/>
+        <text name="rl_ui_dependency_missing_installed" text="- %s (Yüklü: %s, Gerekli Minimum: %s)"/>
+
+
+        <!-- MIGRATION -->
+
+        <text name="rm_rl_conflict_title" text="Mod Çakışması Tespit Edildi"/>
+        <text name="rm_rl_mod_conflict_message" text="Şu mod(lar) 'Realistic Livestock - Ritter version' ile çakışıyor ve birlikte kullanılamaz: %s &#10;&#10;Lütfen çakışan mod(ları) devre dışı bırakıp oyunu yeniden başlatın."/>
+
+        <text name="rl_mod_warn_title" text="Mod Uyumluluğu Uyarısı"/>
+        <text name="rl_mod_warn_message" text="Realistic Livestock RM ile birlikte yüklenen şu mod(lar) sorunlara neden olabilir:%s&#10;&#10;Ayrıntılar için %s adresine bakın. Oyun devam edecektir."/>
         <text name="rl_mod_compat_url" text="https://rittermod.github.io/FS25_RealisticLivestockRM/user-guide/reference-mod-compatibility"/>
-        <text name="rl_mod_warn_FS25_AnimalFoodCalculator" text="FS25_AnimalFoodCalculator: significant performance impact that grows with herd size."/>
+        <text name="rl_mod_warn_FS25_AnimalFoodCalculator" text="FS25_AnimalFoodCalculator: sürü boyutu büyüdükçe artan önemli bir performans etkisi yapmaktadır."/>
 
-		
+        <text name="rm_rl_migration_title" text="Veri Geçişi Bildirimi"/>
+        <text name="rm_rl_migration_message" text="Bu kayıtta önceki Realistic Livestock verileri bulundu. Ayarlarınız, hayvan verileriniz, Sperma Tankı (Dewars) ve AI Sperma tüpleri el aletleriniz oyun kaydedildiğinde otomatik olarak Realistic Livestock - RitterMod sürümüne geçirilecektir."/>
+        <text name="rm_rl_migration_files_found" text="Bulunan veri dosyaları:"/>
+        <text name="rm_rl_migration_continue" text="Devam Et"/>
+        <text name="rm_rl_migration_quit" text="Çık"/>
 
-        <!-- Missing keys (English fallback) -->
-        <text name="input_RL_MENU" text="Open RL Menu (new)"/>
-        <text name="input_RL_RENAME" text="Rename"/>
-        <text name="input_RL_CYCLE_FILTER" text="Cycle Saved Filter"/>
-        <text name="rl_bridge_version_unknown" text="Realistic Livestock: %s version %s has not been tested with version %s of Realistic Livestock. Using config '%s'. If you experience issues with exotic animals, please report them at %s."/>
-        <!-- TODO: localise -->
-        <text name="rl_bridge_configoverride_conflict_header" text="Realistic Livestock: Conflict detected. Two or more bridges/packs replaced configuration for the same animal type. Last-loaded mod wins. If you continue you will have visual glitches and ghost animals."/>
-        <!-- TODO: localise -->
-        <text name="rl_bridge_configoverride_conflict_line" text="%s: applied by %s"/>
-        <text name="rl_menu_info_children" text="Children"/>
-        <text name="rl_menu_info_diseases_header" text="Diseases"/>
-        <text name="rl_menu_info_empty_no_animals" text="No animals in this husbandry"/>
-        <text name="rl_menu_info_empty_no_husbandries" text="You need at least one husbandry to view animals"/>
-        <text name="rl_menu_info_filter_button" text="Filter"/>
-        <text name="rl_menu_info_genetics_header" text="Genetics"/>
-        <text name="rl_menu_info_input_header" text="Input (monitored)"/>
-        <text name="rl_menu_info_output_header" text="Output (monitored)"/>
-        <text name="rl_menu_info_pedigree_header" text="Pedigree"/>
-        <text name="rl_menu_info_pen_information" text="Pen Information"/>
-        <text name="rl_menu_info_title" text="Manage"/>
-        <text name="rl_menu_messages_col_animal" text="Animal"/>
-        <text name="rl_menu_messages_col_date" text="Date"/>
-        <text name="rl_menu_messages_col_husbandry" text="Husbandry"/>
-        <text name="rl_menu_messages_col_message" text="Message"/>
-        <text name="rl_menu_messages_col_type" text="Type"/>
-        <text name="rl_menu_messages_confirm_delete_all" text="Delete all %s messages? This cannot be undone."/>
-        <text name="rl_menu_messages_delete_all_button" text="Delete all"/>
-        <text name="rl_menu_messages_delete_button" text="Delete"/>
-        <text name="rl_menu_messages_empty" text="No messages yet"/>
-        <text name="rl_menu_messages_no_farm" text="You need to own a farm to view messages"/>
-        <text name="rl_menu_messages_summary" text="%s messages"/>
-        <text name="rl_menu_messages_title" text="Messages"/>
-        <text name="rl_menu_messages_unknown" text="Unknown: %s"/>
-        <text name="rl_menu_move_summary" text="%d animals" tag="format"/>
-        <text name="rl_menu_move_title" text="Move"/>
-        <text name="rl_menu_sell_title" text="Sell"/>
-        <text name="rl_menu_sell_cart_header" text="Sale Summary"/>
-        <text name="rl_menu_sell_cart_selected" text="Selected"/>
-        <text name="rl_menu_sell_cart_empty" text="Select animals to sell"/>
+        <text name="rl_bridge_version_unknown" text="Realistic Livestock: %s %s sürümü, Realistic Livestock'in %s sürümü ile test edilmedi. '%s' yapılandırması kullanılıyor. Egzotik hayvanlarla ilgili sorun yaşarsanız lütfen bunları %s adresinden bildirin."/>
+        <text name="rl_bridge_configoverride_conflict_header" text="Realistic Livestock: Çakışma tespit edildi. İki veya daha fazla köprü/paket (bridge/pack), aynı hayvan türü için yapılandırmayı değiştirdi. En son yüklenen mod geçerli olur. Devam ederseniz görsel hatalar (glitches) ve hayalet hayvanlar yaşayabilirsiniz."/>
+        <text name="rl_bridge_configoverride_conflict_line" text="%s: %s tarafından uygulandı"/>
+
+        <!-- RL Tabbed Menu -->
+        <text name="input_RL_MENU" text="RL Menüsünü Aç (yeni)"/>
+        <!-- Phase 1: Messages tab -->
+        <text name="rl_menu_messages_title" text="Mesajlar"/>
+        <text name="rl_menu_messages_empty" text="Henüz mesaj yok"/>
+        <text name="rl_menu_messages_no_farm" text="Mesajları görüntülemek için bir çiftliğe sahip olmanız gerekir"/>
+        <text name="rl_menu_messages_summary" text="%s mesaj"/>
+        <text name="rl_menu_messages_col_type" text="Tür"/>
+        <text name="rl_menu_messages_col_animal" text="Hayvan"/>
+        <text name="rl_menu_messages_col_message" text="Mesaj"/>
+        <text name="rl_menu_messages_col_husbandry" text="Ağıl"/>
+        <text name="rl_menu_messages_col_date" text="Tarih"/>
+        <text name="rl_menu_messages_unknown" text="Bilinmiyor: %s"/>
+        <!-- Messages delete -->
+        <text name="rl_menu_messages_delete_button" text="Sil"/>
+        <text name="rl_menu_messages_delete_all_button" text="Tümünü sil"/>
+        <text name="rl_menu_messages_confirm_delete_all" text="Tüm %s mesajları silinsin mi? Bu işlem geri alınamaz."/>
+        <!-- Phase 2a: Info tab -->
+        <text name="rl_menu_info_title" text="Yönet"/>
+        <text name="rl_menu_info_empty_no_husbandries" text="Hayvanları görüntülemek için en az bir ağıla ihtiyacınız var"/>
+        <text name="rl_menu_info_empty_no_animals" text="Bu ağılda hayvan yok"/>
+        <text name="rl_menu_info_filter_button" text="Filtrele"/>
+
+        <!-- Info tab detail pane -->
+        <text name="rl_menu_info_pen_information" text="Ağıl Bilgisi"/>
+        <text name="rl_menu_info_pedigree_header" text="Soyağacı"/>
+        <text name="rl_menu_info_genetics_header" text="Genetik"/>
+        <text name="rl_menu_info_diseases_header" text="Hastalıklar"/>
+        <text name="rl_menu_info_input_header" text="Girdi (izlenen)"/>
+        <text name="rl_menu_info_output_header" text="Çıktı (izlenen)"/>
+        <text name="rl_menu_info_children" text="Yavrular"/>
+
+        <!-- Phase 3: Move tab -->
+        <text name="rl_menu_move_title" text="Taşı"/>
+        <text name="rl_menu_move_summary" text="%d hayvan" tag="format"/>
+
+        <!-- Phase 4: Sell tab -->
+        <text name="rl_menu_sell_title" text="Sat"/>
+        <text name="rl_menu_sell_cart_header" text="Satış Özeti"/>
+        <text name="rl_menu_sell_cart_selected" text="Seçilen"/>
+        <text name="rl_menu_sell_cart_empty" text="Satılacak hayvanları seçin"/>
 
         <!-- Phase 5: Buy tab -->
-        <text name="rl_menu_buy_title" text="Buy"/>
-        <text name="rl_menu_buy_empty_no_types" text="The dealer has no animal types available"/>
-        <text name="rl_menu_buy_empty_no_animals" text="No animals available at the dealer for this type"/>
-        <text name="rl_menu_buy_cart_header" text="Purchase Summary"/>
-        <text name="rl_menu_buy_cart_selected" text="Selected"/>
-        <!-- Phase 6: AI tab (English fallback) -->
-        <text name="rl_menu_ai_title" text="Artificial Insemination"/>
-        <text name="rl_menu_ai_quantity" text="Quantity"/>
-        <text name="rl_menu_ai_price" text="Price"/>
-        <text name="rl_menu_ai_empty_no_stock" text="No bulls available at the dealer for this species"/>
-        <text name="rl_menu_ai_empty_no_species" text="No animal species registered"/>
-        <!-- Settings tab shell (English fallback) -->
-        <text name="rl_menu_settings_title" text="Settings"/>
-        <text name="rl_menu_settings_tab_general" text="General"/>
-        <text name="rl_menu_settings_tab_filters" text="Filters"/>
+        <text name="rl_menu_buy_title" text="Satın Al"/>
+        <text name="rl_menu_buy_empty_no_types" text="Satıcıda mevcut hayvan türü yok"/>
+        <text name="rl_menu_buy_empty_no_animals" text="Bu tür için satıcıda mevcut hayvan yok"/>
+        <text name="rl_menu_buy_cart_header" text="Satın Alma Özeti"/>
+        <text name="rl_menu_buy_cart_selected" text="Seçilen"/>
 
-		<!-- Filters tab list -->
-		<text name="rl_menu_filters_empty" text="No saved filters yet"/>
-		<text name="rl_menu_filters_empty_no_farm" text="You need a farm to save filters"/>
-		<text name="rl_menu_filters_new_button" text="New filter"/>
-		<text name="rl_menu_filters_default_name" text="New filter"/>
-		<text name="rl_menu_filters_detail_placeholder" text="To be implemented"/>
+        <!-- Phase 6: AI tab -->
+        <text name="rl_menu_ai_title" text="Suni Tohumlama"/>
+        <text name="rl_menu_ai_quantity" text="Miktar"/>
+        <text name="rl_menu_ai_price" text="Fiyat"/>
+        <text name="rl_menu_ai_empty_no_stock" text="Bu tür için satıcıda mevcut boğa yok"/>
+        <text name="rl_menu_ai_empty_no_species" text="Kayıtlı hayvan türü yok"/>
 
-		<!-- Filter cycle + chip MVP -->
-		<text name="rl_menu_filter_chip_none" text="No filter"/>
-		<text name="rl_menu_filter_chip_active" text="Filter: %s"/>
-		<text name="rl_menu_cycle_filter_button" text="Cycle filter"/>
-		<text name="rl_menu_filter_chip_unnamed" text="(unnamed)"/>
-        <text name="rl_settings_geneticsDisplay_label" text="Genetics Display"/>
-        <text name="rl_settings_geneticsDisplay_texts_1" text="Off"/>
-        <text name="rl_settings_geneticsDisplay_texts_2" text="Short"/>
-        <text name="rl_settings_geneticsDisplay_texts_3" text="Long"/>
-        <text name="rl_settings_geneticsDisplay_tooltip" text="Show numeric genetics values in animal names"/>
-        <text name="rl_settings_geneticsPosition_label" text="Genetics Position"/>
-        <text name="rl_settings_geneticsPosition_texts_1" text="Prefix"/>
-        <text name="rl_settings_geneticsPosition_texts_2" text="Postfix"/>
-        <text name="rl_settings_geneticsPosition_tooltip" text="Where to show genetics in the name"/>
-        <text name="rl_settings_sortByGenetics_label" text="Sort by Genetics"/>
-        <text name="rl_settings_sortByGenetics_tooltip_1" text="Animals are sorted by type and age"/>
-        <text name="rl_settings_sortByGenetics_tooltip_2" text="Animals are sorted by genetics (highest first)"/>
-        <text name="rl_ui_buyAllRejected" text="None of the selected animals can be purchased in this husbandry."/>
-        <text name="rl_ui_buyPartialConfirmation" text="Buy %d of %d selected animals for %s?" tag="format"/>
-        <text name="rl_ui_buySkippedNotSupported" text="%d animal(s) not supported by this husbandry" tag="format"/>
-	</texts>
+        <!-- Settings tab shell -->
+        <text name="rl_menu_settings_title" text="Ayarlar"/>
+        <text name="rl_menu_settings_tab_general" text="Genel"/>
+        <text name="rl_menu_settings_tab_filters" text="Filtreler"/>
+
+        <!-- Filters tab list -->
+        <text name="rl_menu_filters_empty" text="Henüz kaydedilmiş filtre yok"/>
+        <text name="rl_menu_filters_empty_no_farm" text="Filtreleri kaydetmek için bir çiftliğe ihtiyacınız var"/>
+        <text name="rl_menu_filters_new_button" text="Yeni filtre"/>
+        <text name="rl_menu_filters_default_name" text="Yeni filtre"/>
+        <text name="rl_menu_filters_detail_placeholder" text="Uygulanacak"/>
+
+        <!-- Filter cycle + chip MVP -->
+        <text name="rl_menu_filter_chip_none" text="Filtre yok"/>
+        <text name="rl_menu_filter_chip_active" text="Filtre: %s"/>
+        <text name="rl_menu_cycle_filter_button" text="Filtre döngüsü"/>
+        <text name="rl_menu_filter_chip_unnamed" text="(isimsiz)"/>
+
+
+        <!-- Missing keys (English fallback) -->
+        <text name="input_RL_RENAME" text="Yeniden Adlandır"/>
+        <text name="input_RL_CYCLE_FILTER" text="Kaydedilen Filtreyi Döngüye Al"/>
+    </texts>
 </l10n>
