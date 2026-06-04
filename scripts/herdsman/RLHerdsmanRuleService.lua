@@ -2,7 +2,7 @@
 -- Singleton CRUD service for the Herdsman rule registry (M-Service S1).
 --
 -- Owns the in-memory rule registry `self.rulesById` and assigns stable ids on
--- create via base-game `Utils.getUniqueId`. A rule binds one saved filter +
+-- create via `Utils.getUniqueId`. A rule binds one saved filter +
 -- operation params to a set of target husbandry placeables. Structural sibling
 -- of `RLFilterService`: same in-memory CRUD + immutability + defensive-clone
 -- discipline, MINUS serialization and MP events (those are later slices).
@@ -20,7 +20,7 @@
 --   * `enabled`           boolean
 --   * `params`            table (opaque here; the per-operation codec is S2)
 --   * `targetHusbandries` array (may be empty -> inert rule, no targets)
---   * `filterId`          string for buy/sell/castrate/ai; MUST be nil for naming
+--   * `filterId`          non-empty string for buy/sell/castrate/ai; MUST be nil for naming
 --
 -- Scope boundary (deliberately NOT here):
 --   * No persistence / XML (S2): no saveToXMLFile / loadFromXMLFile.
@@ -44,7 +44,7 @@ local Log = RmLogging.getLogger("RLRM")
 RLHerdsmanRuleService = {}
 local RLHerdsmanRuleService_mt = { __index = RLHerdsmanRuleService }
 
---- Prefix used by `Utils.getUniqueId` for rule ids. Follows the base-game
+--- Prefix used by `Utils.getUniqueId` for rule ids. Follows the
 --- `UNIQUE_ID_PREFIX` convention (mirrors `RLFilterService.UNIQUE_ID_PREFIX`).
 RLHerdsmanRuleService.UNIQUE_ID_PREFIX = "rlHerdRule_"
 
@@ -147,7 +147,7 @@ end
 --- Enforces: non-empty string `name`; `operation` in the canonical set; integer
 --- `farmId`; boolean `enabled`; table `params`; array (table) `targetHusbandries`;
 --- and the filterId-vs-operation rule (naming MUST have nil filterId, every other
---- operation MUST have a string filterId). Element typing of `targetHusbandries`
+--- operation MUST have a non-empty string filterId). Element typing of `targetHusbandries`
 --- and per-operation `params` shape are intentionally NOT checked here (M-Tick /
 --- S2 concerns).
 ---@param r table|nil
@@ -185,8 +185,8 @@ local function validateRuleFields(r)
             return false, string.format("naming rules must have nil filterId (got %s)", tostring(r.filterId))
         end
     else
-        if type(r.filterId) ~= "string" then
-            return false, string.format("operation '%s' requires a string filterId (got %s)", r.operation, tostring(r.filterId))
+        if type(r.filterId) ~= "string" or r.filterId == "" then
+            return false, string.format("operation '%s' requires a non-empty string filterId (got %s)", r.operation, tostring(r.filterId))
         end
     end
     return true
