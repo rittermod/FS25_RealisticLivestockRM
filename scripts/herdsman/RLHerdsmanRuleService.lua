@@ -65,6 +65,12 @@ RLHerdsmanRuleService.OPERATIONS = {
 --- mirroring `RLFilterService`. Not bumped on update in S1.
 RLHerdsmanRuleService.DEFAULT_VERSION = 1
 
+--- On-disk root for the rule registry inside `rm_RlSettings.xml` (S2). Mirrors
+--- `RLFilterService.XML_BASE_KEY`; both registries share that one file (the
+--- filters under `rm_RlSettings.filters`, the rules under this key), each with
+--- its own error boundary on load.
+RLHerdsmanRuleService.XML_BASE_KEY = "rm_RlSettings.herdsmanRules"
+
 -- =============================================================================
 -- Deep copy
 -- =============================================================================
@@ -387,11 +393,99 @@ function RLHerdsmanRuleService:listForFarm(farmId)
     return out
 end
 
---- Empty the registry. Provided for symmetry with `RLFilterService` and so a
---- future persistence-load path (S2) can clear before reading; harmless in S1.
+--- Empty the registry. Provided for symmetry with `RLFilterService` and so the
+--- persistence-load path (S2) can clear before reading.
 function RLHerdsmanRuleService:clear()
     self.rulesById = {}
     Log:debug("RLHerdsmanRuleService:clear: state emptied")
+end
+
+-- =============================================================================
+-- XML IO (S2)
+-- =============================================================================
+
+--- Serialize every stored rule under `baseKey` via
+--- `RLHerdsmanRuleSerialization.writeRule`. No-op when xmlFile is nil
+--- (defensive; the RLSettings caller already guards).
+---
+--- Rules are sorted by id before writing so the on-disk key order
+--- (`rule(0)`, `rule(1)`, ...) is deterministic across save cycles. Assumes a
+--- FRESH (or caller-cleared) subtree under `baseKey`: it does NOT clear stale
+--- `rule(i)` nodes (same contract as `RLFilterService:saveToXMLFile`;
+--- production always passes a freshly `XMLFile.create`d handle via
+--- `RLSettings.saveToXMLFile`).
+---@param xmlFile table XMLFile handle
+---@param baseKey string e.g. `RLHerdsmanRuleService.XML_BASE_KEY`
+function RLHerdsmanRuleService:saveToXMLFile(xmlFile, baseKey)
+    if xmlFile == nil then
+        Log:warning("RLHerdsmanRuleService:saveToXMLFile: nil xmlFile; skipping")
+        return
+    end
+
+    local rules = self:list()
+    table.sort(rules, function(a, b) return tostring(a.id) < tostring(b.id) end)
+
+    -- Contiguous write-index: `writeRule` fail-closes (returns false, writes
+    -- nothing) on a malformed record, so advancing the on-disk `rule(i)` index
+    -- only on success keeps the indexed sequence gap-free (a gap would truncate
+    -- the iterate on load). Mirrors RLFilterSerialization.writeGroup's condIdx.
+    local written = 0
+    for _, r in ipairs(rules) do
+        local ruleKey = string.format("%s.rule(%d)", baseKey, written)
+        if RLHerdsmanRuleSerialization.writeRule(xmlFile, ruleKey, r) then
+            written = written + 1
+        end
+    end
+
+    Log:debug("RLHerdsmanRuleService:saveToXMLFile: baseKey=%s listed=%d wrote=%d rules (sorted by id)", baseKey, #rules, written)
+end
+
+--- Clear existing state then deserialize every rule under `baseKey` via
+--- `RLHerdsmanRuleSerialization.readRule`. Records that fail the serializer's
+--- fail-closed guards (missing id / unknown operation / missing farmId /
+--- missing required param) are skipped (the serializer logs the warning).
+---
+--- A duplicate `#id` on load is SKIPPED (not last-write-wins): duplicate ids are
+--- corruption, so the first record wins and the duplicate is logged at
+--- `:warning` - deliberately stronger than the filter precedent.
+---
+--- `iterate` is wrapped in `pcall`: a malformed rule that hard-errors deep in
+--- the serializer must not propagate out and abort the surrounding
+--- `RLSettings.loadRulesFromXMLFile`. Partial survivors are kept (non-atomic by
+--- design, mirroring `RLFilterService:loadFromXMLFile`); the warning surfaces
+--- the specific failure.
+---@param xmlFile table XMLFile handle
+---@param baseKey string e.g. `RLHerdsmanRuleService.XML_BASE_KEY`
+function RLHerdsmanRuleService:loadFromXMLFile(xmlFile, baseKey)
+    if xmlFile == nil then
+        Log:warning("RLHerdsmanRuleService:loadFromXMLFile: nil xmlFile; skipping")
+        return
+    end
+
+    self:clear()
+    local loaded = 0
+
+    local ok, err = pcall(function()
+        xmlFile:iterate(baseKey .. ".rule", function(_, ruleKey)
+            local r = RLHerdsmanRuleSerialization.readRule(xmlFile, ruleKey)
+            if r ~= nil then
+                if self.rulesById[r.id] ~= nil then
+                    Log:warning("RLHerdsmanRuleService:loadFromXMLFile: duplicate id '%s' at %s; skipping (first record kept, no clobber)",
+                        tostring(r.id), tostring(ruleKey))
+                else
+                    self.rulesById[r.id] = r
+                    loaded = loaded + 1
+                end
+            end
+        end)
+    end)
+
+    if not ok then
+        Log:warning("RLHerdsmanRuleService:loadFromXMLFile: iterate errored after %d rules loaded; keeping partial state (%s)",
+            loaded, tostring(err))
+    end
+
+    Log:debug("RLHerdsmanRuleService:loadFromXMLFile: baseKey=%s loaded=%d rules", baseKey, loaded)
 end
 
 -- Eager source-time singleton. Constructing the service at source-time means

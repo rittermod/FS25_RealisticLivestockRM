@@ -1118,6 +1118,13 @@ function AnimalSystem:loadFromXMLFile()
     -- silently dropped scope to global on every filter.
     RLSettings.loadFiltersFromXMLFile()
 
+    -- Herdsman rules share rm_RlSettings.xml with the filters (their own subtree,
+    -- M-Service S2). Loaded here for the same reason filters are: this is RLRM's
+    -- GUI-free, server-side, once-per-load savegame hook. Each registry owns its
+    -- own error boundary (separate re-open), so a corrupt filters subtree cannot
+    -- abort rule load, or vice versa.
+    RLSettings.loadRulesFromXMLFile()
+
     return hasData
 
 end

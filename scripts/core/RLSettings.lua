@@ -365,6 +365,43 @@ function RLSettings.loadFiltersFromXMLFile()
 end
 
 
+--- Deferred rule-load entry point (M-Service S2). Sibling of
+--- loadFiltersFromXMLFile: server-only, GUI-free, called from
+--- AnimalSystem:loadFromXMLFile (NOT from the GUI-coupled RLSettings.initialize,
+--- which is reached only through the in-game-menu builder). Rules carry no
+--- animalType, so the AnimalType-registry timing reason that drives the filter
+--- load does not apply here - rules just need a GUI-free, server-side,
+--- once-per-load savegame hook, which AnimalSystem:loadFromXMLFile already is.
+--- Re-opens rm_RlSettings.xml once more so the rule registry owns its own error
+--- boundary (a corrupt filters subtree cannot abort rule load, or vice versa).
+function RLSettings.loadRulesFromXMLFile()
+
+	if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
+	if g_server == nil then return end
+
+	if g_rlHerdsmanRuleService == nil then
+		Log:warning("RLSettings.loadRulesFromXMLFile: g_rlHerdsmanRuleService is nil; skipping rule load (load-order regression?)")
+		return
+	end
+
+	local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlSettings.xml"
+	local xmlFile = XMLFile.loadIfExists("rm_RlSettings", path)
+	if xmlFile == nil then
+		-- No file: clear so a previously-populated singleton cannot leak across a
+		-- second savegame load in the same session (g_rlHerdsmanRuleService is an
+		-- eager source-time singleton that persists between loads). The non-nil
+		-- xmlFile path clears via the service's own loadFromXMLFile; this branch
+		-- short-circuits before that, so clear here to honour "registry empty".
+		g_rlHerdsmanRuleService:clear()
+		Log:debug("RLSettings.loadRulesFromXMLFile: no rm_RlSettings.xml on disk; rule registry cleared (empty)")
+		return
+	end
+
+	g_rlHerdsmanRuleService:loadFromXMLFile(xmlFile, RLHerdsmanRuleService.XML_BASE_KEY)
+	xmlFile:delete()
+end
+
+
 function RLSettings.saveToXMLFile(name, state)
 
 	if RLSettings.isSaving or g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
@@ -398,6 +435,15 @@ function RLSettings.saveToXMLFile(name, state)
 				g_rlFilterService:saveToXMLFile(xmlFile, RLFilterService.XML_BASE_KEY)
 			else
 				Log:warning("RLSettings.saveToXMLFile: g_rlFilterService is nil; skipping filter save (load-order regression?)")
+			end
+
+			-- Herdsman rules share the same rm_RlSettings.xml file (their own
+			-- subtree under RLHerdsmanRuleService.XML_BASE_KEY, M-Service S2).
+			-- Symmetric with the filter save above; server-only.
+			if g_rlHerdsmanRuleService ~= nil then
+				g_rlHerdsmanRuleService:saveToXMLFile(xmlFile, RLHerdsmanRuleService.XML_BASE_KEY)
+			else
+				Log:warning("RLSettings.saveToXMLFile: g_rlHerdsmanRuleService is nil; skipping rule save (load-order regression?)")
 			end
 
 			local saved = xmlFile:save(false, true)
