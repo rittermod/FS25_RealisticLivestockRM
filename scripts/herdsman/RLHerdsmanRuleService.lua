@@ -262,6 +262,11 @@ function RLHerdsmanRuleService:create(rule)
         tostring(stored.farmId), tostring(stored.enabled),
         #stored.targetHusbandries, tostring(stored.filterId))
 
+    -- Dispatch the Create event AFTER the local store (Pattern A: the caller mutates
+    -- first, then the event rebroadcasts the snapshot to remote machines). Called
+    -- module-qualified, not via self, so a test swap of the hook field is observed.
+    RLHerdsmanRuleService._sendCreateEvent(stored)
+
     return cloneRule(stored)
 end
 
@@ -487,6 +492,66 @@ function RLHerdsmanRuleService:loadFromXMLFile(xmlFile, baseKey)
     end
 
     Log:debug("RLHerdsmanRuleService:loadFromXMLFile: baseKey=%s loaded=%d rules", baseKey, loaded)
+end
+
+-- =============================================================================
+-- MP events (S3)
+-- =============================================================================
+
+--- Swappable dispatch hook: fire the Create event for `rule`. Nil-guards the event
+--- class so an offline / source-order path (mod tests, constructor wiring before the
+--- event is sourced) is a safe no-op. Tests swap this field to observe the create
+--- payload without firing a real event.
+---@param rule table the stored rule snapshot to broadcast
+RLHerdsmanRuleService._sendCreateEvent = function(rule)
+    if RLHerdsmanRuleCreateEvent == nil then
+        Log:trace("RLHerdsmanRuleService._sendCreateEvent: RLHerdsmanRuleCreateEvent not loaded; no dispatch (offline/source-order path)")
+        return
+    end
+    RLHerdsmanRuleCreateEvent.sendEvent(rule)
+end
+
+--- Apply a rule create received from the network (Pattern A receiver entry). Unlike
+--- `create`, this does NOT assign an id (the id is authoritative from the wire) and
+--- does NOT re-dispatch an event. It re-enforces the S1 validity floor so a crafted
+--- payload that satisfied the typed codec (which guarantees field TYPES, not enum
+--- validity or a non-empty name) cannot bypass the rule invariants -- the same
+--- fail-closed posture the persistence load path uses. An id already present locally
+--- is overwritten with the authoritative clone (`:warning`, convergence signal).
+---@param rule table rule record reconstructed from the wire
+---@return boolean applied true when stored, false when dropped
+function RLHerdsmanRuleService:applyIncomingCreate(rule)
+    if rule == nil or rule.id == nil or rule.id == "" then
+        Log:warning("RLHerdsmanRuleService:applyIncomingCreate: malformed payload (id=%s); dropping",
+            tostring(rule and rule.id))
+        return false
+    end
+
+    -- MP must not bypass the S1 floor. The codec round-trips type-correct values but
+    -- guarantees neither a valid operation enum nor a non-empty name, so re-validate
+    -- and drop (no store) on failure.
+    local ok, reason = validateRuleFields(rule)
+    if not ok then
+        Log:warning("RLHerdsmanRuleService:applyIncomingCreate: id=%s rejected (%s); not stored (MP floor enforcement)",
+            tostring(rule.id), tostring(reason))
+        return false
+    end
+
+    -- Surface a silent clobber. Server-authoritative state wins, but an existing
+    -- record means something is off upstream (id collision, duplicate broadcast, or
+    -- a state event arriving after create); overwrite with the authoritative clone.
+    if self.rulesById[rule.id] ~= nil then
+        Log:warning("RLHerdsmanRuleService:applyIncomingCreate: id=%s already present locally; overwriting with authoritative payload (possible id collision or duplicate broadcast)",
+            tostring(rule.id))
+    end
+
+    self.rulesById[rule.id] = cloneRule(rule)
+    Log:debug("RLHerdsmanRuleService:applyIncomingCreate: id=%s name=%s operation=%s farmId=%s enabled=%s targets=%d filterId=%s",
+        tostring(rule.id), tostring(rule.name), tostring(rule.operation),
+        tostring(rule.farmId), tostring(rule.enabled),
+        type(rule.targetHusbandries) == "table" and #rule.targetHusbandries or 0,
+        tostring(rule.filterId))
+    return true
 end
 
 -- Eager source-time singleton. Constructing the service at source-time means

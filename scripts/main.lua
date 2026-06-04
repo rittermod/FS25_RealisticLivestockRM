@@ -129,12 +129,16 @@ source(modDirectory .. "scripts/events/RLFilterStateEvent.lua")
 -- and the RLQuickFilterToSavedFilterTests suite.
 source(modDirectory .. "scripts/utils/RLQuickFilterToSavedFilter.lua")
 
--- SECTION 11h: Herdsman Rules - headless service + persistence (M-Service S1-S2)
+-- SECTION 11h: Herdsman Rules - headless service + persistence + MP events (M-Service S1-S3)
 -- In-memory rule registry (sibling of RLFilterService). Serializer before
 -- service (mirrors 11g): the service's saveToXMLFile/loadFromXMLFile call into
--- RLHerdsmanRuleSerialization. MP events (S3-S5) append here in later slices.
+-- RLHerdsmanRuleSerialization. Wire + Create event after the service (the service
+-- references both only at call time, nil-guarded). Update/Delete/State (S4-S5)
+-- append here in later slices.
 source(modDirectory .. "scripts/herdsman/RLHerdsmanRuleSerialization.lua")
 source(modDirectory .. "scripts/herdsman/RLHerdsmanRuleService.lua")
+source(modDirectory .. "scripts/herdsman/RLHerdsmanRuleWire.lua")
+source(modDirectory .. "scripts/events/RLHerdsmanRuleCreateEvent.lua")
 
 -- SECTION 12: GUI Elements
 source(modDirectory .. "scripts/gui/elements/DoubleOptionSliderElement.lua")
