@@ -129,6 +129,11 @@ source(modDirectory .. "scripts/events/RLFilterStateEvent.lua")
 -- and the RLQuickFilterToSavedFilterTests suite.
 source(modDirectory .. "scripts/utils/RLQuickFilterToSavedFilter.lua")
 
+-- SECTION 11h: Herdsman Rules - headless service (M-Service S1)
+-- In-memory rule registry (sibling of RLFilterService). CRUD only - persistence
+-- (S2) and MP events (S3-S5) append here in later slices.
+source(modDirectory .. "scripts/herdsman/RLHerdsmanRuleService.lua")
+
 -- SECTION 12: GUI Elements
 source(modDirectory .. "scripts/gui/elements/DoubleOptionSliderElement.lua")
 source(modDirectory .. "scripts/gui/elements/RenderElement.lua")
