@@ -15,21 +15,23 @@
 -- rule records are flat (scalars + a target list + an operation-keyed params
 -- table), so there is no nested-group recursion here.
 --
--- Per-operation params types are grounded in the legacy AIAnimalManager
--- save/load (AIAnimalManager.lua:175-266). The rule keeps ONLY the operation
--- params; the legacy age/gender/disease/genetics selection block now lives in
--- the rule's saved filter (SS10), so it is intentionally absent here.
+-- Per-operation params types are grounded in the legacy AI-animal job save/load
+-- behavior. The rule keeps ONLY the operation params; the legacy
+-- age/gender/disease/genetics selection block now lives in the rule's saved
+-- filter (SS10), so it is intentionally absent here.
 --
 -- Defensive contracts (fail-closed; mirrors RLFilterSerialization skipping a
 -- filter whose mandatory .group subtree is absent):
 --  * readRule returns nil + :warning (the record is SKIPPED) when @id is
---    missing/empty, @operation is not a known operation, @farmId is absent, or
---    ANY required params field for the operation is absent. Required fields are
+--    missing/empty, @operation is not a known operation, @farmId is absent,
+--    @filterId violates the operation (nil/empty for non-naming, or present for
+--    naming - the read-side twin of the service write floor), or ANY
+--    required params field for the operation is absent. Required fields are
 --    read with NO default: a nil read signals corruption, NOT a silent default
 --    (diverges from legacy, which read params with defaults). A skipped record
 --    never aborts the surrounding load.
 --  * naming @previous is written ONLY when convention=="alphabetical" AND it is
---    a non-empty string (legacy parity, AIAnimalManager.lua:244); it is OPTIONAL
+--    a non-empty string (legacy parity); it is OPTIONAL
 --    on read (absent -> nil).
 --  * a target whose @uniqueId is nil/empty is skipped on read (:trace), keeping
 --    order and the non-empty strings. Duplicate-target dedup, uniqueId validity
@@ -115,7 +117,7 @@ local PARAMS_CODECS = {
         validate = function(p) return p.convention ~= nil end,
         write = function(x, k, p)
             x:setString(k .. "#convention", p.convention)
-            -- Legacy parity (AIAnimalManager.lua:244): persist the cursor only
+            -- Legacy parity: persist the cursor only
             -- for alphabetical naming and only when non-empty, so a random rule
             -- (or a fresh alphabetical one) reloads with previous=nil.
             if p.convention == "alphabetical" and type(p.previous) == "string" and p.previous ~= "" then
@@ -235,8 +237,10 @@ function RLHerdsmanRuleSerialization.writeRule(xmlFile, ruleKey, rule)
     xmlFile:setString(ruleKey .. "#operation", rule.operation)
     xmlFile:setBool(ruleKey .. "#enabled", rule.enabled)
 
-    -- Omit @filterId when nil (naming). A stored non-naming filterId (incl. the
-    -- empty-string floor gap, RLRM-372) round-trips verbatim.
+    -- Omit @filterId when nil (naming). A valid non-naming filterId round-trips
+    -- verbatim; an empty/nil non-naming filterId (or a stray naming filterId) is
+    -- now fail-closed on READ (in readRule), not here - the write-side floor
+    -- already blocks creating one, so writeRule never emits a bad filterId.
     if rule.filterId ~= nil then
         xmlFile:setString(ruleKey .. "#filterId", rule.filterId)
     end
@@ -253,11 +257,13 @@ end
 
 --- Read one rule record from `ruleKey`. Returns the record on success, or nil +
 --- `:warning` (the record is SKIPPED) when fail-closed: missing/empty `@id`, an
---- unknown `@operation` (no params codec), an absent `@farmId`, or any required
+--- unknown `@operation` (no params codec), an absent `@farmId`, a `@filterId` that
+--- violates the operation (nil/empty for non-naming, or present for naming - the
+--- read-side twin of the service write floor), or any required
 --- params field absent (read with no default; nil = corruption). `name`,
 --- `enabled` and `version` carry defaults (`""` / `false` / `1`); `filterId` is
---- nil when absent (naming). The caller stores the returned record (the service
---- preserves id/farmId/version, never reassigns).
+--- nil for a (valid) naming rule. The caller stores the returned record (the
+--- service preserves id/farmId/version, never reassigns).
 ---@param xmlFile table XMLFile handle
 ---@param ruleKey string path prefix for this rule
 ---@return table|nil rule
@@ -290,8 +296,25 @@ function RLHerdsmanRuleSerialization.readRule(xmlFile, ruleKey)
     -- conservatively false so a corrupt rule never silently runs an operation.
     local enabled = xmlFile:getBool(ruleKey .. "#enabled", false)
     local version = xmlFile:getInt(ruleKey .. "#version", 1)
-    -- filterId: absent -> nil (naming, or omitted). Stored verbatim otherwise.
+    -- filterId: read raw, then floored against the operation just below.
     local filterId = xmlFile:getString(ruleKey .. "#filterId")
+
+    -- Load-time floor: read-side twin of validateRuleFields' filterId-vs-operation
+    -- rule. naming carries no filter; everything else binds exactly one (D6/SS10).
+    -- A nil/empty non-naming filterId, or any filterId on a naming rule, is
+    -- corruption -> skip (fail-closed, like the missing-id / unknown-op /
+    -- missing-param guards above).
+    if operation == "naming" then
+        if filterId ~= nil then
+            Log:warning("RLHerdsmanRuleSerialization.readRule: naming rule id=%s at %s carries a #filterId (naming has no filter); skipping",
+                tostring(id), tostring(ruleKey))
+            return nil
+        end
+    elseif filterId == nil or filterId == "" then
+        Log:warning("RLHerdsmanRuleSerialization.readRule: rule id=%s (operation=%s) at %s has nil/empty #filterId; skipping (non-naming rules require a non-empty filterId)",
+            tostring(id), tostring(operation), tostring(ruleKey))
+        return nil
+    end
 
     local targetHusbandries = readTargets(xmlFile, ruleKey)
 

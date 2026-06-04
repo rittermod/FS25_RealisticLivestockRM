@@ -443,7 +443,8 @@ end
 --- Clear existing state then deserialize every rule under `baseKey` via
 --- `RLHerdsmanRuleSerialization.readRule`. Records that fail the serializer's
 --- fail-closed guards (missing id / unknown operation / missing farmId /
---- missing required param) are skipped (the serializer logs the warning).
+--- operation-invalid filterId / missing required param) are skipped (the
+--- serializer logs the warning).
 ---
 --- A duplicate `#id` on load is SKIPPED (not last-write-wins): duplicate ids are
 --- corruption, so the first record wins and the duplicate is logged at
