@@ -260,11 +260,11 @@ function RealisticLivestock_FSBaseMission:onStartMission()
     RmMigrationDialog.register()
 
     -- Mod-compatibility detection runs on every peer (g_modIsLoaded is authoritative
-    -- per peer). The lazy-create is idempotent with FarmManager.lua:15's existing
-    -- nil-check; on a server the singleton is already created with savegameDir set,
-    -- on a pure client it's a thin singleton with savegameDir=nil - safe because
-    -- the methods reachable via the queue (showConflictDialog / showWarningDialog /
-    -- checkModCompatibility) never touch savegameDir.
+    -- per peer). The lazy-create is idempotent - the `g_rmMigrationManager == nil`
+    -- guard makes a re-run a no-op; on a server the singleton is already created with
+    -- savegameDir set, on a pure client it's a thin singleton with savegameDir=nil -
+    -- safe because the methods reachable via the queue (showConflictDialog /
+    -- showWarningDialog / checkModCompatibility) never touch savegameDir.
     if g_rmMigrationManager == nil then
         Log:debug("FSBaseMission: lazy-creating RmMigrationManager (client path)")
         g_rmMigrationManager = RmMigrationManager.new()
@@ -365,6 +365,28 @@ function RealisticLivestock_FSBaseMission:sendInitialClientState(connection, _, 
             #filters)
     else
         Log:warning("RealisticLivestock_FSBaseMission:sendInitialClientState: g_rlFilterService is nil; new client will have empty filter state")
+    end
+
+    -- M-Service S5: push the authoritative full Herdsman rule registry to the new
+    -- client so late-joiners converge with the server. Empty-set (count=0) is a
+    -- valid state event and still sends, giving a deterministic "clear-to-empty".
+    --
+    -- Routes through the static `RLHerdsmanRuleStateEvent.sendEvent` dispatcher
+    -- (not `connection:sendEvent(...new(...))` directly) so the `g_server == nil`
+    -- + nil-connection guards live on a single code path.
+    --
+    -- Same ordering note as the filter block above: this whole function is
+    -- `Utils.prependedFunction`-registered below, so it runs BEFORE the wrapped
+    -- body. That is fine today because `RLHerdsmanRuleStateEvent:run` on the
+    -- receiver only touches `g_rlHerdsmanRuleService` (eager source-time
+    -- singleton) and `g_server` (env), both valid before sendInitialClientState.
+    if g_rlHerdsmanRuleService ~= nil then
+        local rules = g_rlHerdsmanRuleService:list()
+        RLHerdsmanRuleStateEvent.sendEvent(rules, connection)
+        Log:debug("RealisticLivestock_FSBaseMission:sendInitialClientState: sent RLHerdsmanRuleStateEvent with %d rule(s) to new client",
+            #rules)
+    else
+        Log:warning("RealisticLivestock_FSBaseMission:sendInitialClientState: g_rlHerdsmanRuleService is nil; new client will have empty herdsman rule state")
     end
 
 end
