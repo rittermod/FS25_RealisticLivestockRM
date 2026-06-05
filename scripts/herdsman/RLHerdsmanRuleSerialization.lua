@@ -204,7 +204,7 @@ end
 --- operation's `params` codec for the `.params` subtree.
 ---
 --- Fail-closed BEFORE emitting any XML (mirrors RLFilterSerialization's
---- "validate shape before writing" lesson, RLFilterSerialization.lua:196-219):
+--- "validate shape before writing" lesson in `writeCondition`):
 --- an unknown `operation` (no codec) or structurally-incomplete `params` (the
 --- service floor accepts any table-shaped params, so e.g. `buy` with `params={}`
 --- can arrive) returns `false` with a `:warning` and writes nothing - so a
