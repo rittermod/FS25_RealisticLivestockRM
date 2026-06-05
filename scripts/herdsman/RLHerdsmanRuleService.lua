@@ -20,7 +20,7 @@
 --   * `enabled`           boolean
 --   * `params`            table (opaque here; the per-operation codec is S2)
 --   * `targetHusbandries` array (may be empty -> inert rule, no targets)
---   * `filterId`          non-empty string for buy/sell/castrate/ai; MUST be nil for naming
+--   * `filterId`          non-empty (non-whitespace) string for buy/sell/castrate/ai; MUST be nil for naming
 --
 -- Scope boundary (deliberately NOT here):
 --   * No persistence / XML (S2): no saveToXMLFile / loadFromXMLFile.
@@ -147,7 +147,7 @@ end
 --- Enforces: non-empty string `name`; `operation` in the canonical set; integer
 --- `farmId`; boolean `enabled`; table `params`; array (table) `targetHusbandries`;
 --- and the filterId-vs-operation rule (naming MUST have nil filterId, every other
---- operation MUST have a non-empty string filterId). Element typing of `targetHusbandries`
+--- operation MUST have a non-empty (non-whitespace) string filterId). Element typing of `targetHusbandries`
 --- and per-operation `params` shape are intentionally NOT checked here (M-Tick /
 --- S2 concerns).
 ---@param r table|nil
@@ -185,8 +185,8 @@ local function validateRuleFields(r)
             return false, string.format("naming rules must have nil filterId (got %s)", tostring(r.filterId))
         end
     else
-        if type(r.filterId) ~= "string" or r.filterId == "" then
-            return false, string.format("operation '%s' requires a non-empty string filterId (got %s)", r.operation, tostring(r.filterId))
+        if type(r.filterId) ~= "string" or r.filterId:gsub("%s", "") == "" then
+            return false, string.format("operation '%s' requires a non-empty (non-whitespace) string filterId (got %s)", r.operation, tostring(r.filterId))
         end
     end
     return true

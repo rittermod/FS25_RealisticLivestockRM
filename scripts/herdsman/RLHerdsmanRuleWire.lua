@@ -13,10 +13,10 @@
 --   params:            PARAMS_WIRE_CODECS[operation].write   (skipped + :warning on unknown op)
 --
 -- filterId is operation-gated, NOT sentinelled: a non-naming rule always carries a
--- non-empty filterId (the S1 validity floor guarantees it), naming never does. The
--- operation token already on the wire tells the reader whether to expect the field,
--- so a persisted "" (a legal non-naming state) round-trips verbatim instead of being
--- corrupted by a ""-means-nil sentinel.
+-- non-empty (non-whitespace) filterId (the S1 validity floor guarantees it), naming
+-- never does. The operation token already on the wire tells the reader whether to
+-- expect the field, so the string round-trips verbatim with no ""-means-nil sentinel
+-- coercion (the floor blocks an empty/whitespace filterId from ever reaching the wire).
 --
 -- targetHusbandries is a node-object list, not a uniqueId-string list. The engine
 -- maintains a stable cross-machine node id per placeable, so each target resolves
@@ -261,7 +261,8 @@ function RLHerdsmanRuleWire.readRule(streamId)
     local operation = streamReadString(streamId)
 
     -- filterId mirrors the write-side gate: naming carries none (reads back nil),
-    -- every other operation reads the string verbatim ("" stays "", never coerced).
+    -- every other operation reads the string verbatim (no ""-means-nil coercion; the
+    -- S1 floor guarantees a non-empty, non-whitespace value was sent).
     local filterId = nil
     if operation ~= "naming" then
         filterId = streamReadString(streamId)
