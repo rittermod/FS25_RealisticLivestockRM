@@ -347,6 +347,11 @@ function RLHerdsmanRuleService:update(id, payload)
         id, tostring(stored.name), tostring(stored.operation), tostring(stored.enabled),
         #stored.targetHusbandries, tostring(stored.filterId))
 
+    -- Dispatch the Update event AFTER the local store (Pattern A: the caller mutates first,
+    -- then the event rebroadcasts the snapshot to remote machines). Called module-qualified,
+    -- not via self, so a test swap of the hook field is observed.
+    RLHerdsmanRuleService._sendUpdateEvent(stored)
+
     return cloneRule(stored)
 end
 
@@ -362,6 +367,10 @@ function RLHerdsmanRuleService:delete(id)
 
     self.rulesById[id] = nil
     Log:debug("RLHerdsmanRuleService:delete: id=%s removed", tostring(id))
+
+    -- Dispatch the Delete event AFTER the local removal (Pattern A). Module-qualified so a
+    -- test swap of the hook field is observed.
+    RLHerdsmanRuleService._sendDeleteEvent(id)
 
     return true
 end
@@ -511,6 +520,31 @@ RLHerdsmanRuleService._sendCreateEvent = function(rule)
     RLHerdsmanRuleCreateEvent.sendEvent(rule)
 end
 
+--- Swappable dispatch hook: fire the Update event for `rule`. Nil-guards the event class so
+--- an offline / source-order path (mod tests, constructor wiring before the event is sourced)
+--- is a safe no-op. Tests swap this field to observe the update payload without firing a real
+--- event.
+---@param rule table the stored rule snapshot to broadcast
+RLHerdsmanRuleService._sendUpdateEvent = function(rule)
+    if RLHerdsmanRuleUpdateEvent == nil then
+        Log:trace("RLHerdsmanRuleService._sendUpdateEvent: RLHerdsmanRuleUpdateEvent not loaded; no dispatch (offline/source-order path)")
+        return
+    end
+    RLHerdsmanRuleUpdateEvent.sendEvent(rule)
+end
+
+--- Swappable dispatch hook: fire the Delete event for `id`. Nil-guards the event class so an
+--- offline / source-order path is a safe no-op. Tests swap this field to observe the deleted
+--- id without firing a real event.
+---@param id string the removed rule id to broadcast
+RLHerdsmanRuleService._sendDeleteEvent = function(id)
+    if RLHerdsmanRuleDeleteEvent == nil then
+        Log:trace("RLHerdsmanRuleService._sendDeleteEvent: RLHerdsmanRuleDeleteEvent not loaded; no dispatch (offline/source-order path)")
+        return
+    end
+    RLHerdsmanRuleDeleteEvent.sendEvent(id)
+end
+
 --- Apply a rule create received from the network (Pattern A receiver entry). Unlike
 --- `create`, this does NOT assign an id (the id is authoritative from the wire) and
 --- does NOT re-dispatch an event. It re-enforces the S1 validity floor so a crafted
@@ -551,6 +585,73 @@ function RLHerdsmanRuleService:applyIncomingCreate(rule)
         tostring(rule.farmId), tostring(rule.enabled),
         type(rule.targetHusbandries) == "table" and #rule.targetHusbandries or 0,
         tostring(rule.filterId))
+    return true
+end
+
+--- Apply a rule update received from the network (Pattern A receiver entry). Whole-object
+--- replacement: stores the wire-decoded record over any local copy. Does NOT re-dispatch an
+--- event (the server's broadcast already fanned out). Re-enforces the S1 field floor -- the
+--- typed codec guarantees field TYPES, not operation-enum validity or a non-empty name, so a
+--- crafted payload that satisfied the codec must not bypass the rule invariants (the same
+--- fail-closed posture `applyIncomingCreate` uses; wire-inbound and XML-inbound agree). An id
+--- unknown locally is logged at `:warning` (a possible missed create) and UPSERTED, since the
+--- update payload carries the whole object and reconstructs cleanly.
+---@param rule table rule record reconstructed from the wire
+---@return boolean applied true when stored, false when dropped (malformed / floor violation)
+function RLHerdsmanRuleService:applyIncomingUpdate(rule)
+    if rule == nil or rule.id == nil or rule.id == "" then
+        Log:warning("RLHerdsmanRuleService:applyIncomingUpdate: malformed payload (id=%s); dropping",
+            tostring(rule and rule.id))
+        return false
+    end
+
+    -- MP must not bypass the S1 field floor (operation enum, non-empty name, integer farmId,
+    -- params table, dense-array targets, filterId-vs-operation). Re-validate and drop (no
+    -- store) on failure. NOTE: the floor validates FIELDS only, not per-operation params
+    -- VALUES or targetHusbandries element typing (M-Tick / codec concerns).
+    local ok, reason = validateRuleFields(rule)
+    if not ok then
+        Log:warning("RLHerdsmanRuleService:applyIncomingUpdate: id=%s farmId=%s rejected (%s); not stored (MP floor enforcement)",
+            tostring(rule.id), tostring(rule.farmId), tostring(reason))
+        return false
+    end
+
+    -- Surface update-acting-as-upsert: the server rejects updates on unknown ids, so a local
+    -- receiver applying one means it missed the original create. Audible, then upsert.
+    if self.rulesById[rule.id] == nil then
+        Log:warning("RLHerdsmanRuleService:applyIncomingUpdate: id=%s unknown locally; acting as upsert (possible missed create)",
+            tostring(rule.id))
+    end
+
+    self.rulesById[rule.id] = cloneRule(rule)
+    Log:debug("RLHerdsmanRuleService:applyIncomingUpdate: id=%s name=%s operation=%s farmId=%s enabled=%s targets=%d filterId=%s",
+        tostring(rule.id), tostring(rule.name), tostring(rule.operation),
+        tostring(rule.farmId), tostring(rule.enabled),
+        type(rule.targetHusbandries) == "table" and #rule.targetHusbandries or 0,
+        tostring(rule.filterId))
+    return true
+end
+
+--- Remove a rule in response to RLHerdsmanRuleDeleteEvent (Pattern A receiver entry). No-op
+--- when the id is unknown locally (logged at `:trace` since the server already
+--- authoritatively validated; an unknown id here just means this peer never had it). Does
+--- NOT re-dispatch an event.
+---@param id string rule id to remove
+---@return boolean applied true when removed, false when malformed or already gone
+function RLHerdsmanRuleService:applyIncomingDelete(id)
+    if id == nil or id == "" then
+        Log:warning("RLHerdsmanRuleService:applyIncomingDelete: nil/empty id; dropping")
+        return false
+    end
+
+    if self.rulesById[id] == nil then
+        Log:trace("RLHerdsmanRuleService:applyIncomingDelete: id=%s not present locally (already gone)",
+            tostring(id))
+        return false
+    end
+
+    self.rulesById[id] = nil
+    Log:debug("RLHerdsmanRuleService:applyIncomingDelete: id=%s removed", tostring(id))
     return true
 end
 
