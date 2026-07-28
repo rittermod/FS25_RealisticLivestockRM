@@ -410,7 +410,7 @@ function RLMenuBuyFrame:reloadAnimalList()
             and AnimalFilterDialog ~= nil and AnimalFilterDialog.applyFilters ~= nil then
             -- Buy frame is buy-mode by definition. Match the dialog-open path
             -- (onClickFilter passes isBuyMode=true) so the list-rebuild filter
-            -- evaluates Value with the 1.075 markup, not raw sell-price.
+            -- evaluates Value with the active dealer-quality markup, not raw sell-price.
             self.items = AnimalFilterDialog.applyFilters(self.items, self.filters, true)
         end
 
@@ -432,6 +432,27 @@ function RLMenuBuyFrame:reloadAnimalList()
     self:updateEmptyState()
     self:updateButtonVisibility()
     self:updateCartDisplay()
+
+    -- ONE dealer-list digest per population - never per row. This is the
+    -- walkthrough oracle for the dealer-quality GUI seams: it carries the
+    -- active preset, the resolved markup and the per-row buy prices, so the
+    -- named B2 steps can predict prices offline and assert them against a log
+    -- line instead of eyeballing the screen. Guarded on the level because the
+    -- per-row digest is built eagerly and would otherwise be paid at every level.
+    if Log.level >= RmLogging.LOG_LEVEL.TRACE then
+        local presetIndex = RLDealerQualityResolver.getActiveIndex()
+        local parts = {}
+
+        for _, item in ipairs(self.items or {}) do
+            if item.cluster ~= nil then
+                parts[#parts + 1] = string.format("%.0f", RLAnimalBuyService.computeBuyPrice(item.cluster))
+            end
+        end
+
+        Log:trace("RLMenuBuyFrame:reloadAnimalList: dealer list preset=%d(%s) markup=%.3f rows=%d prices=[%s]",
+            presetIndex, RLDealerQualityModel.getPreset(presetIndex).key,
+            RLDealerQualityResolver.getMarkup(), #parts, table.concat(parts, ","))
+    end
 end
 
 
@@ -840,7 +861,7 @@ function RLMenuBuyFrame:startTrailerBuyFlow(animals, _price)
             rejectedCount, totalCount, tostring(result.firstErrorCode))
     end
 
-    -- Recompute price for the VALID subset (single source of the 1.075 markup). A trailer
+    -- Recompute price for the VALID subset (priced through RLAnimalBuyService). A trailer
     -- buy carries NO transport fee: legacy fires AnimalBuyEvent.new(trailer, ..., 0).
     local validPrice = RLAnimalBuyService.computeBulkTotal(result.valid)
     local validFee   = 0
@@ -907,7 +928,7 @@ function RLMenuBuyFrame:onBuyDestinationSelected(entry)
     end
 
     -- Recompute price + fee for the VALID subset via the service helper
-    -- (single source of truth for the 1.075 dealer markup).
+    -- (priced through RLAnimalBuyService.computeBuyPrice).
     local validPrice, validFee = RLAnimalBuyService.computeBulkTotal(result.valid)
 
     self.pendingBuyDestination = entry.placeable
@@ -1068,7 +1089,7 @@ end
 --- Iterates visible items (O(V)) and skips orphan keys silently after restock.
 --- Sign convention: getTranportationFee(1) returns positive; for Buy the fee is
 --- additive (player pays it on top of price), opposite of Sell which negates it.
---- @return number totalPrice Sum of getSellPrice() * 1.075 for checked animals
+--- @return number totalPrice Sum of RLAnimalBuyService.computeBuyPrice for checked animals
 --- @return number totalFee Sum of getTranportationFee(1) for checked animals (positive cost)
 --- @return number count Number of checked animals
 function RLMenuBuyFrame:computeCartTotals()
@@ -1087,8 +1108,10 @@ function RLMenuBuyFrame:computeCartTotals()
                     local identityKey = RLSelectionKey.build(cluster.farmId, cluster.uniqueId,
                         cluster.birthday and cluster.birthday.country)
                     if identityKey ~= nil and self.selectedAnimals[identityKey] then
-                        -- 1.075 dealer markup matches the in-game buy-screen pricing
-                        totalPrice = totalPrice + (cluster:getSellPrice() or 0) * 1.075
+                        -- Priced through the buy service, which is the SAME call
+                        -- dispatchPendingBuy hands to AnimalBuyEvent - so the cart
+                        -- total and the charged amount cannot disagree.
+                        totalPrice = totalPrice + RLAnimalBuyService.computeBuyPrice(cluster)
                         if includeFee then
                             totalFee = totalFee + (cluster:getTranportationFee(1) or 0)
                         end
@@ -1222,7 +1245,7 @@ end
 --- Source list is built from the dealer pool MINUS the Quick filter so
 --- slider ranges always reflect the full dealer pool (or saved-filter-
 --- narrowed pool), never the already-Quick-filtered subset.
---- isBuyMode=true so the Value slider applies the 1.075 buy-markup matching
+--- isBuyMode=true so the Value slider applies the active buy-markup matching
 --- AnimalFilterDialog.applyFilters.
 function RLMenuBuyFrame:onClickFilter()
     if self.activeAnimalTypeIndex == nil then return end
@@ -1288,8 +1311,11 @@ end
 --- Populate one data cell. Mirrors Sell's populateCellForItemInSection.
 --- The inherited `price` cell shows the dealer-marked-up buy price; the
 --- inline checkbox callback toggles selectedAnimals and updates the cart
---- totals. The markup math will move to RLAnimalBuyService.computeBuyPrice
---- when buy logic lands.
+--- totals. The markup math lives in RLAnimalBuyService.computeBuyPrice - this
+--- cell calls it rather than multiplying inline, so the row price, the cart
+--- total and the amount AnimalBuyEvent charges all come from one place.
+--- Deliberately NO log line here: this runs per row per refresh. The
+--- once-per-population TRACE digest at the end of reloadAnimalList carries it.
 --- @param list table
 --- @param section number
 --- @param index number
@@ -1345,11 +1371,12 @@ function RLMenuBuyFrame:populateCellForItemInSection(list, section, index, cell)
         nameCell:setVisible(hasBaseName)
     end
 
-    -- Populate inherited `price` cell with the dealer-marked-up buy price.
-    -- 1.075 dealer markup matches the in-game buy-screen pricing.
+    -- Populate inherited `price` cell with the dealer-marked-up buy price,
+    -- resolved through the buy service so the row, the cart total and the
+    -- charged amount all come from one call.
     local priceCell = cell:getAttribute("price")
     if priceCell ~= nil and item.cluster ~= nil then
-        local buyPrice = (item.cluster:getSellPrice() or 0) * 1.075
+        local buyPrice = RLAnimalBuyService.computeBuyPrice(item.cluster)
         if priceCell.setValue ~= nil then
             priceCell:setValue(buyPrice)
         else

@@ -19,8 +19,10 @@
     it expects stored values to be negative. A positive dispatch credits the
     farm.
 
-    Price markup: dealer sell price = cluster:getSellPrice() * 1.075
-    (see AnimalItemNew).
+    Price markup: dealer buy price = cluster:getSellPrice() *
+    RLDealerQualityResolver.getMarkup(), i.e. the markup of the active
+    dealer-quality preset (see AnimalItemNew, which resolves through the same
+    accessor, so the displayed and charged prices cannot drift apart).
 
     Error mapping: delegates to AnimalScreenDealerFarm.BUY_ERROR_CODE_MAPPING
     (shape `[code] = { warning = bool, text = i18n_key }`). Do NOT define a
@@ -39,18 +41,20 @@ RLAnimalBuyService = {}
 
 
 --- Compute the dealer-marked-up buy price for a single animal.
+--- Deliberately TRACE-FREE: the dealer row-render path calls this once per row
+--- per refresh, so a per-call log line would fire per row. The once-per-population
+--- TRACE digest in RLMenuBuyFrame carries this information instead.
 --- @param animal table Animal/cluster object
---- @return number price Dealer buy price (positive): getSellPrice() * 1.075
+--- @return number price Dealer buy price (positive): getSellPrice() * the active preset's markup
 function RLAnimalBuyService.computeBuyPrice(animal)
     if animal == nil then
         Log:warning("RLAnimalBuyService.computeBuyPrice: nil animal")
         return 0
     end
 
-    -- 1.075 dealer markup (matches AnimalItemNew)
-    local price = (animal:getSellPrice() or 0) * 1.075
-    Log:trace("RLAnimalBuyService.computeBuyPrice: price=%.0f", price)
-    return price
+    -- Buy-side dealer markup, resolved from the active dealer-quality preset
+    -- (matches AnimalItemNew, which resolves through the same accessor).
+    return (animal:getSellPrice() or 0) * RLDealerQualityResolver.getMarkup()
 end
 
 
@@ -67,10 +71,13 @@ function RLAnimalBuyService.computeBulkTotal(animals)
         return 0, 0, 0, 0
     end
 
+    -- Resolve the markup ONCE for the whole batch rather than per animal: it is
+    -- a single active preset, and the accessor logs on change.
+    local markup = RLDealerQualityResolver.getMarkup()
     local totalPrice = 0
     local totalFee = 0
     for _, animal in ipairs(animals) do
-        totalPrice = totalPrice + (animal:getSellPrice() or 0) * 1.075
+        totalPrice = totalPrice + (animal:getSellPrice() or 0) * markup
         totalFee = totalFee + (animal:getTranportationFee(1) or 0)
     end
 
@@ -268,9 +275,13 @@ end
 --- the all-rejected error surface (the LEDGER MECHANISM mirrors RLAnimalMoveService.filterMovableAnimals,
 --- which returns a tuple - a different shape, deliberately not copied here).
 ---
---- Pure / dual-run: takes the destination + validate as parameters; computeBuyPrice is pure
---- (reads animal:getSellPrice). The only call onto the destination is getNumOfFreeAnimalSlots,
---- so a headless test drives it with a mock destination and an injected validator.
+--- Pure / dual-run: takes the destination + validate as parameters. computeBuyPrice reads
+--- animal:getSellPrice AND, since the dealer-quality preset landed, two module globals
+--- (RLDealerQualityResolver -> RLDealerQualityModel) which in turn read RLSettings behind a
+--- nil guard; it stays dual-runnable because the resolver degrades to DEFAULT_INDEX when no
+--- settings global is present, which is exactly the headless state. The only call onto the
+--- destination is getNumOfFreeAnimalSlots, so a headless test drives it with a mock
+--- destination and an injected validator.
 --- @param destination table Buy destination (the held trailer); capacity read via getNumOfFreeAnimalSlots
 --- @param animals table|nil Array of Animal/cluster refs to buy (nil -> empty result)
 --- @param ownerFarmId number Owning farm id passed to the validator (trailer:getOwnerFarmId())

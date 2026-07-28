@@ -228,6 +228,13 @@ source(modDirectory .. "scripts/events/RLDealerSaleSetEvent.lua")
 -- RealisticLivestock_AnimalSystem and AnimalItemNew does not matter.
 source(modDirectory .. "scripts/dealer/RLDealerQualityModel.lua")
 
+-- The active-preset resolver: which preset this machine is on, and the buy-side
+-- markup that follows. Sourced after the model because it dereferences
+-- RLDealerQualityModel.DEFAULT_INDEX at file scope to seed its log memo; every
+-- other reference is at CALL time, so the order is defensive, not load-bearing.
+-- Reads RLSettings only through a nil guard, so it loads before settings exist.
+source(modDirectory .. "scripts/dealer/RLDealerQualityResolver.lua")
+
 -- SECTION 12: GUI Elements
 source(modDirectory .. "scripts/gui/elements/DoubleOptionSliderElement.lua")
 source(modDirectory .. "scripts/gui/elements/RenderElement.lua")

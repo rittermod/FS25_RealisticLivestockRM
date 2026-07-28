@@ -49,7 +49,7 @@ end
 --- @param animalTypeIndex integer|nil AnimalType for genetics/lactating row gates
 --- @param callback function consumer callback fired on OK
 --- @param target table|nil callback target (called via `callback(target, filters, items)`)
---- @param isBuyMode boolean true when opened from Buy frame; applies the 1.075 markup to Value
+--- @param isBuyMode boolean true when opened from Buy frame; applies the active dealer-quality preset's markup to Value
 --- @param allowSave boolean|nil opt-in to render the Save filter button (default false; only the four RLMenu frames pass true; legacy R-key AnimalScreen path keeps default false)
 --- @param sourceUsage string|nil canonical RLFilterUsage value derived from the source frame (OWNED for Info/Sell/Move, DEALER for Buy); threaded into the saved-filter payload when the user clicks Save
 function AnimalFilterDialog.show(items, animalTypeIndex, callback, target, isBuyMode, allowSave, sourceUsage)
@@ -423,12 +423,17 @@ function AnimalFilterDialog:onOpen()
 
                 value = animal[filter.target](animal)
 
-                -- Mirror the buy-mode markup applied in applyFilters (line
-                -- ~628) so filter.min / filter.max are derived in the SAME
-                -- space the predicate later compares against. Without this,
-                -- top-of-range items would compare value*1.075 > raw_max
-                -- and silently drop after dialog OK.
-                if filter.target == "getSellPrice" and self.isBuyMode then value = value * 1.075 end
+                -- Mirror the buy-mode markup applied in applyFilters (the
+                -- matching site is in applyFilters, keyed off the same
+                -- filter.target == "getSellPrice" test) so filter.min /
+                -- filter.max are derived in the SAME space the predicate later
+                -- compares against. Without this, top-of-range items would
+                -- compare marked-up value > raw_max and silently drop after
+                -- dialog OK. Both sites resolve the markup through the same
+                -- accessor, so they cannot drift apart when the preset changes.
+                if filter.target == "getSellPrice" and self.isBuyMode then
+                    value = value * RLDealerQualityResolver.getMarkup()
+                end
 
             else
 
@@ -922,8 +927,13 @@ function AnimalFilterDialog.applyFilters(items, filters, isBuyMode)
                     value = animal[filter.target](animal)
 
                     -- Key off the stable function-name target, NOT the
-                    -- localized filter.name (e.g. "Wert", "Valor").
-                    if filter.target == "getSellPrice" and isBuyMode then value = value * 1.075 end
+                    -- localized filter.name (e.g. "Wert", "Valor"). The markup
+                    -- resolves through the same accessor the range derivation
+                    -- uses, keeping the filter space and the displayed price
+                    -- one space under every dealer-quality preset.
+                    if filter.target == "getSellPrice" and isBuyMode then
+                        value = value * RLDealerQualityResolver.getMarkup()
+                    end
 
                 else
 

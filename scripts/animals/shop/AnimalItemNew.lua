@@ -157,7 +157,8 @@ end
 
 function AnimalItemNew:getPrice()
 
-	return self.cachedSellPrice * 1.075
+	-- Buy-side dealer markup, resolved from the active dealer-quality preset.
+	return self.cachedSellPrice * RLDealerQualityResolver.getMarkup()
 
 end
 

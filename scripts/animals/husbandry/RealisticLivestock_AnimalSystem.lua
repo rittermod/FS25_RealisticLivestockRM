@@ -1545,7 +1545,30 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
 
     local genetics = RLGeneticsDraw.draw(traitKeys)
 
-  
+    -- Reshape the base draw into the active dealer-quality preset's band. This
+    -- MUST sit before Animal.new: stored health (:1556), the targetWeight
+    -- derivation in the constructor, the disease pass and the pregnant-offspring
+    -- bands all read this table, so reshaping afterwards would leave them on the
+    -- unreshaped values. It must also stay BEFORE the name draw below: under a
+    -- non-default preset the reshape consumes an outlier draw from the SHARED
+    -- math.random stream, so moving it past the name draw would change which
+    -- animals get names. Standard is the identity preset - it returns the table
+    -- unchanged and consumes no draw at all.
+    local presetIndex = RLDealerQualityResolver.getActiveIndex()
+    local reshaped, wasOutlier = RLDealerQualityModel.reshapeGenetics(genetics, presetIndex)
+
+    if reshaped ~= nil then
+        genetics = reshaped                     -- MUST reassign: reshapeGenetics is non-mutating
+        Log:debug("createNewSaleAnimal: reshaped genetics preset=%d(%s) outlier=%s met=%.3f qua=%.3f fer=%.3f hea=%.3f prd=%s",
+            presetIndex, RLDealerQualityModel.getPreset(presetIndex).key, tostring(wasOutlier),
+            genetics.metabolism, genetics.quality, genetics.fertility, genetics.health,
+            genetics.productivity ~= nil and string.format("%.3f", genetics.productivity) or "-")
+    else
+        Log:warning("createNewSaleAnimal: reshapeGenetics returned nil (preset=%s); keeping raw genetics",
+            tostring(presetIndex))
+    end
+
+
     local name
     
     if math.random() >= 0.85 then name = g_currentMission.animalNameSystem:getRandomName(animalGender) end

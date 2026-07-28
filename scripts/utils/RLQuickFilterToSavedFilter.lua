@@ -100,8 +100,9 @@ local function convertSliderRow(filter, appendChild)
     end
 
     -- getSellPrice -> dropped with warning. The catalog has no `getSellPrice`
-    -- field and the QF buy-mode 1.075 markup is dialog-layer only; saving the
-    -- raw value would silently match different animals across Info/Sell/Buy.
+    -- field and the QF buy-mode markup (the active dealer-quality preset's,
+    -- resolved at evaluation time) is dialog-layer only; saving the raw value
+    -- would silently match different animals across Info/Sell/Buy.
     if (not filter.isLayered) and filter.target == "getSellPrice" then
         Log:trace("RLQuickFilterToSavedFilter.convertSliderRow: getSellPrice narrowed (left=%d right=%d); dropping with warning",
             left, right)
