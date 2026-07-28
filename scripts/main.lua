@@ -219,6 +219,15 @@ source(modDirectory .. "scripts/dealer/RLDealerSaleWire.lua")
 source(modDirectory .. "scripts/events/RLDealerSaleStateEvent.lua")
 source(modDirectory .. "scripts/events/RLDealerSaleSetEvent.lua")
 
+-- SECTION 11m: Dealer quality - pure preset model. Preset table (genetics band +
+-- price markup + outlier chance) and the reshape math; data-in/data-out, no game
+-- state at load. Reads RLConstants (SECTION 2c) at file scope for the genetics
+-- domain, so it must load after it. Nothing calls it yet; it is sourced so the
+-- global class table exists for the in-game rlTest suite, and the generation and
+-- price call sites reach it at CALL time only, which is why its order relative to
+-- RealisticLivestock_AnimalSystem and AnimalItemNew does not matter.
+source(modDirectory .. "scripts/dealer/RLDealerQualityModel.lua")
+
 -- SECTION 12: GUI Elements
 source(modDirectory .. "scripts/gui/elements/DoubleOptionSliderElement.lua")
 source(modDirectory .. "scripts/gui/elements/RenderElement.lua")
