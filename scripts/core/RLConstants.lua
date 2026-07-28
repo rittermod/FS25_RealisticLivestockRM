@@ -202,4 +202,16 @@ RLConstants.DEWAR_QUANTITIES = {
 }
 
 
+-- Genetics domain bounds. Every genetics trait value the mod generates, stores
+-- or transports lives in [GENETICS_MIN, GENETICS_MAX]. This is the intended one
+-- home for the domain: RLGeneticsDraw reads these rather than carrying its own
+-- copies, and new consumers are expected to do the same. Retrofitting the
+-- literals that predate this constant is tracked separately and NOT done yet,
+-- so hardcoded 0.25 / 1.75 / 1.5 still survive across the tree. GENETICS_SPAN is
+-- DERIVED, never a literal, so it cannot drift from the bounds it summarises.
+RLConstants.GENETICS_MIN = 0.25
+RLConstants.GENETICS_MAX = 1.75
+RLConstants.GENETICS_SPAN = RLConstants.GENETICS_MAX - RLConstants.GENETICS_MIN
+
+
 Log:info("RLConstants loaded")

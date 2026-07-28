@@ -103,6 +103,10 @@ source(modDirectory .. "scripts/bridge/RLModBridge.lua")
 
 -- SECTION 11b: Breeding Mathematics
 source(modDirectory .. "scripts/animal/BreedingMath.lua")
+-- Pure sale-animal genetics draw. Leaf module (RmLogging + RLConstants only) and
+-- resolved at call time by AnimalSystem:createNewSaleAnimal, so this later slot
+-- is safe despite AnimalSystem sourcing earlier.
+source(modDirectory .. "scripts/animal/RLGeneticsDraw.lua")
 
 -- SECTION 11c: Horse Logic (delegate module, sourced before Animal.lua)
 source(modDirectory .. "scripts/animal/AnimalHorse.lua")

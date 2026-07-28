@@ -1423,6 +1423,8 @@ end
 --- isPregnant + reproduction) - mirrors the in-game pen-side cleanup so the
 --- invariant `isPregnant <=> pregnancy ~= nil` holds for sale animals too.
 --- Age picker honours per-visual `canBeBought` via `_pickSaleAnimalAge`.
+--- Genetics come from `RLGeneticsDraw.draw`, which is called before `Animal.new`
+--- so stored health, genetic diseases and offspring all derive from them.
 --- @param animalTypeIndex number Index into the animal-type registry
 --- @return table|nil animal Newly built sale animal, or nil if the animal-type lookup fails
 function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
@@ -1534,15 +1536,14 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
     local uniqueId = RLAnimalUtil.generateUniqueId(farmId, lastAnimalId)
 
 
-    local geneticsModifier = farmQuality * 1000
-    local genetics = {
-        ["metabolism"] = math.clamp(math.random(geneticsModifier - 300, geneticsModifier + 300) / 1000, 0.25, 1.75),
-        ["quality"] = math.clamp(math.random(geneticsModifier - 300, geneticsModifier + 300) / 1000, 0.25, 1.75),
-        ["fertility"] = math.clamp(math.random(geneticsModifier - 300, geneticsModifier + 300) / 1000, 0.25, 1.75),
-        ["health"] = math.clamp(math.random(geneticsModifier - 300, geneticsModifier + 300) / 1000, 0.25, 1.75)
-    }
+    -- Genetics come from the shared bell draw, which centres every sale animal
+    -- on its own base quality rather than on the source farm's. Productivity is
+    -- drawn only for the types that carry it.
+    local traitKeys = (animalTypeIndex == AnimalType.COW or animalTypeIndex == AnimalType.SHEEP
+        or animalTypeIndex == AnimalType.CHICKEN)
+        and RLGeneticsDraw.TRAITS_WITH_PRODUCTIVITY or RLGeneticsDraw.TRAITS_BASE
 
-    if animalTypeIndex == AnimalType.COW or animalTypeIndex == AnimalType.SHEEP or animalTypeIndex == AnimalType.CHICKEN then genetics.productivity = math.clamp(math.random(geneticsModifier - 300, geneticsModifier + 300) / 1000, 0.25, 1.75) end
+    local genetics = RLGeneticsDraw.draw(traitKeys)
 
   
     local name
