@@ -280,7 +280,7 @@ end
 
 function AIAnimalManager:loadFromXMLFile(xmlFile, baseKey)
 
-	local key = self.isProfile and basekey or (baseKey .. ".AIAnimalManager")
+	local key = self.isProfile and baseKey or (baseKey .. ".AIAnimalManager")
 	local settings = self.settings
 
 
