@@ -11,6 +11,47 @@ local modDirectory = g_currentModDirectory
 -- re-sources every mod file on each load, so this resets to false then.
 local warnedReshapeReturnedNil = false
 
+-- Absolute upper bound, in game days, on how long one animal may sit on the
+-- dealer's shelf. It backstops the genetics retention roll in onHourChanged,
+-- whose threshold can reach or exceed 1.0 and then never rotates that listing
+-- again for the rest of the playthrough.
+--
+-- Why 2 and not some other number: `animal.sale.day` is a whole-day counter, so
+-- nothing below 1 day is expressible without adding a persisted field. 1 day
+-- wipes and regenerates the entire shelf daily, and 7/14/30 leave the runaway
+-- essentially unbounded - which leaves 2 and 3 as the only usable values, with 2
+-- measuring the flatter shelf at a generation rate the mod already sustains.
+--
+-- What the constant actually bounds is the FROZEN tail, not ordinary stock: a
+-- healthy listing at a mean around 1.0 is rotated by the roll long before it
+-- reaches either candidate value, so 2-vs-3 is nearly inert for it. The cap
+-- earns its place only where the roll cannot act at all.
+local SALE_LISTING_MAX_AGE_DAYS = 2
+
+-- Published so tests pin the boundary against the real value instead of a magic
+-- offset, and so raising it does not turn every age fixture into a silent lie.
+AnimalSystem.SALE_LISTING_MAX_AGE_DAYS = SALE_LISTING_MAX_AGE_DAYS
+
+-- One-shot warning latches for the hourly sale-pool rotation. ONE flag PER
+-- DETECTION SITE, never one shared flag: these causes are independent, and a
+-- fired warning must not silence a different diagnostic. The sites sit inside
+-- the per-listing loop, so an unlatched WARNING would fire once per bad listing
+-- per type every game hour. Lifetime is the MAP LOAD: FS25 re-sources every mod
+-- file on each load, so every flag resets then.
+--
+-- Grouped in one table only so the suite can restore them after driving a
+-- deliberately-malformed fixture through the real tick; each key is still its
+-- own independent latch.
+local saleRotationWarnLatches = {
+    badDay = false,
+    saleDay = false,
+    age = false,
+    band = false,
+    genetics = false,
+    geneticsEmpty = false,
+    geneticsMean = false,
+}
+
 
 local function getDaysInMonth(month)
     -- Nil-guard retained as defensive pattern for load-order safety
@@ -1897,6 +1938,236 @@ function AnimalSystem:removeAIAnimal(animalTypeIndex, countryIndex, farmId, uniq
 end
 
 
+--- Read an animal's birth country without ever raising. A listing corrupt enough
+--- to reach a malformed branch may carry a `birthday` that is not a table at all,
+--- and `tostring` protects the RESULT of an index, not the index itself - so a
+--- bare `birthday.country` in a diagnostic would raise on exactly the animals the
+--- diagnostic exists to describe.
+---@param animal table The listing
+---@return any country The birth country, or nil when it cannot be read
+local function safeBirthCountry(animal)
+    local birthday = animal.birthday
+    if type(birthday) ~= "table" then return nil end
+    return birthday.country
+end
+
+
+--- Name a listing whose rotation inputs could not be evaluated, ONCE per map load
+--- per detection site.
+---
+--- The latch is set AFTER the log call returns, not before: setting it first means
+--- a diagnostic that raises leaves the latch burnt, silencing every later listing
+--- that hits the same site while never having produced the message it consumed.
+---@param latchKey string Key into `saleRotationWarnLatches` - one per detection site
+---@param animal table The listing being rotated
+---@param detail string What specifically could not be read
+local function warnMalformedSaleListing(latchKey, animal, detail)
+    if saleRotationWarnLatches[latchKey] then return end
+
+    Log:warning("Dealer listing could not be evaluated and was rotated off the shelf (%s): "
+        .. "farmId=%s uniqueId=%s country=%s. Further listings failing the same check "
+        .. "this map load rotate silently.",
+        tostring(detail), tostring(animal.farmId), tostring(animal.uniqueId),
+        tostring(safeBirthCountry(animal)))
+
+    saleRotationWarnLatches[latchKey] = true
+end
+
+
+--- Reset every rotation warning latch. Test-only seam: the wiring suite drives a
+--- deliberately-malformed fixture through the real tick, which would otherwise
+--- consume a production latch and silence the first genuine corrupt listing of the
+--- session.
+function AnimalSystem._resetSaleRotationWarnLatches()
+    for key in pairs(saleRotationWarnLatches) do
+        saleRotationWarnLatches[key] = false
+    end
+end
+
+
+--- Per-listing rotation decision at TRACE. Every argument is passed raw and
+--- formatted only past the level check, so below TRACE the loop pays the call and
+--- not the formatting.
+---
+--- `listed-today` is deliberately NOT traced. It is by far the most common reason
+--- on a healthy shelf and the least informative, and at a large `maxDealerAnimals`
+--- across five types tracing it would put five figures of lines per game day into
+--- the log a maintainer just enabled to investigate something else.
+---@param animal table The listing being decided
+---@param reason string The decision reason
+---@param age number|nil Listing age in days, when it could be computed
+---@param averageGenetics number|nil Mean genetics, when it could be read
+---@param threshold number|nil Retention threshold, when the roll was reached
+---@param roll number|nil The value drawn, when the roll was reached
+local function traceSaleDecision(animal, reason, age, averageGenetics, threshold, roll)
+    if reason == "listed-today" then return end
+    if Log.level < RmLogging.LOG_LEVEL.TRACE then return end
+
+    Log:trace("Dealer rotation: reason=%s farmId=%s uniqueId=%s country=%s age=%s genetics=%s threshold=%s roll=%s",
+        reason, tostring(animal.farmId), tostring(animal.uniqueId),
+        tostring(safeBirthCountry(animal)),
+        tostring(age), tostring(averageGenetics), tostring(threshold), tostring(roll))
+end
+
+
+--- Decide whether one dealer sale listing rotates off the shelf this tick.
+---
+--- TOTAL over every listing the caller hands it, the same-day case included, so
+--- there is exactly one decision site. Reasons, in the order they are tested:
+---
+---   `bad-day`      keep. The tick's own day counter is unusable. That is a
+---                  whole-tick condition rather than this animal's fault, so it
+---                  carries its own latch rather than spending a per-listing one.
+---   `malformed`    rotate. This listing's own inputs cannot be evaluated -
+---                  absent sale day, age running backwards, unreadable genetics,
+---                  or an unusable band. Rotating it is what unsticks it; the
+---                  latched WARNING is what makes it visible instead of being
+---                  silently absorbed by the age cap below.
+---   `listed-today` keep. Reads no genetics and consumes no roll.
+---   `age`          rotate. At or over the absolute cap, whatever the genetics
+---                  say. Consumes no roll.
+---   `genetics`     the inherited retention roll, arithmetic unchanged.
+---
+--- Malformed is tested BEFORE the AGE CAP on purpose: the cap alone would evict
+--- an unevaluable listing after two days with no diagnostic at all, which is
+--- precisely the silent freeze this branch exists to surface. It is NOT tested
+--- before `listed-today` - a listing made today reads no genetics at all, so an
+--- unevaluable one is classified on the next day's tick rather than this one.
+---
+---@param animal table Sale listing; the caller has already proven `animal.sale` exists
+---@param day number Current monotonic day
+---@param bandMidpoint number Midpoint of the active dealer-quality band
+---@param randomFn function|nil Zero-arg, returning a float in `[0, 1)`; defaults to
+---       `math.random`. This is NOT the `_pickSaleAnimalAge` seam, which is
+---       `function(lo, hi) -> int` - injecting that shape here compares an integer
+---       against a fraction and rotates every listing.
+---@return boolean shouldRotate
+---@return string reason One of `bad-day`, `malformed`, `listed-today`, `age`, `genetics`
+function AnimalSystem._shouldRotateSaleAnimal(animal, day, bandMidpoint, randomFn)
+
+    -- A whole-tick condition, so it gets its own latch rather than spending a
+    -- per-listing one. It still WARNS: without that, an unusable day counter keeps
+    -- every listing every hour forever with nothing above TRACE ever saying so -
+    -- the same silent freeze this predicate exists to end, merely relocated.
+    -- `not (day > 0)` also rejects a NaN day.
+    if type(day) ~= "number" or not (day > 0) then
+        if not saleRotationWarnLatches.badDay then
+            Log:warning("Dealer rotation is halted: the current day is %s, so no listing age can be "
+                .. "computed and nothing will rotate off the shelf until it is usable again.",
+                tostring(day))
+            saleRotationWarnLatches.badDay = true
+        end
+        traceSaleDecision(animal, "bad-day")
+        return false, "bad-day"
+    end
+
+    local saleDay = animal.sale.day
+
+    -- The caller's `animal.sale ~= nil` guard proves the TABLE exists, not the
+    -- field; the savegame writer tests `sale.day ~= nil` separately for the same
+    -- reason. `day - nil` would raise.
+    if type(saleDay) ~= "number" then
+        warnMalformedSaleListing("saleDay", animal, "sale day is " .. type(saleDay))
+        traceSaleDecision(animal, "malformed")
+        return true, "malformed"
+    end
+
+    local age = day - saleDay
+
+    -- `not (age >= 0)` rather than `age < 0`, because this test also has to catch a
+    -- NaN age - and every comparison against NaN is false, so `age < 0` would wave
+    -- it through. A NaN age then fails `== 0` and `>= the cap` too, reaching the
+    -- roll where `roll >= NaN` is false as well: a listing that never rotates for
+    -- any reason and never warns. That is precisely the permanent freeze this
+    -- predicate exists to bound, so the cap must not be the only thing guarding it.
+    --
+    -- A negative age is reachable from a dealer pool carried into a save whose day
+    -- counter is lower than the one the listing was stamped under.
+    if not (age >= 0) then
+        warnMalformedSaleListing("age", animal,
+            string.format("listing age is unusable (saleDay=%s, day=%s, age=%s)",
+                tostring(saleDay), tostring(day), tostring(age)))
+        traceSaleDecision(animal, "malformed", age)
+        return true, "malformed"
+    end
+
+    if age == 0 then
+        traceSaleDecision(animal, "listed-today", age)
+        return false, "listed-today"
+    end
+
+    -- Band before genetics: it divides the threshold, so an unusable one would
+    -- otherwise reach the arithmetic as a nil operand or a division by zero.
+    if type(bandMidpoint) ~= "number" or not (bandMidpoint > 0) then
+        warnMalformedSaleListing("band", animal, "dealer band midpoint is " .. tostring(bandMidpoint))
+        traceSaleDecision(animal, "malformed", age)
+        return true, "malformed"
+    end
+
+    -- Checked before `pairs`, which raises on a nil table.
+    if type(animal.genetics) ~= "table" then
+        warnMalformedSaleListing("genetics", animal, "genetics is " .. type(animal.genetics))
+        traceSaleDecision(animal, "malformed", age)
+        return true, "malformed"
+    end
+
+    -- Numeric traits only. The inherited loop tested `value ~= nil`, which `pairs`
+    -- can never falsify, so it admitted anything - and a string or table trait then
+    -- raised inside the arithmetic. Skipping non-numbers keeps a corrupt entry from
+    -- taking the tick down, at the cost of computing the mean over the survivors; a
+    -- table with NO numeric trait still lands in the malformed branch below.
+    local geneticQuality = 0
+    local totalGenetics = 0
+
+    for _, value in pairs(animal.genetics) do
+        if type(value) == "number" then
+            totalGenetics = totalGenetics + 1
+            geneticQuality = geneticQuality + value
+        end
+    end
+
+    if totalGenetics == 0 then
+        warnMalformedSaleListing("geneticsEmpty", animal, "genetics carries no readable traits")
+        traceSaleDecision(animal, "malformed", age)
+        return true, "malformed"
+    end
+
+    local averageGenetics = geneticQuality / totalGenetics
+
+    -- `not (x > 0)` rather than `x == 0`, to catch three separate bad means in one
+    -- test. Zero and NaN (one NaN trait poisons the sum) both drive the threshold
+    -- somewhere no roll can reach, freezing the listing. A NEGATIVE mean does the
+    -- opposite - the threshold goes negative and every roll clears it, so the
+    -- listing would churn out on its first tick while being reported as an ordinary
+    -- `genetics` rotation. Neither outcome should be silent, so all three are
+    -- malformed. Never math.min/math.max to tame this - LuaJIT's are argument-order
+    -- dependent on NaN and would hide it rather than catch it.
+    if not (averageGenetics > 0) then
+        warnMalformedSaleListing("geneticsMean", animal, "genetics mean is " .. tostring(averageGenetics))
+        traceSaleDecision(animal, "malformed", age, averageGenetics)
+        return true, "malformed"
+    end
+
+    if age >= SALE_LISTING_MAX_AGE_DAYS then
+        traceSaleDecision(animal, "age", age, averageGenetics)
+        return true, "age"
+    end
+
+    -- Inherited retention roll, arithmetic deliberately untouched. The 1.45 factor
+    -- is exactly the premium band's midpoint, which makes the expression a double
+    -- normalisation under that preset; that is inherited too, and retuning it is not
+    -- what bounds the runaway - the cap above is.
+    local threshold = (saleDay / day) / ((averageGenetics / bandMidpoint) * 1.45)
+    local roll = (randomFn or math.random)()
+    local shouldRotate = roll >= threshold
+
+    traceSaleDecision(animal, "genetics", age, averageGenetics, threshold, roll)
+
+    return shouldRotate, "genetics"
+
+end
+
+
 function AnimalSystem:onHourChanged()
     RmSafeUtils.safeCall("AnimalSystem:onHourChanged", function()
 
@@ -1920,29 +2191,58 @@ function AnimalSystem:onHourChanged()
 
             local indexesToRemove = {}
 
+            -- Pool size counts entries carrying a sale block, which is exactly the
+            -- set the loop below decides on - so the reported size and the number
+            -- of decisions can never disagree.
+            local poolBefore = 0
+            local rotatedByAge, rotatedByGenetics, rotatedMalformed = 0, 0, 0
+            local rotatedUnclassified = 0
+
             for i, animal in pairs(animals) do
 
                 if animal.sale ~= nil then
 
-                    local saleDay = animal.sale.day
+                    poolBefore = poolBefore + 1
 
-                    if saleDay == day then continue end
+                    -- Per-listing containment. This handler's whole body is one
+                    -- safeCall xpcall, so an unguarded raise here would abort
+                    -- rotation, restock AND the broadcast for every animal type -
+                    -- a harder freeze than the one being fixed, and a silent one.
+                    -- Two defaults, not one: the failure branch returns them
+                    -- positionally, so a single-element default would hand the
+                    -- summary below a nil reason to special-case. The failure
+                    -- branch also logs an error and a callstack per animal per
+                    -- tick; that is loud by design, and the malformed guards
+                    -- inside the predicate exist so it never fires for the
+                    -- known-bad shapes. A recurring one is a real defect signal.
+                    local shouldRotate, reason = RmSafeUtils.safeAnimalCall(animal, "AnimalSystem:onHourChanged", function()
+                        return AnimalSystem._shouldRotateSaleAnimal(animal, day, bandMidpoint)
+                    end, { false, "error" })
 
-                    local geneticQuality = 0
-                    local totalGenetics = 0
+                    if shouldRotate then
 
-                    for _, value in pairs(animal.genetics) do
-                        if value ~= nil then
-                            totalGenetics = totalGenetics + 1
-                            geneticQuality = geneticQuality + value
-                        end
-                    end
-
-                    local averageGenetics = geneticQuality / totalGenetics
-
-                    if math.random() >= (saleDay / day) / ((averageGenetics / bandMidpoint) * 1.45) then
                         table.insert(indexesToRemove, i)
+
+                        -- Every rotation reason sets this: it is what triggers the
+                        -- state broadcast, and an age or malformed eviction that
+                        -- skipped it would leave clients showing listings the
+                        -- server has already removed.
                         hasChanges = true
+
+                        -- Explicit on every reason rather than an `else` catch-all:
+                        -- a catch-all silently files any future reason under
+                        -- genetics, which is invisible in the summary below and
+                        -- exactly the kind of drift a counter is supposed to expose.
+                        if reason == "age" then
+                            rotatedByAge = rotatedByAge + 1
+                        elseif reason == "malformed" then
+                            rotatedMalformed = rotatedMalformed + 1
+                        elseif reason == "genetics" then
+                            rotatedByGenetics = rotatedByGenetics + 1
+                        else
+                            rotatedUnclassified = rotatedUnclassified + 1
+                        end
+
                     end
 
                 end
@@ -1954,18 +2254,66 @@ function AnimalSystem:onHourChanged()
             end
 
             local threshold = math.random(10, self.maxDealerAnimals)
+            local creationsAttempted, creationsSucceeded = 0, 0
 
             if #animals < threshold then
 
                 for i = #animals + 1, threshold do
 
+                    creationsAttempted = creationsAttempted + 1
+
                     local animal = self:createNewSaleAnimal(animalTypeIndex)
 
                     if animal ~= nil then
                         table.insert(animals, animal)
+                        creationsSucceeded = creationsSucceeded + 1
                         hasChanges = true
                     end
 
+                end
+
+            end
+
+            local rotatedTotal = rotatedByAge + rotatedByGenetics + rotatedMalformed + rotatedUnclassified
+
+            -- Never expected: every reason the predicate can return is counted
+            -- above. Reaching this means a reason was added without updating the
+            -- summary, so say it out loud rather than let the numbers quietly
+            -- stop adding up.
+            if rotatedUnclassified > 0 then
+                Log:warning("Dealer rotation type=%d: %d listings rotated for an unrecognised reason - "
+                    .. "the per-reason counters no longer cover every branch",
+                    animalTypeIndex, rotatedUnclassified)
+            end
+
+            -- Suppressed on a quiet tick: without this the summary alone is five
+            -- lines an hour, 120 a game day, at the dev DEBUG default.
+            if rotatedTotal > 0 or creationsAttempted > 0 then
+
+                local poolAfter = 0
+
+                for _, animal in pairs(animals) do
+                    if animal.sale ~= nil then poolAfter = poolAfter + 1 end
+                end
+
+                -- Attempted and succeeded diverge when createNewSaleAnimal returns
+                -- nil - a legitimate outcome when an owner has disabled every
+                -- buyable subtype for this type - and that divergence is the thing
+                -- a reader is diagnosing, so report both rather than one "created".
+                Log:debug("Dealer rotation type=%d: pool %d -> %d, rotated %d (age=%d genetics=%d malformed=%d), restocked %d of %d attempted",
+                    animalTypeIndex, poolBefore, poolAfter, rotatedTotal,
+                    rotatedByAge, rotatedByGenetics, rotatedMalformed,
+                    creationsSucceeded, creationsAttempted)
+
+                -- A tick that clears more than half the shelf is worth finding by
+                -- grep rather than inferring from the counters above: it is what a
+                -- silted or pre-cap save does on its first tick. DEBUG, not INFO -
+                -- nothing here is actionable by a player or an admin, and in steady
+                -- state a day-granular cap makes this fire more often than "rare"
+                -- would suggest.
+                if poolBefore > 0 and rotatedTotal * 2 > poolBefore then
+                    Log:debug("Dealer shelf turnover: type=%d evicted %d of %d listings in a single tick",
+                        animalTypeIndex, rotatedTotal, poolBefore)
                 end
 
             end
