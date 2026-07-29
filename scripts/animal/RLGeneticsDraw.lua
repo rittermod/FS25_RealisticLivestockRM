@@ -33,15 +33,25 @@ local Log = RmLogging.getLogger("RLRM")
 RLGeneticsDraw.MIN = RLConstants.GENETICS_MIN
 RLGeneticsDraw.MAX = RLConstants.GENETICS_MAX
 
--- Half-width of the pre-rejection support, in domain units around the centre:
--- `q` is drawn on `[1 - H, 1 + H]`, i.e. wider than `[MIN, MAX]`, so that the
+-- Curve centre, DERIVED from the domain rather than written as a literal. The
+-- `q` mapping below used to hard-code `1`, which meant this module could not
+-- follow a change to the bounds it had just been refactored to read from one
+-- home: moving MIN or MAX alone silently produced an off-centre, mis-scaled bell
+-- and drove the rejection rate toward MAX_ATTEMPTS exhaustion, which only WARNs.
+-- Deriving it closes that coupling (RLRM-556 review F6, Ritter 2026-07-29).
+--
+-- Behaviour is unchanged for the shipped domain: `(0.25 + 1.75) / 2` is exactly
+-- `1.0`, the value the literal carried.
+RLGeneticsDraw.CENTRE = (RLGeneticsDraw.MIN + RLGeneticsDraw.MAX) / 2
+
+-- Half-width of the pre-rejection support, in domain units around CENTRE: `q` is
+-- drawn on `[CENTRE - H, CENTRE + H]`, i.e. wider than `[MIN, MAX]`, so that the
 -- rejection step returns a bell whose tails reach the domain limits instead of
 -- a bell truncated to a plateau.
 --
--- COUPLING (there is no runtime check for it): the `q` mapping below hard-codes
--- a centre of 1.0, so the curve is only centred on the domain while
--- `(MIN + MAX) / 2 == 1.0`. Moving MIN or MAX alone silently yields an
--- off-centre bell - move the centre with them.
+-- H itself is still a hand-picked curve constant, NOT derived - it sets how much
+-- of the bell's body survives rejection, which is a shape decision rather than a
+-- consequence of the domain. Retuning it is Ask First per the spec's Boundaries.
 RLGeneticsDraw.H = 1.5
 
 -- Per-trait spread around the animal's base quality: `uniform(-JITTER, +JITTER)`.
@@ -125,7 +135,10 @@ function RLGeneticsDraw.draw(traitKeys, randomFn)
     for attempt = 1, RLGeneticsDraw.MAX_ATTEMPTS do
         -- Bates-3: the mean of three uniforms, stretched onto [1 - H, 1 + H].
         local qUnit = (randomFn() + randomFn() + randomFn()) / 3
-        local q = (1 - RLGeneticsDraw.H) + 2 * RLGeneticsDraw.H * qUnit
+        -- CENTRE, not a literal 1: the curve follows the domain if either bound
+        -- ever moves. Identical arithmetic for the shipped domain, where CENTRE
+        -- is exactly 1.0 (RLRM-556 review F6).
+        local q = (RLGeneticsDraw.CENTRE - RLGeneticsDraw.H) + 2 * RLGeneticsDraw.H * qUnit
 
         local values = {}
         local inRange = true
@@ -151,8 +164,17 @@ function RLGeneticsDraw.draw(traitKeys, randomFn)
             -- TRACE, not DEBUG: this fires once per generated sale animal
             -- (hundreds per dealer reset). The per-trait values double as the
             -- live sample dump for verifying the distribution in a play session.
-            Log:trace("RLGeneticsDraw: accept attempts=%d q=%.4f %s",
-                attempt, q, formatTraitValues(traitKeys, values))
+            --
+            -- Level-guarded: RmLogger:trace checks the level INSIDE the method,
+            -- so `formatTraitValues` - a table alloc, N string.format calls and a
+            -- table.concat - was being paid on EVERY accepted draw at every
+            -- level, ERROR included (~1,250 formats per default dealer reset).
+            -- Mirrors the guards at `RealisticLivestock_AnimalSystem`
+            -- (createNewSaleAnimal) and `RLMenuBuyFrame` (the dealer-list digest).
+            if Log.level >= RmLogging.LOG_LEVEL.TRACE then
+                Log:trace("RLGeneticsDraw: accept attempts=%d q=%.4f %s",
+                    attempt, q, formatTraitValues(traitKeys, values))
+            end
 
             if attempt > RLGeneticsDraw.DEBUG_ATTEMPT_THRESHOLD then
                 Log:debug("RLGeneticsDraw: accepted only after %d attempts (threshold %d)",

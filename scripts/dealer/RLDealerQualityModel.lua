@@ -39,7 +39,10 @@ local Log = RmLogging.getLogger("RLRM")
 
 -- Genetics domain: ONE home, RLConstants. This module re-exports rather than
 -- re-declaring, so the sibling dealer-quality slices have a single name to
--- consume without a second copy of the bounds existing anywhere.
+-- consume without a second DECLARATION of the bounds existing anywhere. Other
+-- modules re-export the same constants under their own names (`RLGeneticsDraw`
+-- publishes `.MIN` / `.MAX`); those are additional NAMES for one declaration,
+-- not second copies of the values.
 RLDealerQualityModel.GENETICS_MIN  = RLConstants.GENETICS_MIN
 RLDealerQualityModel.GENETICS_MAX  = RLConstants.GENETICS_MAX
 RLDealerQualityModel.GENETICS_SPAN = RLConstants.GENETICS_SPAN
@@ -267,12 +270,19 @@ end
 --- Remap one genetics value from the full domain onto `[lo, hi]`.
 ---
 --- The identity short-circuit (`lo == GENETICS_MIN and hi == GENETICS_MAX`) is
---- load-bearing, not an optimization: the generic path would compute
---- `MIN + ((x - MIN) / SPAN) * SPAN`, and in IEEE-754 doubles that is not
---- exactly `x` for every `x`, so the bit-for-bit identity claim would fail on
---- some inputs and fail nondeterministically across the value space. It keys on
---- the BAND, not on the preset index, so any future full-range preset inherits
---- the zero-arithmetic path automatically.
+--- DEFENSIVE against a future non-dyadic domain, not an optimization: the
+--- generic path would compute `MIN + ((x - MIN) / SPAN) * SPAN`, which in
+--- IEEE-754 doubles is not exactly `x` for an arbitrary MIN/SPAN.
+---
+--- For the SHIPPED constants it IS exact - `MIN = 0.25` is dyadic and
+--- `SPAN = 1.5` round-trips cleanly, measured at 0 mismatches over a
+--- 1,000,001-point dense sweep and 500,000 random samples (2026-07-29). So this
+--- branch is not what makes today's bit-for-bit claim true; it is what keeps it
+--- true if either bound ever moves off a dyadic value. Do not remove it on the
+--- strength of "the numbers work without it" - they do, for now.
+---
+--- It keys on the BAND, not on the preset index, so any future full-range preset
+--- inherits the zero-arithmetic path automatically.
 ---
 --- This leaf logs nothing but its own one-shot input warnings: a full repopulate
 --- calls it hundreds to thousands of times. The per-trait TRACE line lives in
@@ -294,8 +304,13 @@ function RLDealerQualityModel.applyBand(rolled, lo, hi)
                     tostring(rolled), lo)
                 _warnedInvalidRolledBanded = true
             end
-            -- Band-consistent floor, NOT the domain minimum: handing the worst
-            -- genetics in the domain to a premium animal is the defect this closes.
+            -- Band-consistent floor, NOT the domain minimum: on the BANDED path,
+            -- handing the worst genetics in the domain to a premium animal is the
+            -- defect this closes. The outlier path in `reshapeGenetics` is the
+            -- deliberate exception, not a contradiction: an outlier skips this
+            -- function entirely and keeps its raw roll, which under premium can
+            -- legitimately sit below the band. Malformed INPUT is what gets the
+            -- band-consistent floor; a deliberate band skip is not malformed.
             return lo
         end
 
@@ -372,8 +387,15 @@ end
 ---     the values nor the RNG stream.
 ---
 --- Non-mutating: the input table is never written, and a NEW table is returned
---- under every preset. The copy is SHALLOW - genetics tables are a flat map of
---- scalar members, which is the contract this module assumes.
+--- under every preset. What lands in it is PATH-DEPENDENT, and the difference
+--- matters for a malformed input:
+---   - identity band and outlier: a plain copy, so the copy is SHALLOW and a
+---     non-scalar member is ALIASED between input and output. Genetics tables
+---     are a flat map of scalars today, which is the contract this module
+---     assumes, but a future nested member would be shared.
+---   - banded: every member is routed through `applyBand`, so the result is
+---     all-numeric by construction - a non-number member is replaced by the band
+---     floor (with a one-shot WARNING from the leaf), never aliased.
 ---@param genetics any The animal's genetics table (runtime data; may be malformed)
 ---@param presetIndex any Index of the active preset
 ---@param rng function|nil Zero-arg RNG returning a float in `[0, 1)`. TRUSTED
@@ -415,25 +437,48 @@ function RLDealerQualityModel.reshapeGenetics(genetics, presetIndex, rng)
             result[key] = value
         end
 
-        Log:debug("RLDealerQualityModel.reshapeGenetics: outlier animal under preset '%s' - band skipped, raw roll kept",
+        -- TRACE, not DEBUG: this is a per-item DECISION (which branch this animal
+        -- took), which `wiki/conventions/logging-levels.md` puts at TRACE - per-item
+        -- DETAIL is what belongs at DEBUG. The spec originally classified it as
+        -- detail; Ritter reclassified it as a decision (2026-07-29). A2's
+        -- per-animal reshape line stays at DEBUG: it dumps the resulting values,
+        -- which is detail, and it is level-guarded.
+        Log:trace("RLDealerQualityModel.reshapeGenetics: outlier animal under preset '%s' - band skipped, raw roll kept",
             preset.key)
 
         return result, true
     end
 
+    -- Level-guarded: RmLogger:trace checks the level INSIDE the method, so the
+    -- three tostring() calls below would be evaluated for every trait of every
+    -- animal even at ERROR - hundreds to thousands of throwaway strings per
+    -- repopulate. Mirrors the guards at `RealisticLivestock_AnimalSystem`
+    -- (createNewSaleAnimal's reshape line) and `RLMenuBuyFrame` (the dealer-list
+    -- digest). The leaf itself deliberately stays logging-free.
+    local traceEnabled = Log.level >= RmLogging.LOG_LEVEL.TRACE
+
     for key, value in pairs(genetics) do
-        if type(value) == "number" then
-            local banded = RLDealerQualityModel.applyBand(value, lo, hi)
+        -- EVERY member goes through applyBand, non-numbers included. applyBand's
+        -- isRealNumber guard already replaces anything that is not a finite
+        -- number with the band floor and warns ONCE, so a corrupt string or
+        -- table member now gets the SAME treatment as NaN/inf instead of riding
+        -- through into the sold animal (where `Animal:getSellPrice` does
+        -- `meatFactor - 1` and throws, far from the cause).
+        --
+        -- REVERSAL, Ritter 2026-07-29: the spec originally pinned "copied
+        -- verbatim" on the reasoning that a WARNING here "would fire per animal
+        -- on a corrupt save and drown the log". The one-shot latch makes that
+        -- obsolete - `_warnedInvalidRolledBanded` fires once per map load, not
+        -- once per animal - so the objection that justified the old behaviour no
+        -- longer holds. See the spec Change Log.
+        local banded = RLDealerQualityModel.applyBand(value, lo, hi)
+
+        if traceEnabled then
             Log:trace("RLDealerQualityModel.reshapeGenetics: %s %s -> %s (band [%.2f, %.2f])",
                 tostring(key), tostring(value), tostring(banded), lo, hi)
-            result[key] = banded
-        else
-            -- A corrupt member surfaces through the genetics display, not here:
-            -- a WARNING would fire per animal on a corrupt save and drown the log.
-            Log:trace("RLDealerQualityModel.reshapeGenetics: %s is %s, not a number - copied verbatim",
-                tostring(key), type(value))
-            result[key] = value
         end
+
+        result[key] = banded
     end
 
     return result, false
