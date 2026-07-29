@@ -2160,6 +2160,179 @@ function AnimalSystem.onSettingChanged(name, state)
 end
 
 
+--- Settings callback for the dealer-quality preset row.
+---
+--- Genetics are BAKED into each sale animal at construction, so a preset change
+--- only becomes visible once the pool is regenerated - the markup follows the
+--- preset live, the stock does not. This callback owns that regeneration and
+--- nothing else: persistence rides the generic RLSettings scalar codec and the
+--- broadcast is already sent by RLMenuSettingsFrame:onClickGeneralSetting, so
+--- doing either here would double up.
+---
+--- Invoked on EVERY peer and on several non-change paths (applyDefaultSettings
+--- at mission start, the full-set push on join, the relay to other clients).
+--- The guard chain below reduces that to exactly one server-side regeneration
+--- per real preset transition.
+---
+--- The regeneration enters RL_ResetDealerEvent.executeOnServer directly, NOT
+--- sendEvent / onClickResetDealer: those are the client-side REQUEST
+--- dispatchers, and from a path that has already passed the g_server gate a
+--- request would fan out one repopulate per peer and race the settings commit.
+---
+---@param name string  settings key ("dealerQuality")
+---@param value number|nil resolved option value; the preset index, or nil when
+---                       the committed state is out of range
+function AnimalSystem.onDealerQualityChanged(name, value)
+
+    local animalSystem = g_currentMission ~= nil and g_currentMission.animalSystem or nil
+
+    -- Logging rule for this function: resolve an index through getPreset ONLY
+    -- where it is already known valid - i.e. on the change path below, after the
+    -- range bail, where both indices are guaranteed in range. `previous` must be
+    -- formatted bare (tostring) on the entry line, because it is nil on every
+    -- seed - mission start and every client join - and getPreset latches a
+    -- one-shot WARNING on an invalid index. Resolving it there would warn on a
+    -- perfectly healthy install AND spend the latch, swallowing a later genuine
+    -- invalid-index warning. Log lines must not change program-visible state.
+    if animalSystem == nil then
+
+        if g_server ~= nil then
+            Log:warning("AnimalSystem.onDealerQualityChanged: animalSystem unreachable on the server (load-order regression); the preset was not applied to the stock - run Reset Animal Dealer once after the change")
+        else
+            -- Pure client: the join full-set landing before animalSystem is
+            -- built is routine timing, not a defect.
+            Log:debug("AnimalSystem.onDealerQualityChanged: animalSystem not built yet (client join timing), skipping")
+        end
+
+        return
+
+    end
+
+    -- Nil-guarded because every caller invokes this from inside an unprotected
+    -- `for name, setting in pairs(SETTINGS)` loop: raising here would abort the
+    -- REST of that loop, so every setting later in pairs() order would silently
+    -- lose its callback. Matches the nil-guard applyChange and
+    -- onClickGeneralSetting already use on the same lookup.
+    local setting = RLSettings.SETTINGS[name]
+    if setting == nil then
+        Log:warning("AnimalSystem.onDealerQualityChanged: no settings row named '%s'; ignoring", tostring(name))
+        return
+    end
+
+    -- (0) Validity bail. RL_BroadcastSettingsEvent commits the raw wire byte with
+    -- no range check, so a master client can put 0 or 4..255 into state, and the
+    -- caller then resolves values[state] to nil. Bailing here keeps that nil out
+    -- of the early commit below, where the next full-set streamWriteUInt8 could
+    -- not serialise it.
+    --
+    -- isValidIndex rather than a hand-rolled range test: it also rejects
+    -- non-numbers (a bare `value < 1` RAISES on a string) and non-integers (2.5
+    -- passes any 1..#values test, then poisons state with a value
+    -- streamWriteUInt8 truncates, and spends RLDealerQualityModel's one-shot
+    -- invalid-index warning latch from inside a log argument). It is also the
+    -- predicate the preset table itself uses, so row and model cannot disagree.
+    if not RLDealerQualityModel.isValidIndex(value) then
+
+        -- Deliberately does NOT claim "nothing was committed": on the wire path
+        -- RL_BroadcastSettingsEvent has already written the raw byte into
+        -- setting.state before this callback runs. What this bail guarantees is
+        -- that the callback does not commit it a second time (which is how a nil
+        -- would reach state and break the next full-set serialise) and does not
+        -- seed the tracker or regenerate from it.
+        Log:warning("AnimalSystem.onDealerQualityChanged: invalid preset index %s (want an integer 1..%d); not applied and the tracker was not seeded, so the NEXT preset change will be treated as a seed and will not restock either - correct the preset in Settings, then run Reset Animal Dealer",
+            tostring(value), RLDealerQualityModel.PRESET_COUNT)
+
+        return
+
+    end
+
+    local previous = animalSystem.dealerQualityApplied
+
+    Log:debug("AnimalSystem.onDealerQualityChanged: name='%s' value=%d previous=%s isServer=%s",
+        name, value, tostring(previous), tostring(g_server ~= nil))
+
+    -- (1) Seed. The first callback on any peer is not a change: on the server it
+    -- is applyDefaultSettings at mission start, on a client the join full-set
+    -- push. Regenerating here would discard the saved dealer pool on every load.
+    if previous == nil then
+
+        animalSystem.dealerQualityApplied = value
+        Log:debug("AnimalSystem.onDealerQualityChanged: seeding tracker to %d (%s); no repopulate",
+            value, RLDealerQualityModel.getPreset(value).key)
+
+        return
+
+    end
+
+    -- (2) No-op. A full-set rebroadcast re-fires every callback unchanged, and a
+    -- local click can land back on the already-applied index.
+    if previous == value then
+
+        Log:debug("AnimalSystem.onDealerQualityChanged: preset unchanged at %d (%s); no repopulate",
+            value, RLDealerQualityModel.getPreset(value).key)
+
+        return
+
+    end
+
+    -- (3) Server gate. Clients never generate - they receive the new pool via
+    -- AnimalSystemStateEvent. The tracker still advances so the DEBUG trail on
+    -- that peer stays truthful.
+    if g_server == nil then
+
+        animalSystem.dealerQualityApplied = value
+        Log:debug("AnimalSystem.onDealerQualityChanged: client defers regeneration to the server; tracker %s -> %d (%s)",
+            tostring(previous), value, RLDealerQualityModel.getPreset(value).key)
+
+        return
+
+    end
+
+    Log:debug("AnimalSystem.onDealerQualityChanged: preset %d(%s) -> %d(%s); repopulating the dealer",
+        previous, RLDealerQualityModel.getPreset(previous).key,
+        value, RLDealerQualityModel.getPreset(value).key)
+
+    -- (4) Early commit, BEFORE the reset. RLSettings.applyChange runs this
+    -- callback and only then writes setting.state, but the regeneration resolves
+    -- the active preset FROM that state - so without this a local click would
+    -- rebuild the pool under the OLD preset. applyChange writes the identical
+    -- value immediately afterwards, and on the wire path the state is already
+    -- committed, so this is a no-op everywhere except the local click path. It
+    -- is correct only because values[i] == i; a test pins that.
+    -- Separate concern from the tracker advance below - do not collapse them.
+    setting.state = value
+
+    -- Persistence is deliberately NOT triggered here: the index is written by
+    -- the generic scalar codec, driven by the savegame save or by the settings
+    -- event when the change arrived from a remote client.
+    Log:debug("AnimalSystem.onDealerQualityChanged: state committed to %d; persistence rides the RLSettings scalar codec, no explicit save here",
+        value)
+    Log:debug("AnimalSystem.onDealerQualityChanged: dispatching RL_ResetDealerEvent.executeOnServer(TYPE_DEALER)")
+
+    local ok = RmSafeUtils.safeCall("AnimalSystem.onDealerQualityChanged: repopulate", function()
+        RL_ResetDealerEvent.executeOnServer(RL_ResetDealerEvent.TYPE_DEALER)
+    end)
+
+    -- (5) Failure exit. safeCall has already logged the ERROR and callstack, so
+    -- this adds only the player-facing recovery.
+    if not ok then
+
+        Log:warning("AnimalSystem.onDealerQualityChanged: repopulate failed; the preset moved to %d (%s) but the stock did not - run Reset Animal Dealer, or re-select the same preset to retry",
+            value, RLDealerQualityModel.getPreset(value).key)
+
+        return
+
+    end
+
+    -- (6) Advance only AFTER the reset returned. A failed or partial reset
+    -- therefore leaves the tracker at the OLD preset, so re-selecting the same
+    -- preset takes the real-transition path and RETRIES instead of being
+    -- swallowed by guard (2). Safe because executeOnServer is synchronous.
+    animalSystem.dealerQualityApplied = value
+
+end
+
+
 function AnimalSystem.onClickResetDealer()
     RL_ResetDealerEvent.sendEvent(RL_ResetDealerEvent.TYPE_DEALER)
 end

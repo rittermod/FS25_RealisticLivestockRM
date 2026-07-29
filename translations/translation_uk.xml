@@ -470,6 +470,11 @@
 
 		<text name="rl_settings_maxDealerAnimals_label" text="Максимальна кількість тварин у продавця"/>
 		<text name="rl_settings_maxDealerAnimals_tooltip" text="Змінити максимальну кількість тварин, яку продавець тварин може мати в наявності для кожного типу тварин"/>
+		<text name="rl_settings_dealerQuality_label" text="Dealer Animal Quality"/>
+		<text name="rl_settings_dealerQuality_tooltip" text="Sets how good - and how expensive - the animals the dealer offers are. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing this discards the current dealer stock and restocks with new animals. Does not affect the AI animals used for insemination."/>
+		<text name="rl_settings_dealerQuality_texts_1" text="Budget"/>
+		<text name="rl_settings_dealerQuality_texts_2" text="Standard"/>
+		<text name="rl_settings_dealerQuality_texts_3" text="Premium"/>
 
 		<text name="rl_settings_mapCountry_label" text="Країна походження тварин"/>
 		<text name="rl_settings_mapCountry_tooltip" text="Перевизначає країну, в якій реєструються нові тварини (вушні бирки, ідентифікатори). Застосовується лише до нових тварин; наявні тварини зберігають свою країну."/>

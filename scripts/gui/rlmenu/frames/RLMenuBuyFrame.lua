@@ -393,6 +393,21 @@ function RLMenuBuyFrame:buildDialogSourceList()
 end
 
 
+--- Refresh only when the frame is currently open. Called by
+--- AnimalSystemStateEvent:run so a wholesale dealer-pool replacement - from a
+--- dealer-quality preset change or the Reset Animal Dealer button - rebinds an
+--- open list instead of leaving it holding items that no longer exist.
+--- Delegates to reloadAnimalList, which already owns selection capture/restore.
+function RLMenuBuyFrame:refreshIfOpen()
+    if self.isFrameOpen then
+        Log:debug("RLMenuBuyFrame:refreshIfOpen: refreshing")
+        self:reloadAnimalList()
+    else
+        Log:debug("RLMenuBuyFrame:refreshIfOpen: frame closed, skipping")
+    end
+end
+
+
 --- Requery dealer stock for the active type, group into sections, refresh
 --- the SmoothList, restore selection by identity.
 --- No canBeSold filter: dealer animals are freshly generated and always

@@ -207,10 +207,10 @@ end
 -- each row by its rlmenuSetting_<name> element id. setting.index is consumed by
 -- RLDebugUtils.dumpSettings, which prints state rows in index order (it skips
 -- ignore==true rows), so index must stay a faithful mirror of the XML order below.
--- Keep the two in step when adding or moving a row. Sections (1..20):
--- Mortality (1-2), Health & Disease (3-4), Husbandry & Economy (5-7),
--- Custom Animals (8-9), Message Log (10-11), Display Preferences (12-15),
--- Tools & Admin (16-19), Visual Animals (20, client-local, no admin gate).
+-- Keep the two in step when adding or moving a row. Sections (1..21):
+-- Mortality (1-2), Health & Disease (3-4), Husbandry & Economy (5-8),
+-- Custom Animals (9-10), Message Log (11-12), Display Preferences (13-16),
+-- Tools & Admin (17-20), Visual Animals (21, client-local, no admin gate).
 RLSettings.SETTINGS = {
 
 	["deathEnabled"] = {
@@ -283,12 +283,28 @@ RLSettings.SETTINGS = {
 		["callback"] = AnimalSystem.onSettingChanged
 	},
 
+	-- Admin-gated because the dealer pool is shared world state, not a per-player
+	-- display preference. Changing it REPOPULATES the dealer (genetics are baked
+	-- into each animal at generation, so the existing stock cannot be re-banded);
+	-- the AI insemination pool is deliberately left untouched (decided by Ritter
+	-- 2026-07-28, RLRM-554/555). State index IS the preset index - the callback
+	-- and every reader depend on values[i] == i, which RLSettingsTests pins
+	-- against RLDealerQualityModel.DEFAULT_INDEX / PRESET_COUNT.
+	["dealerQuality"] = {
+		["index"] = 7,
+		["adminOnly"] = true,
+		["type"] = "MultiTextOption",
+		["default"] = 2,
+		["values"] = { 1, 2, 3 },
+		["callback"] = AnimalSystem.onDealerQualityChanged
+	},
+
 	-- Persisted as the RL area-code VALUE string (state 1 -> "default"), never
 	-- the index; values is the ONE table shared with RLMapCountry so the codec
 	-- and the resolver cannot drift. Option texts are runtime-built (getTexts):
 	-- only "Map default" is localized, country names render in English.
 	["mapCountry"] = {
-		["index"] = 7,
+		["index"] = 8,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 1,
@@ -306,7 +322,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["useCustomAnimals"] = {
-		["index"] = 8,
+		["index"] = 9,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
@@ -316,7 +332,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["animalsXML"] = {
-		["index"] = 9,
+		["index"] = 10,
 		["adminOnly"] = true,
 		["type"] = "Button",
 		["ignore"] = true,
@@ -328,7 +344,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["messageSummary"] = {
-		["index"] = 10,
+		["index"] = 11,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
@@ -339,7 +355,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["maxNumMessages"] = {
-		["index"] = 11,
+		["index"] = 12,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 5,
@@ -349,7 +365,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["geneticsDisplay"] = {
-		["index"] = 12,
+		["index"] = 13,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 1,
@@ -357,7 +373,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["geneticsPosition"] = {
-		["index"] = 13,
+		["index"] = 14,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["default"] = 1,
@@ -365,7 +381,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["sortByGenetics"] = {
-		["index"] = 14,
+		["index"] = 15,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
@@ -375,7 +391,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["tagColour"] = {
-		["index"] = 15,
+		["index"] = 16,
 		["adminOnly"] = true,
 		["type"] = "Button",
 		["ignore"] = true,
@@ -383,7 +399,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["exportCSV"] = {
-		["index"] = 16,
+		["index"] = 17,
 		["adminOnly"] = true,
 		["type"] = "Button",
 		["ignore"] = true,
@@ -391,7 +407,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["resetDealer"] = {
-		["index"] = 17,
+		["index"] = 18,
 		["type"] = "Button",
 		["ignore"] = true,
 		["adminOnly"] = true,
@@ -402,7 +418,7 @@ RLSettings.SETTINGS = {
 	-- dealer offers. Server-authoritative (the Confirm handler writes the override
 	-- registry and regenerates the dealer), hence the admin gate.
 	["dealerSale"] = {
-		["index"] = 18,
+		["index"] = 19,
 		["type"] = "Button",
 		["ignore"] = true,
 		["adminOnly"] = true,
@@ -410,7 +426,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["resetAIAnimals"] = {
-		["index"] = 19,
+		["index"] = 20,
 		["type"] = "Button",
 		["ignore"] = true,
 		["adminOnly"] = true,
@@ -423,7 +439,7 @@ RLSettings.SETTINGS = {
 	-- and out of rm_RlSettings.xml. The dialog persists the value per peer to
 	-- modSettings/Settings.xml.
 	["maxVisualAnimals"] = {
-		["index"] = 20,
+		["index"] = 21,
 		["type"] = "Button",
 		["ignore"] = true,
 		["callback"] = RLSettings.onClickVisualAnimals

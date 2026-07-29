@@ -96,6 +96,62 @@ function AnimalBuyEvent:run(connection)
 			#self.animals,
 			tostring(self.object and self.object.getName and self.object:getName() or self.object))
 
+		-- The charged price is the SERVER's, never the client's. The dispatched
+		-- float is computed on the sending peer, whose dealer-quality preset can
+		-- lag authority (a demoted admin, or the ordering gap between the stock
+		-- and settings events), so it is treated as display-only from here on.
+		-- Recomputed BEFORE the validation loop so affordability and the charge
+		-- below both use the same server number. Sign follows the dispatch
+		-- convention: computeBuyPrice returns a positive price, the event
+		-- carries it negated. transportPrice is deliberately left alone.
+		-- Priced under pcall because getSellPrice dereferences getSubType(),
+		-- genetics.quality and targetWeight with no guards, and self.animals is
+		-- a client-supplied payload. Without this a malformed animal raises
+		-- BEFORE the validation loop, the enclosing safeCall swallows it, and no
+		-- response is ever sent - the client just waits out its watchdog. Falling
+		-- back to the dispatched price keeps the validation loop reachable so it
+		-- returns its normal BUY_ERROR_* code instead.
+		local serverBuyPrice = 0
+		local priced = pcall(function()
+			local total = 0
+			for _, animal in pairs(self.animals) do
+				total = total - RLAnimalBuyService.computeBuyPrice(animal)
+			end
+			serverBuyPrice = total
+		end)
+
+		-- NaN is its own check: every comparison against NaN is false, so it
+		-- would silently take the "agrees" branch below AND pass the
+		-- affordability test, reaching addMoney and turning the farm balance into
+		-- NaN. Corrupt genetics reaching getSellPrice is a real failure mode
+		-- here, so this is a guard, not ceremony. `x ~= x` is the NaN test.
+		if priced and serverBuyPrice ~= serverBuyPrice then
+			Log:warning("AnimalBuyEvent:run: server price recompute produced NaN (corrupt animal data?); keeping the dispatched price")
+			priced = false
+		end
+
+		if not priced then
+			Log:warning("AnimalBuyEvent:run: server price recompute failed for %d animal(s); keeping the dispatched price so validation can reject the payload normally",
+				#self.animals)
+		else
+			-- Epsilon, not equality: the client's figure arrived as a float32
+			-- (streamReadFloat32) while this sum is a full-precision double, and
+			-- the two sides accumulate in pairs() order, which differs per
+			-- machine. An exact comparison would report a divergence on
+			-- essentially every multi-animal purchase and destroy the value of
+			-- this line as a tamper signal. One currency unit is far below
+			-- anything worth flagging.
+			local clientBuyPrice = self.buyPrice or 0
+			if math.abs(serverBuyPrice - clientBuyPrice) > 1 then
+				Log:debug("AnimalBuyEvent:run: client price %.2f differs from server recompute %.2f; charging the server's",
+					clientBuyPrice, serverBuyPrice)
+			else
+				Log:trace("AnimalBuyEvent:run: server price recompute agrees with the client (%.2f)", serverBuyPrice)
+			end
+
+			self.buyPrice = serverBuyPrice
+		end
+
 		phaseReset()
 		for _, animal in pairs(self.animals) do
 
