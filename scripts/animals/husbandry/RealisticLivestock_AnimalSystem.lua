@@ -4,6 +4,13 @@ local Log = RmLogging.getLogger("RLRM")
 local modName = g_currentModName
 local modDirectory = g_currentModDirectory
 
+-- One-shot warning latch for the dealer-quality reshape, matching the per-site
+-- latches RLDealerQualityModel carries. The warn site sits inside the per-animal
+-- generation loop, so an unlatched WARNING would fire once per animal per type on
+-- every hourly restock and on every dealer reset. Lifetime is the MAP LOAD: FS25
+-- re-sources every mod file on each load, so this resets to false then.
+local warnedReshapeReturnedNil = false
+
 
 local function getDaysInMonth(month)
     -- Nil-guard retained as defensive pattern for load-order safety
@@ -1546,7 +1553,7 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
     local genetics = RLGeneticsDraw.draw(traitKeys)
 
     -- Reshape the base draw into the active dealer-quality preset's band. This
-    -- MUST sit before Animal.new: stored health (:1556), the targetWeight
+    -- MUST sit before Animal.new: the stored health argument, the targetWeight
     -- derivation in the constructor, the disease pass and the pregnant-offspring
     -- bands all read this table, so reshaping afterwards would leave them on the
     -- unreshaped values. It must also stay BEFORE the name draw below: under a
@@ -1559,11 +1566,19 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
 
     if reshaped ~= nil then
         genetics = reshaped                     -- MUST reassign: reshapeGenetics is non-mutating
-        Log:debug("createNewSaleAnimal: reshaped genetics preset=%d(%s) outlier=%s met=%.3f qua=%.3f fer=%.3f hea=%.3f prd=%s",
-            presetIndex, RLDealerQualityModel.getPreset(presetIndex).key, tostring(wasOutlier),
-            genetics.metabolism, genetics.quality, genetics.fertility, genetics.health,
-            genetics.productivity ~= nil and string.format("%.3f", genetics.productivity) or "-")
-    else
+
+        -- Level-guarded: Lua evaluates call arguments before the logger can check
+        -- its level, so the getPreset lookup and the string.format below would be
+        -- paid on every generated animal even at ERROR. Mirrors the dealer-list
+        -- digest guard in RLMenuBuyFrame.
+        if Log.level >= RmLogging.LOG_LEVEL.DEBUG then
+            Log:debug("createNewSaleAnimal: reshaped genetics preset=%d(%s) outlier=%s met=%.3f qua=%.3f fer=%.3f hea=%.3f prd=%s",
+                presetIndex, RLDealerQualityModel.getPreset(presetIndex).key, tostring(wasOutlier),
+                genetics.metabolism, genetics.quality, genetics.fertility, genetics.health,
+                genetics.productivity ~= nil and string.format("%.3f", genetics.productivity) or "-")
+        end
+    elseif not warnedReshapeReturnedNil then
+        warnedReshapeReturnedNil = true
         Log:warning("createNewSaleAnimal: reshapeGenetics returned nil (preset=%s); keeping raw genetics",
             tostring(presetIndex))
     end
@@ -1888,6 +1903,19 @@ function AnimalSystem:onHourChanged()
         local day = g_currentMission.environment.currentMonotonicDay
         local hasChanges = false
 
+        -- Retention below divides by the animal's mean genetics, so reshaping the
+        -- generated genetics into a preset band would silently reprogram how fast the
+        -- dealer rotates: budget pushes the threshold to or past 1.0, which makes the
+        -- removal branch unreachable and freezes the shelf, and premium roughly halves
+        -- shelf life. Normalising by the band midpoint keeps the rotation rate matched
+        -- to the identity preset under every preset, while an animal that is better
+        -- than its own preset's peers still turns over faster. The identity band's
+        -- midpoint is exactly 1.0, so standard saves are unchanged.
+        -- The pool is regenerated whenever the preset changes, so the active preset is
+        -- the one this stock was generated under.
+        local activePreset = RLDealerQualityModel.getPreset(RLDealerQualityResolver.getActiveIndex())
+        local bandMidpoint = (activePreset.lo + activePreset.hi) / 2
+
         for animalTypeIndex, animals in pairs(self.animals) do
 
             local indexesToRemove = {}
@@ -1912,7 +1940,7 @@ function AnimalSystem:onHourChanged()
 
                     local averageGenetics = geneticQuality / totalGenetics
 
-                    if math.random() >= (saleDay / day) / (averageGenetics * 1.45) then
+                    if math.random() >= (saleDay / day) / ((averageGenetics / bandMidpoint) * 1.45) then
                         table.insert(indexesToRemove, i)
                         hasChanges = true
                     end

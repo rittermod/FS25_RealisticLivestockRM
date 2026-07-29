@@ -159,10 +159,31 @@ function RLDealerQualityModel.assertPresetTable(presets)
         failPreset("?", "preset table is not a table", type(presets))
     end
 
-    local count = #presets
+    -- Count and key-check through pairs, NOT `#presets`. `#` reports the array
+    -- part only, so a table with a hole or an out-of-array key would carry rows
+    -- that `isValidIndex` / `getPreset` still reach - reachable but unvalidated,
+    -- which is exactly what this gate exists to prevent. A mis-edited PRESETS is
+    -- the only way to get here, so every violation fails the load loudly.
+    local count = 0
+
+    for key in pairs(presets) do
+        if type(key) ~= "number" or key < 1 or key % 1 ~= 0 then
+            failPreset(tostring(key), "preset key is not a positive integer", key)
+        end
+
+        count = count + 1
+    end
 
     if count < 1 then
         failPreset("?", "preset table is empty", count)
+    end
+
+    -- Contiguity: with keys 1..count all present, `#presets` is trustworthy and
+    -- the row loop below reaches every row the lookups can reach.
+    for index = 1, count do
+        if presets[index] == nil then
+            failPreset(index, "preset table has a hole - keys must be contiguous 1..N", "nil")
+        end
     end
 
     for index = 1, count do

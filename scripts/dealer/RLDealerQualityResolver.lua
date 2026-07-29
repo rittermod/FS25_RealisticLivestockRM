@@ -57,8 +57,21 @@ function RLDealerQualityResolver.indexFrom(settings)
         return RLDealerQualityModel.DEFAULT_INDEX
     end
 
+    -- Read the state defensively: `type(entry) == "table"` because a scalar entry
+    -- (hand-edited save, a migration writing the index directly) would otherwise
+    -- raise on the index, and this sits on the per-row dealer price path. An
+    -- explicit assignment rather than the `and/or` idiom because that idiom
+    -- collapses a `false` state to nil, which would skip the warning below.
     local entry = settings.dealerQuality
-    local state = entry ~= nil and entry.state or nil
+    local state = nil
+
+    if type(entry) == "table" then
+        state = entry.state
+    elseif entry ~= nil and not warnedInvalidState then
+        warnedInvalidState = true
+        Log:warning("RLDealerQualityResolver.indexFrom: dealerQuality entry is a %s, not a table; using DEFAULT_INDEX",
+            type(entry))
+    end
 
     if RLDealerQualityModel.isValidIndex(state) then return state end
 
