@@ -8,7 +8,11 @@ local AIAnimalManager_mt = Class(AIAnimalManager)
 --- in-game way to see or disable it. While this is true the RLRM-authored call sites skip the
 --- legacy day-change execution and its wage, and the herdsman frame hides the legacy-active
 --- banner. Only the call sites are gated; onDayChanged, the op bodies, and save/load stay
---- byte-identical and reversible. Read at RUNTIME only: this module sources after its placeable
+--- BEHAVIOUR-identical and reversible. Not byte-identical: the buy leg's price expression carries
+--- an explanatory comment recording that it does not honour the active dealer-quality preset. A
+--- comment inside a frozen body is an accepted exception - it changes no behaviour and no fixture,
+--- and the alternative was leaving a known-divergent number to be rediscovered.
+--- Read at RUNTIME only: this module sources after its placeable
 --- consumer, so a load-time read of the flag would see nil and silently fail to freeze.
 AIAnimalManager.FREEZE_LEGACY_HERDSMAN = true
 
@@ -554,6 +558,12 @@ function AIAnimalManager:onDayChanged()
 				if animal.genetics.health < healthMin or animal.genetics.health > healthMax then continue end
 				if animal.genetics.productivity ~= nil and (animal.genetics.productivity < productivityMin or animal.genetics.productivity > productivityMax) then continue end
 
+				-- Fixed markup, deliberately NOT the active dealer-quality preset: this legacy
+				-- per-pen buy path predates that setting and does not honour it, so its price can
+				-- disagree with what the shop charges. Dormant, not charged - unreachable while
+				-- FREEZE_LEGACY_HERDSMAN holds. The live herdsman resolves the markup through
+				-- RLDealerQualityResolver.getMarkup() and injects it as RLHerdsmanPlanner's
+				-- ctx.buyMarkup; if this path is ever revived it must do the same.
 				local price = animal:getSellPrice() * 1.075 + animalSystem:getAnimalTransportFee(animal.subTypeIndex, animal.age)
 
 				if price > budget then continue end

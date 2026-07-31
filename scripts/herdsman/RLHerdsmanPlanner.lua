@@ -26,7 +26,14 @@
 --     animalNameSystem    = <real AnimalNameSystem>,       -- getNamesAlphabetical (DI; T2b)
 --     farmBalanceByFarmId = { [farmId] = balance },        -- ledger seed, farm-scoped (T2a)
 --     dewarsByFarmId      = { [farmId] = { [animalTypeIndex] = { {animal=<sire>, straws=n, uniqueId=s}, ... } } }, -- AI dewar pool (DI; T2c)
+--     buyMarkup           = number,                        -- active dealer-quality markup (T2a Buy)
 --   }
+-- `buyMarkup` is a STRUCTURAL dep, deliberately UNGUARDED and undefaulted: T4 resolves it from the
+-- active dealer-quality preset, so its absence is a wiring bug, not a data problem, and any default
+-- this module could pick would be the one wrong number (the old compiled markup) that reading the
+-- preset exists to eliminate. A ctx missing it therefore RAISES on the buy arithmetic rather than
+-- silently pricing every automated purchase at a stale markup. See the Edge-handling note on
+-- `planActions`.
 -- The caller (T4) farm-scopes BOTH `rules` and `ctx.husbandries`, and excludes legacy
 -- `reserved` dealer animals from `dealerAnimalsByType` (coexistence: legacy AIAnimalManager
 -- claims dealer animals via `animal.reserved`). The planner filters `enabled` itself.
@@ -59,7 +66,7 @@
 --
 -- Candidate match is RLFilterEvaluator.evaluate (pure, fails closed: a nil / deleted
 -- filter selects nothing, never raises - D16). Naming carries no filter and selects every
--- remaining UNNAMED animal in its targets (legacy `:683` exact `name ~= ""` skip).
+-- remaining UNNAMED animal in its targets (the exact `name ~= ""` skip in legacy's naming leg).
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -73,10 +80,12 @@ RLHerdsmanPlanner = {}
 --- lines are the verification surface; the evaluator already emits per-animal DEBUG lines).
 local LOG_PREFIX = "[planActions]"
 
---- Buy applies a 7.5% dealer markup on the sell price before adding transport (the buy leg
---- of legacy AIAnimalManager:onDayChanged); sell uses the raw price (1.0, the sell leg).
+--- Buy applies the ACTIVE dealer-quality markup on the sell price before adding transport - the
+--- buy leg of legacy AIAnimalManager:onDayChanged, with the markup injected as `ctx.buyMarkup`
+--- rather than compiled in. Sell deliberately applies NO markup (the sell leg of that same
+--- function); note that is not "the raw price" either, because the transport fee is still ADDED
+--- here, where the player sell path subtracts it.
 local SELL_MARKUP = 1.0
-local BUY_MARKUP = 1.075
 
 --- Per-operation claim traits - the explicit table that drives how each operation threads
 --- state across the sequential rule passes (the two-level claim model, intake 1a):
@@ -249,7 +258,7 @@ local function validateBuyBudget(rule, params)
     return t, b.fixed, b.percentage, false
 end
 
---- Reproduce legacy's per-animal alphabetical-naming cursor walk (AIAnimalManager:695-713)
+--- Reproduce the per-animal alphabetical-naming cursor walk in `AIAnimalManager:onDayChanged`'s naming leg
 --- on a sorted name list, given the incoming cursor (already normalized "" -> nil by the
 --- caller). Returns the assigned name AND the advanced cursor; `names` is guaranteed non-empty
 --- by the caller (an empty gender list is a caller-side skip, never reaches here).
@@ -328,14 +337,15 @@ end
 --- SAME-op rule cannot re-pick them; buy removes its selected set from the dealer pool and
 --- appends it to the destination owned pool.
 ---
---- Edge handling (never raises except the nil-arg guard): an unresolvable / malformed target
---- husbandry is skipped + WARN (once per uid per call); an animal with a nil identity field is
+--- Edge handling (never raises except the nil-arg guard and a missing structural BUY dep -
+--- `ctx.buyMarkup`, see the file header): an unresolvable / malformed target husbandry is
+--- skipped + WARN (once per uid per call); an animal with a nil identity field is
 --- skipped + WARN; a deleted / nil filter selects nothing (evaluator fails closed); a missing
 --- `ctx.animalSystem` fails a sell/buy rule closed (WARN); an empty target list / selection
 --- emits no record (+ DEBUG).
 ---
 ---@param rules table[] farm-scoped rule records (the planner filters `enabled`)
----@param ctx table { husbandries, dealerAnimalsByType, filtersById, animalSystem, animalNameSystem, farmBalanceByFarmId, dewarsByFarmId }
+---@param ctx table { husbandries, dealerAnimalsByType, filtersById, animalSystem, animalNameSystem, farmBalanceByFarmId, dewarsByFarmId, buyMarkup }
 ---@return table[] actions ordered action records (see the file header for per-op shapes)
 function RLHerdsmanPlanner.planActions(rules, ctx)
     if rules == nil or ctx == nil then
@@ -351,8 +361,13 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
     local animalNameSystem = ctx.animalNameSystem
     local farmBalanceByFarmId = type(ctx.farmBalanceByFarmId) == "table" and ctx.farmBalanceByFarmId or {}
     local dewarsByFarmId = type(ctx.dewarsByFarmId) == "table" and ctx.dewarsByFarmId or {}
+    -- Read RAW - no type coercion, no `or` default. A ctx that omits this raises on the buy
+    -- arithmetic rather than pricing every automated purchase at a stale markup; see the
+    -- structural-dep note in the file header.
+    local buyMarkup = ctx.buyMarkup
 
-    -- The CHICKEN type index for castrate's per-target no-op (legacy AIAnimalManager:606). Read
+    -- The CHICKEN type index for castrate's per-target no-op (the chicken skip in legacy's
+    -- castrate leg). Read
     -- once; AnimalType is a runtime global (populated by AnimalSystem.new well before the day-tick),
     -- so a missing table just yields nil -> no target is treated as chicken (fail-open, matching
     -- wageFor's lazy-AnimalType posture; in practice AnimalType is always present at tick time).
@@ -486,10 +501,11 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
         end
     end
 
-    --- Real per-animal price: the REAL getSellPrice (markup 1.0 sell / 1.075 buy) plus the
-    --- REAL transport fee - the SAME calls as legacy AIAnimalManager:onDayChanged (mutation
-    --- parity), no mock, no re-derivation. Caller guarantees `animalSystem` is usable
-    --- (sell/buy fail closed when it is missing).
+    --- Real per-animal price: the REAL getSellPrice scaled by the caller's markup - SELL_MARKUP
+    --- for the sell leg, the active dealer-quality `ctx.buyMarkup` for the buy leg - plus the
+    --- REAL transport fee, which is ADDED for both legs. The SAME calls as legacy
+    --- AIAnimalManager:onDayChanged (mutation parity), no mock, no re-derivation. Caller
+    --- guarantees `animalSystem` is usable (sell/buy fail closed when it is missing).
     ---@param animal table
     ---@param markup number
     ---@return number price
@@ -565,8 +581,9 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
     --- invokes (`getSellPrice`, and for Sell `getCanBeSold`). A row can pass `matchFromPool`'s
     --- identity gate yet be a non-Animal data table without these methods; pricing it would be
     --- a call-on-nil-method raise. The planner's contract is "never raises except the nil-arg
-    --- guard", so the caller skips + WARNs such a row (deduped) instead - the same fail-closed
-    --- posture as the nil-identity skip. Owned non-price ops (castrate/naming/ai) never reach here.
+    --- guard and a missing structural buy dep", so the caller skips + WARNs such a row (deduped)
+    --- instead - the same fail-closed posture as the nil-identity skip. Owned non-price ops
+    --- (castrate/naming/ai) never reach here.
     ---@param animal table identity-valid candidate
     ---@param needsCanBeSold boolean true for Sell (also needs getCanBeSold)
     ---@return boolean priceable
@@ -912,7 +929,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                                             if not isPriceableAnimal(a, false) then
                                                 warnNotPriceable(a)
                                             else
-                                                local p = priceOf(a, BUY_MARKUP)
+                                                local p = priceOf(a, buyMarkup)
                                                 if p <= budget then
                                                     shortlist[#shortlist + 1] = { animal = a, price = p, key = animalKey(a) }
                                                 end
@@ -924,6 +941,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                                             return x.key < y.key
                                         end)
                                         local selected, selectedKeys, amountSpent = {}, {}, 0
+                                        local selectedItems = {}
                                         local remaining = budget
                                         for _, item in ipairs(shortlist) do
                                             -- Three break conditions: budget (strict `>`, so a candidate
@@ -932,6 +950,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                                             -- is the ledger value at this target's entry.
                                             if item.price > remaining or #selected >= maxN or #selected >= slotsRemaining then break end
                                             selected[#selected + 1] = item.animal
+                                            selectedItems[#selectedItems + 1] = item
                                             selectedKeys[item.key] = true
                                             amountSpent = amountSpent + item.price
                                             remaining = remaining - item.price
@@ -942,8 +961,28 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                                         -- `matched` distinguishes the three Buy no-op causes (T8.1):
                                         -- matched=0 filter-empty; matched>0 & affordable=0 all-unaffordable;
                                         -- affordable>0 & selected<cap budget-OR-slot-consumed mid-loop.
-                                        Log:debug("%s rule=%s op=buy husbandry=%s candidates=%d matched=%d affordable=%d selected=%d slotsAtEntry=%d budgetAtEntry=%.2f amountSpent=%.2f wage=%.2f",
-                                            LOG_PREFIX, tostring(rule.id), tostring(uid), candidates, #matched, S, n, slotsRemaining, budget, amountSpent, wage)
+                                        Log:debug("%s rule=%s op=buy husbandry=%s markup=%.3f candidates=%d matched=%d affordable=%d selected=%d slotsAtEntry=%d budgetAtEntry=%.2f amountSpent=%.2f wage=%.2f",
+                                            LOG_PREFIX, tostring(rule.id), tostring(uid), buyMarkup, candidates, #matched, S, n, slotsRemaining, budget, amountSpent, wage)
+                                        -- Per-animal price breakdown for the SELECTED set only - bounded by
+                                        -- maxAnimals, so it can never become a per-candidate flood. The
+                                        -- aggregate line above names no animal and does not show how the
+                                        -- markup and the transport fee split the charge, which leaves a
+                                        -- charged price impossible to audit against the dealer list. The fee
+                                        -- is derived by subtraction from the already-computed total rather
+                                        -- than re-read, so the line is self-verifying
+                                        -- (sellPrice * markup + fee == total) at the cost of one
+                                        -- getSellPrice call. Level-guarded because Lua evaluates log
+                                        -- arguments BEFORE the logger checks the level.
+                                        if Log.level >= RmLogging.LOG_LEVEL.DEBUG then
+                                            for _, item in ipairs(selectedItems) do
+                                                local a = item.animal
+                                                local sell = a:getSellPrice()
+                                                Log:debug("%s rule=%s op=buy husbandry=%s bought uniqueId=%s farmId=%s subType=%s age=%s sellPrice=%.4f markup=%.3f fee=%.2f total=%.4f",
+                                                    LOG_PREFIX, tostring(rule.id), tostring(uid), tostring(a.uniqueId),
+                                                    tostring(a.farmId), tostring(a.subTypeIndex), tostring(a.age),
+                                                    sell, buyMarkup, item.price - sell * buyMarkup, item.price)
+                                            end
+                                        end
                                         if n > 0 then
                                             -- Remove bought from the dealer pool; claim same-op; append
                                             -- to the destination owned pool (cross-op visible); debit the
@@ -969,10 +1008,11 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
             end
 
         elseif op == "castrate" then
-            -- Castrate (legacy AIAnimalManager:606-667): owned-herd, no cap, no sort, sequential.
+            -- Castrate (legacy `AIAnimalManager:onDayChanged`'s castrate leg): owned-herd, no cap,
+            -- no sort, sequential.
             -- Resolve the husbandry FIRST (malformed -> skip + WARN, unchanged), THEN per-target
-            -- no-op a chicken-type husbandry (:606; other targets of a multi-target rule proceed).
-            -- Candidates come via the filter; per survivor apply the hard floor (:621) the user
+            -- no-op a chicken-type husbandry (other targets of a multi-target rule proceed).
+            -- Candidates come via the filter; per survivor apply legacy's hard floor, the one the user
             -- filter cannot express - female / already-castrated / infertile - plus a nil-genetics
             -- guard (fail closed). `mark` (coerced == true) only sets the action field that gates the
             -- T3 mutation, never the claim. Same-op claim (mark-independent), cross-op visible
@@ -982,7 +1022,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                 local h = resolveHusbandry(uid)
                 if h ~= nil then
                     if chickenTypeIndex ~= nil and h.animalTypeIndex == chickenTypeIndex then
-                        Log:debug("%s rule=%s op=castrate husbandry=%s: chicken-type target no-op (legacy :606); other targets proceed",
+                        Log:debug("%s rule=%s op=castrate husbandry=%s: chicken-type target no-op (legacy parity); other targets proceed",
                             LOG_PREFIX, tostring(rule.id), tostring(uid))
                     else
                         local pool = ownedPool(uid)
@@ -992,7 +1032,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                         for _, a in ipairs(matched) do
                             local g = a.genetics
                             if a.gender == "female" or a.isCastrated then
-                                -- Hard floor (:621), silent. Checked first so the genetics read is
+                                -- Hard floor (legacy's castrate hard-skip), silent. Checked first so the genetics read is
                                 -- short-circuited for females (legacy reaches genetics.fertility only past here).
                             elseif type(g) ~= "table" or g.fertility == nil then
                                 -- nil genetics/fertility -> skip + WARN (never index-nil; fail-closed
@@ -1003,14 +1043,14 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                                     warnedAnimals[a] = true
                                 end
                             elseif g.fertility == 0 then
-                                -- Infertile -> hard-skip (:621), silent.
+                                -- Infertile -> hard-skip (same legacy hard floor), silent.
                             else
                                 selected[#selected + 1] = a
                             end
                         end
                         local n = #selected
                         local W = wageFor(h.animalTypeIndex)
-                        -- Single-term wage (:644) - NO min(S, n*5) shortlist component (that is a
+                        -- Single-term wage (legacy's castrate wage) - NO min(S, n*5) shortlist component (that is a
                         -- sell/buy-only term). mark halves-then-discounts to the 0.35 advisory rate.
                         local wage = W * 0.5 * n * (mark and 0.35 or 1)
                         Log:debug("%s rule=%s op=castrate husbandry=%s candidates=%d selected=%d mark=%s wage=%.2f",
@@ -1027,14 +1067,15 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
             end
 
         elseif op == "naming" then
-            -- Naming (legacy AIAnimalManager:673-727): owned-herd, no filter (selects ALL remaining),
-            -- narrowed to unnamed-only (:683, exact ~= "" - a whitespace-only name counts as named).
+            -- Naming (legacy `AIAnimalManager:onDayChanged`'s naming leg): owned-herd, no filter
+            -- (selects ALL remaining), narrowed to unnamed-only (exact ~= "" - a whitespace-only
+            -- name counts as named).
             -- No cap, no mark. Needs the real name system (DI) for getNamesAlphabetical; a missing one
             -- is a T4 wiring error -> fail closed (skip + WARN), mirroring the sell/buy guard.
             if type(animalNameSystem) ~= "table" or type(animalNameSystem.getNamesAlphabetical) ~= "function" then
                 Log:warning("%s rule=%s op=naming skipped: ctx.animalNameSystem missing/invalid (T4 wiring)", LOG_PREFIX, tostring(rule.id))
             else
-                -- convention (:685): "random" -> random; anything else -> alphabetical (the legacy
+                -- convention (legacy's naming-convention branch): "random" -> random; anything else -> alphabetical (the legacy
                 -- else-branch), WARN when it is not literally "alphabetical" (stale "" / "legacy" / nil).
                 local convention = params.convention
                 local isRandom = convention == "random"
@@ -1090,7 +1131,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                             bucket.assignments[#bucket.assignments + 1] = { animal = a, name = assignedName }
                         end
                     else
-                        -- Empty gender list (:695 ipairs never runs) -> skip: no name, not counted,
+                        -- Empty gender list (legacy's per-gender ipairs never runs) -> skip: no name, not counted,
                         -- cursor unchanged.
                         Log:debug("%s rule=%s op=naming husbandry=%s: empty name list for gender=%s (uniqueId=%s) - skipped, uncounted",
                             LOG_PREFIX, tostring(rule.id), tostring(item.uid), tostring(a.gender), tostring(a.uniqueId))
@@ -1106,7 +1147,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                         local named = bucket.named
                         local n = #named
                         local W = wageFor(bucket.h.animalTypeIndex)
-                        local wage = W * 0.15 * n   -- single term (:688/:707), no shortlist component
+                        local wage = W * 0.15 * n   -- single term (legacy's naming wage), no shortlist component
                         Log:debug("%s rule=%s op=naming husbandry=%s candidates=%d named=%d convention=%s wage=%.2f",
                             LOG_PREFIX, tostring(rule.id), tostring(uid), bucket.candidates, n, conventionOut, wage)
                         if n > 0 then
@@ -1127,10 +1168,10 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
             end
 
         elseif op == "ai" then
-            -- AI / insemination (legacy AIAnimalManager:onDayChanged :733-855). Owned-herd,
+            -- AI / insemination (legacy `AIAnimalManager:onDayChanged`'s AI leg). Owned-herd,
             -- non-end-task, the LAST op. Ritter-locked genetics-first deviation: legacy assigns
             -- scarce straws during shortlist build in nondeterministic `pairs` order BEFORE the
-            -- genetics sort (:786-799); this planner collects compatible dewars straw-IGNORANT,
+            -- genetics sort, during its shortlist build; this planner collects compatible dewars straw-IGNORANT,
             -- sorts candidates genetics-desc FIRST, then greedily assigns scarce straws best-first
             -- against the planner-wide dewar-identity ledger. NOT byte-parity (legacy is
             -- nondeterministic); because greedy straw assignment is an order-dependent bipartite
@@ -1146,7 +1187,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                     local h = resolveHusbandry(uid)
                     if h ~= nil then
                         local typeIdx = h.animalTypeIndex
-                        -- Dewar pool (legacy :735-753): farm scope = rule.farmId (the key T2a's money
+                        -- Dewar pool (legacy's AI dewar gather): farm scope = rule.farmId (the key T2a's money
                         -- ledger uses; == legacy husbandry:getOwnerFarmId() since T4 farm-scopes rules),
                         -- type = husbandry.animalTypeIndex. The farmId value type MUST match the table
                         -- key type (mirror farmBalanceByFarmId, else a silent "no dewars"). DewarManager
@@ -1168,7 +1209,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                                         sortedBucket[#sortedBucket + 1] = d
                                     end
                                 end
-                                -- d.animal == nil never inseminates (legacy :785) -> silently dropped.
+                                -- d.animal == nil never inseminates (legacy drops a nil sire) -> silently dropped.
                             end
                             table.sort(sortedBucket, function(x, y) return tostring(x.uniqueId) < tostring(y.uniqueId) end)
                         end
@@ -1201,10 +1242,10 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                             -- remaining straws thread across ALL AI rules (no cross-rule overcommit).
                             for _, d in ipairs(dewars) do seedDewarStraws(d) end
                             local pool = ownedPool(uid)
-                            -- Candidate eligibility (legacy :766-807): filter-matched (matchFromPool) AND
+                            -- Candidate eligibility (legacy's AI candidate loop): filter-matched (matchFromPool) AND
                             -- not same-op-claimed (matchFromPool, so claimed animals never reach the scratch
                             -- assignment) AND >= 1 compatible dewar. Straw-IGNORANT here - the predicate is
-                            -- pure, so collecting ALL compatible dewars (vs legacy's first-match break :796)
+                            -- pure, so collecting ALL compatible dewars (vs legacy's first-match break)
                             -- is observationally safe and is the mechanism behind the genetics-first deviation.
                             local matched = matchFromPool(pool, filter, false, claimed)
                             local candidates = {}
@@ -1296,7 +1337,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                                 dewarStrawLedger[item.dewar] = (dewarStrawLedger[item.dewar] or 0) - 1
                             end
                             local W = wageFor(typeIdx)
-                            -- Wage (legacy :829): per-animal 1.2 exec / 0.45 mark, plus the shortlist term
+                            -- Wage (legacy's AI wage): per-animal 1.2 exec / 0.45 mark, plus the shortlist term
                             -- min(S, n*5)*0.2 at 1.0 exec / 0.35 mark - over THIS planner's S/n.
                             local wage = W * n * (mark and 0.45 or 1.2)
                                 + W * math.min(S, n * 5) * 0.2 * (mark and 0.35 or 1)

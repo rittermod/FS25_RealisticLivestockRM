@@ -36,8 +36,14 @@
 --     filtersById            = { [filterId] = filter },             -- g_rlFilterService:list keyed by id (farm-independent)
 --     balanceForFarm(farmId) -> number|nil,                         -- g_farmManager:getFarmById(id):getBalance()
 --     dewarsForFarm(farmId)  -> { [typeIndex] = { <dewar OBJECT>, ... } }|nil,  -- g_dewarManager:getDewarsByFarm (RAW objects)
+--     buyMarkup              = number,                          -- active dealer-quality markup (buy pricing)
+--     dealerQualityIndex     = number|nil,                      -- preset index it came from; DEBUG readout ONLY
 --     server, mission, ruleService, animalSystem, animalNameSystem,
 --   }
+-- `buyMarkup` is resolved ONCE per tick in buildEnv and forwarded verbatim into the planner ctx.
+-- It lives in env rather than being read where it is used because buildEnv is this module's only
+-- g_*-reading layer: resolving it further in would make the dual-run layer env-dependent and would
+-- pin every headless assert to the default preset, with no way to exercise another one.
 --
 -- readout contract (run's return value; surfaced at DEBUG, consumed by no caller yet - T5
 -- reads the executor summary directly. Defined so tests + LuaDoc have a concrete shape):
@@ -177,7 +183,8 @@ end
 --- reserved-excluded dealer pool (built once per type, re-read
 --- freshly per farm), the farm-scoped balance ledger seed, and the materialized dewar pool
 --- (raw dewar OBJECT -> { animal, straws, uniqueId } - the planner's per-T2c nil-guards filter,
---- T4 materializes faithfully). filtersById + the service refs pass straight through from env.
+--- T4 materializes faithfully). filtersById + the service refs pass straight through from env, as
+--- does buyMarkup - a farm-independent scalar, so every farm this tick prices at the same markup.
 ---@param farm table the farm record (carries farm.farmId)
 ---@param husbandriesById table { [uniqueId] = placeable } (already deduped by run)
 ---@param env table the run(env) seam
@@ -229,6 +236,10 @@ local function buildPlannerCtx(farm, husbandriesById, env)
         animalNameSystem    = env.animalNameSystem,
         farmBalanceByFarmId = { [farmId] = env.balanceForFarm(farmId) },
         dewarsByFarmId      = { [farmId] = dewarsByType },
+        -- Forwarded verbatim - farm-independent, so it is the same scalar for every farm this
+        -- tick. Deliberately NOT defaulted here: the planner treats it as a structural dep and
+        -- must raise on a ctx that lacks it rather than price at a stale markup.
+        buyMarkup           = env.buyMarkup,
     }
 end
 
@@ -295,6 +306,24 @@ function RLHerdsmanDayTick.run(env)
         if farm.farmId ~= FarmManager.SPECTATOR_FARM_ID then farmCount = farmCount + 1 end
     end
     Log:debug("%s day-tick entry: %d farm(s) to process", LOG_PREFIX, farmCount)
+
+    -- The markup this tick prices buys at, read off the injected env so the line is assertable
+    -- under the dual-run harness (a line at the buildEnv seam would be in-game only). This is the
+    -- ONLY markup line on a tick where no buy reaches the planner's deepest branch; when one does,
+    -- the per-buy [planActions] line reports the same value again.
+    -- Guarded because RmLogging pcall-wraps string.format and falls back to printing the RAW
+    -- template: an unusable markup would otherwise emit `markup=%.3f` verbatim, losing the one
+    -- diagnostic that names it, in exactly the case someone would be reading for it. This does NOT
+    -- gate the tick - the fail-loud placement is the planner's buy arithmetic, and this WARNING
+    -- only makes a wiring bug legible before a buy rule gets there (it may never, if no candidate
+    -- reaches pricing).
+    if type(env.buyMarkup) ~= "number" then
+        Log:warning("%s dealer-quality buy markup is %s, not a number - a T4 wiring bug; buy rules will fail loud once one prices a candidate",
+            LOG_PREFIX, tostring(env.buyMarkup))
+    else
+        Log:debug("%s dealer-quality buy markup=%.3f (preset %s)",
+            LOG_PREFIX, env.buyMarkup, tostring(env.dealerQualityIndex))
+    end
 
     for _, farm in pairs(farms) do
         local farmId = farm.farmId
@@ -422,6 +451,14 @@ function RLHerdsmanDayTick.buildEnv()
             return farm ~= nil and farm:getBalance() or nil
         end,
         dewarsForFarm      = function(farmId) return g_dewarManager:getDewarsByFarm(farmId) end,
+        -- The active dealer-quality markup, resolved fresh per tick. A VALUE, not a closure: it is
+        -- farm-independent, and buildEnv itself re-runs inside the DAY_CHANGED handler, so a value
+        -- is exactly as current as a closure would be (filtersById is the same precedent).
+        -- Called at RUNTIME only - main.lua sources RLDealerQualityResolver AFTER this module, so a
+        -- file-scope reference here would read nil. The index rides along for the readout line in
+        -- run(); resolving it there instead would make that layer env-dependent.
+        buyMarkup          = RLDealerQualityResolver.getMarkup(),
+        dealerQualityIndex = RLDealerQualityResolver.getActiveIndex(),
         server             = g_server,
         mission            = mission,
         ruleService        = ruleService,

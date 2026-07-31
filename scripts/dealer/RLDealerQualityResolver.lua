@@ -94,8 +94,12 @@ function RLDealerQualityResolver.getActiveIndex()
 end
 
 
---- The buy-side markup for the active preset. This is THE markup accessor -
---- every site that used to multiply by a hardcoded 1.075 calls this.
+--- The buy-side markup for the active preset. This is THE markup accessor for every LIVE pricing
+--- path. Two qualifications on "every", both deliberate: the herdsman reaches it INDIRECTLY, because
+--- RLHerdsmanPlanner must stay pure - RLHerdsmanDayTick.buildEnv calls this once per tick and
+--- injects the result as that planner's ctx.buyMarkup; and the DORMANT legacy per-pen herdsman buy
+--- in AIAnimalManager:onDayChanged keeps a fixed 1.075, does NOT call this, and is annotated in
+--- place while its freeze flag holds.
 --- Logs only when the resolved preset CHANGES, because this sits on the
 --- dealer-row render path and is called per row per refresh.
 --- @return number markup Multiplier applied to an animal's sell price
