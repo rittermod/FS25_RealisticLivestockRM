@@ -1607,17 +1607,6 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
 
     if reshaped ~= nil then
         genetics = reshaped                     -- MUST reassign: reshapeGenetics is non-mutating
-
-        -- Level-guarded: Lua evaluates call arguments before the logger can check
-        -- its level, so the getPreset lookup and the string.format below would be
-        -- paid on every generated animal even at ERROR. Mirrors the dealer-list
-        -- digest guard in RLMenuBuyFrame.
-        if Log.level >= RmLogging.LOG_LEVEL.DEBUG then
-            Log:debug("createNewSaleAnimal: reshaped genetics preset=%d(%s) outlier=%s met=%.3f qua=%.3f fer=%.3f hea=%.3f prd=%s",
-                presetIndex, RLDealerQualityModel.getPreset(presetIndex).key, tostring(wasOutlier),
-                genetics.metabolism, genetics.quality, genetics.fertility, genetics.health,
-                genetics.productivity ~= nil and string.format("%.3f", genetics.productivity) or "-")
-        end
     elseif not warnedReshapeReturnedNil then
         warnedReshapeReturnedNil = true
         Log:warning("createNewSaleAnimal: reshapeGenetics returned nil (preset=%s); keeping raw genetics",
@@ -1626,13 +1615,41 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
 
 
     local name
-    
+
     if math.random() >= 0.85 then name = g_currentMission.animalNameSystem:getRandomName(animalGender) end
+
+
+    -- Bound to a local so the value handed to the constructor can be logged beside
+    -- the genetics it derives from - the two numbers whose ratio shows whether the
+    -- reshape preceded construction. Its position is load-bearing in THREE ways and
+    -- each has a different failure mode:
+    --   AFTER the reshape above  - otherwise stored health derives from unreshaped
+    --                              genetics, which IS the post-hoc dealer-quality
+    --                              defect this whole seam exists to prevent.
+    --   AFTER the name draw      - the name gate directly above draws from the same
+    --                              math.random stream, so lifting this roll over it
+    --                              swaps the two draws and silently changes WHICH
+    --                              animals get names for a given seed.
+    --   BEFORE Animal.new        - the constructor consumes the value.
+    local storedHealth = math.clamp((math.random(650, 1000) / 10) * genetics.health, 0, 100)
+
+    -- Level-guarded: Lua evaluates call arguments before the logger can check its
+    -- level, so the getPreset lookup and the string.format below would be paid on
+    -- every generated animal even at ERROR. Exactly ONE line per generated animal,
+    -- carrying the health as it was BEFORE the disease pass. Triage aid, not a
+    -- pass/fail surface - the values are rounded, and the ratio only discriminates
+    -- on rows below the 100 clamp.
+    if Log.level >= RmLogging.LOG_LEVEL.DEBUG then
+        Log:debug("createNewSaleAnimal: reshaped genetics preset=%d(%s) outlier=%s met=%.3f qua=%.3f fer=%.3f hea=%.3f health=%.2f prd=%s",
+            presetIndex, RLDealerQualityModel.getPreset(presetIndex).key, tostring(wasOutlier),
+            genetics.metabolism, genetics.quality, genetics.fertility, genetics.health, storedHealth,
+            genetics.productivity ~= nil and string.format("%.3f", genetics.productivity) or "-")
+    end
 
 
     local animal = Animal.new({
         age = age,
-        health = math.clamp((math.random(650, 1000) / 10) * genetics.health, 0, 100),
+        health = storedHealth,
         monthsSinceLastBirth = monthsSinceLastBirth,
         gender = animalGender,
         subTypeIndex = subTypeIndex,
