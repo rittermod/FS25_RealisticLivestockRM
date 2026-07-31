@@ -87,6 +87,7 @@ Almost everything can be tuned to your preference:
 - Adjust accident and disease probability
 - Control dealer stock size
 - Choose which breeds and age groups the animal dealer offers at all
+- Set how good - and how expensive - the dealer's animals are (Budget / Standard / Premium)
 - Customise ear tag colours
 - Display genetics values in animal names (short or detailed format)
 - Export animal data to CSV
@@ -105,7 +106,7 @@ Open the **RL Menu** with **Right Shift + O** in-game - or, from the ESC menu's 
 - **Insemination** - Browse and buy stored semen for artificial breeding without keeping males
 - **Message Log** - Track births, deaths, diseases, and other events
 - **Herdsman** - Automate daily herd chores with rules: sell, buy, move, castrate, name, or inseminate the animals a saved filter picks, in the pens you choose. See the [Herdsman guide](guide-herdsman.md).
-- **Settings** - Adjust every RLRM option: death and disease toggles, food scaling, dealer stock size, which breeds and age groups the dealer offers, ear tag colours, genetics display, CSV export, and more. This tab also hosts the **saved filter** editor.
+- **Settings** - Adjust every RLRM option: death and disease toggles, food scaling, dealer stock size, how good the dealer's animals are, which breeds and age groups the dealer offers, ear tag colours, genetics display, CSV export, and more. This tab also hosts the **saved filter** editor.
 
 **Saved filters** let you narrow the Buy, Sell, Move, and Manage lists to just the animals you care about - and they are how the Herdsman targets animals. Press **F** on any of those screens to cycle them. See the [Saved Filters guide](guide-saved-filters.md).
 

@@ -93,6 +93,8 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 
 *The genetics tag format for Long mode is `[avg-metabolism:health:fertility:quality:productivity]` (productivity only shown for species that have it). Values are scaled 0-99.*
 
+These settings only change how genetics are DISPLAYED. They are unrelated to **Dealer Animal Quality**, which changes what the dealer actually generates.
+
 ---
 
 ## Custom Animals

@@ -202,6 +202,25 @@ Hiding every age group in a section removes that section's animals from the deal
 
 ---
 
+## Why are the dealer's animals so poor - or so expensive?
+
+**Short answer:** RL Menu -> **Settings** -> **Dealer Animal Quality**. One setting decides both how good the dealer's stock is and what it costs.
+
+- **Budget** - the dealer stocks weaker animals and asks barely more than they are worth. Cheap to buy from, slow to build a strong herd from.
+- **Standard** - the default, and exactly how the mod behaves without touching the setting: the full natural spread of animals at the usual dealer price.
+- **Premium** - the dealer stocks strong animals only, and charges a steep premium for them.
+
+A few things worth knowing:
+
+- **Roughly one animal in thirteen ignores the setting**, in either direction. A Budget dealer can be hiding a genuinely good animal, and a Premium one can offer something ordinary at a premium price. That is deliberate - it keeps it worth actually reading the list.
+- **Changing the setting restocks the dealer.** An animal's genetics are fixed when it is generated, so existing stock cannot be re-graded - it is replaced. Animals you already own are untouched, and the AI animals used for insemination are not affected at all.
+- **The herdsman pays the same price you do.** If you have it buying animals for you, it budgets at the active setting's markup.
+- **In multiplayer it is server-wide and admin-only** - other players see the setting but cannot change it.
+
+Don't confuse this with **Genetics Display**, which only changes whether genetics numbers are shown in animal names. It has no effect on what the dealer offers.
+
+---
+
 ## Why don't Hof Bergmann pasture bulls breed like cattle?
 
 **Short answer:** Hof Bergmann's pasture bulls are a completely different animal type from cattle. The game engine doesn't allow animals of different types to breed with each other, and this isn't something the mod can work around.
