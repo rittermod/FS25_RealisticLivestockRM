@@ -287,7 +287,7 @@ RLSettings.SETTINGS = {
 	-- display preference. Changing it REPOPULATES the dealer (genetics are baked
 	-- into each animal at generation, so the existing stock cannot be re-banded);
 	-- the AI insemination pool is deliberately left untouched (decided by Ritter
-	-- 2026-07-28, RLRM-554/555). State index IS the preset index - the callback
+	-- 2026-07-28). State index IS the preset index - the callback
 	-- and every reader depend on values[i] == i, which RLSettingsTests pins
 	-- against RLDealerQualityModel.DEFAULT_INDEX / PRESET_COUNT.
 	["dealerQuality"] = {

@@ -3,6 +3,8 @@
 ## 1.3.1.0-dev.2:
 - Added "Dealer Animal Quality" in RL Menu > Settings > General - choose whether the animal dealer stocks Budget, Standard or Premium animals. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing it discards the current dealer stock and restocks with new animals, and it does not affect the AI animals used for insemination. Admin only in multiplayer.
 - Fixed the animal dealer's poorest stock lingering forever on established saves - listings now rotate off the shelf after at most two in-game days.
+- Fixed the herdsman ignoring the "Dealer Animal Quality" setting when it buys animals - it always paid the Standard price, so Budget saves were overcharged and Premium saves underpaid; it now pays the same markup the dealer shows.
+- Added user-guide coverage for the dealer animal quality setting.
 
 ## 1.3.1.0-dev.1:
 - Added "Choose Animals For Sale" in RL Menu > Settings > General - pick which animals and age groups the animal dealer offers, and the dealer restocks to match. Admins can change it in multiplayer, and every player's dealer updates to match.

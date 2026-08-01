@@ -38,7 +38,7 @@ RLGeneticsDraw.MAX = RLConstants.GENETICS_MAX
 -- follow a change to the bounds it had just been refactored to read from one
 -- home: moving MIN or MAX alone silently produced an off-centre, mis-scaled bell
 -- and drove the rejection rate toward MAX_ATTEMPTS exhaustion, which only WARNs.
--- Deriving it closes that coupling (RLRM-556 review F6, Ritter 2026-07-29).
+-- Deriving it closes that coupling.
 --
 -- Behaviour is unchanged for the shipped domain: `(0.25 + 1.75) / 2` is exactly
 -- `1.0`, the value the literal carried.
@@ -137,7 +137,7 @@ function RLGeneticsDraw.draw(traitKeys, randomFn)
         local qUnit = (randomFn() + randomFn() + randomFn()) / 3
         -- CENTRE, not a literal 1: the curve follows the domain if either bound
         -- ever moves. Identical arithmetic for the shipped domain, where CENTRE
-        -- is exactly 1.0 (RLRM-556 review F6).
+        -- is exactly 1.0.
         local q = (RLGeneticsDraw.CENTRE - RLGeneticsDraw.H) + 2 * RLGeneticsDraw.H * qUnit
 
         local values = {}
@@ -203,6 +203,5 @@ function RLGeneticsDraw.draw(traitKeys, randomFn)
 
     return lastValues, RLGeneticsDraw.MAX_ATTEMPTS, true
 end
-
 
 Log:info("RLGeneticsDraw loaded")
