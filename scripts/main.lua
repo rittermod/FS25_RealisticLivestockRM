@@ -11,7 +11,12 @@ local modDirectory = g_currentModDirectory
 -- SECTION 0: Logging
 source(modDirectory .. "scripts/rmlib/RmLogging.lua")
 Log = RmLogging.getLogger("RLRM")
-Log:setLevel(RmLogging.LOG_LEVEL.DEBUG)
+source(modDirectory .. "scripts/rmlib/RmVersion.lua")
+local Ver = RmVersion.forMod(g_currentModName, Log)
+Log:info("Build: %s", Ver:describe())
+-- DEBUG unless this is a released stable version (>= 1.0.0.0 with no -dev suffix).
+Ver:applyBuildLogLevel()
+-- Log:setLevel(RmLogging.LOG_LEVEL.DEBUG) -- Manual override of log level
 
 -- SECTION 1: Font Library
 source(modDirectory .. "scripts/fontlib/RmFontCharacter.lua")
