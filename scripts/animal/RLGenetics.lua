@@ -1,26 +1,32 @@
 --[[
     RLGenetics.lua
     The one home for genetics BANDING: the two tier ladders, the single-value
-    domain predicate, and the guarded domain entries that sit on top of them.
+    domain predicate, the guarded domain entries that sit on top of them, and
+    the whole-table layer - the validity verdict and the aggregate.
 
     Engine-free and deterministic in what it returns: no g_* access, no GUI, no
     XML, no engine natives. RmLogging and RLConstants at file scope are the only
     couplings, so the module dual-runs headless.
 
     It is NOT side-effect-free, and calling it "pure" without that qualifier is
-    wrong: three module-scope warn latches are its mutable state, and the
-    failure path logs.
+    wrong: six module-scope warn latches are its mutable state, and the failure
+    paths log.
 
-    Two layers, deliberately separated:
+    Three layers, deliberately separated:
 
       resolve()   the raw ladder primitive - any number against any ladder, no
                   domain opinion, and it RAISES on a nil or non-number value. A
                   caller whose value is not a genetics trait uses this directly.
 
       perTrait() / fertility() / overall()
-                  the DOMAIN entries. Each guards its input, NEVER raises, and
-                  falls back to its ladder's lowest band with one latched
-                  warning.
+                  the SINGLE-VALUE domain entries. Each guards its input, NEVER
+                  raises, and falls back to its ladder's lowest band with one
+                  latched warning.
+
+      validateGenetics() / aggregate()
+                  the WHOLE-TABLE entries. Both take a genetics table plus an
+                  optional stat set, never raise on any argument of any type,
+                  and share one canonical walk order.
 
     KEYS arrays hold FULL localisation keys, and there is always exactly one
     more key than there are thresholds - the extra key is the fall-through band
@@ -86,24 +92,63 @@ RLGenetics.OVERALL_KEYS = {
 RLGenetics.INFERTILE_KEY = "rl_ui_genetics_infertile"
 
 
+-- The stat set a whole-table walk covers, in CANONICAL order. That order is
+-- itself contract: the walk always follows it (filtered to the resolved set),
+-- never the caller's array order, which is what makes `badKey` a property of
+-- the DATA rather than of the call site and keeps a reordered subset summing
+-- bit-for-bit identically.
+--
+-- A fourth named trait array, deliberately NOT reused from RLGeneticsDraw: the
+-- draw arrays say what to GENERATE and split productivity by animal type, while
+-- this says what to AGGREGATE and marks productivity optional per member.
+-- Reusing them would also give this module a file-scope dependency it excludes
+-- on purpose.
+--
+-- READ-ONLY by contract - see PER_TRAIT_THRESHOLDS.
+RLGenetics.DEFAULT_STAT_KEYS = { "metabolism", "quality", "health", "fertility", "productivity" }
+
+-- Stats whose ABSENCE is normal rather than a partial load, so they drop out of
+-- the denominator when the key is missing. Optionality is inferred from key
+-- presence, not animal type - the whole-table entries receive no
+-- animalTypeIndex, and `statKeys` is the escape hatch for a caller that knows
+-- the species.
+--
+-- READ-ONLY by contract - see PER_TRAIT_THRESHOLDS.
+RLGenetics.OPTIONAL_STATS = { productivity = true }
+
+
 -- The fall-through band of each ladder, resolved once. Both domain entries use
 -- their ladder's lowest key as the guarded fallback, so a corrupt value reads
 -- as the worst band rather than as a plausible middling one.
 local LOWEST_PER_TRAIT = RLGenetics.PER_TRAIT_KEYS[#RLGenetics.PER_TRAIT_KEYS]
 local LOWEST_OVERALL   = RLGenetics.OVERALL_KEYS[#RLGenetics.OVERALL_KEYS]
 
+-- Membership set over DEFAULT_STAT_KEYS, built once. A table READ against it is
+-- raise-safe for every key type including NaN, which is what lets the resolver
+-- reject a malformed entry BEFORE it would have to write one.
+local DEFAULT_MEMBER = {}
+for _, key in ipairs(RLGenetics.DEFAULT_STAT_KEYS) do DEFAULT_MEMBER[key] = true end
 
--- One latch per domain entry: the first corrupt value each entry meets is
+
+-- One latch per reporting cause: the first offender each cause meets is
 -- reported, the rest are silent. Banding runs several times per rendered row,
 -- so an unlatched warning would flood the log from a single bad animal.
 --
+-- The two aggregate causes latch SEPARATELY on purpose. A single shared latch
+-- would let one `aggregate(nil)` at map load - reachable through
+-- `Animal:setGenetics`, which validates nothing - silence every genuinely
+-- corrupt trait table for the rest of the session, which is the exact failure
+-- this layer exists to surface.
+--
 -- Module scope, NOT an `RLGenetics = RLGenetics or {}` idiom: main.lua re-sources
 -- per map load, so these reset when a save is loaded. Accepted cost - on a
--- long-running dedicated server only the first corrupt animal per entry is
--- reported.
+-- long-running dedicated server only the first offender per cause is reported.
 local warnedPerTrait = false
 local warnedFertility = false
 local warnedOverall = false
+local warnedStatKeys = false
+local warnedContainer = false
+local warnedMember = false
 
 
 -- What each entry actually accepts, in the entry's own terms. These are NOT
@@ -114,6 +159,19 @@ local EXPECTED_PER_TRAIT = string.format("a trait value in [%s, %s], or exactly 
     tostring(RLGenetics.MIN), tostring(RLGenetics.MAX), tostring(RLGenetics.INFERTILE_VALUE))
 local EXPECTED_FERTILITY = EXPECTED_PER_TRAIT
 local EXPECTED_OVERALL = "a finite number (an aggregate factor is open-ended, NOT clamped to the trait domain)"
+local EXPECTED_CONTAINER = "a genetics table"
+
+-- A FORMAT string, not a finished one: the `%%s` survives this outer
+-- `string.format` and is filled with the offending stat name at the warn site.
+-- The key belongs in the expectation rather than in the entry name, because the
+-- latch is per CAUSE and not per key - naming the entry `aggregate[quality]`
+-- would tell a maintainer that only `quality` was suppressed, when in fact the
+-- first corrupt member of ANY stat silences every later one.
+local EXPECTED_MEMBER = string.format(
+    "stat '%%s' to be absent, or a value in [%s, %s], or exactly %s for fertility",
+    tostring(RLGenetics.MIN), tostring(RLGenetics.MAX), tostring(RLGenetics.INFERTILE_VALUE))
+
+local EXPECTED_STAT_KEYS = "a dense array of distinct DEFAULT_STAT_KEYS members"
 
 
 --- Emit one latched warning describing a rejected value.
@@ -123,14 +181,24 @@ local EXPECTED_OVERALL = "a finite number (an aggregate factor is open-ended, NO
 --- `string.format` BARE (the in-game logger pcalls it), so a numeric verb would
 --- raise headless only - breaking dual-run parity and the never-raises contract
 --- at the same time.
---- @param entry string Name of the domain entry, for the log line
+---
+--- The tail says "of this kind" rather than "from this entry" because each latch
+--- covers one CAUSE, and causes do not map one-to-one onto entries: `aggregate`
+--- owns two (malformed container, malformed member), and the `statKeys` fallback
+--- latch is shared across both public entries.
+--- @param entry string Name of the entry, for the log line
 --- @param value any The rejected value
---- @param fallbackKey string The key being returned instead
+--- @param fallback any What is being returned instead - a band key for the
+---        single-value entries, a phrase for the whole-table ones
 --- @param expectation string What this entry accepts, phrased for this entry
-local function warnRejected(entry, value, fallbackKey, expectation)
+--- @param verb string|nil How the fallback is being delivered. Defaults to
+---        "banding as", which is what every single-value entry means; the
+---        whole-table entries return a triple rather than a band, so they pass
+---        their own verb rather than describing a band that does not exist
+local function warnRejected(entry, value, fallback, expectation, verb)
     Log:warning(
-        "RLGenetics.%s: rejected value %s (type %s) - banding as %s. Expected %s. Further occurrences from this entry are silent until the next map load.",
-        entry, tostring(value), type(value), tostring(fallbackKey), expectation)
+        "RLGenetics.%s: rejected value %s (type %s) - %s %s. Expected %s. Further occurrences of this kind are silent until the next map load.",
+        entry, tostring(value), type(value), verb or "banding as", tostring(fallback), expectation)
 end
 
 
@@ -281,7 +349,256 @@ function RLGenetics.overall(factor)
 end
 
 
---- Clear all three warn latches so the next corrupt value is reported again.
+-- =========================================================================
+-- The whole-table layer: one stat-set resolver, one validity verdict, one
+-- aggregate.
+-- =========================================================================
+
+--- Count every entry in a table, array part and map part alike.
+---
+--- `#` and `ipairs` both stop at the first hole and therefore AGREE with each
+--- other on `{"metabolism", nil, "health"}` (both say 1) - so only a `pairs`
+--- count detects that shape. `pairs` is banned over a `genetics` table, whose
+--- out-of-schema keys must be ignored; it is not banned over `statKeys`, which
+--- is a caller argument being validated rather than data being read.
+--- @param t table
+--- @return number count
+local function pairsCount(t)
+    local count = 0
+    for _ in pairs(t) do count = count + 1 end
+    return count
+end
+
+
+--- Emit the shared, latched `statKeys` fallback warning.
+---
+--- One latch for both whole-table entries, so a single bad argument is reported
+--- once even though `aggregate` resolves twice.
+--- @param statKeys any The rejected argument
+--- @param rule string Which rule it broke, for the log line
+local function warnStatKeys(statKeys, rule)
+    if warnedStatKeys then return end
+
+    warnedStatKeys = true
+    warnRejected("resolveStatKeys", statKeys, "the default stat set",
+        EXPECTED_STAT_KEYS .. " - this one " .. rule, "falling back to")
+end
+
+
+--- Build a fresh, canonically ordered stat array.
+---
+--- Always a COPY: the module's own `DEFAULT_STAT_KEYS` is read-only by contract
+--- and is never handed out, not even internally, so no later edit can turn a
+--- walk into a mutation of the constant.
+--- @param seen table|nil Membership set to filter by; `nil` means every member
+--- @return table keys Canonically ordered
+local function canonicalCopy(seen)
+    local keys = {}
+
+    for _, key in ipairs(RLGenetics.DEFAULT_STAT_KEYS) do
+        if seen == nil or seen[key] then keys[#keys + 1] = key end
+    end
+
+    return keys
+end
+
+
+--- Resolve a caller's `statKeys` argument to a canonical stat set.
+---
+--- The ORDER of the checks is the contract, not just the rules themselves.
+--- Membership is tested BEFORE any `seen[key]` write because `DEFAULT_MEMBER[0/0]`
+--- is a table READ and is fine, while `seen[0/0] = true` RAISES "table index is
+--- NaN". Verified in LuaJIT.
+---
+--- `nil` is the ORDINARY call and is silent; every genuine malformation falls
+--- back to the full default set with one shared latched warning.
+--- @param statKeys table|nil Caller's stat array, or nil for the default set
+--- @return table keys A fresh canonically ordered array. Never raises
+local function resolveStatKeys(statKeys)
+    -- Not a malformation: the overwhelmingly common call passes nothing.
+    if statKeys == nil then return canonicalCopy(nil) end
+
+    if type(statKeys) ~= "table" then
+        warnStatKeys(statKeys, "is not a table")
+        return canonicalCopy(nil)
+    end
+
+    local seen, walked = {}, 0
+
+    -- `ipairs`, so a hole simply ends the walk rather than raising. The index is
+    -- carried into the warning because `tostring(statKeys)` is a per-run table
+    -- address - useless in a log - so the rule text is the only actionable part.
+    for i, key in ipairs(statKeys) do
+        if DEFAULT_MEMBER[key] == nil then
+            warnStatKeys(statKeys, string.format(
+                "carries an entry that is not a DEFAULT_STAT_KEYS member (index %s: %s)",
+                tostring(i), tostring(key)))
+            return canonicalCopy(nil)
+        end
+
+        if seen[key] then
+            warnStatKeys(statKeys, string.format("repeats an entry (index %s: %s)",
+                tostring(i), tostring(key)))
+            return canonicalCopy(nil)
+        end
+
+        seen[key] = true
+        walked = walked + 1
+    end
+
+    if walked == 0 then
+        warnStatKeys(statKeys, "is empty, or begins with a hole")
+        return canonicalCopy(nil)
+    end
+
+    if pairsCount(statKeys) ~= walked then
+        warnStatKeys(statKeys, "has a hole or a map-style entry")
+        return canonicalCopy(nil)
+    end
+
+    return canonicalCopy(seen)
+end
+
+
+--- Is every stat in the resolved set readable?
+---
+--- Validity is an ALLOWLIST evaluated per NAMED trait key, so `0` passes for
+--- `fertility` and fails everywhere else. It is scoped to the RESOLVED stat set:
+--- a corrupt member outside a narrowed set neither validates nor fails, and an
+--- out-of-schema key is ignored for the same reason.
+---
+--- SILENT about `genetics` by contract - it returns a verdict and leaves the
+--- reporting to whoever acts on it. Only the shared `statKeys` resolver may warn
+--- from here.
+---
+--- @param genetics any The genetics table. A non-table is a verdict, not a raise
+--- @param statKeys table|nil Stat set to check; defaults to DEFAULT_STAT_KEYS
+--- @return boolean ok
+--- @return string|nil badKey First offending key in canonical order. NIL when
+---         `ok` is false means the CONTAINER itself was unusable
+--- @return any badValue The offending value, or the container argument
+function RLGenetics.validateGenetics(genetics, statKeys)
+    -- FIRST statement, and load-bearing rather than defensive habit:
+    -- `(7).metabolism`, `(true).metabolism` and `(nil).metabolism` all raise in
+    -- LuaJIT, while `("x").metabolism` does not.
+    if type(genetics) ~= "table" then return false, nil, genetics end
+
+    for _, key in ipairs(resolveStatKeys(statKeys)) do
+        local value = genetics[key]
+
+        if not RLGenetics.isValidTraitValue(value, key) then
+            return false, key, value
+        end
+    end
+
+    return true, nil, nil
+end
+
+
+--- Aggregate a genetics table into both dialects at once.
+---
+--- Returns the normalised `factor` the Overall ladder bands, the raw `mean` the
+--- `[NN]` name tag scales, and how many stats were actually readable.
+---
+--- **Poison, not skip.** A single invalid member discards the whole aggregate -
+--- one corrupt trait costs four good ones, deliberately, because a plausible
+--- average built from the survivors hides the corruption instead of surfacing it.
+---
+--- **The denominator and `presentCount` are different counts, and the asymmetry
+--- is entirely about ABSENT stats.** A present stat always joins both. An absent
+--- stat joins the denominator only when it is NOT optional - so a missing
+--- `metabolism` still divides (the animal is scored as having lost it), while a
+--- missing `productivity` simply narrows the set (a pig never had one).
+---
+--- Stating it as "the KEY is present" would be vacuous: in Lua a nil-valued key
+--- does not exist, so key-presence and value-presence are the same test. The
+--- real rule is the optionality one above.
+---
+--- Consequences: a castrated male's `fertility = 0` raises `presentCount` and
+--- contributes 0 to the sum; `presentCount` is always <= the denominator; and the
+--- empty table divides by 4 rather than short-circuiting.
+---
+--- **Known artifact, pinned rather than endorsed: a BAND derived from `factor`
+--- depends on the TERM COUNT, not only on the trait values.** Float addition is
+--- not associative, so accumulating n copies of one value and dividing does not
+--- reproduce the exact quotient: four literal `0.35` values sum to
+--- 1.3999999999999999 while five sum to exactly 1.75, and those straddle a rung -
+--- so the same nominal animal can band one tier apart purely by stat count. That
+--- is a rounding consequence, NOT a design decision; whether banding should round
+--- or compare with an epsilon is an open question owned outside this module. The
+--- three returns below are unaffected either way - only a ladder applied to
+--- `factor` sees it - and the suite pins today's behaviour so that changing it
+--- has to be deliberate.
+---
+--- Separately, and not to be confused with the above, that same non-associativity
+--- is why the walk order is canonical rather than the caller's, and why `factor`
+--- and `mean` each get their OWN expression from the shared sum - deriving one
+--- from the other moves the result by an ulp, which is invisible everywhere
+--- except at an exact rung.
+---
+--- @param genetics any The genetics table. A non-table returns the zero triple
+--- @param statKeys table|nil Stat set to walk; defaults to DEFAULT_STAT_KEYS
+--- @return number factor `sum / (MAX * denominator)`, or 0
+--- @return number mean `sum / denominator`, or 0
+--- @return number presentCount How many stats OF THE RESOLVED SET held a value -
+---         scoped, so a narrowed `statKeys` lowers it even when the table is
+---         fully populated. Never nil, never raises
+function RLGenetics.aggregate(genetics, statKeys)
+    if type(genetics) ~= "table" then
+        if not warnedContainer then
+            warnedContainer = true
+            warnRejected("aggregate", genetics, "0, 0, 0", EXPECTED_CONTAINER, "returning")
+        end
+
+        return 0, 0, 0
+    end
+
+    local keys = resolveStatKeys(statKeys)
+
+    -- Calls the public helper rather than inlining the check, so the poison
+    -- behaviour here is definitionally whatever validateGenetics says and the
+    -- two can never disagree. The accepted cost is a second resolveStatKeys
+    -- pass; it is idempotent, and the shared latch still warns at most once.
+    local ok, badKey, badValue = RLGenetics.validateGenetics(genetics, statKeys)
+
+    if not ok then
+        if not warnedMember then
+            warnedMember = true
+            warnRejected("aggregate", badValue, "0, 0, 0",
+                string.format(EXPECTED_MEMBER, tostring(badKey)), "returning")
+        end
+
+        return 0, 0, 0
+    end
+
+    local sum, denominator, presentCount = 0, 0, 0
+
+    for _, key in ipairs(keys) do
+        local value = genetics[key]
+
+        -- Presence is `~= nil`, never truthiness: `false` is present (and would
+        -- already have poisoned above), absent is absent.
+        if value ~= nil then
+            sum = sum + value
+            presentCount = presentCount + 1
+            denominator = denominator + 1
+        elseif not RLGenetics.OPTIONAL_STATS[key] then
+            denominator = denominator + 1
+        end
+    end
+
+    -- Branches on the DENOMINATOR, not on presentCount: `aggregate({})` has
+    -- denominator 4 and legitimately divides to 0, while a stat set of only
+    -- optional absent members has nothing to divide by at all.
+    if denominator == 0 then return 0, 0, 0 end
+
+    -- Each dialect from its own expression against the shared sum. Never derive
+    -- one from the other - see the term-count note above.
+    return sum / (RLGenetics.MAX * denominator), sum / denominator, presentCount
+end
+
+
+--- Clear all six warn latches so the next offender is reported again.
 ---
 --- TEST SEAM. Production never calls it: the latches are meant to survive a
 --- session and are reset by the per-map-load re-source. It exists so a suite
@@ -292,6 +609,9 @@ function RLGenetics._resetWarnLatches()
     warnedPerTrait = false
     warnedFertility = false
     warnedOverall = false
+    warnedStatKeys = false
+    warnedContainer = false
+    warnedMember = false
 end
 
 
