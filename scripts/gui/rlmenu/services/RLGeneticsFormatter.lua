@@ -5,10 +5,22 @@
     Converts Animal genetics + type into a list of display-ready rows:
       { { labelKey, valueKey, colorKey, numericValue }, ... }
 
-    Thresholds match Animal:addGeneticsInfo. Pure module - no g_* access,
-    no GUI calls. Unit-testable without a running mission. The optional
-    numericValue (0-99) is produced by RLScaleHelper.scaleToNinetyNine,
-    the same helper that powers the in-game animal name tag.
+    Banding is NOT owned here. RLGenetics owns both ladders and the domain
+    entries; this module re-exports its constants and forwards its resolvers, so
+    every consumer of RLGenetics bands identically by construction.
+
+    REMAINING DUPLICATE: Animal:addGeneticsInfo still carries its own copy of
+    these numbers and is deliberately not migrated here. It bands identically
+    today, so nothing is visibly wrong - but the locked-numbers tripwire in
+    RLGeneticsTests does NOT cover it, and the two can drift silently. Do not
+    read "one home" as "only home" until that call site moves.
+
+    Engine-free - no g_* access, no GUI calls - and unit-testable without a
+    running mission. NOT side-effect-free, though: the fertility resolver
+    forwards into RLGenetics, which logs and flips a warn latch on a rejected
+    value. The optional numericValue (0-99) is produced by
+    RLScaleHelper.scaleToNinetyNine, the same helper that powers the in-game
+    animal name tag.
 ]]
 
 local Log = RmLogging and RmLogging.getLogger and RmLogging.getLogger("RLRM") or nil
@@ -19,42 +31,40 @@ RLGeneticsFormatter = {}
 -- Tier label keys (localization keys resolved by the frame, not here)
 -- =============================================================================
 
+-- All five constants below are RE-EXPORTS: they are the SAME OBJECTS as
+-- RLGenetics', not copies. Two consequences a maintainer must not lose:
+--   * they are READ-ONLY by contract - mutating one here mutates every consumer
+--     of RLGenetics, mod-wide;
+--   * binding them at file scope pins this module AFTER RLGenetics in
+--     main.lua's source order.
+-- The names are kept so existing consumers and tests read unchanged.
+
 --- Keys used by the stat rows that lean "high = good": metabolism, health,
 --- fertility, meat quality, productivity. Ordered highest-first so a linear
 --- scan stops at the first threshold the value meets.
-RLGeneticsFormatter.HIGH_TIER_KEYS = {
-    "rl_ui_genetics_extremelyHigh",
-    "rl_ui_genetics_veryHigh",
-    "rl_ui_genetics_high",
-    "rl_ui_genetics_average",
-    "rl_ui_genetics_low",
-    "rl_ui_genetics_veryLow",
-    "rl_ui_genetics_extremelyLow",
-}
+--- @see RLGenetics.PER_TRAIT_KEYS
+RLGeneticsFormatter.HIGH_TIER_KEYS = RLGenetics.PER_TRAIT_KEYS
 
 --- Thresholds for the HIGH_TIER_KEYS ladder, one per key in the same order.
 --- Value >= thresholds[i] selects keys[i]; values below the last threshold
 --- fall through to "extremelyLow".
-RLGeneticsFormatter.HIGH_TIER_THRESHOLDS = { 1.65, 1.4, 1.1, 0.9, 0.7, 0.35 }
+--- @see RLGenetics.PER_TRAIT_THRESHOLDS
+RLGeneticsFormatter.HIGH_TIER_THRESHOLDS = RLGenetics.PER_TRAIT_THRESHOLDS
 
 --- Keys used by the Overall row, which leans "high = good" but uses a
 --- separate "good/bad" vocabulary distinct from the other stats.
-RLGeneticsFormatter.OVERALL_TIER_KEYS = {
-    "rl_ui_genetics_extremelyGood",
-    "rl_ui_genetics_veryGood",
-    "rl_ui_genetics_good",
-    "rl_ui_genetics_average",
-    "rl_ui_genetics_bad",
-    "rl_ui_genetics_veryBad",
-    "rl_ui_genetics_extremelyBad",
-}
+--- @see RLGenetics.OVERALL_KEYS
+RLGeneticsFormatter.OVERALL_TIER_KEYS = RLGenetics.OVERALL_KEYS
 
---- Thresholds for the OVERALL_TIER_KEYS ladder. Matches
---- Animal:addGeneticsInfo thresholds.
-RLGeneticsFormatter.OVERALL_TIER_THRESHOLDS = { 0.95, 0.8, 0.6, 0.4, 0.2, 0.05 }
+--- Thresholds for the OVERALL_TIER_KEYS ladder. Scaled for a normalised
+--- aggregate FACTOR, not a raw trait value, so it is never interchangeable with
+--- HIGH_TIER_THRESHOLDS.
+--- @see RLGenetics.OVERALL_THRESHOLDS
+RLGeneticsFormatter.OVERALL_TIER_THRESHOLDS = RLGenetics.OVERALL_THRESHOLDS
 
 --- Fertility has a special "infertile" tier at value == 0.
-RLGeneticsFormatter.FERTILITY_INFERTILE_KEY = "rl_ui_genetics_infertile"
+--- @see RLGenetics.INFERTILE_KEY
+RLGeneticsFormatter.FERTILITY_INFERTILE_KEY = RLGenetics.INFERTILE_KEY
 
 -- =============================================================================
 -- Color keys (consumed by frame; frame maps key -> RGBA tuple for setTextColor)
@@ -98,30 +108,29 @@ RLGeneticsFormatter.VALUE_KEY_TO_COLOR_KEY = {
 --- Pick a tier key from a value against a thresholds+keys ladder. Ladders
 --- always have one more key than thresholds; values below the last threshold
 --- fall through to the last key.
+---
+--- Thin forwarder to the shared primitive, which is STRICT: it raises on a nil
+--- or non-number value rather than inventing a band.
 --- @param value number
 --- @param thresholds table list of thresholds, highest first
 --- @param keys table list of tier keys, same order as thresholds + 1
 --- @return string key
+--- @see RLGenetics.resolve
 function RLGeneticsFormatter.resolveTier(value, thresholds, keys)
-    for i, threshold in ipairs(thresholds) do
-        if value >= threshold then return keys[i] end
-    end
-    return keys[#keys]
+    return RLGenetics.resolve(value, thresholds, keys)
 end
 
 --- Resolve a fertility value to its tier key, honoring the special
 --- "infertile" case at value == 0.
---- @param fertility number
+---
+--- Thin forwarder to the shared domain entry, which guards its input and never
+--- raises. No local nil coalesce is needed: a nil fertility bands as the lowest
+--- tier there too, NOT as infertile.
+--- @param fertility number|nil
 --- @return string key
+--- @see RLGenetics.fertility
 function RLGeneticsFormatter.resolveFertilityTier(fertility)
-    if fertility ~= nil and fertility <= 0 then
-        return RLGeneticsFormatter.FERTILITY_INFERTILE_KEY
-    end
-    return RLGeneticsFormatter.resolveTier(
-        fertility or 0,
-        RLGeneticsFormatter.HIGH_TIER_THRESHOLDS,
-        RLGeneticsFormatter.HIGH_TIER_KEYS
-    )
+    return RLGenetics.fertility(fertility)
 end
 
 -- =============================================================================
@@ -178,8 +187,10 @@ end
 
 --- Format an animal's genetics into display-ready rows.
 ---
---- Returns 5 rows for animals without a productivity stat (pigs, horses,
---- bulls) and 6 rows for cow/sheep/chicken. Rows are:
+--- The productivity row is gated by animal TYPE, not by gender or subtype: COW,
+--- SHEEP and CHICKEN carry it, so a bull gets it too (a bull is AnimalType.COW).
+--- Types with no productivity label - pigs and horses - get 5 rows; the rest get
+--- 6, provided the animal actually carries a productivity value. Rows are:
 ---   [1] Overall     ("good/bad" scale)
 ---   [2] Metabolism  ("high/low" scale)
 ---   [3] Health      ("high/low" scale)

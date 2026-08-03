@@ -112,6 +112,13 @@ source(modDirectory .. "scripts/animal/BreedingMath.lua")
 -- resolved at call time by AnimalSystem:createNewSaleAnimal, so this later slot
 -- is safe despite AnimalSystem sourcing earlier.
 source(modDirectory .. "scripts/animal/RLGeneticsDraw.lua")
+-- Genetics banding ladders + the domain predicate. Two real ordering
+-- constraints, and neither is "consumers resolve at call time":
+--   * it READS RLConstants at file scope, so it must follow SECTION 2c;
+--   * any consumer that binds one of its re-exported TABLES at file scope is
+--     pinned AFTER this line - today that is RLGeneticsFormatter (SECTION 13b).
+-- Consumers that only call its functions are unconstrained.
+source(modDirectory .. "scripts/animal/RLGenetics.lua")
 
 -- SECTION 11c: Horse Logic (delegate module, sourced before Animal.lua)
 source(modDirectory .. "scripts/animal/AnimalHorse.lua")
