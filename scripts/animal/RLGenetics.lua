@@ -266,6 +266,24 @@ end
 --- it `animal.genetics` wholesale, so every castrated male and freemartin
 --- heifer would warn on every render.
 ---
+--- Two consequences are CONTRACT, decided rather than accidental:
+---
+---   * ABSENT bands as the lowest band, silently, indistinguishable from a
+---     genuinely terrible trait. There is deliberately no nil or
+---     not-applicable return for it: no production caller can feed an absent
+---     trait (generic loops iterate `pairs`, so an absent key never reaches
+---     the call, and the row formatter coalesces or omits before banding), and
+---     a sentinel would break the never-nil guarantee for a case nobody
+---     produces. A caller that needs absent and present to differ tests for
+---     nil BEFORE calling - see `isValidTraitValue`.
+---
+---   * Fertility 0 bands as the lowest band HERE and as infertile via
+---     `fertility` - which entry a surface calls is a preserved per-call-site
+---     choice. Unifying that vocabulary across surfaces is a decision owned
+---     outside this module; do not "fix" it here by teaching this entry a
+---     trait key. A generic loop already holds the trait key and can branch
+---     to `fertility` at the call site when that decision lands.
+---
 --- @param value number|nil Trait value; `nil` is treated as absent
 --- @return string key Never nil, never raises
 function RLGenetics.perTrait(value)
@@ -294,6 +312,11 @@ end
 --- runs BEFORE the infertile test, so the allowlist stays symmetric with
 --- `perTrait` and a negative value is rejected instead of being read as
 --- sterile.
+---
+--- This entry is the ONE owner of the infertile BAND: `perTrait(0)` bands
+--- lowest because it cannot know the value is fertility, so a surface that
+--- wants "infertile" calls THIS entry. That split is contract, not accident -
+--- see `perTrait`.
 ---
 --- @param value number|nil Fertility value; `nil` is treated as absent
 --- @return string key Never nil, never raises
