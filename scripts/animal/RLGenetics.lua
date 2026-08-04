@@ -518,17 +518,22 @@ end
 --- contributes 0 to the sum; `presentCount` is always <= the denominator; and the
 --- empty table divides by 4 rather than short-circuiting.
 ---
---- **Known artifact, pinned rather than endorsed: a BAND derived from `factor`
---- depends on the TERM COUNT, not only on the trait values.** Float addition is
---- not associative, so accumulating n copies of one value and dividing does not
---- reproduce the exact quotient: four literal `0.35` values sum to
---- 1.3999999999999999 while five sum to exactly 1.75, and those straddle a rung -
---- so the same nominal animal can band one tier apart purely by stat count. That
---- is a rounding consequence, NOT a design decision; whether banding should round
---- or compare with an epsilon is an open question owned outside this module. The
---- three returns below are unaffected either way - only a ladder applied to
---- `factor` sees it - and the suite pins today's behaviour so that changing it
---- has to be deliberate.
+--- **Known artifact: a BAND derived from `factor` depends on the TERM COUNT,
+--- not only on the trait values.** Float addition is not associative, so
+--- accumulating n copies of one value and dividing does not reproduce the exact
+--- quotient: four literal `0.35` values sum to 1.3999999999999999 while five
+--- sum to exactly 1.75, and those straddle a rung - so the same nominal animal
+--- can band one tier apart purely by stat count. That is a rounding
+--- consequence, NOT a design decision; whether banding should round or compare
+--- with an epsilon is an open question owned outside this module. The artifact
+--- is harmless per stat set: one animal under one `statKeys` set yields the
+--- same factor at every call site, so no two consumers can disagree on its
+--- band - but a caller passing a NARROWED `statKeys` changes the denominator
+--- and legitimately gets a different factor, so that guarantee is per-stat-set,
+--- not universal. The three returns below are unaffected either way - only a
+--- ladder applied to `factor` sees it. The suite pins the two straddling
+--- doubles as `%.17g` strings (which arithmetic ran) and keeps its own
+--- band-key fixtures off the rungs; the band SPLIT itself is not a contract.
 ---
 --- Separately, and not to be confused with the above, that same non-associativity
 --- is why the walk order is canonical rather than the caller's, and why `factor`
