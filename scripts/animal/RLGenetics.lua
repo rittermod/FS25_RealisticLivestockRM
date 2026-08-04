@@ -9,7 +9,8 @@
     couplings, so the module dual-runs headless.
 
     It is NOT side-effect-free, and calling it "pure" without that qualifier is
-    wrong: six module-scope warn latches are its mutable state, and the failure
+    wrong: five module-scope rejection counters with latest-offender snapshots,
+    plus the one-shot statKeys latch, are its mutable state, and the failure
     paths log.
 
     Three layers, deliberately separated:
@@ -20,8 +21,9 @@
 
       perTrait() / fertility() / overall()
                   the SINGLE-VALUE domain entries. Each guards its input, NEVER
-                  raises, and falls back to its ladder's lowest band with one
-                  latched warning.
+                  raises, and falls back to its ladder's lowest band with a
+                  counted, milestone-throttled warning that can carry a
+                  caller-supplied diagnostic context.
 
       validateGenetics() / aggregate()
                   the WHOLE-TABLE entries. Both take a genetics table plus an
@@ -130,25 +132,47 @@ local DEFAULT_MEMBER = {}
 for _, key in ipairs(RLGenetics.DEFAULT_STAT_KEYS) do DEFAULT_MEMBER[key] = true end
 
 
--- One latch per reporting cause: the first offender each cause meets is
--- reported, the rest are silent. Banding runs several times per rendered row,
--- so an unlatched warning would flood the log from a single bad animal.
+-- One counter per DATA-rejection cause, plus that cause's latest-offender
+-- snapshots. Banding runs several times per rendered row, so an unthrottled
+-- warning would flood the log from a single bad animal; each cause reports its
+-- first occurrence and then power-of-ten milestone rollups, so hundreds of bad
+-- animals read as hundreds instead of masquerading as one.
 --
--- The two aggregate causes latch SEPARATELY on purpose. A single shared latch
--- would let one `aggregate(nil)` at map load - reachable through
--- `Animal:setGenetics`, which validates nothing - silence every genuinely
--- corrupt trait table for the rest of the session, which is the exact failure
--- this layer exists to surface.
+-- The two aggregate causes count SEPARATELY on purpose. A single shared
+-- counter would let one `aggregate(nil)` at map load - reachable through
+-- `Animal:setGenetics`, which validates nothing - absorb the first report of a
+-- genuinely corrupt trait table, which is the exact failure this layer exists
+-- to surface. Counting stays per CAUSE, never per context or per animal -
+-- those key spaces are unbounded.
 --
--- Module scope, NOT an `RLGenetics = RLGenetics or {}` idiom: main.lua re-sources
--- per map load, so these reset when a save is loaded. Accepted cost - on a
--- long-running dedicated server only the first offender per cause is reported.
-local warnedPerTrait = false
-local warnedFertility = false
-local warnedOverall = false
+-- Snapshots are STRINGS, captured at the warn site: `tostring` at capture time
+-- keeps the module from pinning a caller's table against GC and from later
+-- reporting a value the caller has since mutated. A nil context overwrites the
+-- snapshot to nil.
+--
+-- Module scope, NOT an `RLGenetics = RLGenetics or {}` idiom: main.lua
+-- re-sources per map load, so counters reset when a save is loaded. Rollup
+-- counts therefore read "since map load" in production - and "since the last
+-- seam reset" during a test session, whose suite drives `_resetWarnLatches`
+-- between rejection drives.
+local warnCounts = {
+    perTrait = 0,
+    fertility = 0,
+    overall = 0,
+    container = 0,
+    member = 0,
+}
+local warnLatestValueText = {}
+local warnLatestContext = {}
+
+-- The statKeys cause keeps a one-shot boolean latch, excluded from counting
+-- twice over: it reports a call-site coding bug rather than animal-data
+-- corruption, so milestone cardinality adds nothing an operator needs - and
+-- `aggregate` resolves statKeys twice per call, so a naive counter would book
+-- two occurrences per bad aggregate call against one per validateGenetics
+-- call for the same mistake, misreporting exactly the cardinality the
+-- counters exist to fix. The boolean hides the double pass by design.
 local warnedStatKeys = false
-local warnedContainer = false
-local warnedMember = false
 
 
 -- What each entry actually accepts, in the entry's own terms. These are NOT
@@ -174,18 +198,46 @@ local EXPECTED_MEMBER = string.format(
 local EXPECTED_STAT_KEYS = "a dense array of distinct DEFAULT_STAT_KEYS members"
 
 
---- Emit one latched warning describing a rejected value.
+--- Should this occurrence of a rejection cause be reported?
 ---
---- Formats with `%s` + `tostring` throughout, never `%d`/`%f`: the offending
---- value can be a string, a boolean or a table, and the headless harness calls
---- `string.format` BARE (the in-game logger pcalls it), so a numeric verb would
---- raise headless only - breaking dual-run parity and the never-raises contract
---- at the same time.
+--- Reports the FIRST occurrence and then every power-of-ten milestone (10,
+--- 100, 1000, ...), so log volume grows logarithmically with the number of
+--- offenders while the count itself stays exact. Stateless and pure: the warn
+--- path owns the counter and consults this on every COUNTED rejection (the
+--- one-shot statKeys latch never does), which is what makes the milestone
+--- math assertable under both runners without a logger spy.
 ---
---- The tail says "of this kind" rather than "from this entry" because each latch
---- covers one CAUSE, and causes do not map one-to-one onto entries: `aggregate`
---- owns two (malformed container, malformed member), and the `statKeys` fallback
---- latch is shared across both public entries.
+--- The counter is a Lua double, integer-exact to 2^53 - acknowledged and not
+--- guarded; reaching the inexact range would take more rejections than an
+--- engine session can issue.
+--- @param count number Occurrence number for one cause, starting at 1
+--- @return boolean emits True when this occurrence must be reported
+--- @return number nextReport The next occurrence number that will be reported
+function RLGenetics.isReportedOccurrence(count)
+    local rung = 1
+    while rung < count do rung = rung * 10 end
+
+    if rung == count then return true, rung * 10 end
+
+    return false, rung
+end
+
+
+--- Compose the first-occurrence rejection line for a cause.
+---
+--- Pure and stateless - the warn path calls it, and the suite asserts on its
+--- return, which is what makes the TEXT dual-run provable without a logger
+--- spy. Every slot renders via `%s` + `tostring`, never `%d`/`%f`: the
+--- offending value or the context can be a string, a boolean or a table, and
+--- the headless harness calls `string.format` BARE (the in-game logger pcalls
+--- it), so a numeric verb would raise headless only - breaking dual-run
+--- parity and the never-raises contract at the same time.
+---
+--- Causes do not map one-to-one onto entries: `aggregate` owns two (malformed
+--- container, malformed member), told apart by their Expected clause on
+--- first-occurrence lines. A milestone ROLLUP carries the entry name only -
+--- an accepted limit of the rollup line shape; its latest-context snapshot
+--- is what narrows the cause in practice.
 --- @param entry string Name of the entry, for the log line
 --- @param value any The rejected value
 --- @param fallback any What is being returned instead - a band key for the
@@ -195,10 +247,97 @@ local EXPECTED_STAT_KEYS = "a dense array of distinct DEFAULT_STAT_KEYS members"
 ---        "banding as", which is what every single-value entry means; the
 ---        whole-table entries return a triple rather than a band, so they pass
 ---        their own verb rather than describing a band that does not exist
-local function warnRejected(entry, value, fallback, expectation, verb)
-    Log:warning(
-        "RLGenetics.%s: rejected value %s (type %s) - %s %s. Expected %s. Further occurrences of this kind are silent until the next map load.",
-        entry, tostring(value), type(value), verb or "banding as", tostring(fallback), expectation)
+--- @param context any|nil Caller-supplied diagnostic context; rendered via
+---        `tostring`, segment omitted entirely when nil
+--- @param nextReport number|nil The next occurrence number that will be
+---        reported. NIL means the cause does not count (the one-shot statKeys
+---        latch): the tail then states the latched behaviour instead of
+---        promising a next report that will never come
+--- @return string line
+function RLGenetics.buildRejectionLine(entry, value, fallback, expectation, verb, context, nextReport)
+    local contextSegment = ""
+    if context ~= nil then
+        contextSegment = string.format(" Context: %s.", tostring(context))
+    end
+
+    local tail = "Further occurrences of this kind are silent until the next map load."
+    if nextReport ~= nil then
+        tail = string.format("Next report at %s.", tostring(nextReport))
+    end
+
+    return string.format("RLGenetics.%s: rejected value %s (type %s) - %s %s. Expected %s.%s %s",
+        entry, tostring(value), type(value), verb or "banding as", tostring(fallback),
+        expectation, contextSegment, tail)
+end
+
+
+--- Compose a milestone rollup line for a counting cause.
+---
+--- Pure and stateless, composed and rendered exactly like
+--- `buildRejectionLine`. Reports the cause's total count plus the LATEST
+--- offender's snapshots, so a new offender that arrived between milestones
+--- still surfaces here even though its own occurrence was silent.
+--- @param entry string Name of the entry, for the log line
+--- @param count number Total occurrences of this cause since the counters
+---        reset (per map load in production; per seam reset under test)
+--- @param latestValueText string The latest rejected value, already stringified
+--- @param latestContext string|nil The latest context snapshot; segment
+---        omitted entirely when nil
+--- @param nextReport number The next occurrence number that will be reported
+--- @return string line
+function RLGenetics.buildRollupLine(entry, count, latestValueText, latestContext, nextReport)
+    local contextSegment = ""
+    if latestContext ~= nil then
+        contextSegment = string.format(", context %s", tostring(latestContext))
+    end
+
+    return string.format(
+        "RLGenetics.%s: %s rejections of this kind since map load; latest: value %s%s. Next report at %s.",
+        entry, tostring(count), tostring(latestValueText), contextSegment, tostring(nextReport))
+end
+
+
+--- Count one rejection for a cause and report it when the milestone says so.
+---
+--- Snapshots are taken BEFORE the milestone check and overwritten on EVERY
+--- occurrence, nil context included, so a rollup always names the newest
+--- offender. The finished line goes out as `Log:warning("%s", line)` - one
+--- opaque argument, so a `%` inside a value or context is never re-interpreted
+--- as a format directive by either runner.
+--- @param cause string Key into the counter tables. Must be one of the five
+---        seeded keys: an unknown key RAISES at the count increment,
+---        deliberately - that is a coding bug in this module, not caller
+---        input, and failing loud beats silently forking a counter the reset
+---        seam would never clear
+--- @param entry string Name of the entry, for the log line
+--- @param value any The rejected value
+--- @param fallback any What is being returned instead
+--- @param expectation string What this entry accepts, phrased for this entry
+--- @param verb string|nil How the fallback is being delivered
+--- @param context any|nil Caller-supplied diagnostic context
+local function warnRejected(cause, entry, value, fallback, expectation, verb, context)
+    local count = warnCounts[cause] + 1
+    warnCounts[cause] = count
+    warnLatestValueText[cause] = tostring(value)
+
+    if context ~= nil then
+        warnLatestContext[cause] = tostring(context)
+    else
+        warnLatestContext[cause] = nil
+    end
+
+    local emits, nextReport = RLGenetics.isReportedOccurrence(count)
+    if not emits then return end
+
+    local line
+    if count == 1 then
+        line = RLGenetics.buildRejectionLine(entry, value, fallback, expectation, verb, context, nextReport)
+    else
+        line = RLGenetics.buildRollupLine(entry, count,
+            warnLatestValueText[cause], warnLatestContext[cause], nextReport)
+    end
+
+    Log:warning("%s", line)
 end
 
 
@@ -285,17 +424,25 @@ end
 ---     to `fertility` at the call site when that decision lands.
 ---
 --- @param value number|nil Trait value; `nil` is treated as absent
+--- @param context any|nil DIAGNOSTIC-ONLY caller context for the rejection
+---        warning: it never branches behaviour, and every return value is
+---        identical with and without it. Rendered via `tostring`, so any type
+---        formats rather than raising; ignored entirely on the silent absent
+---        path (absent is normal, not a rejection). Recommended grammar:
+---        "<trait> of <farmId> <uniqueId> <country>" - the identity half is
+---        RLAnimalUtil.toKey's space-joined output, composed by the CALLER
+---        (this module deliberately takes no RLAnimalUtil dependency). Ids
+---        only, never player-entered text. Pass nil rather than ""; a site on
+---        a per-frame render path may precompute its identity string once
+---        outside the trait loop
 --- @return string key Never nil, never raises
-function RLGenetics.perTrait(value)
+function RLGenetics.perTrait(value, context)
     -- Absent is normal, so it short-circuits BEFORE the allowlist and before
     -- resolve (which would raise on nil) - and it stays silent.
     if value == nil then return LOWEST_PER_TRAIT end
 
     if not RLGenetics.isValidTraitValue(value, nil) then
-        if not warnedPerTrait then
-            warnedPerTrait = true
-            warnRejected("perTrait", value, LOWEST_PER_TRAIT, EXPECTED_PER_TRAIT)
-        end
+        warnRejected("perTrait", "perTrait", value, LOWEST_PER_TRAIT, EXPECTED_PER_TRAIT, nil, context)
 
         return LOWEST_PER_TRAIT
     end
@@ -319,15 +466,15 @@ end
 --- see `perTrait`.
 ---
 --- @param value number|nil Fertility value; `nil` is treated as absent
+--- @param context any|nil Diagnostic-only caller context for the rejection
+---        warning; never branches behaviour, ignored on the silent absent
+---        path. Grammar and rules: see RLGenetics.perTrait
 --- @return string key Never nil, never raises
-function RLGenetics.fertility(value)
+function RLGenetics.fertility(value, context)
     if value == nil then return LOWEST_PER_TRAIT end
 
     if not RLGenetics.isValidTraitValue(value, "fertility") then
-        if not warnedFertility then
-            warnedFertility = true
-            warnRejected("fertility", value, LOWEST_PER_TRAIT, EXPECTED_FERTILITY)
-        end
+        warnRejected("fertility", "fertility", value, LOWEST_PER_TRAIT, EXPECTED_FERTILITY, nil, context)
 
         return LOWEST_PER_TRAIT
     end
@@ -350,8 +497,11 @@ end
 --- trait, an absent FACTOR is a caller bug, so `nil` warns here.
 ---
 --- @param factor number|nil Aggregate factor, typically `sum / (MAX * statCount)`
+--- @param context any|nil Diagnostic-only caller context for the rejection
+---        warning; never branches behaviour. Grammar and rules: see
+---        RLGenetics.perTrait
 --- @return string key Never nil, never raises
-function RLGenetics.overall(factor)
+function RLGenetics.overall(factor, context)
     -- `factor ~= factor` is the NaN test; the two explicit infinity tests are
     -- needed because both infinities compare normally against the rungs and
     -- would otherwise band as a real value.
@@ -360,10 +510,7 @@ function RLGenetics.overall(factor)
         or factor == math.huge
         or factor == -math.huge then
 
-        if not warnedOverall then
-            warnedOverall = true
-            warnRejected("overall", factor, LOWEST_OVERALL, EXPECTED_OVERALL)
-        end
+        warnRejected("overall", "overall", factor, LOWEST_OVERALL, EXPECTED_OVERALL, nil, context)
 
         return LOWEST_OVERALL
     end
@@ -396,15 +543,22 @@ end
 --- Emit the shared, latched `statKeys` fallback warning.
 ---
 --- One latch for both whole-table entries, so a single bad argument is reported
---- once even though `aggregate` resolves twice.
+--- once even though `aggregate` resolves twice. Deliberately a one-shot
+--- boolean rather than a counter - see the state block - and deliberately
+--- context-free: it reports a call-site coding bug, not animal data. Composed
+--- by the shared builder with a nil nextReport, so only its tail differs from
+--- the counting causes' lines.
 --- @param statKeys any The rejected argument
 --- @param rule string Which rule it broke, for the log line
 local function warnStatKeys(statKeys, rule)
     if warnedStatKeys then return end
 
     warnedStatKeys = true
-    warnRejected("resolveStatKeys", statKeys, "the default stat set",
-        EXPECTED_STAT_KEYS .. " - this one " .. rule, "falling back to")
+
+    local line = RLGenetics.buildRejectionLine("resolveStatKeys", statKeys,
+        "the default stat set", EXPECTED_STAT_KEYS .. " - this one " .. rule,
+        "falling back to", nil, nil)
+    Log:warning("%s", line)
 end
 
 
@@ -566,17 +720,22 @@ end
 ---
 --- @param genetics any The genetics table. A non-table returns the zero triple
 --- @param statKeys table|nil Stat set to walk; defaults to DEFAULT_STAT_KEYS
+--- @param context any|nil Diagnostic-only caller context for the rejection
+---        warnings; never branches behaviour. Grammar and rules: see
+---        RLGenetics.perTrait. POSITION TRAP: context is argument THREE -
+---        `aggregate(g, ctx)` lands ctx in `statKeys`, falls back to the
+---        default stat set, and spends the one-shot statKeys latch on the
+---        misplaced value for the rest of the session; a caller with no stat
+---        narrowing passes `aggregate(g, nil, ctx)`
 --- @return number factor `sum / (MAX * denominator)`, or 0
 --- @return number mean `sum / denominator`, or 0
 --- @return number presentCount How many stats OF THE RESOLVED SET held a value -
 ---         scoped, so a narrowed `statKeys` lowers it even when the table is
 ---         fully populated. Never nil, never raises
-function RLGenetics.aggregate(genetics, statKeys)
+function RLGenetics.aggregate(genetics, statKeys, context)
     if type(genetics) ~= "table" then
-        if not warnedContainer then
-            warnedContainer = true
-            warnRejected("aggregate", genetics, "0, 0, 0", EXPECTED_CONTAINER, "returning")
-        end
+        warnRejected("container", "aggregate", genetics, "0, 0, 0", EXPECTED_CONTAINER,
+            "returning", context)
 
         return 0, 0, 0
     end
@@ -590,11 +749,8 @@ function RLGenetics.aggregate(genetics, statKeys)
     local ok, badKey, badValue = RLGenetics.validateGenetics(genetics, statKeys)
 
     if not ok then
-        if not warnedMember then
-            warnedMember = true
-            warnRejected("aggregate", badValue, "0, 0, 0",
-                string.format(EXPECTED_MEMBER, tostring(badKey)), "returning")
-        end
+        warnRejected("member", "aggregate", badValue, "0, 0, 0",
+            string.format(EXPECTED_MEMBER, tostring(badKey)), "returning", context)
 
         return 0, 0, 0
     end
@@ -626,20 +782,22 @@ function RLGenetics.aggregate(genetics, statKeys)
 end
 
 
---- Clear all six warn latches so the next offender is reported again.
+--- Reset every rejection counter, both snapshot tables, and the statKeys latch.
 ---
---- TEST SEAM. Production never calls it: the latches are meant to survive a
+--- TEST SEAM. Production never calls it: the counters are meant to survive a
 --- session and are reset by the per-map-load re-source. It exists so a suite
---- can exercise a rejection path without leaving the latches spent for whatever
---- runs next.
+--- can exercise a rejection path without leaving counts, snapshots or the
+--- latch spent for whatever runs next. The name predates the counters and is
+--- kept: it is the seam's contract, and every caller reaches it by this name.
 --- @return nil
 function RLGenetics._resetWarnLatches()
-    warnedPerTrait = false
-    warnedFertility = false
-    warnedOverall = false
+    for cause in pairs(warnCounts) do
+        warnCounts[cause] = 0
+        warnLatestValueText[cause] = nil
+        warnLatestContext[cause] = nil
+    end
+
     warnedStatKeys = false
-    warnedContainer = false
-    warnedMember = false
 end
 
 
