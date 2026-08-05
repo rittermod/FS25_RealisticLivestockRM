@@ -15,13 +15,13 @@
 --
 -- Validity floor (enforced on BOTH create and update):
 --   * `name`              non-empty string
---   * `operation`         one of sell|move|buy|castrate|naming|ai
+--   * `operation`         one of sell|move|buy|castrate|naming|ai|horseCare
 --   * `farmId`            integer (the owning farm)
 --   * `enabled`           boolean
 --   * `params`            table (opaque here; the per-operation codec is S2)
 --   * `targetHusbandries` array (may be empty -> inert rule, no targets)
---   * `filterId`          buy/sell/move/castrate/ai: nil (incomplete draft) OR a non-empty
---                          (non-whitespace) string; naming: MUST be nil
+--   * `filterId`          every operation except naming: nil (incomplete draft) OR a
+--                          non-empty (non-whitespace) string; naming: MUST be nil
 --
 -- Scope boundary (deliberately NOT here):
 --   * No per-operation `params` validation, no filterId resolution against
@@ -52,21 +52,27 @@ RLHerdsmanRuleService.UNIQUE_ID_PREFIX = "rlHerdRule_"
 --- operations lives in `OPERATION_ORDER` below - the service owns it now (M-Tick T1)
 --- so the M-Frame presenter and the M-Tick planner share one source of truth.
 RLHerdsmanRuleService.OPERATIONS = {
-    sell     = true,
-    move     = true,
-    buy      = true,
-    castrate = true,
-    naming   = true,
-    ai       = true,
+    sell      = true,
+    move      = true,
+    buy       = true,
+    castrate  = true,
+    naming    = true,
+    ai        = true,
+    horseCare = true,
 }
 
---- Canonical run / visual order for the five operations (D3 "visual order = run
+--- Canonical run / visual order for the operations (D3 "visual order = run
 --- order"): Sell frees herd space before Buy fills it, mirroring legacy
---- `AIAnimalManager:onDayChanged`. The single source of truth for BOTH consumers -
---- the M-Frame presenter (section placement) and the M-Tick planner (run order).
---- Each consumer derives its own operation -> rank map from this list (no shared
---- rank table, so a consumer's load order can never read a half-built map).
-RLHerdsmanRuleService.OPERATION_ORDER = { "sell", "move", "buy", "castrate", "naming", "ai" }
+--- `AIAnimalManager:onDayChanged`. The single source of truth for all THREE consumers -
+--- the M-Frame presenter (section placement), the M-Tick planner (run order), and the
+--- presenter's legacy-active banner sweep. Each consumer derives its own operation ->
+--- rank map from this list (no shared rank table, so a consumer's load order can never
+--- read a half-built map).
+---
+--- APPEND-ONLY at the TAIL. The frame binds the operation selector's widget state to the
+--- ARRAY INDEX, so inserting anywhere but the end silently reassigns every later
+--- operation's state.
+RLHerdsmanRuleService.OPERATION_ORDER = { "sell", "move", "buy", "castrate", "naming", "ai", "horseCare" }
 
 --- Within-operation comparator: alphabetical by name (case-insensitive), with a
 --- nil-safe `tostring(id)` tie-break. Persisted records always carry an id, so the
@@ -186,7 +192,7 @@ local function validateRuleFields(r)
         return false, string.format("name must be a non-empty string (got %s)", tostring(r.name))
     end
     if type(r.operation) ~= "string" or not RLHerdsmanRuleService.OPERATIONS[r.operation] then
-        return false, string.format("operation must be one of sell|move|buy|castrate|naming|ai (got %s)", tostring(r.operation))
+        return false, string.format("operation must be one of sell|move|buy|castrate|naming|ai|horseCare (got %s)", tostring(r.operation))
     end
     if type(r.farmId) ~= "number" or math.floor(r.farmId) ~= r.farmId then
         return false, string.format("farmId must be an integer (got %s)", tostring(r.farmId))

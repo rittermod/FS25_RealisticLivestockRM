@@ -26,8 +26,13 @@ local modDirectory = g_currentModDirectory
 
 -- operation -> section-header i18n key. Localization wiring for the multi-section
 -- list AND the Operation selector's state labels: the presenter stays key-free, so the
--- frame owns the label map. A value lookup, not decision logic. Operations are
--- RLHerdsmanRulePresenter's canonical OPERATION_ORDER set.
+-- frame owns the label map. A value lookup, not decision logic.
+--
+-- This map is deliberately allowed to be a SUBSET of the canonical OPERATION_ORDER: an
+-- operation registered before it is surfaced to players carries no entry yet. Both readers
+-- already cope - the selector seed falls back to the raw operation name, and
+-- getTitleForSectionHeader returns nil so the section header renders untitled. `horseCare`
+-- is in that state until its player-facing pass lands.
 local OPERATION_TITLE_KEY = {
     sell     = "rl_menu_herdsman_section_sell",
     move     = "rl_menu_herdsman_section_move",
@@ -40,6 +45,44 @@ local OPERATION_TITLE_KEY = {
 -- =============================================================================
 -- Module-local helpers (pure wiring; no decisions)
 -- =============================================================================
+
+--- Resolve the animal type NAMES the presenter's operation x animalType declarations reference
+--- into live indices, as a `name -> index` map for the presenter's gate. A name the registry
+--- does not carry is OMITTED rather than mapped to nil, which is what gives the gate its
+--- polarity for free: an allow-list with an unresolved name admits nothing, an exclude-list
+--- with one excludes nothing.
+---
+--- This is the frame's job precisely because it is the `AnimalType` READ. The presenter stays
+--- pure and stateless and simply consumes whatever map it is handed - so an absent registry is
+--- diagnosed HERE, once per build (menu-open frequency), rather than by a latch in a pure module.
+--- Resolution is per call, never memoized: `AnimalType` is populated after this file is sourced.
+---@return table animalTypeIndexByName map of resolved NAME -> live animalType index (possibly empty)
+function RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
+    local names = RLHerdsmanRulePresenter.getDeclaredAnimalTypeNames()
+    local map = {}
+    if AnimalType == nil then
+        Log:warning("RLMenuHerdsmanFrame.buildAnimalTypeIndexMap: AnimalType registry is nil; the operation x animalType gate gets an EMPTY map (allow-lists admit nothing, exclude-lists exclude nothing) - check AnimalSystem load order")
+        return map
+    end
+
+    local resolved, missing = {}, {}
+    for _, name in ipairs(names) do
+        local idx = AnimalType[name]
+        if idx ~= nil then
+            map[name] = idx
+            resolved[#resolved + 1] = string.format("%s=%s", name, tostring(idx))
+        else
+            missing[#missing + 1] = name
+        end
+    end
+
+    if #missing > 0 then
+        Log:debug("RLMenuHerdsmanFrame.buildAnimalTypeIndexMap: %d/%d declared type(s) absent from this map [%s]; the gate treats each as no-match",
+            #missing, #names, table.concat(missing, ","))
+    end
+    Log:trace("RLMenuHerdsmanFrame.buildAnimalTypeIndexMap: resolved [%s]", table.concat(resolved, " "))
+    return map
+end
 
 --- 1-based index of `value` in the ordered `values` array (==), or nil. The
 --- index<->value bridge between the presenter's value domains and a MultiTextOption /
@@ -1213,11 +1256,11 @@ function RLMenuHerdsmanFrame:onClickRuleFilter(_button)
 
     -- usageMatch folds ANY/nil filters in (RLFilterService:listAvailable), so a non-nil usage
     -- AND farmId yield exactly the operation's { ANY, X } pool. Then drop filters whose
-    -- animalType the operation forbids (castrate x chicken - F6 retrofit, M4) keeping ANY-type,
-    -- and sort alpha for the picker.
-    local chickenIdx = AnimalType ~= nil and AnimalType.CHICKEN or nil
+    -- animalType the operation forbids (castrate excludes chicken, horse care allows only
+    -- horses) keeping ANY-type, and sort alpha for the picker.
+    local animalTypeIndexByName = RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
     local scoped = RLHerdsmanRulePresenter.filterCandidateFilters(
-        g_rlFilterService:listAvailable(nil, farmId, pickerUsage), merged.operation, chickenIdx)
+        g_rlFilterService:listAvailable(nil, farmId, pickerUsage), merged.operation, animalTypeIndexByName)
     local candidates = RLHerdsmanRulePresenter.sortFiltersByName(scoped)
 
     -- M4: a current binding the retrofit dropped (e.g. a chicken filter on a castrate rule) is
@@ -1318,10 +1361,10 @@ function RLMenuHerdsmanFrame:onClickRuleHusbandries(_button)
     end
 
     local descriptors = RLAnimalQuery.listHusbandryDescriptorsForFarm(farmId)
-    local chickenIdx = AnimalType ~= nil and AnimalType.CHICKEN or nil
+    local animalTypeIndexByName = RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
     local filterAnimalType = self:resolveFilterAnimalType(merged.filterId)
     local candidates = RLHerdsmanRulePresenter.selectTargetableHusbandries(
-        descriptors, filterAnimalType, merged.operation, chickenIdx)
+        descriptors, filterAnimalType, merged.operation, animalTypeIndexByName)
 
     -- Capture the target id at OPEN; the pick stashes against THIS id (selection may move).
     self.husbandryPickTargetId = id
@@ -1446,12 +1489,12 @@ end
 --- @param merged table the current overlay-merged record (filter/op already applied)
 function RLMenuHerdsmanFrame:revalidatePendingTargetsAndSemen(id, merged)
     local farmId = RLAnimalInfoService.getCurrentFarmId()
-    local chickenIdx = AnimalType ~= nil and AnimalType.CHICKEN or nil
+    local animalTypeIndexByName = RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
     local filterAnimalType = self:resolveFilterAnimalType(merged.filterId)
     local typeByUid = self:buildHusbandryTypeByUid(farmId)
 
     local before = merged.targetHusbandries or {}
-    local kept = RLHerdsmanRulePresenter.revalidateTargets(before, typeByUid, filterAnimalType, merged.operation, chickenIdx)
+    local kept = RLHerdsmanRulePresenter.revalidateTargets(before, typeByUid, filterAnimalType, merged.operation, animalTypeIndexByName)
     if #kept ~= #before then
         self:ensurePending(id).targetHusbandries = kept
         Log:debug("RLMenuHerdsmanFrame:revalidatePendingTargetsAndSemen: id=%s targets %d -> %d (dropped %d type-incompatible resolvable)",
@@ -1485,9 +1528,11 @@ function RLMenuHerdsmanFrame:revalidatePendingDestination(id, merged, sourceUids
     -- Dest-axis map (husbandries + EPP butchers): an EPP dest resolves to its type-index SET here, so
     -- revalidateDestination type-gates it instead of treating it as unresolvable-preserved-forever.
     local typeByUid = self:buildDestinationTypeByUid(farmId)
-    local chickenIdx = AnimalType ~= nil and AnimalType.CHICKEN or nil
+    -- 4th arg, NOT 5th: revalidateDestination carries no `operation` (it applies "move"), so the
+    -- type map sits one slot left of its position in revalidateTargets above.
+    local animalTypeIndexByName = RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
     local filterAnimalType = self:resolveFilterAnimalType(merged.filterId)
-    local kept = RLHerdsmanRulePresenter.revalidateDestination(dest, typeByUid, filterAnimalType, chickenIdx, sourceUids)
+    local kept = RLHerdsmanRulePresenter.revalidateDestination(dest, typeByUid, filterAnimalType, animalTypeIndexByName, sourceUids)
     if kept ~= dest then
         self:ensurePendingParams(id).params.destinationHusbandry = kept
         Log:debug("RLMenuHerdsmanFrame:revalidatePendingDestination: id=%s dest %s -> %s (revalidated)",
@@ -1533,10 +1578,12 @@ function RLMenuHerdsmanFrame:onClickRuleDestination(_button)
     -- set-aware gate keeps a multi-type butcher under an ANY filter and a type-matching one under a
     -- typed filter. Husbandry-only picker sources would never offer a butcher.
     local descriptors = RLAnimalQuery.listMoveDestinationDescriptorsForFarm(farmId)
-    local chickenIdx = AnimalType ~= nil and AnimalType.CHICKEN or nil
+    -- 3rd arg, NOT 4th: selectDestinationHusbandries carries no `operation`, so the type map sits
+    -- one slot left of its position in selectTargetableHusbandries.
+    local animalTypeIndexByName = RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
     local filterAnimalType = self:resolveFilterAnimalType(merged.filterId)
     local candidates = RLHerdsmanRulePresenter.selectDestinationHusbandries(
-        descriptors, filterAnimalType, chickenIdx, merged.targetHusbandries or {})
+        descriptors, filterAnimalType, animalTypeIndexByName, merged.targetHusbandries or {})
 
     -- A stored dest the gate dropped (its type left the filter scope, or it became a source) is no
     -- longer in the list; flag it so the picker surfaces "current unavailable" rather than silently

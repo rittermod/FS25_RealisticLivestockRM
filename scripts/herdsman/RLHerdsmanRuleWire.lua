@@ -69,6 +69,7 @@ RLHerdsmanRuleWire.NIL_INT_SENTINEL = -1
 ---   castrate  -> mark Bool
 ---   naming    -> convention String, previous String ("" sentinel for nil cursor)
 ---   ai        -> maxAnimals Int32, mark Bool, semen String
+---   horseCare -> (no fields; zero bytes both ways)
 ---
 --- The codec is a transport, not a validator: it round-trips type-correct values
 --- verbatim. Per-operation VALUE validation is the picker / M-Frame's job; the
@@ -210,6 +211,17 @@ local PARAMS_WIRE_CODECS = {
             local semen = streamReadString(streamId)
             return { maxAnimals = maxAnimals, mark = mark, semen = semen }
         end,
+    },
+    horseCare = {
+        -- ZERO params: consumes and produces no bytes, symmetric on both ends. `read` returns
+        -- an EMPTY table and never nil - a nil is the fail-closed "drop the whole record"
+        -- signal (the move destination's contract), which a param-free operation can never mean.
+        --
+        -- The entry cannot be inferred from a passing round trip: the unknown-operation branch
+        -- below ALSO writes zero bytes and ALSO yields `params = {}`, so removing this entry
+        -- changes only a warning line. Its presence is asserted directly instead.
+        write = function(_streamId, _p) end,
+        read = function(_streamId) return {} end,
     },
 }
 

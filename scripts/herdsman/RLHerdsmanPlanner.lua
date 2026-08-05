@@ -60,9 +60,14 @@
 -- ai { ruleId, operation="ai", husbandryId, animals } (T1 shape; per-op params = T2c)
 --
 -- Run order = operation order (RLHerdsmanRuleService.OPERATION_ORDER: sell -> move -> buy ->
--- castrate -> naming -> ai) then RLHerdsmanRuleService.compareRulesByName within an op
--- (mirrors legacy AIAnimalManager:onDayChanged - sell frees herd space + funds buys before
--- buy fills the space / spends the proceeds).
+-- castrate -> naming -> ai -> horseCare) then RLHerdsmanRuleService.compareRulesByName within
+-- an op (mirrors legacy AIAnimalManager:onDayChanged - sell frees herd space + funds buys
+-- before buy fills the space / spends the proceeds).
+--
+-- `horseCare` is RANKED but has NO plan arm: an enabled horseCare rule reaches the operation
+-- if-chain, matches nothing, and falls out - emitting no action, charging no wage and sending
+-- no event. The chain has no `else`, and that absence is what makes the fall-through silent;
+-- adding a defensive `else` warning would turn every horseCare rule into a daily log line.
 --
 -- Candidate match is RLFilterEvaluator.evaluate (pure, fails closed: a nil / deleted
 -- filter selects nothing, never raises - D16). Naming carries no filter and selects every
@@ -102,15 +107,19 @@ local SELL_MARKUP = 1.0
 ---     its targets (T1).
 --- Every operation ALSO claims same-operation (two rules of one op never pick the same
 --- animal); that is enforced uniformly by the per-op claimed set, independent of these traits.
---- An operation with an empty traits table (castrate / ai) is a plain owned-herd, non-end-task,
---- filtered op.
+--- An operation with an empty traits table (castrate / ai / horseCare) is a plain owned-herd,
+--- non-end-task, filtered op.
+--- Every registered operation MUST have an entry even when it has no plan arm: `matchFromPool`
+--- reads `traits.noFilter`, so a missing entry would raise the moment a future arm routes
+--- through it.
 RLHerdsmanPlanner.OPERATION_TRAITS = {
-    sell     = { removesFromPlanPool = true },
-    move     = { removesFromPlanPool = true },
-    buy      = { sourcesFromDealer = true, addsToHerd = true },
-    castrate = {},
-    naming   = { noFilter = true },
-    ai       = {},
+    sell      = { removesFromPlanPool = true },
+    move      = { removesFromPlanPool = true },
+    buy       = { sourcesFromDealer = true, addsToHerd = true },
+    castrate  = {},
+    naming    = { noFilter = true },
+    ai        = {},
+    horseCare = {},
 }
 
 --- Herdsman daily wage per animal, by animalTypeIndex (reproduced EXACTLY from legacy

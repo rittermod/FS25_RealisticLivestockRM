@@ -10,6 +10,11 @@
 --     .targetHusbandries.target(k)     -- @uniqueId per target string; none when empty
 --     .params                          -- operation-specific subtree (PARAMS_CODECS)
 --
+-- A param-free operation (horseCare) emits NO `.params` node at all - its codec writes
+-- nothing and reads back an empty table. The codec entry still has to exist: `writeRule`
+-- resolves it before emitting any XML and skips the whole record when there is none, so a
+-- missing entry silently drops the rule at save time rather than failing loudly.
+--
 -- Structural sibling of RLFilterSerialization (TYPE_CODECS -> PARAMS_CODECS,
 -- writeFilter/readFilter -> writeRule/readRule) MINUS the recursive group/AST:
 -- rule records are flat (scalars + a target list + an operation-keyed params
@@ -191,6 +196,18 @@ local PARAMS_CODECS = {
             if maxAnimals == nil or mark == nil or semen == nil then return nil end
             return { maxAnimals = maxAnimals, mark = mark, semen = semen }
         end,
+    },
+    horseCare = {
+        -- ZERO params: the operation is enabled or it is not. The entry is NOT optional even
+        -- though it emits nothing - `writeRule` looks the codec up BEFORE writing any XML and
+        -- returns false when there is none, so an absent entry would make every horseCare rule
+        -- work for a whole session and then vanish on save, with no error a player could see.
+        -- The three halves are symmetric: nothing required, nothing written, an EMPTY table read
+        -- back. `read` must return `{}` and never nil - a nil read means "a required field is
+        -- missing" and makes `readRule` drop the whole record.
+        validate = function(_p) return true end,
+        write = function(_x, _k, _p) end,
+        read = function(_x, _k) return {} end,
     },
 }
 

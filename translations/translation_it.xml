@@ -798,6 +798,7 @@
         <text name="rl_menu_herdsman_budgetFixed_tooltip" text="The herdsman spends up to %s per day, in each selected husbandry."/>
         <text name="rl_menu_herdsman_budgetPercentage_tooltip" text="The herdsman spends up to %s of your farm's money per day, in each selected husbandry."/>
         <text name="rl_menu_herdsman_destination_tooltip" text="The husbandry the herdsman moves matching animals into."/>
+        <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Whether the herdsman runs this horse care task each day."/>
         <text name="rl_menu_herdsman_enabled_move_tooltip" text="Whether the herdsman runs this move task each day."/>
         <text name="rl_menu_herdsman_empty" text="Ancora nessuna regola del mandriano"/>
         <text name="rl_menu_herdsman_empty_editor" text="Seleziona una regola da modificare"/>
