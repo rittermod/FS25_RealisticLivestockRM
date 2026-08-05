@@ -38,8 +38,12 @@
 --     dewarsForFarm(farmId)  -> { [typeIndex] = { <dewar OBJECT>, ... } }|nil,  -- g_dewarManager:getDewarsByFarm (RAW objects)
 --     buyMarkup              = number,                          -- active dealer-quality markup (buy pricing)
 --     dealerQualityIndex     = number|nil,                      -- preset index it came from; DEBUG readout ONLY
+--     defer(fn)              -> nil,                            -- run fn after the current DAY_CHANGED chain (horse care only)
 --     server, mission, ruleService, animalSystem, animalNameSystem,
 --   }
+-- `defer` is forwarded verbatim into the executor ctx, where it is a STRUCTURAL dep: the horse-care
+-- leg is the only consumer, and a missing seam would leave it silently never writing while the wage
+-- is still charged. See buildEnv for why the real implementation is a zero-delay timer.
 -- `buyMarkup` is resolved ONCE per tick in buildEnv and forwarded verbatim into the planner ctx.
 -- It lives in env rather than being read where it is used because buildEnv is this module's only
 -- g_*-reading layer: resolving it further in would make the dual-run layer env-dependent and would
@@ -260,6 +264,10 @@ local function buildExecutorCtx(husbandriesById, eppPlaceablesById, env)
         eppPlaceablesById       = eppPlaceablesById or {},
         ruleService             = env.ruleService,
         animalNameSystem        = env.animalNameSystem,
+        -- Forwarded verbatim, like buyMarkup: deliberately NOT defaulted here, because the
+        -- executor treats it as a structural dep and must fail loud on a ctx that lacks it
+        -- rather than skip the care write while still charging for it.
+        defer                   = env.defer,
     }
 end
 
@@ -459,6 +467,27 @@ function RLHerdsmanDayTick.buildEnv()
         -- run(); resolving it there instead would make that layer env-dependent.
         buyMarkup          = RLDealerQualityResolver.getMarkup(),
         dealerQualityIndex = RLDealerQualityResolver.getActiveIndex(),
+        -- The horse-care deferral seam, and the ONLY Timer.createOneshot in scripts/herdsman/.
+        --
+        -- WHY it exists (do not inline the leg's write back into the executor): the care write sets
+        -- riding = 100, and Animal:onDayChanged -> AnimalHorse.processRidingUpdate grades fitness
+        -- from riding and then ZEROES it for the day. Both run off MessageType.DAY_CHANGED, and the
+        -- order between this tick and a given husbandry placeable is NOT fixed - it depends on
+        -- whether the barn was preplaced, savegame-loaded, or bought mid-session, and the same barn
+        -- can change sides across a save/reload. Writing inline is therefore correct on one barn and
+        -- silently zeroed on another. A zero-delay oneshot re-queues the write behind every
+        -- DAY_CHANGED subscriber AND still lands in the same frame: the publish drains inside the
+        -- environment update, and the mission's updateables walk - where a zero-duration timer has
+        -- already registered itself - runs immediately after it. So the write is last, on this day
+        -- tick, whatever order the barns subscribed in.
+        --
+        -- This is the established fix for placement-dependent DAY_CHANGED order, not a new idea
+        -- here: @see RLMessageAggregator.initialize for the same seam, and the wiki pattern
+        -- [[message-center-subscription]] for the mechanism and its residuals.
+        --
+        -- Injected rather than read directly inside the executor because that module documents
+        -- "no g_* reads" and its whole decision layer is dual-run on that basis.
+        defer              = function(fn) Timer.createOneshot(0, fn) end,
         server             = g_server,
         mission            = mission,
         ruleService        = ruleService,

@@ -34,7 +34,24 @@
 --     husbandryPlaceablesById = { [uniqueId] = <placeable> },    -- event object, getOwnerFarmId, getNumOfFreeAnimalSlots
 --     ruleService             = <RLHerdsmanRuleService>,         -- setNamingCursor(id, previous)
 --     animalNameSystem        = <real AnimalNameSystem>,         -- getRandomName(gender) (reused from T2)
+--     defer                   = function(fn) ... end,            -- run fn after the current day-change chain
 --   }
+--
+-- The horse-care leg is the ONE deferred leg, and `defer` is a STRUCTURAL dep for that reason:
+-- a missing seam would leave horse care silently never writing while the wage is still charged -
+-- the worst failure shape available - so it joins the fail-loud entry guard rather than
+-- defaulting (the ctx.buyMarkup precedent). It is checked with type(...) ~= "function", not
+-- ~= nil, so a non-callable cannot pass. The client guard runs FIRST, so the fail-loud binds
+-- server-side only.
+--
+-- Why horse care defers at all: the care write must land AFTER Animal:onDayChanged ->
+-- AnimalHorse.processRidingUpdate has graded and zeroed `riding` for the day, and the
+-- DAY_CHANGED dispatch order between the herdsman tick and a husbandry placeable is NOT fixed -
+-- it depends on whether the barn was preplaced, savegame-loaded, or bought mid-session, and the
+-- same barn changes sides across a save/reload. Without the deferral the feature is correct on a
+-- preplaced barn and silently zeroed on a bought one. Membership still resolves INLINE (only the
+-- field WRITE defers), so the result row's count / skippedCount and the wage stay exact and the
+-- row contract is identical to _doCastrate's.
 -- T3 does NOT read ctx.husbandries (clear-stale-marks is T4, decision 1b).
 --
 -- summary (return value, consumed by T4 wage readout + T5 messages):
@@ -45,7 +62,10 @@
 -- A result row: { ruleId, husbandryId, farmId, operation, count, skippedCount, mark,
 --   amountGained, amountSpent, dispatched, skipReason }. `dispatched` is true iff the event
 --   broadcast / direct mutation was applied; `skipReason` is nil when dispatched, else one of
---   "no-space" | "no-money" | "mark-mode" | "missing-placeable" | "missing-dest" | "bad-data" | "not-in-husbandry".
+--   "no-space" | "no-money" | "mark-mode" | "missing-placeable" | "missing-dest" | "bad-data" |
+--   "not-in-husbandry" | "defer-failed" (horse care only - the deferral seam raised, so the write
+--   can never land; distinct from "bad-data" because the cluster and members WERE resolvable).
+--   Every skipReason except "mark-mode" and "no-space"/"no-money" means no wage was charged.
 --   On a guarded direct-mutation leg (castrate exec / naming / mark-mode) `count` is the count
 --   ACTUALLY mutated/marked and `skippedCount` is the membership-skip count (planned - actual);
 --   the unguarded legs (sell / buy / ai exec) report the planned count with skippedCount 0. An exec
@@ -247,12 +267,18 @@ function RLHerdsmanExecutor.executeActions(plan, ctx)
 
     -- Fail LOUD on a missing STRUCTURAL dep the executor unconditionally needs: a missing one
     -- is a T4-wiring bug, never a silent no-op that would hide a broken day-tick.
+    -- `defer` is checked for CALLABILITY, not mere presence: a `== nil` check would let a
+    -- non-callable through to the horse-care arm, where calling it raises far from the cause.
     if ctx.mission == nil or ctx.ruleService == nil or ctx.animalNameSystem == nil
-        or ctx.husbandryPlaceablesById == nil then
+        or ctx.husbandryPlaceablesById == nil or type(ctx.defer) ~= "function" then
+        -- One convention for all five: present-and-usable as a boolean. Reporting `defer` as a
+        -- type() string while its four neighbours read true/false makes the reader stop and work
+        -- out which field uses which format, and the `function` case is unreachable here anyway.
         error(string.format(
-            "%s missing structural ctx dep (T4 wiring bug): mission=%s ruleService=%s animalNameSystem=%s husbandryPlaceablesById=%s",
+            "%s missing structural ctx dep (T4 wiring bug): mission=%s ruleService=%s animalNameSystem=%s husbandryPlaceablesById=%s defer=%s",
             LOG_PREFIX, tostring(ctx.mission ~= nil), tostring(ctx.ruleService ~= nil),
-            tostring(ctx.animalNameSystem ~= nil), tostring(ctx.husbandryPlaceablesById ~= nil)))
+            tostring(ctx.animalNameSystem ~= nil), tostring(ctx.husbandryPlaceablesById ~= nil),
+            tostring(type(ctx.defer) == "function")))
     end
 
     if plan == nil then
@@ -363,6 +389,8 @@ function RLHerdsmanExecutor._executeOne(action, ctx, summary, wageFarmOrder)
         chargeWage, dispatched, skipReason, actualCount, skippedCount = RLHerdsmanExecutor._doAi(action, ctx, placeable, farmId, count)
     elseif op == "move" then
         chargeWage, dispatched, skipReason, actualCount, skippedCount, extra = RLHerdsmanExecutor._doMove(action, ctx, placeable, farmId, count)
+    elseif op == "horseCare" then
+        chargeWage, dispatched, skipReason, actualCount, skippedCount = RLHerdsmanExecutor._doHorseCare(action, ctx, placeable, farmId, count)
     else
         chargeWage, dispatched, skipReason = false, false, "bad-data"
         Log:warning("%s rule=%s husbandry=%s farm=%s: unknown operation '%s' - skipped (no wage)",
@@ -554,6 +582,180 @@ function RLHerdsmanExecutor._doCastrate(action, ctx, placeable, farmId, count)
     if actual == 0 then
         return true, false, "not-in-husbandry", 0, skipped
     end
+    return true, true, nil, actual, skipped
+end
+
+--- The full-care values. `riding` is written ABSOLUTE (setRiding clamps to 0-100); dirt is
+--- cleared by a -100 DELTA, because changeDirt is the only mutator the Animal prototype exposes.
+--- On a corrupt save carrying dirt > 100 the clear is therefore PARTIAL, landing at
+--- `clamp(dirt - 100, 0, 100)`: 150 -> 50, and only dirt >= 200 lands at 100. Accepted - the
+--- per-animal DEBUG row's before/after makes it visible rather than silent.
+local HORSE_CARE_RIDING = 100
+local HORSE_CARE_DIRT_DELTA = -100
+
+--- The DEFERRED half of the horse-care leg: re-validate membership, then write.
+--- Runs OUTSIDE the day-tick's own safeCall (the timer fires later), so it carries its own
+--- isolation - per-animal via safeAnimalCall, so one malformed horse cannot abort the loop and
+--- leave every sibling unwritten while the full wage was already charged.
+---
+--- Membership is re-resolved rather than trusted: the inline pass proved these were members when
+--- the action was armed, but a horse can leave the pen between arming and firing (mounted as a
+--- rideable, loaded into a trailer, sold). The row already reported it as acted-on; writing to a
+--- non-member would be worse than the count being one optimistic.
+---@param action table the horse-care action (ruleId / husbandryId for the log rows)
+---@param placeable table husbandry placeable owning the cluster
+---@param planned table[] the INLINE-resolved live cluster animals
+---@param farmId number owning farm (log context)
+---@return nil the row and wage were committed when the action was armed; this half cannot retract them
+function RLHerdsmanExecutor._writeHorseCare(action, placeable, planned, farmId)
+    local clusterAnimals = resolveClusterAnimals(placeable)
+    -- An EMPTY list is the teardown signal and aborts ONCE. Without this special case every probe
+    -- would simply fail membership and emit its own WARNING - N lines saying "not in husbandry"
+    -- for a husbandry that no longer exists. Base onDelete nils clusterHusbandry but never
+    -- clusterSystem, and RLRM's AnimalClusterSystem:delete sets animals = {}, so the torn-down
+    -- shape is {} rather than nil.
+    if clusterAnimals == nil or #clusterAnimals == 0 then
+        -- Distinguish the two causes: a cluster system that is GONE (the husbandry was deleted or
+        -- sold) from a live pen that merely emptied during this same day-change chain (deaths, or a
+        -- legacy sell inside the placeable's own tick). Reporting the second as "cluster gone"
+        -- misdirects diagnosis of an entirely normal day.
+        local torn = type(placeable.getClusterSystem) ~= "function" or clusterAnimals == nil
+        Log:warning("%s rule=%s op=horseCare husbandry=%s farm=%s: %s when the deferred write fired - %d planned horse(s) unwritten (aborted once)",
+            LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId),
+            torn and "cluster gone (husbandry torn down)" or "pen emptied during this day-change chain",
+            #planned)
+        -- Emit the summary row on THIS path too. It is a separate requirement from the abort
+        -- WARNING, and this is the outcome where a reader most needs applied/skipped to be explicit:
+        -- the action row already reported these horses as acted-on and the wage is already committed.
+        Log:debug("%s rule=%s op=horseCare husbandry=%s farm=%s: deferred write complete applied=0 left-pen=%d failed=0 of %d planned (aborted: no live cluster)",
+            LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId),
+            #planned, #planned)
+        return
+    end
+
+    local applied, left, failed = 0, 0, 0
+    for _, probe in ipairs(planned) do
+        local animal = resolveMember(clusterAnimals, probe, action, farmId)
+        if animal == nil then
+            left = left + 1
+        else
+            local ok = RmSafeUtils.safeAnimalCall(animal, "RLHerdsmanExecutor:horseCareWrite", function()
+                local ridingBefore, dirtBefore = animal.riding, animal.dirt
+                animal:setRiding(HORSE_CARE_RIDING)
+                animal:changeDirt(HORSE_CARE_DIRT_DELTA)
+                -- AnimalHorse's mutators do NOT set the dirty flag (base AnimalClusterHorse's do),
+                -- so the leg must. This drives clusterSystem:setDirty -> owner:raiseActive, and the
+                -- placeable's own update flushes, broadcasting AnimalClusterUpdateEvent - whose
+                -- payload already carries dirt / fitness / riding for every animal. One broadcast
+                -- per husbandry per flush, versus one or two per animal for a bespoke event.
+                animal:setDirty()
+                Log:debug("%s rule=%s op=horseCare husbandry=%s farm=%s: cared uniqueId=%s riding %s->%s dirt %s->%s",
+                    LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId),
+                    tostring(animal.uniqueId), tostring(ridingBefore), tostring(animal.riding),
+                    tostring(dirtBefore), tostring(animal.dirt))
+                return true
+            end, { false })
+            if ok then applied = applied + 1 else failed = failed + 1 end
+        end
+    end
+
+    -- ruleId + husbandryId are load-bearing on this row: concurrent pens in one tick emit
+    -- interleaved callbacks, and without both there is no way to tell them apart in the log.
+    Log:debug("%s rule=%s op=horseCare husbandry=%s farm=%s: deferred write complete applied=%d left-pen=%d failed=%d of %d planned",
+        LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId),
+        applied, left, failed, #planned)
+end
+
+--- Horse care: write riding = 100 and clear dirt on every planned HORSE, DEFERRED to after the
+--- animal day tick (see the file header for why the ordering is the substance).
+---
+--- Membership resolves INLINE, before arming - so this returns the guarded-leg tuple in the same
+--- SHAPE as _doCastrate's: `count` is the resolved count, `skippedCount` the membership skips, and
+--- the wage scales to the count rather than to what was planned.
+---
+--- The SHAPE is identical; the SEMANTICS are not, and a consumer must not confuse them.
+--- _doCastrate's `count` counts mutations that have ALREADY happened and been broadcast. This
+--- leg's `count` is PREDICTIVE: the writes land one or more frames later, and the callback
+--- re-validates membership and may drop some of them. A horse sold or mounted between arming and
+--- firing is counted here and never written. Anything downstream that reads `count` as "work done"
+--- - the wage today, the message family in the next slice - is optimistic for this operation alone.
+---
+--- The leg performs NO animal-type check, by decision. The planner's pen gate is the only gate,
+--- and it is sufficient because a pen cannot hold a foreign-type animal through any gated path
+--- (PlaceableHusbandryAnimals:getSupportsAnimalSubType is enforced on every entry path; buy draws
+--- from a per-type dealer pool; births inherit the mother's type). A per-animal type check here
+--- would be this layer's first root-global read, in a module whose header claims none and whose
+--- dual-run posture depends on that claim - spent on a path normal play cannot reach. An
+--- acceptance criterion greps this file to keep one from being reintroduced in good faith; do not
+--- defeat it by naming the rejected predicate here.
+---@param action table the horse-care action (animals + ruleId / husbandryId)
+---@param ctx table dispatch context (ctx.defer is the deferral seam this leg consumes)
+---@param placeable table husbandry placeable owning the animals' cluster system
+---@param farmId number owning farm (wage attribution + log context)
+---@param count number planned animal count (the wage scales actual/planned against it)
+---@return boolean chargeWage
+---@return boolean dispatched
+---@return string|nil skipReason
+---@return number|nil actualCount nil on a bad-data fail-closed; count armed otherwise
+---@return number|nil skippedCount membership-skip count (nil when actualCount is nil)
+function RLHerdsmanExecutor._doHorseCare(action, ctx, placeable, farmId, count)
+    -- Cluster resolve precedes arming, so the bad-data outcome stays reachable: no wage, no timer.
+    local clusterAnimals = resolveClusterAnimals(placeable)
+    if clusterAnimals == nil then
+        Log:warning("%s rule=%s op=horseCare husbandry=%s farm=%s: cluster unavailable (getClusterSystem) - whole action skipped (no wage, nothing armed)",
+            LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId))
+        return false, false, "bad-data"
+    end
+
+    local resolved, skipped = {}, 0
+    for _, probe in ipairs(action.animals) do
+        local animal = resolveMember(clusterAnimals, probe, action, farmId)
+        if animal ~= nil then
+            resolved[#resolved + 1] = animal
+        else
+            skipped = skipped + 1
+        end
+    end
+
+    local actual = #resolved
+    if actual == 0 then
+        -- Every planned horse skipped membership: a genuine all-skip exec row (wage scales to 0),
+        -- and nothing is armed - a timer that would write nothing is not worth scheduling.
+        Log:debug("%s rule=%s op=horseCare husbandry=%s farm=%s: all %d planned horse(s) absent from the cluster - nothing armed",
+            LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), count)
+        return true, false, "not-in-husbandry", 0, skipped
+    end
+
+    -- Arming is itself guarded: a raising ctx.defer must not take out the remaining actions or the
+    -- per-farm wage deduction that follows them. safeCall logs the failure - a silent pcall here
+    -- would hide a broken seam behind a wage that still gets charged.
+    local armed = RmSafeUtils.safeCall(
+        string.format("RLHerdsmanExecutor:armHorseCare rule=%s husbandry=%s", tostring(action.ruleId), tostring(action.husbandryId)),
+        function()
+            ctx.defer(function()
+                RmSafeUtils.safeCall(
+                    string.format("RLHerdsmanExecutor:horseCareDeferred rule=%s husbandry=%s", tostring(action.ruleId), tostring(action.husbandryId)),
+                    function()
+                        RLHerdsmanExecutor._writeHorseCare(action, placeable, resolved, farmId)
+                    end)
+            end)
+        end)
+
+    if not armed then
+        -- The seam raised, so NOTHING will ever write - and therefore nothing is charged. Returning
+        -- chargeWage=true here would bill the farm the full planned wage for a write that provably
+        -- never happens, which is precisely the failure shape the file header calls the worst one
+        -- available and cites as the reason `defer` is fail-loud in the first place.
+        -- Its OWN reason, not "bad-data": that reason already means "no wage" at every other exit in
+        -- this module, and reusing it for a case with a live cluster and resolved members would make
+        -- the two indistinguishable to anything reading the row.
+        Log:warning("%s rule=%s op=horseCare husbandry=%s farm=%s: the defer seam raised - %d resolved horse(s) will never be written; no wage charged",
+            LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), actual)
+        return false, false, "defer-failed", 0, skipped
+    end
+
+    Log:debug("%s rule=%s op=horseCare husbandry=%s farm=%s: armed deferred care for %d horse(s) (%d skipped at membership)",
+        LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), actual, skipped)
     return true, true, nil, actual, skipped
 end
 
