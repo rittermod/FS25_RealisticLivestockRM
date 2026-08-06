@@ -916,6 +916,66 @@ function RLHerdsmanRulePresenter.filterCandidateFilters(filters, operation, anim
     return out
 end
 
+--- Decide whether switching a rule to `operation` must CLEAR its bound filter, and name the
+--- cause. Returns nil to KEEP the binding, else one of three reason strings. The three causes an
+--- operation change has for dropping a filter live here together so the frame owns no part of
+--- the decision:
+---   * "naming"     - a naming rule carries no filter at all (the service floor rejects one)
+---   * "usage"      - the filter's usage bucket is not one the new operation draws from
+---   * "animalType" - the filter's animal type is one the new operation cannot act on
+---
+--- ARM ORDER IS CONTRACT: naming, then usage, then animalType. Every arm produces the SAME
+--- clear, so the order decides only which cause is REPORTED. The reason is diagnostic - it
+--- exists because "my filter disappeared" is otherwise undiagnosable - and no caller may branch
+--- on its value without renegotiating that.
+---
+--- Sits beside filterCandidateFilters because the two MUST agree on the animalType axis: a
+--- filter the picker refuses to OFFER for type reasons is exactly a filter an operation change
+--- must not leave BOUND. That agreement is why the animalType arm tests a NON-NIL
+--- `filter.animalType`, carrying filterCandidateFilters' own nil short-circuit. Without it every
+--- ANY-type filter would be cleared on a switch to an allow-list operation, because
+--- isOperationAnimalTypeCompatible answers false for a nil index under `allow` - the same one
+--- rule that gives the gate its fail-closed / fail-open polarity.
+---
+--- An UNRESOLVABLE binding (a deleted filter resolving to nil, or a non-table record) is left
+--- as-is, mirroring filterCandidateFilters' own non-table handling: a dangling id is repaired by
+--- rebinding, never by a silent erase.
+---@param operation any the operation being switched TO
+---@param filter table|nil the RESOLVED filter record `{ usage, animalType, ... }`, or nil
+---@param animalTypeIndexByName table|nil map of declared animal type NAME -> live animalType index
+---@return string|nil reason nil to keep the binding, else "naming" | "usage" | "animalType"
+function RLHerdsmanRulePresenter.filterClearReasonForOperation(operation, filter, animalTypeIndexByName)
+    if operation == "naming" then
+        Log:trace("RLHerdsmanRulePresenter.filterClearReasonForOperation: operation=naming -> clear (reason=naming)")
+        return "naming"
+    end
+
+    -- type() rather than a field read: this branch must never index `filter`, so a nil or scalar
+    -- binding cannot raise here (a raise would cost an engine stack in the log).
+    if type(filter) ~= "table" then
+        Log:trace("RLHerdsmanRulePresenter.filterClearReasonForOperation: operation=%s filter unresolvable (%s) -> keep",
+            tostring(operation), type(filter))
+        return nil
+    end
+
+    if not RLHerdsmanRulePresenter.isFilterUsageAllowed(operation, filter.usage) then
+        Log:trace("RLHerdsmanRulePresenter.filterClearReasonForOperation: operation=%s usage=%s not allowed -> clear (reason=usage)",
+            tostring(operation), tostring(filter.usage))
+        return "usage"
+    end
+
+    local at = filter.animalType
+    if at ~= nil and not RLHerdsmanRulePresenter.isOperationAnimalTypeCompatible(operation, at, animalTypeIndexByName) then
+        Log:trace("RLHerdsmanRulePresenter.filterClearReasonForOperation: operation=%s animalType=%s incompatible -> clear (reason=animalType)",
+            tostring(operation), tostring(at))
+        return "animalType"
+    end
+
+    Log:trace("RLHerdsmanRulePresenter.filterClearReasonForOperation: operation=%s usage=%s animalType=%s -> keep",
+        tostring(operation), tostring(filter.usage), tostring(at))
+    return nil
+end
+
 --- Gate + order the husbandry picker candidate list for a rule (D8). From a list of live
 --- husbandry descriptors `{ uniqueId, animalType, name }`, keep those the operation + filter
 --- scope admit (keepHusbandryType: nil-type excluded, filter-type match or ANY,

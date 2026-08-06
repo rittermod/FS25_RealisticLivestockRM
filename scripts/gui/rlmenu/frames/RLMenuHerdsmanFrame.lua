@@ -1803,10 +1803,14 @@ function RLMenuHerdsmanFrame:onRuleOperationChanged(state, _widget)
 end
 
 --- Apply an operation change (D5): stash the operation, reshape pending.params via the
---- edit-model (shared scalars carried, op-specific reseeded), and revalidate the filter -
---- naming clears filterId (the service floor rejects a naming rule with a filter); a
---- non-naming op clears filterId when the current filter's usage is not allowed for it
---- (an unresolvable/deleted filter is left as-is). Then re-section live + re-render.
+--- edit-model (shared scalars carried, op-specific reseeded), and revalidate the filter through
+--- the presenter's single clear predicate - which folds all three causes (naming carries no
+--- filter, the usage bucket is not drawn on, the animal type cannot be acted on) into one
+--- answer. An unresolvable / deleted filter is left as-is. Then re-section live + re-render.
+---
+--- The clear MUST precede revalidatePendingTargetsAndSemen: revalidation reads the merged
+--- record, so clearing first is what widens the filter scope to ANY before targets are gated.
+--- Reverse the two and a type-incompatible switch revalidates against the OLD filter's type.
 --- @param id any
 --- @param newOp string
 function RLMenuHerdsmanFrame:applyOperationChange(id, newOp)
@@ -1819,16 +1823,17 @@ function RLMenuHerdsmanFrame:applyOperationChange(id, newOp)
     pending.operation = newOp
     pending.params = RLHerdsmanRuleEditModel.reshapeParamsForOperation(merged.params, newOp)
 
-    if newOp == "naming" then
+    local filter = resolveFilterById(merged.filterId)
+    local clearReason = RLHerdsmanRulePresenter.filterClearReasonForOperation(
+        newOp, filter, RLMenuHerdsmanFrame.buildAnimalTypeIndexMap())
+    if clearReason ~= nil then
         pending.filterId = RLHerdsmanRuleEditModel.CLEAR
-        Log:debug("RLMenuHerdsmanFrame:applyOperationChange: id=%s -> naming; filterId cleared", tostring(id))
-    elseif merged.filterId ~= nil then
-        local filter = resolveFilterById(merged.filterId)
-        if filter ~= nil and not RLHerdsmanRulePresenter.isFilterUsageAllowed(newOp, filter.usage) then
-            pending.filterId = RLHerdsmanRuleEditModel.CLEAR
-            Log:debug("RLMenuHerdsmanFrame:applyOperationChange: id=%s -> %s; filter usage %s not allowed, filterId cleared",
-                tostring(id), newOp, tostring(filter.usage))
-        end
+        -- Name the rejected VALUES, not just the cause. "My filter disappeared" is diagnosed off
+        -- this line, and a player reporting it will not be running at TRACE.
+        Log:debug("RLMenuHerdsmanFrame:applyOperationChange: id=%s -> %s; filterId cleared (reason=%s usage=%s animalType=%s)",
+            tostring(id), tostring(newOp), tostring(clearReason),
+            tostring(type(filter) == "table" and filter.usage or nil),
+            tostring(type(filter) == "table" and filter.animalType or nil))
     end
 
     -- Cross-type revalidation against the NEW merged op/filter - the SAME path a filter

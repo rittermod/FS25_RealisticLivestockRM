@@ -52,7 +52,7 @@ So selling happens before buying - a "sell old cows, then buy young ones" pair d
 ## Setting up a task
 
 1. **New** - creates a draft task to start from (a disabled Sell task).
-2. **Operation** - pick the job you want.
+2. **Operation** - pick the job you want. If you change the job later, a filter the new job can't use is unbound for you - a chicken-only filter on Castrate, or a filter tied to a non-horse animal on Horse Care - along with any pens that no longer suit the job. A filter that isn't tied to one animal type is kept. Note that if the task is already **enabled**, the whole change is discarded when you leave the menu: disable it first, repair it, then switch it back on.
 3. **Filter** - open the filter picker and choose a saved filter. Only filters that suit the operation are offered, so it helps to [build the filter first](guide-saved-filters.md).
 4. **Pens** - open the pen picker and select one or more husbandries. Only pens matching the filter's animal type are offered.
 5. **Settings** - set the per-operation options.
