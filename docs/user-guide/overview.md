@@ -106,7 +106,7 @@ Open the **RL Menu** with **Right Shift + O** in-game - or, from the ESC menu's 
 - **Insemination** - Browse and buy stored semen for artificial breeding without keeping males
 - **Message Log** - Track births, deaths, diseases, and other events
 - **Herdsman** - Automate daily herd chores with rules: sell, buy, move, castrate, name, inseminate, or look after your horses - applied to the animals a saved filter picks, in the pens you choose. See the [Herdsman guide](guide-herdsman.md).
-- **Settings** - Adjust every RLRM option: death and disease toggles, food scaling, dealer stock size, how good the dealer's animals are, which breeds and age groups the dealer offers, ear tag colours, genetics display, CSV export, and more. This tab also hosts the **saved filter** editor.
+- **Settings** - Adjust every RLRM option: death and disease toggles, food scaling, dealer stock size, how good the dealer's animals are, which breeds and age groups the dealer offers, ear tag colours, genetics display, how many animals are shown in 3D per pen, CSV export, and more. This tab also hosts the **saved filter** editor.
 
 **Saved filters** let you narrow the Buy, Sell, Move, and Manage lists to just the animals you care about - and they are how the Herdsman targets animals. Press **F** on any of those screens to cycle them. See the [Saved Filters guide](guide-saved-filters.md).
 
@@ -117,7 +117,6 @@ Open the **RL Menu** with **Right Shift + O** in-game - or, from the ESC menu's 
 | **Right Shift + O** | Open RL Menu | In-game |
 | **R** | Open Manage Animals | Animal menu |
 | **A** | Select / deselect | Buy and sell dialogs |
-| **Shift + T** | Change visual animals amount (how many are shown in 3D) | In-game |
 | **X** | Mark animal | Animal detail view |
 | **M** | Toggle monitor | Animal detail view |
 | **I** | Insemination | Animal detail view (females only) |

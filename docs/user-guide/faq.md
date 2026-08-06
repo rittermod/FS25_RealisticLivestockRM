@@ -123,6 +123,23 @@ See the [Breeding Guide](guide-breeding.md#offspring-breed) for examples and pra
 
 ---
 
+## Why do I only see one animal per pen?
+
+**Short answer:** That is a display setting, not a broken herd. Open **RL Menu > Settings > General > Set Maximum Visual Animals** and check the value.
+
+The setting caps how many animals are **drawn in 3D** in each pen. It does not touch your herd: every animal still exists, eats, produces, breeds and ages exactly as before, and the Manage list shows them all. It exists because rendering a hundred individual animals per pen is expensive, so the cap protects your frame rate.
+
+Two things about it surprise people:
+
+- **It is per machine, not per savegame.** It lives in `modSettings/FS25_RealisticLivestockRM/Settings.xml`, is not saved with your farm, and is not synced in multiplayer - every player sets their own, and any player can change it.
+- **It survives a restart.** Whatever value was last applied is read back on every launch, so a low value stays low until you change it.
+
+To fix it: open the dialog, drag the slider or use the **Recommended** button (which picks a value based on your graphics settings), then press **Apply**. Moving the slider alone does nothing - the value is only stored when you press Apply.
+
+To check the value without opening the menu, search your `log.txt` for `Maximum number of visual animals:` - it is written once at startup.
+
+---
+
 ## Does the mod work on my map?
 
 Almost certainly yes. RLRM works on virtually any map - it does not need to be on a supported list. The maps listed in the docs are only the ones that add their *own* custom animal types or breeds, which need built-in support so those extras also get genetics and breeding. On any other map, the standard FS25 animals work normally.
