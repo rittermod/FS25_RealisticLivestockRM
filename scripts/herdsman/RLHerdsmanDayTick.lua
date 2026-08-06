@@ -21,9 +21,10 @@
 -- from the handler's `if g_server == nil then return end` early-return. A dedicated server has
 -- g_server, so dedis ARE ticked; clients register an inert listener.
 --
--- Coexists with legacy (D12): the legacy AIAnimalManager tick and the legacy wage hook
--- (RealisticLivestock_FSBaseMission:onDayChanged) stay live and untouched. T4 acts only on new
--- rules. T3 OWNS the MoneyType.HERDSMAN_WAGES deduction (one addMoney per farm); T4 NEVER
+-- The legacy AIAnimalManager tick and the legacy wage hook
+-- (RealisticLivestock_FSBaseMission:onDayChanged) are FROZEN behind
+-- AIAnimalManager.FREEZE_LEGACY_HERDSMAN - neither runs, so this tick is the only herdsman
+-- automation. T3 OWNS the MoneyType.HERDSMAN_WAGES deduction (one addMoney per farm); T4 NEVER
 -- re-deducts - it only LOGS summary.wageByFarm at DEBUG. Player/GUI wage surfacing is T5.
 --
 -- env contract (subscriber builds it from g_*; tests inject fakes - RAW engine shapes in,

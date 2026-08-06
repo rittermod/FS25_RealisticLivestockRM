@@ -69,7 +69,7 @@ You can **Duplicate** a task as a starting point for another, or **Delete** one 
 - **Start narrow, then watch.** Test a new task with a tight filter and check the **Message Log** to see exactly what the Herdsman did before widening it.
 - **The filter is the whole game.** The Herdsman only ever touches animals the filter matches - a well-built filter is what keeps automation safe.
 - **Horse Care needs a filter like any other task.** Only Naming works without one, so a Horse Care task with no filter selected sits idle. A filter that simply matches every horse is a perfectly good starting point.
-- **Horse Care bills every horse, every day.** The wage is per horse per day and there is no cap and no upper limit on herd size, so a large stable keeps paying for as long as the task is enabled - and it keeps paying whether or not you ever sell the horse. The payoff is realised when you sell one yourself, so it suits a stable you trade from rather than one you only breed in. Note the Herdsman's own Sell task prices a horse before Horse Care runs, so selling through the Herdsman does not collect the higher price.
+- **Horse Care bills every horse, every day.** The wage is per horse per day and there is no cap and no upper limit on herd size, so a large stable keeps paying for as long as the task is enabled - and it keeps paying whether or not you ever sell the horse. The payoff comes when you sell, so it suits a stable you trade from rather than one you only breed in. We recommend selling a horse manually after a full riding session to sell at the highest possible price - selling automatically via the Herdsman forgoes the riding share of the care bonus for that day, though the fitness and cleanliness built up by earlier care still count.
 
 ---
 

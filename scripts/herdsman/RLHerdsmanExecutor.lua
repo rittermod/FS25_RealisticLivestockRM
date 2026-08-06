@@ -77,9 +77,10 @@
 -- RealisticLivestock_FSBaseMission:onDayChanged. T3 SETS marks for mark-mode; clear-stale
 -- is T4.
 --
--- T3 ships DORMANT: it wires NO MessageCenter subscription and NO day-tick hook (T4). The
--- legacy AIAnimalManager tick is still live, so a live T3 tick would double-dispatch +
--- double-charge HERDSMAN_WAGES. Until T4 lands, in-game verification is via rlTest only.
+-- T3 wires NO MessageCenter subscription and NO day-tick hook of its own - RLHerdsmanDayTick
+-- (T4) is the only caller. The legacy AIAnimalManager tick is frozen behind
+-- AIAnimalManager.FREEZE_LEGACY_HERDSMAN, so this executor is the only dispatch and the only
+-- HERDSMAN_WAGES charge.
 
 local Log = RmLogging.getLogger("RLRM")
 
