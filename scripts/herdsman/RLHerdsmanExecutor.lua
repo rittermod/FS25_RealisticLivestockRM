@@ -662,14 +662,25 @@ function RLHerdsmanExecutor._writeHorseCare(action, placeable, planned, farmId)
         else
             local ok = RmSafeUtils.safeAnimalCall(animal, "RLHerdsmanExecutor:horseCareWrite", function()
                 local ridingBefore, dirtBefore = animal.riding, animal.dirt
+                -- The flag LEADS the two field writes, and that order is the contract: a raise
+                -- between the writes must not leave the horse mutated server-side but unflagged.
+                -- The asymmetry is what settles it - under-flagging is a silent MP divergence
+                -- (clients keep stale riding / dirt until some unrelated pen event happens to
+                -- flush), while over-flagging costs one extra per-pen cluster pass. Restoring the
+                -- natural mutate-then-flag reading order re-opens the defect.
+                -- This leg owns the flag: RLRM's own AnimalHorse mutators set no dirty flag at all,
+                -- and the riding write does not acquire one from the base cluster class either. Do
+                -- NOT assume a mutator flags on your behalf - check the one you are calling before
+                -- relying on it, because the answer differs per mutator.
+                -- setDirty only marks: it drives clusterSystem:setDirty -> owner:raiseActive, and
+                -- the placeable's own update flushes, broadcasting AnimalClusterUpdateEvent -
+                -- whose payload already carries dirt / fitness / riding for every animal. One
+                -- broadcast per husbandry per flush, versus one or two per animal for a bespoke
+                -- event. Flag-first is safe only because nothing can flush in this window; do not
+                -- introduce a synchronous flush between the flag and the writes.
+                animal:setDirty()
                 animal:setRiding(HORSE_CARE_RIDING)
                 animal:changeDirt(HORSE_CARE_DIRT_DELTA)
-                -- AnimalHorse's mutators do NOT set the dirty flag (base AnimalClusterHorse's do),
-                -- so the leg must. This drives clusterSystem:setDirty -> owner:raiseActive, and the
-                -- placeable's own update flushes, broadcasting AnimalClusterUpdateEvent - whose
-                -- payload already carries dirt / fitness / riding for every animal. One broadcast
-                -- per husbandry per flush, versus one or two per animal for a bespoke event.
-                animal:setDirty()
                 Log:debug("%s rule=%s op=horseCare husbandry=%s farm=%s: cared uniqueId=%s riding %s->%s dirt %s->%s",
                     LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId),
                     tostring(animal.uniqueId), tostring(ridingBefore), tostring(animal.riding),
