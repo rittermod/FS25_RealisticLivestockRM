@@ -1425,7 +1425,28 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                         local W = wageFor(h.animalTypeIndex)
                         -- Single-term wage, the NAMING coefficient (25 * 0.15 = 3.75 per horse for a
                         -- HORSE pen). No min(S, n*5) shortlist component - that term is sell/buy/ai only.
-                        local wage = W * 0.15 * n
+                        --
+                        -- Why the coefficient is not higher. Full care buys about +3,500 on a mature
+                        -- horse priced off the 36-month sellPrice key of 5,000 - the 0.60 neglected
+                        -- multiplier against the 1.30 ceiling - and that is a ONE-OFF realised on a
+                        -- MANUAL sale, while this wage recurs every real day for the animal's whole
+                        -- life. So the two sides are a rate against a lump sum, and the holding
+                        -- period decides which wins: a horse held to 36 months sits on the books for
+                        -- 36 * daysPerPeriod real days, 324 of them at daysPerPeriod 9. At 0.15 that
+                        -- hold bills 1,215 against the 3,500; the castrate coefficient 0.50 bills
+                        -- 4,050 on the same animal and goes underwater. The coefficient is therefore
+                        -- bounded by the long-season breeder, not by the default settings, where
+                        -- every candidate looks affordable.
+                        --
+                        -- Two honest limits on that argument. 36 months is not the curve's peak -
+                        -- sellPrice keeps rising to 5,500 at 60 months, so the worst-case hold is
+                        -- longer than the one costed above. And 0.15 is not unconditionally safe
+                        -- either: fitness gain floors to zero above daysPerPeriod 25, which drops
+                        -- the realisable delta to about +2,500, so a 36-month hold at the top of the
+                        -- selectable range (28) bills 3,780 against it. The claim is that 0.15 is
+                        -- the only one of the existing coefficients that stays viable across the
+                        -- range players actually use, not that it can never be beaten.
+                        local wage = W * 0.15 * n   -- 3.75/horse/day against a one-off ~+3,500 sale delta
                         Log:debug("%s rule=%s op=horseCare husbandry=%s candidates=%d selected=%d wage=%.2f",
                             LOG_PREFIX, tostring(rule.id), tostring(uid), candidates, n, wage)
                         if n > 0 then

@@ -590,6 +590,26 @@ end
 --- On a corrupt save carrying dirt > 100 the clear is therefore PARTIAL, landing at
 --- `clamp(dirt - 100, 0, 100)`: 150 -> 50, and only dirt >= 200 lands at 100. Accepted - the
 --- per-animal DEBUG row's before/after makes it visible rather than silent.
+---
+--- Why the care level is 100 rather than the 40 that would merely hold fitness. `changeFitness`
+--- applies `math.floor` to `fitness + delta` (the SUM, not the increment - so a fractional fitness
+--- loaded from a save shifts the first tick by one), which makes the effective daily gain
+--- `floor(25 * factor / daysPerPeriod)` ABOVE the threshold. `factor` here is the normalized
+--- `(riding/100 - t) / (1 - t)`, NOT `riding/100`, and `t` is `ridingThresholdFactor` - 0.4 by
+--- engine default and unset in RLRM's `animals.xml`, so every number below is a 0.4 number and a
+--- subtype declaring `health#ridingThreshold` invalidates the ladder.
+---
+--- Above the threshold each care level therefore has a `daysPerPeriod` at which its gain floors to
+--- zero and fitness stops growing: riding 50 dies at 5, 60 at 9, 70 at 13, 80 at 17, 90 at 21, and
+--- 100 only at 26. That makes 100 the level that stays useful across the seasons players actually
+--- run - though NOT across the whole selectable range, which reaches 28: at 26, 27 and 28 even full
+--- care grows no fitness, and the operation is then a grooming service that also holds the riding
+--- price term. At exactly 40 the factor is 0, so fitness FREEZES wherever it already sits instead of
+--- converging - a horse bought at 0 stays at 0 and one already at 100 stays at 100, making the
+--- settled sale price history-dependent. Below 40 the arithmetic changes shape: `delta` is 10 rather
+--- than 25 and the factor is negative, so care actively DECAYS fitness while still billing the wage,
+--- and because the decay uses `ceil` it never floors away - a sub-threshold level loses ground at
+--- every `daysPerPeriod`, which is strictly worse for the player than owning no rule at all.
 local HORSE_CARE_RIDING = 100
 local HORSE_CARE_DIRT_DELTA = -100
 
