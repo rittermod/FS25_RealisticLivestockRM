@@ -1312,12 +1312,12 @@ end
 ---   * filterOk       - naming: `filterId == nil`; non-naming: a filter is required only when
 ---                      `enabled` - a disabled draft may carry a nil filterId;
 ---                      a present filterId must always be a non-blank string
----   * filterRequired - non-naming AND `enabled` (surfaced for the frame's flush narrow-revert)
+---   * filterRequired - non-naming AND `enabled` (surfaced for the frame's flush enable-demote)
 ---   * husbandriesOk  - `#targetHusbandries >= 1`
 ---   * paramsOk       - `validateParams(operation, params).ok` (per-op param value domains)
 ---   * destinationOk  - move dest gate (the filterOk twin): an ENABLED move needs a non-blank
 ---                      `params.destinationHusbandry`; a disabled move may carry nil; non-move ops n/a (true)
----   * destinationRequired - move AND `enabled` (surfaced for the frame's flush narrow-revert)
+---   * destinationRequired - move AND `enabled` (surfaced for the frame's flush enable-demote)
 ---   * valid          - nameOk AND operationOk AND filterOk AND husbandriesOk AND paramsOk AND destinationOk
 --- nil / non-table draft -> all-false.
 ---@param draft table|nil { name, operation, enabled, filterId, targetHusbandries, params }
@@ -1336,7 +1336,7 @@ function RLHerdsmanRulePresenter.validateEdit(draft)
     -- to be ENABLED (mirrors F6's enabled-conditional husbandries) - a disabled draft may carry
     -- a nil filterId (an incomplete draft, inert until a filter is picked). A present filterId
     -- must always be a non-blank string. filterRequired (== non-naming AND enabled) is surfaced
-    -- so the frame's flush narrow-revert can drop just an illegal enable on an unfiltered rule.
+    -- so the frame's flush demote can switch off just the enable on an unfiltered rule.
     local filterRequired = draft.operation ~= "naming" and draft.enabled == true
     local filterOk
     if draft.operation == "naming" then
@@ -1356,7 +1356,7 @@ function RLHerdsmanRulePresenter.validateEdit(draft)
     -- `move` rule has a destination, and it needs one only to be ENABLED (a disabled move draft may
     -- carry a nil dest - inert until picked). A present dest must always be a non-blank string. For a
     -- non-move op the dest is n/a (true). destinationRequired (== move AND enabled) is surfaced for
-    -- the frame's flush narrow-revert (drop just the enable on a dest-less move).
+    -- the frame's flush demote (switch off just the enable on a dest-less move).
     local destinationRequired = draft.operation == "move" and draft.enabled == true
     local destinationOk
     if draft.operation == "move" then
@@ -1387,7 +1387,7 @@ end
 --- enabling a 0-target rule is blocked (the enable reverts via this gate). So `ok` = name +
 --- operation + filter + params all valid AND (the rule is disabled OR has >= 1 husbandry).
 --- `husbandriesRequired` (== the enabled flag) and `filterRequired` (== non-naming AND enabled,
---- from validateEdit) are surfaced for the frame's narrow-revert + revert logging. The
+--- from validateEdit) are surfaced for the frame's enable-demote + revert logging. The
 --- enabled-conditional filter requirement is baked into validateEdit's `filterOk`, so `ok`
 --- consumes it directly (no separate filter arm here); the move destination gate is likewise baked
 --- into validateEdit's `destinationOk` and consumed the same way. Encoded here (not ad-hoc in the
@@ -1411,6 +1411,82 @@ function RLHerdsmanRulePresenter.validateFlush(draft)
         destinationOk = v.destinationOk, destinationRequired = v.destinationRequired,
         husbandriesRequired = husbandriesRequired,
     }
+end
+
+--- Every key `enableDemotionAxes` reads. validateFlush returns all ten as booleans, so a
+--- non-boolean at any of them means the caller handed over something that is not a flush
+--- breakdown - the one shape the predicate must refuse rather than interpret.
+local DEMOTION_BREAKDOWN_KEYS = {
+    "ok", "nameOk", "operationOk", "paramsOk",
+    "filterOk", "filterRequired",
+    "husbandriesOk", "husbandriesRequired",
+    "destinationOk", "destinationRequired",
+}
+
+--- Which ENABLE-GATED axes are what stop this draft flushing - i.e. the axes that would come
+--- good if the rule were simply not enabled. Returns an array of axis names to DEMOTE on
+--- (a subset of `filter`, `husbandries`, `destination`), or nil to leave the enable alone.
+---
+--- The frame consumes this in two places - the edit-time flip and the flush backstop - and the
+--- decision lives here, once, so the two can never diverge on what "invalidated by this edit"
+--- means. The input is `validateFlush`'s breakdown verbatim; this function re-derives nothing.
+---
+--- Answers a non-nil result when AND ONLY WHEN all of:
+---   * the draft fails the flush gate (`ok` false) - a valid draft is never demoted;
+---   * `nameOk`, `operationOk` and `paramsOk` all hold - a blank name or a bad param value is
+---     NOT an enable-gated failure, and demoting on one would silently disable a rule the
+---     player can still repair by fixing the field they just broke. Those keep the frame's
+---     full revert;
+---   * at least one required-and-failing enable-gated axis exists.
+--- The `*Required` flags already encode `enabled == true` (validateEdit :1340/:1360,
+--- validateFlush's `husbandriesRequired`), so there is deliberately no separate enabled check:
+--- on a disabled draft all three are false, no axis can fire, and the answer is nil.
+---
+--- ORDER IS CONTRACT: filter, husbandries, destination - validateEdit's own field order. The
+--- frame renders these into a DEBUG line that ModTest pins as an ordered sequence, so an
+--- unordered result would make that pin nondeterministic rather than merely ugly.
+---
+--- Fails SAFE on garbage: nil, a non-table, or a table that is not a flush breakdown answers
+--- nil (no demote). A demote WRITES `enabled = false` onto a real rule, so guessing from a
+--- malformed input is the one failure mode worth spending a key check to avoid.
+---@param g table|nil a RLHerdsmanRulePresenter.validateFlush breakdown
+---@return table|nil axes array of "filter" | "husbandries" | "destination" in that order, or nil
+function RLHerdsmanRulePresenter.enableDemotionAxes(g)
+    if type(g) ~= "table" then
+        Log:trace("RLHerdsmanRulePresenter.enableDemotionAxes: nil/non-table breakdown (%s) -> no demote", type(g))
+        return nil
+    end
+
+    for _, key in ipairs(DEMOTION_BREAKDOWN_KEYS) do
+        if type(g[key]) ~= "boolean" then
+            Log:trace("RLHerdsmanRulePresenter.enableDemotionAxes: breakdown missing/non-boolean '%s' -> no demote", key)
+            return nil
+        end
+    end
+
+    if g.ok then
+        Log:trace("RLHerdsmanRulePresenter.enableDemotionAxes: draft flushes clean -> no demote")
+        return nil
+    end
+
+    if not (g.nameOk and g.operationOk and g.paramsOk) then
+        Log:trace("RLHerdsmanRulePresenter.enableDemotionAxes: non-enable-gated failure (nameOk=%s operationOk=%s paramsOk=%s) -> no demote",
+            tostring(g.nameOk), tostring(g.operationOk), tostring(g.paramsOk))
+        return nil
+    end
+
+    local axes = {}
+    if g.filterRequired and not g.filterOk then axes[#axes + 1] = "filter" end
+    if g.husbandriesRequired and not g.husbandriesOk then axes[#axes + 1] = "husbandries" end
+    if g.destinationRequired and not g.destinationOk then axes[#axes + 1] = "destination" end
+
+    if #axes == 0 then
+        Log:trace("RLHerdsmanRulePresenter.enableDemotionAxes: draft invalid but no required enable-gated axis failed -> no demote")
+        return nil
+    end
+
+    Log:trace("RLHerdsmanRulePresenter.enableDemotionAxes: demotable on axes=[%s]", table.concat(axes, ","))
+    return axes
 end
 
 -- =============================================================================
