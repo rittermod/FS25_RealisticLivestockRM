@@ -23,9 +23,9 @@ RLMessageAggregator.AGGREGATABLE = {
     AI_MANAGER_SOLD_MULTIPLE = "sales",
     AI_MANAGER_BOUGHT_SINGLE = "purchases",
     AI_MANAGER_BOUGHT_MULTIPLE = "purchases",
-    -- New herdsman count-only categories (M-Tick T5, decision 1b): castrate / named /
-    -- inseminated / mark each fold into their own daily summary on the host (sold/bought already do
-    -- via sales/purchases above). No money - the buckets carry a count only.
+    -- Herdsman count-only categories (M-Tick T5, decision 1b): castrate / named / inseminated /
+    -- mark each fold into their own daily summary on the host (sold/bought already do via
+    -- sales/purchases above). No money - the buckets carry a count only.
     AI_MANAGER_CASTRATED_SINGLE = "castrations",
     AI_MANAGER_CASTRATED_MULTIPLE = "castrations",
     AI_MANAGER_NAMED_SINGLE = "namings",
@@ -42,12 +42,21 @@ RLMessageAggregator.AGGREGATABLE = {
     AI_MANAGER_MOVED_SINGLE = "moves",
     AI_MANAGER_MOVED_MULTIPLE = "moves",
     AI_MANAGER_MARK_MOVE_SINGLE = "markMoves",
-    AI_MANAGER_MARK_MOVE_MULTIPLE = "markMoves"
+    AI_MANAGER_MARK_MOVE_MULTIPLE = "markMoves",
+    -- Horse care (count-only, net-new, perform-only - no mark family exists for it).
+    AI_MANAGER_HORSE_CARE_SINGLE = "horseCares",
+    AI_MANAGER_HORSE_CARE_MULTIPLE = "horseCares"
 }
 
--- The new count-only herdsman summary categories in their FIXED emission order (decision 1b):
+-- The count-only herdsman summary categories in their FIXED emission order (decision 1b):
 -- consolidateDay emits each non-empty bucket as one DAILY_*_SUMMARY with { count, husbandryName },
 -- mirroring DAILY_BIRTHS_SUMMARY. Ordered (not pairs) so the daily messages append deterministically.
+--
+-- The array order IS the player-visible append order, so a new category is APPENDED and the existing
+-- ones never move. Every `category` here must also appear as an AGGREGATABLE value and carry a
+-- zero-init bucket in queueMessage: an AGGREGATABLE category missing from this list falls off the end
+-- of queueMessage's if/elseif chain (which has no else) and the message is LOST silently, in SUMMARY
+-- mode only; a missing bucket nil-indexes instead. Two omissions, two different failures.
 RLMessageAggregator.HERDSMAN_SUMMARY_CATEGORIES = {
     { category = "castrations",       id = "DAILY_CASTRATIONS_SUMMARY" },
     { category = "namings",           id = "DAILY_NAMINGS_SUMMARY" },
@@ -55,9 +64,10 @@ RLMessageAggregator.HERDSMAN_SUMMARY_CATEGORIES = {
     { category = "markSales",         id = "DAILY_MARK_SELL_SUMMARY" },
     { category = "markCastrations",   id = "DAILY_MARK_CASTRATE_SUMMARY" },
     { category = "markInseminations", id = "DAILY_MARK_INSEMINATE_SUMMARY" },
-    -- Move op appended at the END so the 6 shipped tuples keep their deterministic append order.
+    -- Appended at the END so every already-shipped tuple keeps its deterministic append order.
     { category = "moves",             id = "DAILY_MOVES_SUMMARY" },
-    { category = "markMoves",         id = "DAILY_MARK_MOVE_SUMMARY" }
+    { category = "markMoves",         id = "DAILY_MARK_MOVE_SUMMARY" },
+    { category = "horseCares",        id = "DAILY_HORSE_CARE_SUMMARY" }
 }
 
 -- Membership set derived from the ordered list above, so queueMessage routes the herdsman ids to
@@ -116,8 +126,9 @@ function RLMessageAggregator.queueMessage(husbandry, id, animal, args, date)
             sales = { count = 0, totalValue = 0 },
             purchases = { count = 0, totalValue = 0 },
             overcrowding = { count = 0, totalValue = 0 },
-            -- New herdsman count-only buckets (T5). MUST be initialized here or the first message
-            -- of each category nil-indexes pending.<category>.count below.
+            -- Herdsman count-only buckets. MUST be initialized here or the first message of each
+            -- category nil-indexes pending.<category>.count below. One entry per
+            -- HERDSMAN_SUMMARY_CATEGORIES row.
             castrations = { count = 0 },
             namings = { count = 0 },
             inseminations = { count = 0 },
@@ -125,7 +136,8 @@ function RLMessageAggregator.queueMessage(husbandry, id, animal, args, date)
             markCastrations = { count = 0 },
             markInseminations = { count = 0 },
             moves = { count = 0 },
-            markMoves = { count = 0 }
+            markMoves = { count = 0 },
+            horseCares = { count = 0 }
         }
         RLMessageAggregator.pending[husbandry] = pending
     end
@@ -195,8 +207,9 @@ function RLMessageAggregator.queueMessage(husbandry, id, animal, args, date)
         pending.purchases.totalValue = pending.purchases.totalValue + value
 
     elseif RLMessageAggregator.HERDSMAN_SUMMARY_CATEGORY_SET[category] then
-        -- New herdsman count-only categories (T5): the _MULTIPLE ids carry the count in args[1],
-        -- the _SINGLE ids carry none (+1). No money, so just accumulate the count.
+        -- Herdsman count-only categories: the _MULTIPLE ids carry the count in args[1], the _SINGLE
+        -- ids carry none (+1). No money, so just accumulate the count. The suffix test below is why
+        -- every per-op id MUST end in exactly _SINGLE / _MULTIPLE.
         local count = 1
         if string.sub(id, -9) == "_MULTIPLE" then
             count = (args ~= nil and tonumber(args[1])) or 1
@@ -293,8 +306,8 @@ function RLMessageAggregator.consolidateDay()
                         { tostring(pending.purchases.count), husbandryName, moneyStr })
                 end
 
-                -- New herdsman count-only summaries (T5): one DAILY_*_SUMMARY per non-empty bucket,
-                -- args { count, husbandryName } (no money), in the fixed category order.
+                -- Herdsman count-only summaries: one DAILY_*_SUMMARY per non-empty bucket, args
+                -- { count, husbandryName } (count FIRST, no money), in the fixed category order.
                 for _, entry in ipairs(RLMessageAggregator.HERDSMAN_SUMMARY_CATEGORIES) do
                     local bucket = pending[entry.category]
                     if bucket ~= nil and bucket.count > 0 then

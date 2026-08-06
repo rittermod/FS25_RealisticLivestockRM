@@ -51,12 +51,18 @@ RLHerdsmanMessages = {}
 local LOG_PREFIX = "[herdsmanMessages]"
 
 --- operation -> the AI_MANAGER_* id families. sell/buy/castrate/naming/ai mirror the ids
---- AIAnimalManager:onDayChanged emits; move follows the SAME count-only shape but is net-new (the
---- legacy day-tick emits no move message). `exec` is the executed-op family (and, for sell/buy,
---- carries the money amount field name; move is count-only, no amountField); `mark` is the mark-mode
---- family (count-only; nil for buy/naming, which have no mark family - T3 never sets mark on them,
---- but a corrupt row that does is WARNed + skipped before the id lookup). Mapped ops: sell, buy,
---- castrate, naming, ai, move.
+--- AIAnimalManager:onDayChanged emits; move and horseCare follow the SAME count-only shape but are
+--- net-new (the legacy day-tick emits neither). `exec` is the executed-op family (and, for sell/buy,
+--- carries the money amount field name; move and horseCare are count-only, no amountField); `mark` is
+--- the mark-mode family (count-only; nil for buy/naming/horseCare, which have no mark family - T3
+--- never sets mark on them, but a corrupt row that does is WARNed + skipped before the id lookup).
+--- Mapped ops: sell, buy, castrate, naming, ai, move, horseCare.
+---
+--- Every id here is one link of a THREE-link chain - ID_FAMILY -> RLMessage[id] ->
+--- rl_message_<text> - and nothing in the runtime gates it: a break at the second link discards the
+--- player's saved messages at load, a break at the third renders the missing-key fallback. The
+--- registry cross-check in the dual-run suite walks this table and asserts both links for every
+--- operation, so a new entry is covered the moment it is added here.
 local ID_FAMILY = {
     sell = {
         exec = { single = "AI_MANAGER_SOLD_SINGLE",   multiple = "AI_MANAGER_SOLD_MULTIPLE",   amountField = "amountGained" },
@@ -81,6 +87,16 @@ local ID_FAMILY = {
     move = {
         exec = { single = "AI_MANAGER_MOVED_SINGLE",     multiple = "AI_MANAGER_MOVED_MULTIPLE" },   -- count-only, no amountField
         mark = { single = "AI_MANAGER_MARK_MOVE_SINGLE", multiple = "AI_MANAGER_MARK_MOVE_MULTIPLE" },
+    },
+    horseCare = {
+        -- Count-only, no amountField: the wage is charged by the executor, not reported here. A
+        -- buy/sell-template copy would read a nil amount field and emit a formatted 0 with a WARN.
+        -- The count reported is the ARMED count - the care write is deferred and its callback
+        -- re-validates membership, so this family alone is optimistic (@see RLHerdsmanExecutor._doHorseCare).
+        -- mark = nil is DOCUMENTATION: a table constructor stores no key for a nil value, so the
+        -- WARN-skip routing for a corrupt mark row is a property of the lookup, not of this line.
+        exec = { single = "AI_MANAGER_HORSE_CARE_SINGLE", multiple = "AI_MANAGER_HORSE_CARE_MULTIPLE" },
+        mark = nil,
     },
 }
 
@@ -181,7 +197,8 @@ function RLHerdsmanMessages.buildMessages(results, formatMoney)
                 idSet, isMoney = family.exec, (family.exec.amountField ~= nil)
             else
                 -- Genuine skip (dispatched=false, mark~=true): no message. Carries T3's skipReason
-                -- (no-space / no-money / missing-placeable / bad-data). Expected, so DEBUG.
+                -- (no-space / no-money / missing-placeable / bad-data, plus horse care's
+                -- not-in-husbandry / defer-failed). Expected, so DEBUG.
                 addSkip(row, "genuine-skip:" .. tostring(row.skipReason), "debug")
             end
 

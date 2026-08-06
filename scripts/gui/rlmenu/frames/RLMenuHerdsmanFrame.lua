@@ -28,19 +28,27 @@ local modDirectory = g_currentModDirectory
 -- list AND the Operation selector's state labels: the presenter stays key-free, so the
 -- frame owns the label map. A value lookup, not decision logic.
 --
--- This map is deliberately allowed to be a SUBSET of the canonical OPERATION_ORDER: an
--- operation registered before it is surfaced to players carries no entry yet. Both readers
--- already cope - the selector seed falls back to the raw operation name, and
--- getTitleForSectionHeader returns nil so the section header renders untitled. `horseCare`
--- is in that state until its player-facing pass lands.
+-- Both readers TOLERATE a missing entry - the selector seed falls back to the raw operation name
+-- and getTitleForSectionHeader returns nil - because a nil key once crashed the whole game through
+-- the I18N.getText override. That tolerance is correct and stays. Its side effect is that a missing
+-- label is invisible at runtime: the player simply reads a programmer string. So the map is expected
+-- to be COMPLETE over OPERATION_ORDER, and a test sweep (not the runtime) is what enforces it -
+-- which is why the table is exported below.
 local OPERATION_TITLE_KEY = {
-    sell     = "rl_menu_herdsman_section_sell",
-    move     = "rl_menu_herdsman_section_move",
-    buy      = "rl_menu_herdsman_section_buy",
-    castrate = "rl_menu_herdsman_section_castrate",
-    naming   = "rl_menu_herdsman_section_naming",
-    ai       = "rl_menu_herdsman_section_ai",
+    sell      = "rl_menu_herdsman_section_sell",
+    move      = "rl_menu_herdsman_section_move",
+    buy       = "rl_menu_herdsman_section_buy",
+    castrate  = "rl_menu_herdsman_section_castrate",
+    naming    = "rl_menu_herdsman_section_naming",
+    ai        = "rl_menu_herdsman_section_ai",
+    horseCare = "rl_menu_herdsman_section_horsecare",
 }
+
+-- Exposed read-only so a test can sweep it against OPERATION_ORDER and assert every operation has a
+-- resolvable player-facing label. Same reason RLHerdsmanRulePresenter.OPERATION_ANIMAL_TYPES and
+-- RLHerdsmanMessages.ID_FAMILY are exported: a declaration table no test can see is a declaration
+-- nothing checks. Read it; never mutate it.
+RLMenuHerdsmanFrame.OPERATION_TITLE_KEY = OPERATION_TITLE_KEY
 
 -- =============================================================================
 -- Module-local helpers (pure wiring; no decisions)
@@ -323,9 +331,10 @@ function RLMenuHerdsmanFrame:onGuiSetupFinished()
     if self.ruleOperationSelector ~= nil then
         local opTexts = {}
         for i, op in ipairs(RLHerdsmanRulePresenter.OPERATION_ORDER) do
-            -- An operation without a section title key (a not-yet-UI-wired op) falls back to its
-            -- raw name instead of crashing getText on a nil key - mirrors the nil-key guard in
-            -- getTitleForSectionHeader. The real label is seeded when that op's UI is wired.
+            -- Backstop, not a supported state: an operation with no title key falls back to its raw
+            -- name instead of crashing getText on a nil key - mirrors the nil-key guard in
+            -- getTitleForSectionHeader. The map is expected complete over OPERATION_ORDER and a test
+            -- sweep enforces that; reaching this fallback in a shipped build is the defect.
             local key = OPERATION_TITLE_KEY[op]
             opTexts[i] = key ~= nil and g_i18n:getText(key) or op
         end

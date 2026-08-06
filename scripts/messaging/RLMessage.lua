@@ -226,6 +226,18 @@ RLMessage = {
 		["title"] = "aiManager",
 		["importance"] = 3
 	},
+	-- Herdsman horse-care op (count-only, no money - the wage is charged by the executor and never
+	-- reported here). Net-new herdsman family with no mark variant: horse care is perform-only.
+	["AI_MANAGER_HORSE_CARE_SINGLE"] = {
+		["text"] = "aiManager_horseCare_single",
+		["title"] = "aiManager",
+		["importance"] = 3
+	},
+	["AI_MANAGER_HORSE_CARE_MULTIPLE"] = {
+		["text"] = "aiManager_horseCare_multiple",
+		["title"] = "aiManager",
+		["importance"] = 3
+	},
 	-- Herdsman move age-skip (EPP butcher destinations): animals outside the butcher's
 	-- accepted age window are skipped at delivery. Count-only, INDIVIDUAL (not in
 	-- RLMessageAggregator.AGGREGATABLE) - exceptional + actionable, so it stays out of the daily
@@ -305,6 +317,11 @@ RLMessage = {
 	},
 	["DAILY_MARK_MOVE_SUMMARY"] = {
 		["text"] = "dailyMarkMoveSummary",
+		["title"] = "aiManager",
+		["importance"] = 2
+	},
+	["DAILY_HORSE_CARE_SUMMARY"] = {
+		["text"] = "dailyHorseCareSummary",
 		["title"] = "aiManager",
 		["importance"] = 2
 	}

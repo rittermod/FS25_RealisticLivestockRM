@@ -672,6 +672,8 @@
         <text name="rl_message_aiManager_mark_move_multiple" text="Il mandriano ha contrassegnato %s animali per lo spostamento"/>
         <text name="rl_message_aiManager_moveSkippedAge_single" text="Herdsman skipped 1 animal (wrong age for the butcher)"/>
         <text name="rl_message_aiManager_moveSkippedAge_multiple" text="Herdsman skipped %s animals (wrong age for the butcher)"/>
+        <text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
+        <text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
 
         <!-- Daily summary messages -->
         <text name="rl_message_dailyBirthsSummary" text="%s animali sono nati presso %s"/>
@@ -687,6 +689,7 @@
         <text name="rl_message_dailyMarkInseminateSummary" text="Segnati %s animali per l'inseminazione presso %s"/>
         <text name="rl_message_dailyMovesSummary" text="Spostati %s animali da %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="Segnati %s animali per lo spostamento da %s"/>
+        <text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
 
         <!-- DEATHS -->
 
@@ -807,6 +810,7 @@
         <text name="rl_menu_herdsman_section_castrate" text="Castrazione"/>
         <text name="rl_menu_herdsman_section_naming" text="Denominazione"/>
         <text name="rl_menu_herdsman_section_ai" text="Inseminazione artificiale"/>
+        <text name="rl_menu_herdsman_section_horsecare" text="Horse Care"/>
         <text name="rl_menu_herdsman_detail_operation" text="Operazione"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Attivato"/>
         <text name="rl_menu_herdsman_detail_convention" text="Convenzione di denominazione"/>

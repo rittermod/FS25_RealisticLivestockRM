@@ -659,6 +659,8 @@
 		<text name="rl_message_aiManager_mark_move_multiple" text="Herdsman marked %s animals for moving"/>
 		<text name="rl_message_aiManager_moveSkippedAge_single" text="Herdsman skipped 1 animal (wrong age for the butcher)"/>
 		<text name="rl_message_aiManager_moveSkippedAge_multiple" text="Herdsman skipped %s animals (wrong age for the butcher)"/>
+		<text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
+		<text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
 
 
 
@@ -695,6 +697,7 @@
         <text name="rl_message_dailyMarkInseminateSummary" text="Marked %s animals for insemination at %s"/>
         <text name="rl_message_dailyMovesSummary" text="Moved %s animals from %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="Marked %s animals for moving from %s"/>
+        <text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
         <text name="rl_message_dailySalesSummary" text="Vendidos %s animais em %s por %s"/>
         <text name="rl_settings_accidentsChance_tooltip_github" text="Alterar a probabilidade de animais morrerem devido a acidentes aleatórios"/>
         <text name="rl_settings_deathEnabled_label_github" text="Morte de Animais"/>
@@ -814,6 +817,7 @@
         <text name="rl_menu_herdsman_section_castrate" text="Castrate"/>
         <text name="rl_menu_herdsman_section_naming" text="Naming"/>
         <text name="rl_menu_herdsman_section_ai" text="Artificial Insemination"/>
+        <text name="rl_menu_herdsman_section_horsecare" text="Horse Care"/>
         <text name="rl_menu_herdsman_detail_operation" text="Operation"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Enabled"/>
         <text name="rl_menu_herdsman_detail_convention" text="Naming Convention"/>
