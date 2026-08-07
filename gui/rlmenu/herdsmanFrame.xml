@@ -133,14 +133,6 @@
                         <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_menu_herdsman_detail_operation"/>
                     </Bitmap>
 
-                    <!-- Enabled (binary) -->
-                    <Bitmap profile="fs25_multiTextOptionContainer" id="ruleEnabledRow">
-                        <BinaryOption profile="fs25_settingsBinaryOption" id="ruleEnabledToggle" onClick="onRuleEnabledChanged">
-                            <Text profile="rlMenu_herdsmanRowTooltip" name="tooltip"/>
-                        </BinaryOption>
-                        <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_menu_herdsman_detail_enabled"/>
-                    </Bitmap>
-
                     <!-- maxAnimals (numeric TextInput; hidden for castrate/naming) -->
                     <Bitmap profile="fs25_multiTextOptionContainer" id="ruleMaxAnimalsRow">
                         <TextInput profile="fs25_settingsTextInput" id="ruleMaxAnimalsInput"
@@ -259,6 +251,20 @@
                             <Text profile="rlMenu_herdsmanRowTooltip" name="tooltip"/>
                         </Button>
                         <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_menu_herdsman_detail_destination"/>
+                    </Bitmap>
+
+                    <!-- Enabled (binary). LAST row by design: enabling is the commit
+                         step, not a parameter - the flush gate makes the filter / husbandries /
+                         destination requirements enabled-conditional (RLHerdsmanRulePresenter
+                         validateEdit / validateFlush), so the toggle belongs after the rows that
+                         satisfy those gates. Row order here IS the pane order; the frame resolves
+                         every row by id, and updateAlternatingElements re-derives the tint stripe
+                         from this element order on each render. -->
+                    <Bitmap profile="fs25_multiTextOptionContainer" id="ruleEnabledRow">
+                        <BinaryOption profile="fs25_settingsBinaryOption" id="ruleEnabledToggle" onClick="onRuleEnabledChanged">
+                            <Text profile="rlMenu_herdsmanRowTooltip" name="tooltip"/>
+                        </BinaryOption>
+                        <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_menu_herdsman_detail_enabled"/>
                     </Bitmap>
 
                 </ScrollingLayout>
