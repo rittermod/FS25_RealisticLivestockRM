@@ -160,7 +160,7 @@
 		<text name="rl_ui_moveSingle" text="Verschieben"/>
 		<text name="rl_ui_moveSelectDestination" text="Zielort auswählen"/>
 		<text name="rl_ui_moveNoDestinations" text="Kein Zielort für diesen Tiertyp verfügbar."/>
-		<text name="rl_ui_moveEPPAgeFormat" text="Alter %d-%d mo" tag="format"/>/
+		<text name="rl_ui_moveEPPAgeFormat" text="Alter %d-%d mo" tag="format"/>
 		<text name="rl_ui_moveValidSummary" text="%d Tier(e) werden verschoben" tag="format"/>
 		<text name="rl_ui_moveRejectedAge" text="%d Tier(e) übersprungen: Erfüllen nicht die Altersanforderung (%d-%d months)" tag="format"/>
 		<text name="rl_ui_moveRejectedCapacity" text="%d Tier(e) übersprungen: Nicht genug Platz am Zielort" tag="format"/>
@@ -168,7 +168,7 @@
 		<text name="rl_ui_moveBulkConfirmTitle" text="Verschiebe Tiere"/>
 		<text name="rl_ui_moveErrorNoPermission" text="Du hast keine Erlaubnis Tiere hierhin zu verschieben."/>
 		<text name="rl_ui_moveErrorNotSupported" text="Dieser Zielort unterstützt diese Tierart nicht."/>
-		<text name="rl_ui_moveErrorNoSpace" text="Nicht genug Platz am Zielort."/>/
+		<text name="rl_ui_moveErrorNoSpace" text="Nicht genug Platz am Zielort."/>
 		<text name="rl_ui_tradeRequestInProgress" text="Es wird bereits ein Handel ausgeführt. Bitte warten."/>
 		<text name="rl_ui_tradeRequestTimeout" text="Der Server hat nicht geantwortet. Bitte versuche es erneut."/>
 
