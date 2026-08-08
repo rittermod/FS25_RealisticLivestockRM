@@ -53,6 +53,51 @@ local saleRotationWarnLatches = {
 }
 
 
+-- One-shot latches for the reasons sale-animal GENERATION declines to produce an
+-- animal. Keyed "<site>:<animalTypeIndex>" rather than by site alone: one type
+-- being unable to generate must not silence the notice for a different type.
+-- Same MAP LOAD lifetime as the rotation latches above (re-sourced on each load).
+--
+-- Why this exists: the restock loop calls createNewSaleAnimal up to
+-- math.random(10, maxDealerAnimals) times an hour and only checks for nil, so
+-- every decline looked identical from the log. The hourly summary reports
+-- "restocked 0 of N attempted", which says generation produced nothing but not
+-- WHICH of the three declines fired - and that distinction is the whole
+-- diagnosis (RLRM-595).
+local saleGenerationBailLatches = {}
+
+
+--- Name the reason a sale-animal generation attempt produced nothing, ONCE per
+--- (site, animal type) per map load.
+---
+--- Level is the caller's to choose because the audiences differ: an owner having
+--- switched a whole animal type off is a PLAYER-facing answer to "why does the
+--- dealer never stock cows", so it goes out at INFO where it is visible without
+--- turning on debug logging. The other declines are maintainer-facing and stay at
+--- DEBUG. None of them is a WARNING - every one is a legitimate configuration,
+--- not a defect.
+---
+--- The latch is set AFTER the log call returns, matching warnMalformedSaleListing:
+--- setting it first means a diagnostic that raises leaves the latch burnt, having
+--- silenced every later attempt while never producing the message it consumed.
+---@param site string Detection-site key - one per decline branch
+---@param animalTypeIndex number The type that could not be generated
+---@param level string "info" for the player-facing decline, "debug" otherwise
+---@param message string Fully-formatted message
+local function noteSaleGenerationBail(site, animalTypeIndex, level, message)
+    local latchKey = site .. ":" .. tostring(animalTypeIndex)
+    if saleGenerationBailLatches[latchKey] then return end
+
+    if level == "info" then
+        Log:info(message)
+    else
+        Log:debug(message)
+    end
+
+    saleGenerationBailLatches[latchKey] = true
+end
+
+
 local function getDaysInMonth(month)
     -- Nil-guard retained as defensive pattern for load-order safety
     local daysPerMonth = RLConstants ~= nil and RLConstants.DAYS_PER_MONTH or nil
@@ -1479,7 +1524,13 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
 
     local animalType = self:getTypeByIndex(animalTypeIndex)
 
-    if animalType == nil then return nil end
+    if animalType == nil then
+        noteSaleGenerationBail("noAnimalType", animalTypeIndex, "debug", string.format(
+            "createNewSaleAnimal: no animal type is registered at index %d, so the dealer cannot "
+            .. "generate stock for it. Further attempts this map load are silent.",
+            animalTypeIndex))
+        return nil
+    end
 
     -- Filter to subtypes with at least one buyable visual (respects bridge canBeBought overrides)
     local buyableSubTypes = {}
@@ -1495,18 +1546,36 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
         end
     end
 
-    if #buyableSubTypes == 0 then return nil end
+    -- Player-facing (INFO): this is the answer to "why does the dealer never have
+    -- any cows". Every subtype of the type is marked not-buyable - by the dealer
+    -- sale-availability settings, or by a map/bridge canBeBought override - so the
+    -- hourly restock will keep attempting and keep producing nothing.
+    if #buyableSubTypes == 0 then
+        noteSaleGenerationBail("noBuyableSubTypes", animalTypeIndex, "info", string.format(
+            "The animal dealer will not stock %s: every subtype is currently set to not buyable "
+            .. "(dealer sale-availability settings, or a map/mod override). Change it in the "
+            .. "Realistic Livestock settings if that was not intended. Said once per map load.",
+            RLAnimalUtil.getAnimalTypeDisplayName(animalType)))
+        return nil
+    end
 
     local subTypeIndex = buyableSubTypes[math.random(1, #buyableSubTypes)]
     local subType = self:getSubTypeByIndex(subTypeIndex)
-    
+
     local farmId, farmQuality, farmCountryIndex, lastAnimalId
     local attemptedCountryIndexes = {}
 
-    
+
     while farmId == nil do
 
-        if #attemptedCountryIndexes == #self.countries then return nil end
+        if #attemptedCountryIndexes == #self.countries then
+            noteSaleGenerationBail("noValidFarms", animalTypeIndex, "debug", string.format(
+                "createNewSaleAnimal: no country has a source farm that keeps %s (%d attempted), "
+                .. "so generation produces nothing until the country/farm data changes. "
+                .. "Further attempts this map load are silent.",
+                RLAnimalUtil.getAnimalTypeDisplayName(animalType), #attemptedCountryIndexes))
+            return nil
+        end
 
         local countryIndex
         local wasMapPick = false
@@ -1999,6 +2068,28 @@ function AnimalSystem._resetSaleRotationWarnLatches()
     for key in pairs(saleRotationWarnLatches) do
         saleRotationWarnLatches[key] = false
     end
+end
+
+
+--- Reset every sale-generation bail latch. Test-only seam, and the keys are DYNAMIC
+--- ("<site>:<typeIndex>"), so this clears the table rather than setting known keys
+--- false - a suite that drove type 5 must not leave a latch that silences the first
+--- genuine decline for type 5 later in the session.
+function AnimalSystem._resetSaleGenerationBailLatches()
+    for key in pairs(saleGenerationBailLatches) do
+        saleGenerationBailLatches[key] = nil
+    end
+end
+
+
+--- Whether a sale-generation bail latch has already fired. Test-only seam: the
+--- latch is invisible from outside, and a suite proving "said once" needs to read
+--- the flag rather than spy the logger.
+---@param site string Detection-site key
+---@param animalTypeIndex number
+---@return boolean fired
+function AnimalSystem._hasSaleGenerationBailLatch(site, animalTypeIndex)
+    return saleGenerationBailLatches[site .. ":" .. tostring(animalTypeIndex)] == true
 end
 
 
