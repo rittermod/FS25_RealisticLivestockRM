@@ -820,6 +820,9 @@
         <text name="rl_menu_herdsman_detail_husbandries" text="Allevamenti"/>
         <text name="rl_menu_herdsman_detail_none" text="(nessuno)"/>
         <text name="rl_menu_herdsman_detail_missing" text="(mancante)"/>
+        <text name="rl_menu_herdsman_detail_required" text="Required"/>
+        <text name="rl_menu_herdsman_detail_wholeNumberRange" text="Value must be a whole number between %d and %d"/>
+        <text name="rl_menu_herdsman_detail_wholeNumberMin" text="Value must be a whole number, %d or more"/>
         <text name="rl_menu_herdsman_filter_select" text="Seleziona filtro"/>
         <text name="rl_menu_herdsman_filter_picker_title" text="Seleziona filtro"/>
         <text name="rl_menu_herdsman_filter_picker_empty" text="Nessun filtro disponibile per questa operazione."/>

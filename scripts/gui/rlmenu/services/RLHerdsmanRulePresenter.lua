@@ -127,6 +127,11 @@ for _, value in ipairs(BUDGET_PERCENTAGE_VALUES) do BUDGET_PERCENTAGE_SET[value]
 RLHerdsmanRulePresenter.MAXANIMALS_MIN = 1
 RLHerdsmanRulePresenter.MAXANIMALS_MAX = 9999
 
+--- budget.fixed floor (inclusive). Named rather than inline because the detail pane formats the
+--- player-facing bounds sentence with it: the message and the check that produced it read the same
+--- constant, so they cannot say different numbers.
+RLHerdsmanRulePresenter.BUDGET_FIXED_MIN = 0
+
 --- The "any dewar" semen sentinel. The frame prepends this as its own option with an
 --- i18n label; formatSemenOption (real dewars only) never emits it.
 RLHerdsmanRulePresenter.SEMEN_ANY = "any"
@@ -482,11 +487,14 @@ local function isValidBudgetType(value)
     return type(value) == "string" and BUDGET_TYPE_SET[value] == true
 end
 
---- budget.fixed: a non-negative integer (serializer setInt).
+--- budget.fixed: a whole number at or above the floor (serializer setInt). The floor is a named
+--- constant because the player-facing bounds string is formatted with it - a literal copied into
+--- the frame would let the sentence and the rule that rejects the value drift apart.
 ---@param value any
 ---@return boolean
 local function isValidBudgetFixed(value)
-    return type(value) == "number" and value == math.floor(value) and value >= 0
+    return type(value) == "number" and value == math.floor(value)
+        and value >= RLHerdsmanRulePresenter.BUDGET_FIXED_MIN
 end
 
 --- budget.percentage: a member of the 28-value whitelist.
@@ -1216,6 +1224,53 @@ end
 -- Edit validation (pre-submit; stricter than the service floor on targets)
 -- =============================================================================
 
+--- A reference field counts as PRESENT only when it is a non-blank string. Shared by
+--- validateEdit's gates and rowIssues' markers so the two can never drift on what
+--- "the player filled this in" means - a whitespace-only key is absent on both paths.
+---@param value any
+---@return boolean
+local function isNonBlankString(value)
+    -- `find("%S")` rather than a gsub-and-compare: identical semantics, no garbage string per call,
+    -- and this runs once per husbandry target per render AND per keystroke.
+    return type(value) == "string" and value:find("%S") ~= nil
+end
+
+--- A RESOLVED filter counts as usable only when it carries a renderable name - the same test
+--- getFilterSummary applies before it falls back to its `missing` label. Shared so the marker and
+--- the button cannot disagree: the frame maps BOTH of getFilterSummary's empty labels onto one
+--- "Select filter" CTA, so a filter record with a blank name renders exactly like an unset one. If
+--- this predicate were merely `type(f) == "table"`, that row would show the CTA with no marker
+--- beside it, which is precisely the silent-CTA state this feature exists to remove.
+---@param filter any the resolved filter record, or nil
+---@return boolean
+local function isUsableFilter(filter)
+    return type(filter) == "table" and isNonBlankString(filter.name)
+end
+
+--- The draft's bound filter id, present-tested. Callers that also need to tell "absent"
+--- from "blank" read `draft.filterId` directly; this answers only the presence question.
+---@param draft table
+---@return boolean
+local function filterIdPresent(draft)
+    return isNonBlankString(draft.filterId)
+end
+
+--- The draft's move destination key, or nil. Split from the presence test because
+--- validateEdit's disabled arm distinguishes an ABSENT dest (legal on a draft) from a
+--- present-but-blank one (never legal).
+---@param draft table
+---@return any
+local function destinationKey(draft)
+    return type(draft.params) == "table" and draft.params.destinationHusbandry or nil
+end
+
+--- Whether the draft carries a usable move destination.
+---@param draft table
+---@return boolean
+local function destinationPresent(draft)
+    return isNonBlankString(destinationKey(draft))
+end
+
 --- Validate an in-progress rule draft for the detail pane (pre-submit). Returns a
 --- per-field boolean breakdown plus an overall `valid`. Deliberately STRICTER than
 --- RLHerdsmanRuleService's validity floor on targets: the service accepts an empty
@@ -1258,7 +1313,7 @@ function RLHerdsmanRulePresenter.validateEdit(draft)
     if draft.operation == "naming" then
         filterOk = draft.filterId == nil
     else
-        local present = type(draft.filterId) == "string" and draft.filterId:gsub("%s", "") ~= ""
+        local present = filterIdPresent(draft)
         if draft.enabled == true then
             filterOk = present
         else
@@ -1276,8 +1331,8 @@ function RLHerdsmanRulePresenter.validateEdit(draft)
     local destinationRequired = draft.operation == "move" and draft.enabled == true
     local destinationOk
     if draft.operation == "move" then
-        local dest = type(draft.params) == "table" and draft.params.destinationHusbandry or nil
-        local present = type(dest) == "string" and dest:gsub("%s", "") ~= ""
+        local dest = destinationKey(draft)
+        local present = isNonBlankString(dest)
         if draft.enabled == true then
             destinationOk = present
         else
@@ -1403,6 +1458,139 @@ function RLHerdsmanRulePresenter.enableDemotionAxes(g)
 
     Log:trace("RLHerdsmanRulePresenter.enableDemotionAxes: demotable on axes=[%s]", table.concat(axes, ","))
     return axes
+end
+
+--- Process-lifetime flag: warn exactly once when rowIssues meets an unknown operation.
+--- The frame calls this on EVERY render, so a transient invalid op in the editor must not
+--- spam the log (same one-shot contract as validateParams).
+local _warnedRowIssuesUnknownOp = false
+
+--- Which detail-pane rows are REQUIRED-but-empty or filled-but-out-of-domain, as a map of
+--- row-field token -> `"required"` | `"invalid"` | nil (absent = nothing to mark).
+---
+--- Driven by REQUIREMENT, never by the flush breakdown. `validateFlush` /
+--- `enableDemotionAxes` are enable-gated: on a disabled draft with a nil filter they report
+--- clean, which is exactly the post-demote state a player is left staring at. So this reads
+--- `PARAM_VISIBILITY` (plus the always-required `name` / `husbandries`, whose rows are visible
+--- for every operation and therefore carry no `vis` key) and answers the same for an enabled
+--- and a disabled rule.
+---
+--- An unresolvable reference counts as ABSENT, not present: the buttons already render the
+--- same CTA for "never set" and "the filter was deleted", so the marker must agree with what
+--- the player sees. That is why both resolvers are injected - fed the SAME
+--- `resolveFilterById` / `resolvePlaceableName` the frame passes to `getFilterSummary` and
+--- `formatHusbandryButtonLabel`, so listing, labelling and marking cannot diverge.
+---
+--- Husbandries mark only when EVERY target fails to resolve. One live target means the rule
+--- still runs, and `revalidateTargets` deliberately PRESERVES unresolvable uids - so a plain
+--- count test would read a list of dead references as healthy.
+---
+--- Fails CLOSED on its OWN inputs: a nil / non-table draft and an unknown operation both answer an
+--- empty map rather than raising, because the frame calls this on every render and a raise here
+--- kills the whole detail pane. That guarantee does NOT extend to the injected resolvers - they are
+--- frame-side closures over live game state and a raise inside one propagates out of here. The
+--- frame clears every marker BEFORE calling this for exactly that reason, so such a raise leaves
+--- blank rows rather than another rule's text.
+---@param draft table|nil the overlay-merged rule record
+---@param resolveFilter function|nil function(filterId) -> filter table|nil
+---@param resolveName function|nil function(uid) -> placeable name string|nil
+---@return table issues map keyed by name|filter|husbandries|destination|maxAnimals|"budget|fixed"
+function RLHerdsmanRulePresenter.rowIssues(draft, resolveFilter, resolveName)
+    local out = {}
+
+    if type(draft) ~= "table" then
+        Log:trace("RLHerdsmanRulePresenter.rowIssues: nil/non-table draft (%s) -> no marks", type(draft))
+        return out
+    end
+
+    local operation = draft.operation
+    local vis = PARAM_VISIBILITY[operation]
+    if vis == nil then
+        if not _warnedRowIssuesUnknownOp then
+            Log:warning("RLHerdsmanRulePresenter.rowIssues: unknown operation '%s'; no marks", tostring(operation))
+            _warnedRowIssuesUnknownOp = true
+        end
+        return out
+    end
+
+    local params = type(draft.params) == "table" and draft.params or {}
+
+    -- name: always required (the row is visible for every operation).
+    if not isNonBlankString(draft.name) then
+        out.name = "required"
+    end
+
+    -- husbandries: always required. Mark only when NOTHING resolves - see the doc block.
+    local targets = draft.targetHusbandries
+    if type(targets) ~= "table" or #targets == 0 then
+        out.husbandries = "required"
+    else
+        local anyResolves = false
+        if type(resolveName) == "function" then
+            -- Indexed rather than ipairs: the presence guard one line above and
+            -- formatHusbandryButtonLabel both measure this list with `#`, and ipairs stops at the
+            -- first hole. A list whose index 1 is absent would otherwise read as "no target
+            -- resolves" while the button beside it renders "N selected".
+            for i = 1, #targets do
+                if isNonBlankString(resolveName(targets[i])) then
+                    anyResolves = true
+                    break
+                end
+            end
+        end
+        if not anyResolves then
+            out.husbandries = "required"
+        end
+    end
+
+    -- filter: required exactly when its row is visible. Absent OR dangling both mark.
+    if vis.filter == true then
+        if not filterIdPresent(draft) then
+            out.filter = "required"
+        elseif type(resolveFilter) ~= "function" or not isUsableFilter(resolveFilter(draft.filterId)) then
+            out.filter = "required"
+        end
+    end
+
+    -- destination: the filter's twin on the move-only row.
+    if vis.destination == true then
+        if not destinationPresent(draft) then
+            out.destination = "required"
+        elseif type(resolveName) ~= "function" or not isNonBlankString(resolveName(destinationKey(draft))) then
+            out.destination = "required"
+        end
+    end
+
+    -- maxAnimals: empty is a PRESENCE failure, out-of-domain is a DOMAIN failure. The stash
+    -- layer writes tonumber(typed), so unparseable text arrives as nil and reads as empty -
+    -- accepted: nothing downstream can tell "" from "abc" once it is nil.
+    if vis.maxAnimals == true then
+        local value = params.maxAnimals
+        if type(value) ~= "number" then
+            out.maxAnimals = "required"
+        elseif not isValidMaxAnimals(value) then
+            out.maxAnimals = "invalid"
+        end
+    end
+
+    -- budget|fixed: gated on the budget row being visible AND a budget table existing, so the
+    -- `.type` read below can never index nil (the frame renders a buy rule with no budget table).
+    if vis.budget == true and type(params.budget) == "table" then
+        local bvis = RLHerdsmanRulePresenter.getBudgetFieldVisibility(params.budget.type)
+        if bvis.fixed then
+            local value = params.budget.fixed
+            if type(value) ~= "number" then
+                out["budget|fixed"] = "required"
+            elseif not isValidBudgetFixed(value) then
+                out["budget|fixed"] = "invalid"
+            end
+        end
+    end
+
+    Log:trace("RLHerdsmanRulePresenter.rowIssues: operation=%s name=%s filter=%s husbandries=%s destination=%s maxAnimals=%s budget|fixed=%s",
+        tostring(operation), tostring(out.name), tostring(out.filter), tostring(out.husbandries),
+        tostring(out.destination), tostring(out.maxAnimals), tostring(out["budget|fixed"]))
+    return out
 end
 
 -- =============================================================================

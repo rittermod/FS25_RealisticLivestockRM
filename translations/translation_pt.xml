@@ -829,6 +829,9 @@
         <text name="rl_menu_herdsman_detail_husbandries" text="Husbandries"/>
         <text name="rl_menu_herdsman_detail_none" text="(none)"/>
         <text name="rl_menu_herdsman_detail_missing" text="(missing)"/>
+        <text name="rl_menu_herdsman_detail_required" text="Required"/>
+        <text name="rl_menu_herdsman_detail_wholeNumberRange" text="Value must be a whole number between %d and %d"/>
+        <text name="rl_menu_herdsman_detail_wholeNumberMin" text="Value must be a whole number, %d or more"/>
         <text name="rl_menu_herdsman_filter_select" text="Select filter"/>
         <text name="rl_menu_herdsman_filter_picker_title" text="Select Filter"/>
         <text name="rl_menu_herdsman_filter_picker_empty" text="No filters available for this operation."/>

@@ -121,6 +121,7 @@
                                 <Bitmap profile="fs25_textInputIcon"/>
                             </Bitmap>
                             <Text profile="rlMenu_herdsmanRowTooltipInput" name="tooltip"/>
+                            <Text profile="rlMenu_herdsmanRowReasonInput" name="reason"/>
                         </TextInput>
                         <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_menu_filters_editor_title_name"/>
                     </Bitmap>
@@ -146,6 +147,7 @@
                                 <Bitmap profile="fs25_textInputIcon"/>
                             </Bitmap>
                             <Text profile="rlMenu_herdsmanRowTooltipInput" name="tooltip"/>
+                            <Text profile="rlMenu_herdsmanRowReasonInput" name="reason"/>
                         </TextInput>
                         <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_ui_maxAnimals"/>
                     </Bitmap>
@@ -187,6 +189,7 @@
                                 <Bitmap profile="fs25_textInputIcon"/>
                             </Bitmap>
                             <Text profile="rlMenu_herdsmanRowTooltipInput" name="tooltip"/>
+                            <Text profile="rlMenu_herdsmanRowReasonInput" name="reason"/>
                         </TextInput>
                         <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_menu_herdsman_detail_budgetfixed"/>
                     </Bitmap>
@@ -220,6 +223,7 @@
                         <Button profile="rl_settingsButton" id="ruleFilterButton" onClick="onClickRuleFilter">
                             <ThreePartBitmap profile="fs25_settingsButtonBg"/>
                             <Text profile="rlMenu_herdsmanRowTooltip" name="tooltip"/>
+                            <Text profile="rlMenu_herdsmanRowReason" name="reason"/>
                         </Button>
                         <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_menu_info_filter_button"/>
                     </Bitmap>
@@ -235,6 +239,7 @@
                         <Button profile="rl_settingsButton" id="ruleHusbandriesButton" onClick="onClickRuleHusbandries">
                             <ThreePartBitmap profile="fs25_settingsButtonBg"/>
                             <Text profile="rlMenu_herdsmanRowTooltip" name="tooltip"/>
+                            <Text profile="rlMenu_herdsmanRowReason" name="reason"/>
                         </Button>
                         <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_menu_herdsman_detail_husbandries"/>
                     </Bitmap>
@@ -249,6 +254,7 @@
                         <Button profile="rl_settingsButton" id="ruleDestinationButton" onClick="onClickRuleDestination">
                             <ThreePartBitmap profile="fs25_settingsButtonBg"/>
                             <Text profile="rlMenu_herdsmanRowTooltip" name="tooltip"/>
+                            <Text profile="rlMenu_herdsmanRowReason" name="reason"/>
                         </Button>
                         <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_menu_herdsman_detail_destination"/>
                     </Bitmap>

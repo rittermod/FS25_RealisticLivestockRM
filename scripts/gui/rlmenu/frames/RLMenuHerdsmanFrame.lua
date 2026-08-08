@@ -50,6 +50,29 @@ local OPERATION_TITLE_KEY = {
 -- nothing checks. Read it; never mutate it.
 RLMenuHerdsmanFrame.OPERATION_TITLE_KEY = OPERATION_TITLE_KEY
 
+-- Row field -> the bounds string an "invalid" row marker renders, with the arguments that fill it.
+-- Only the two numeric rows can ever be "invalid" - every other covered row is presence-only - so a
+-- field absent from this table is not a gap.
+--
+-- The arguments are read from the presenter's own domain constants at CALL time, not copied here, so
+-- the sentence the player reads and the rule that rejected their value cannot drift; the closure also
+-- keeps this table free of a load-time read of a module sourced after this one.
+local REASON_INVALID = {
+    maxAnimals = {
+        key = "rl_menu_herdsman_detail_wholeNumberRange",
+        args = function()
+            return RLHerdsmanRulePresenter.MAXANIMALS_MIN, RLHerdsmanRulePresenter.MAXANIMALS_MAX
+        end,
+    },
+    -- budget.fixed has a lower bound only, so it uses the one-placeholder string rather than the
+    -- range one. The floor is read from the presenter like maxAnimals' pair - a literal here would
+    -- be exactly the drift the comment above promises is impossible.
+    ["budget|fixed"] = {
+        key = "rl_menu_herdsman_detail_wholeNumberMin",
+        args = function() return RLHerdsmanRulePresenter.BUDGET_FIXED_MIN end,
+    },
+}
+
 -- =============================================================================
 -- Module-local helpers (pure wiring; no decisions)
 -- =============================================================================
@@ -414,6 +437,30 @@ function RLMenuHerdsmanFrame:onGuiSetupFinished()
     grabTooltip(self.ruleFilterRow, "filter")
     grabTooltip(self.ruleHusbandriesRow, "husbandries")
     grabTooltip(self.ruleDestinationRow, "destination")
+
+    -- Per-row REASON lines: the second Text stacked in the same value widget as the help line
+    -- above, carrying the required / out-of-range marker. Grabbed exactly like the tooltips
+    -- (recursive getDescendantByName off the ROW, setVisible on grab) but only for the SIX rows
+    -- that carry one - extending grabTooltip would emit seven spurious "no reason child" lines
+    -- per setup. A missing node on a covered row is a wiring defect, not a runtime condition:
+    -- the XML and this file ship together, so it is an ERROR rather than a trace.
+    self.reasons = {}
+    local function grabReason(row, field)
+        if row == nil then return end
+        local r = row:getDescendantByName("reason")
+        if r == nil then
+            Log:error("RLMenuHerdsmanFrame:onGuiSetupFinished: covered row '%s' has no reason child; the row marker cannot render (herdsmanFrame.xml out of sync with this file)", field)
+            return
+        end
+        r:setVisible(true)
+        self.reasons[field] = r
+    end
+    grabReason(self.ruleNameRow, "name")
+    grabReason(self.ruleMaxAnimalsRow, "maxAnimals")
+    grabReason(self.ruleBudgetFixedRow, "budget|fixed")
+    grabReason(self.ruleFilterRow, "filter")
+    grabReason(self.ruleHusbandriesRow, "husbandries")
+    grabReason(self.ruleDestinationRow, "destination")
 
     -- Action bar (single-tier; no Filters Tier 2/3 - the herdsman frame has no conditions
     -- sub-list): Back / New / Duplicate / Delete. Code-driven footer (menuButtonInfo), not XML,
@@ -1007,11 +1054,36 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
     local semenValue      = self.semenValues[semenIdx] or RLHerdsmanRulePresenter.SEMEN_ANY
     local semenOptionText = (self.semenTexts ~= nil and self.semenTexts[semenIdx]) or ""
 
+    -- Clear every covered row FIRST, BEFORE resolving anything. Two reasons, and the order matters
+    -- for both. tip() runs only for rows this render shows, so a row hidden by an operation change
+    -- would otherwise keep the marker its last visible render wrote - stale text on a row the player
+    -- cannot see, which reappears the moment the row comes back. And the editor is already visible
+    -- by this point, so anything that raises below - a resolver reaching dead game state, or the
+    -- deliberate re-raise in the value-push block - would leave the PREVIOUS rule's markers sitting
+    -- on the pane against a different rule. Clearing first makes that failure blank rather than wrong.
+    for field in pairs(self.reasons) do
+        self:applyRowReason(field, nil)
+    end
+
+    -- Per-row repair markers, resolved ONCE for the whole pane from the merged draft and written
+    -- inside the tip() loop below, so the marker and the help line share one gating decision and one
+    -- write path. Both resolvers are the same ones the summaries above use, so a reference the
+    -- button renders as a CTA is marked, and one it renders as a name is not.
+    local issues = RLHerdsmanRulePresenter.rowIssues(merged, resolveFilterById, resolvePlaceableName)
+
     local tipKeys = {}
+    local reasonMarks = {}
     local function tip(field, state, value, raw)
         local key = self:applyRowTooltip(self.tooltips[field], field, op, state, value, raw)
         if key ~= nil then tipKeys[#tipKeys + 1] = field .. "=" .. key end
+        local issue = issues[field]
+        self:applyRowReason(field, issue)
+        if issue ~= nil then reasonMarks[#reasonMarks + 1] = field .. "=" .. issue end
     end
+    -- ORDER IS LOAD-BEARING, and pinned outside this file. The reason marks reach the debug line
+    -- below in the order these calls run, and an ordered log assertion in the in-game leg config
+    -- requires husbandries to arrive before filter. Reordering these for readability turns that red
+    -- with no signal local to this file.
     tip("operation")
     tip("name")
     tip("enabled", enabledState)
@@ -1025,7 +1097,8 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
     if vis.budget and budget ~= nil then tip("budget|type", budgetTypeState) end
     if bvis.fixed then tip("budget|fixed", nil, nil, budget and budget.fixed) end
     if bvis.percentage then tip("budget|percentage", nil, nil, budget and budget.percentage) end
-    Log:debug("RLMenuHerdsmanFrame:refreshRuleDetail: tooltips op=%s keys[%s]", tostring(op), table.concat(tipKeys, " "))
+    Log:debug("RLMenuHerdsmanFrame:refreshRuleDetail: tooltips op=%s keys[%s] reasons[%s]",
+        tostring(op), table.concat(tipKeys, " "), table.concat(reasonMarks, " "))
 
     -- One-shot in-row geometry of the TextInput rows + their tooltip Text (Ask-First:
     -- does fs25_multiTextOptionTooltip anchor cleanly inside a TextInput row?). Per-open guards.
@@ -1096,12 +1169,62 @@ function RLMenuHerdsmanFrame:applyRowTooltip(tooltipElem, field, op, state, valu
     return d.key
 end
 
+--- Write ONE detail row's REASON line from its resolved issue token. nil clears the line to the
+--- empty string; "required" writes the shared Required string; "invalid" writes that row's bounds
+--- string, formatted with its own bounds.
+---
+--- Touches ONLY self.reasons, never self.tooltips. Keeping the two Texts on separate write paths is
+--- what makes them unable to clobber each other, so no precedence rule between them is needed.
+---
+--- The REASON_INVALID presence check below guards a nil INDEX (`bounds.key`), not a nil i18n key:
+--- the mod's own I18N override delegates a nil key to the base implementation rather than raising,
+--- so `getText(nil)` would merely render a placeholder. Deleting the check would raise on
+--- `bounds.key` instead, in a render path - which is why it stays even though nothing produces the
+--- state today (only the two numeric rows ever report "invalid", and both have entries).
+--- @param field string row field token
+--- @param issue string|nil "required" | "invalid" | nil
+function RLMenuHerdsmanFrame:applyRowReason(field, issue)
+    local elem = self.reasons[field]
+    if elem == nil then return end
+
+    if issue == nil then
+        elem:setText("")
+        return
+    end
+
+    if issue == "required" then
+        elem:setText(g_i18n:getText("rl_menu_herdsman_detail_required"))
+        return
+    end
+
+    local bounds = REASON_INVALID[field]
+    if bounds == nil then
+        -- Unreachable today (only the two numeric rows produce "invalid"). A WARNING rather than a
+        -- silent blank, so a row that starts reporting it is visible instead of rendering nothing -
+        -- but ONE-SHOT per field, because this sits on the render path AND on the per-keystroke
+        -- path: an unlatched warning here would write a line per character typed.
+        self._warnedNoBounds = self._warnedNoBounds or {}
+        if not self._warnedNoBounds[field] then
+            self._warnedNoBounds[field] = true
+            Log:warning("RLMenuHerdsmanFrame:applyRowReason: field '%s' reported issue '%s' with no bounds string; row left blank (warned once per field)",
+                tostring(field), tostring(issue))
+        end
+        elem:setText("")
+        return
+    end
+
+    elem:setText(string.format(g_i18n:getText(bounds.key), bounds.args()))
+end
+
 --- Live-update ONE value-row's tooltip after a TextInput edit, WITHOUT a full refreshRuleDetail -
 --- a re-render would push setText(tostring(tonumber(typed))) into the FOCUSED input and stomp the
 --- caret on partial input ("05", "5."). Resolves the merged operation for the current selection,
---- then re-resolves just that row's tooltip via applyRowTooltip with the freshly-typed value.
---- No-op if nothing is selected / the rule is not in the snapshot.
---- @param field string the row field token ("maxAnimals" | "budget|fixed")
+--- then re-resolves just that row's tooltip via applyRowTooltip with the freshly-typed value, and
+--- re-resolves that row's REASON marker the same way - so a value going out of range marks, and one
+--- coming good clears, without waiting for a render the caret cannot survive.
+--- No-op if nothing is selected / the rule is not in the snapshot: both mean there is no row on
+--- screen to update.
+--- @param field string the row field token ("name" | "maxAnimals" | "budget|fixed")
 --- @param raw any the live value to format into the tooltip %s
 function RLMenuHerdsmanFrame:refreshValueRowTooltip(field, raw)
     local id = self.selectedRuleId
@@ -1110,6 +1233,10 @@ function RLMenuHerdsmanFrame:refreshValueRowTooltip(field, raw)
     if stored == nil then return end
     local merged = RLHerdsmanRuleEditModel.overlayRule(stored, self.pendingChanges[id])
     self:applyRowTooltip(self.tooltips[field], field, merged.operation, nil, nil, raw)
+    -- The caller has already stashed the keystroke into pending, so the merged draft above carries
+    -- the value the player just typed and the marker reflects it rather than the last render's.
+    local issues = RLHerdsmanRulePresenter.rowIssues(merged, resolveFilterById, resolvePlaceableName)
+    self:applyRowReason(field, issues[field])
 end
 
 --- One-shot geometry of a TextInput editor row + its tooltip Text, so the Ask-First (does
@@ -1735,6 +1862,10 @@ function RLMenuHerdsmanFrame:onRuleNameChanged(element, _text)
     self:ensurePending(id).name = typed
     Log:debug("RLMenuHerdsmanFrame:onRuleNameChanged: id=%s value=%q", tostring(id), typed)
     self:refreshList(id)
+    -- Same per-row refresh the other two TextInput handlers make, so clearing the name marks the row
+    -- required. The name input holds focus while the player clears it, so the marker is transparent
+    -- until focus leaves - the write still has to happen here, or it never appears at all.
+    self:refreshValueRowTooltip("name", typed)
 end
 
 --- maxAnimals TextInput. Parse to a number and stash; tonumber failure stashes nil ->
