@@ -67,9 +67,19 @@
 -- an op (mirrors legacy AIAnimalManager:onDayChanged - sell frees herd space + funds buys
 -- before buy fills the space / spends the proceeds).
 --
--- `horseCare` runs LAST and is HORSE-only. Its type gate is an ALLOW-LIST and therefore fails
--- CLOSED - the opposite polarity to castrate's chicken EXCLUSION beside it, which fails open.
--- An unresolvable AnimalType.HORSE means nothing is targetable, never everything.
+-- Which animal types an operation may target is NOT decided here. The declarations and the
+-- compatibility predicate live in RLHerdsmanRuleService, shared with the M-Frame presenter so the
+-- editor and the runtime cannot encode different rules; every per-target SOURCE resolution in this
+-- file goes through `resolveGatedHusbandry`, so an operation gaining a declaration needs no planner
+-- edit on that axis. The service states the polarity rule normatively - an allow-list fails CLOSED,
+-- an exclusion fails OPEN, both from "a declared name that does not resolve does not match".
+--
+-- SCOPE LIMIT, stated because the obvious reading of the line above is wrong: this covers the
+-- SOURCE axis only. `move`'s `params.destinationHusbandry` is never resolved or type-checked here,
+-- while the presenter DOES gate the destination (`keepDestinationType`). So a declaration added for
+-- `move` would still be honoured by the editor's destination picker and ignored by the runtime on
+-- that axis. Closing it is a behaviour change on a reachable input and is deliberately out of this
+-- slice's scope - do not read "the gate is structural" as covering destinations.
 --
 -- Candidate match is RLFilterEvaluator.evaluate (pure, fails closed: a nil / deleted
 -- filter selects nothing, never raises - D16). Naming carries no filter and selects every
@@ -158,6 +168,30 @@ end
 local OPERATION_RANK = {}
 for rank, op in ipairs(RLHerdsmanRuleService.OPERATION_ORDER) do
     OPERATION_RANK[op] = rank
+end
+
+--- The planner's SINGLE `AnimalType` read for the operation x animalType gate, behind a module
+--- field so a test can swap it. Zero-argument and returns ONLY the map: it discards the
+--- resolver's second return deliberately, so the value stays safe in any argument position.
+---
+--- A module field rather than a `ctx` entry (a locked design decision): threading the map through
+--- `buildPlannerCtx` would change the planner ctx data shape and buy nothing, since `wageFor`
+--- reads `AnimalType` regardless - the planner does not become registry-free either way. The
+--- seam is the established shape for this (`RLAnimalQuery._wrapCluster`,
+--- `RLDealerQuery._wrapSaleAnimal`, `RLAIStockService._getLocalPlayer`), and it is the ONLY way
+--- to reach the fail-closed leg from a test: reassigning the `AnimalType` root global from test
+--- code does not propagate under the engine's setfenv sandbox, so the mock silently no-ops.
+---
+--- Called per `planActions`, never memoized - `AnimalType` is populated after this file is
+--- sourced, so a cached empty map would close an allow-list gate for the whole session.
+---@return table animalTypeIndexByName map of declared NAME -> live animalType index
+function RLHerdsmanPlanner._resolveAnimalTypeIndexMap()
+    -- ONE return value, deliberately. The resolver's second (missingNames) is DISCARDED here so
+    -- this seam stays safe in any argument position - a two-value call in a trailing argument slot
+    -- silently widens its caller's argument list. The DEBUG block below re-derives the missing
+    -- names under its own level guard rather than widening this contract.
+    local map = RLHerdsmanRuleService.resolveAnimalTypeIndexMap(AnimalType)
+    return map
 end
 
 -- =============================================================================
@@ -353,8 +387,11 @@ end
 --- SAME-op rule cannot re-pick them; buy removes its selected set from the dealer pool and
 --- appends it to the destination owned pool.
 ---
---- Edge handling (never raises except the nil-arg guard and a missing structural BUY dep -
---- `ctx.buyMarkup`, see the file header): an unresolvable / malformed target husbandry is
+--- Edge handling (never raises except the nil-arg guard, a missing structural BUY dep -
+--- `ctx.buyMarkup`, see the file header - and a MALFORMED declaration in
+--- `RLHerdsmanRuleService.OPERATION_ANIMAL_TYPES`, whose `allow`/`exclude` lists are walked with
+--- `ipairs` on the assumption they are arrays; that table is a code constant, so a non-array there
+--- is a programmer error rather than a data condition): an unresolvable / malformed target husbandry is
 --- skipped + WARN (once per uid per call); an animal with a nil identity field is
 --- skipped + WARN; a deleted / nil filter selects nothing (evaluator fails closed); a missing
 --- `ctx.animalSystem` fails a sell/buy rule closed (WARN); an empty target list / selection
@@ -382,23 +419,40 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
     -- structural-dep note in the file header.
     local buyMarkup = ctx.buyMarkup
 
-    -- The CHICKEN type index for castrate's per-target no-op (the chicken skip in legacy's
-    -- castrate leg). Read
-    -- once; AnimalType is a runtime global (populated by AnimalSystem.new well before the day-tick),
-    -- so a missing table just yields nil -> no target is treated as chicken (fail-open, matching
-    -- wageFor's lazy-AnimalType posture; in practice AnimalType is always present at tick time).
-    local chickenTypeIndex = type(AnimalType) == "table" and AnimalType.CHICKEN or nil
+    -- The declared animal type NAME -> live index map for the operation x animalType gate,
+    -- resolved ONCE per call through the module seam. Names, never literal indices: an index is
+    -- assigned at registration ORDER, so a third-party map or an active bridge shifts it and a
+    -- hardcoded index becomes a wrong-species defect on someone else's map. A name that does not
+    -- resolve is simply absent from the map, which is what gives each declaration its polarity
+    -- with no special-casing here (see RLHerdsmanRuleService for the normative rule).
+    -- Coerced, because the seam is swappable: a double returning nil would otherwise raise on the
+    -- first index below, and only at DEBUG level - passing silently at INFO and crashing the whole
+    -- day tick in dev. Both service consumers already coerce; this block was the one that did not.
+    local animalTypeIndexByName = RLHerdsmanPlanner._resolveAnimalTypeIndexMap()
+    if type(animalTypeIndexByName) ~= "table" then animalTypeIndexByName = {} end
+    local declaredTypeNames = RLHerdsmanRuleService.getDeclaredAnimalTypeNames()
+    local resolvedTypeNames, missingTypeNames = {}, {}
+    for _, name in ipairs(declaredTypeNames) do
+        if animalTypeIndexByName[name] ~= nil then
+            resolvedTypeNames[#resolvedTypeNames + 1] = string.format("%s=%s", name, tostring(animalTypeIndexByName[name]))
+        else
+            missingTypeNames[#missingTypeNames + 1] = name
+        end
+    end
+    Log:debug("%s animalType gate map: resolved [%s] missing [%s]",
+        LOG_PREFIX, table.concat(resolvedTypeNames, " "), table.concat(missingTypeNames, ","))
 
-    -- The HORSE type index for horseCare's allow-list gate. Resolved by NAME, once per call,
-    -- exactly as chickenTypeIndex is - never a literal index (animalTypeIndex is assigned by
-    -- registration ORDER, so a map or bridge can shift it).
-    -- OPPOSITE POLARITY to the line above, and this is the one a maintainer will get backwards
-    -- by mirroring castrate: chicken is an EXCLUSION, so a nil index excludes nothing (fail
-    -- OPEN). Horse care is an ALLOW-LIST, so a nil index must make nothing targetable (fail
-    -- CLOSED) - the arm's gate is `horseTypeIndex == nil or h.animalTypeIndex ~= horseTypeIndex`.
-    -- Written the other way round it would groom cows on a map where AnimalType.HORSE did not
-    -- resolve.
-    local horseTypeIndex = type(AnimalType) == "table" and AnimalType.HORSE or nil
+    -- NOT ONE declared name resolved, yet the registry declares some: the gate is degenerate for
+    -- EVERY operation this tick. Worth a WARNING rather than the DEBUG row above, and specifically
+    -- because of the polarity that does NOT get one otherwise. An allow-list operation announces
+    -- itself per rule below (`isOperationTypeGateClosed`); an EXCLUSION cannot, because an
+    -- exclusion resolving nothing excludes nothing and so reads as a perfectly healthy open gate -
+    -- castrate would quietly start castrating chickens with nothing in the log to say why. The
+    -- unwarned polarity is the dangerous one, so the systemic case is reported once per call here.
+    if #declaredTypeNames > 0 and #resolvedTypeNames == 0 then
+        Log:warning("%s NO declared animal type resolved this tick [%s] - every operation x animalType gate is degenerate: allow-lists admit nothing, EXCLUSIONS exclude nothing (so an excluded type is now actioned). Check AnimalSystem load order",
+            LOG_PREFIX, table.concat(missingTypeNames, ","))
+    end
 
     -- One evalCtx per planActions call: RLFilterEvaluator.evaluate MUTATES its third arg
     -- (per-call warning / type-mismatch dedup sets), so NEVER pass the planner's input ctx
@@ -457,6 +511,41 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                     LOG_PREFIX, tostring(uid))
                 warnedHusbandries[uid] = true
             end
+            return nil
+        end
+        return h
+    end
+
+    --- Resolve a target husbandry AND apply the operation x animalType gate: the single
+    --- per-target entry point for every plan arm. Returns nil when the husbandry is
+    --- unresolvable/malformed (WARN, from resolveHusbandry) or when this operation may not
+    --- target that animal type (per-target DEBUG, the rule's other targets still proceed).
+    ---
+    --- RESOLVE FIRST, GATE SECOND, and that order is the contract: the malformed-husbandry
+    --- WARNING must still fire for a target the gate would go on to reject, so gating first
+    --- would silence a real data fault behind a routine type mismatch.
+    ---
+    --- Every per-target resolution in this file goes through here rather than through
+    --- `resolveHusbandry` directly, so the gate is structural instead of per-arm: an operation
+    --- that gains a declaration is enforced without a planner edit, and no arm can be honoured
+    --- by the editor while the runtime ignores it. `ownedPool`'s own resolveHusbandry call is
+    --- deliberately NOT routed here - it is operation-agnostic and shared across arms, so
+    --- gating there would apply one operation's rule to another's pool.
+    ---@param uid string
+    ---@param operation string the rule's operation key
+    ---@param ruleId any for the DEBUG line
+    ---@return table|nil husbandry nil when unresolvable, malformed, or type-incompatible
+    local function resolveGatedHusbandry(uid, operation, ruleId)
+        local h = resolveHusbandry(uid)
+        if h == nil then return nil end
+        if not RLHerdsmanRuleService.isOperationAnimalTypeCompatible(operation, h.animalTypeIndex, animalTypeIndexByName) then
+            -- The row carries the target's index but not what it was measured AGAINST: the
+            -- per-`planActions` "animalType gate map" DEBUG line above carries the resolved and
+            -- missing declared names once per call, so the pair reads together at DEBUG. Rendering
+            -- the declaration here too would mean a public accessor for it on the service, which
+            -- the spec's function list does not carry.
+            Log:debug("%s rule=%s op=%s husbandry=%s: animalType-incompatible target no-op (typeIndex=%s); other targets proceed",
+                LOG_PREFIX, tostring(ruleId), tostring(operation), tostring(uid), tostring(h.animalTypeIndex))
             return nil
         end
         return h
@@ -709,6 +798,31 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
             Log:debug("%s rule=%s op=%s: empty targets, no action", LOG_PREFIX, tostring(rule.id), op)
         end
 
+        -- The SYSTEMIC gate-closed case: this operation declares an allow-list and not one of its
+        -- names resolved, so it can run on NO pen this tick. That is a different event from an
+        -- ordinary per-target type mismatch, and it deserves a WARNING rather than a DEBUG row: at
+        -- the stable INFO level the per-target rows leave no evidence of it at all, while the
+        -- operation silently does nothing everywhere. Rendered from the DECLARATION - the operation
+        -- plus its unresolved names - never from a hardcoded type, so a future allow-list operation
+        -- inherits the diagnosis instead of getting a misleading one about someone else's species.
+        --
+        -- Fires once per affected rule regardless of target count (including a zero-target rule),
+        -- and sits AFTER the dedupe / empty-targets rows so their DEBUG-stream order is unchanged.
+        local gateClosed, unresolvedNames = RLHerdsmanRuleService.isOperationTypeGateClosed(op, animalTypeIndexByName)
+        if gateClosed then
+            -- Two distinct causes reach this branch and they need different words. Normally one or
+            -- more declared names failed to resolve. But an EMPTY allow-list is also closed - and
+            -- there "declared type(s) [] did not resolve" would be false twice over, since nothing
+            -- was declared and so nothing failed.
+            if #unresolvedNames > 0 then
+                Log:warning("%s rule=%s op=%s: declared animal type(s) [%s] did not resolve - NO pen is targetable this tick (fail closed)",
+                    LOG_PREFIX, tostring(rule.id), tostring(op), table.concat(unresolvedNames, ","))
+            else
+                Log:warning("%s rule=%s op=%s: the operation declares an EMPTY allow-list - NO pen is targetable this tick (fail closed)",
+                    LOG_PREFIX, tostring(rule.id), tostring(op))
+            end
+        end
+
         if op == "sell" then
             -- Sell needs the real price path; a missing animalSystem is a T4 wiring error -
             -- fail closed (skip + WARN) rather than crash the whole tick.
@@ -719,7 +833,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                 if maxN ~= nil then
                     local mark = params.mark == true
                     for _, uid in ipairs(targets) do
-                        local h = resolveHusbandry(uid)
+                        local h = resolveGatedHusbandry(uid, op, rule.id)
                         if h ~= nil then
                             local pool = ownedPool(uid)
                             local candidates = #pool
@@ -820,7 +934,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                 if maxN ~= nil then
                     local mark = params.mark == true
                     for _, uid in ipairs(targets) do
-                        local h = resolveHusbandry(uid)
+                        local h = resolveGatedHusbandry(uid, op, rule.id)
                         if h ~= nil then
                             local pool = ownedPool(uid)
                             local candidates = #pool
@@ -895,7 +1009,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                 end
                 if maxN ~= nil and not badBudget then
                     for _, uid in ipairs(targets) do
-                        local h = resolveHusbandry(uid)
+                        local h = resolveGatedHusbandry(uid, op, rule.id)
                         if h ~= nil then
                             -- SPACE gate BEFORE the money gate (mirror AIAnimalBuyEvent.validate -
                             -- space then money). seedSlotLedger reads ctx.husbandries[uid].freeSlots
@@ -1037,8 +1151,10 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
         elseif op == "castrate" then
             -- Castrate (legacy `AIAnimalManager:onDayChanged`'s castrate leg): owned-herd, no cap,
             -- no sort, sequential.
-            -- Resolve the husbandry FIRST (malformed -> skip + WARN, unchanged), THEN per-target
-            -- no-op a chicken-type husbandry (other targets of a multi-target rule proceed).
+            -- The husbandry resolve AND the animal-type gate both live in the shared
+            -- `resolveGatedHusbandry` (resolve first -> malformed skip + WARN, then gate -> per-target
+            -- no-op, other targets of a multi-target rule proceed). Castrate's chicken exclusion is a
+            -- DECLARATION in RLHerdsmanRuleService, not an arm-local check - do not restore one here.
             -- Candidates come via the filter; per survivor apply legacy's hard floor, the one the user
             -- filter cannot express - female / already-castrated / infertile - plus a nil-genetics
             -- guard (fail closed). `mark` (coerced == true) only sets the action field that gates the
@@ -1046,49 +1162,44 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
             -- (survivors stay in the owned pool - one animal may be castrated AND named the same day).
             local mark = params.mark == true
             for _, uid in ipairs(targets) do
-                local h = resolveHusbandry(uid)
+                local h = resolveGatedHusbandry(uid, op, rule.id)
                 if h ~= nil then
-                    if chickenTypeIndex ~= nil and h.animalTypeIndex == chickenTypeIndex then
-                        Log:debug("%s rule=%s op=castrate husbandry=%s: chicken-type target no-op (legacy parity); other targets proceed",
-                            LOG_PREFIX, tostring(rule.id), tostring(uid))
-                    else
-                        local pool = ownedPool(uid)
-                        local candidates = #pool
-                        local matched = matchFromPool(pool, filter, false, claimed)
-                        local selected = {}
-                        for _, a in ipairs(matched) do
-                            local g = a.genetics
-                            if a.gender == "female" or a.isCastrated then
-                                -- Hard floor (legacy's castrate hard-skip), silent. Checked first so the genetics read is
-                                -- short-circuited for females (legacy reaches genetics.fertility only past here).
-                            elseif type(g) ~= "table" or g.fertility == nil then
-                                -- nil genetics/fertility -> skip + WARN (never index-nil; fail-closed
-                                -- posture). Deduped per call (warnedAnimals - the pool is re-scanned per op).
-                                if not warnedAnimals[a] then
-                                    Log:warning("%s rule=%s op=castrate skipping animal with nil genetics/fertility (uniqueId=%s) - fail closed",
-                                        LOG_PREFIX, tostring(rule.id), tostring(type(a) == "table" and a.uniqueId or a))
-                                    warnedAnimals[a] = true
-                                end
-                            elseif g.fertility == 0 then
-                                -- Infertile -> hard-skip (same legacy hard floor), silent.
-                            else
-                                selected[#selected + 1] = a
+                    local pool = ownedPool(uid)
+                    local candidates = #pool
+                    local matched = matchFromPool(pool, filter, false, claimed)
+                    local selected = {}
+                    for _, a in ipairs(matched) do
+                        local g = a.genetics
+                        if a.gender == "female" or a.isCastrated then
+                            -- Hard floor (legacy's castrate hard-skip), silent. Checked first so the genetics read is
+                            -- short-circuited for females (legacy reaches genetics.fertility only past here).
+                        elseif type(g) ~= "table" or g.fertility == nil then
+                            -- nil genetics/fertility -> skip + WARN (never index-nil; fail-closed
+                            -- posture). Deduped per call (warnedAnimals - the pool is re-scanned per op).
+                            if not warnedAnimals[a] then
+                                Log:warning("%s rule=%s op=castrate skipping animal with nil genetics/fertility (uniqueId=%s) - fail closed",
+                                    LOG_PREFIX, tostring(rule.id), tostring(type(a) == "table" and a.uniqueId or a))
+                                warnedAnimals[a] = true
                             end
+                        elseif g.fertility == 0 then
+                            -- Infertile -> hard-skip (same legacy hard floor), silent.
+                        else
+                            selected[#selected + 1] = a
                         end
-                        local n = #selected
-                        local W = wageFor(h.animalTypeIndex)
-                        -- Single-term wage (legacy's castrate wage) - NO min(S, n*5) shortlist component (that is a
-                        -- sell/buy-only term). mark halves-then-discounts to the 0.35 advisory rate.
-                        local wage = W * 0.5 * n * (mark and 0.35 or 1)
-                        Log:debug("%s rule=%s op=castrate husbandry=%s candidates=%d selected=%d mark=%s wage=%.2f",
-                            LOG_PREFIX, tostring(rule.id), tostring(uid), candidates, n, tostring(mark), wage)
-                        if n > 0 then
-                            -- Same-op claim covers EVERY survivor (mark-independent): a later castrate
-                            -- rule cannot re-pick them; they stay in the pool for naming/ai (cross-op).
-                            claimAll(claimed, selected)
-                            actions[#actions + 1] = { ruleId = rule.id, operation = "castrate", husbandryId = uid,
-                                animals = selected, mark = mark, wage = wage }
-                        end
+                    end
+                    local n = #selected
+                    local W = wageFor(h.animalTypeIndex)
+                    -- Single-term wage (legacy's castrate wage) - NO min(S, n*5) shortlist component (that is a
+                    -- sell/buy-only term). mark halves-then-discounts to the 0.35 advisory rate.
+                    local wage = W * 0.5 * n * (mark and 0.35 or 1)
+                    Log:debug("%s rule=%s op=castrate husbandry=%s candidates=%d selected=%d mark=%s wage=%.2f",
+                        LOG_PREFIX, tostring(rule.id), tostring(uid), candidates, n, tostring(mark), wage)
+                    if n > 0 then
+                        -- Same-op claim covers EVERY survivor (mark-independent): a later castrate
+                        -- rule cannot re-pick them; they stay in the pool for naming/ai (cross-op).
+                        claimAll(claimed, selected)
+                        actions[#actions + 1] = { ruleId = rule.id, operation = "castrate", husbandryId = uid,
+                            animals = selected, mark = mark, wage = wage }
                     end
                 end
             end
@@ -1126,7 +1237,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                 local stream = {}    -- { { animal = a, uid = <husbandry uid> }, ... } rule-wide
                 local byTarget = {}  -- [uid] = { h, candidates, named = {}, assignments = {} }
                 for _, uid in ipairs(targets) do
-                    local h = resolveHusbandry(uid)
+                    local h = resolveGatedHusbandry(uid, op, rule.id)
                     if h ~= nil then
                         local pool = ownedPool(uid)
                         byTarget[uid] = { h = h, candidates = #pool, named = {}, assignments = {} }
@@ -1211,7 +1322,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                 local mark = params.mark == true
                 local semen = params.semen
                 for _, uid in ipairs(targets) do
-                    local h = resolveHusbandry(uid)
+                    local h = resolveGatedHusbandry(uid, op, rule.id)
                     if h ~= nil then
                         local typeIdx = h.animalTypeIndex
                         -- Dewar pool (legacy's AI dewar gather): farm scope = rule.farmId (the key T2a's money
@@ -1393,70 +1504,58 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
             -- -> wage -> DEBUG row -> claimAll + emit) minus the per-survivor hard floor and all mark
             -- handling: the filter is the ONLY narrowing beyond the type gate.
             --
-            -- The gate FAILS CLOSED (see horseTypeIndex above): a nil index or a non-HORSE target
-            -- selects nothing. A non-HORSE target of a multi-target rule is a per-target no-op - the
-            -- rule's OTHER targets still proceed, matching castrate's chicken skip.
+            -- The type gate is the shared one (resolveGatedHusbandry), and for horse care it FAILS
+            -- CLOSED: an unresolvable declared name or a non-matching target selects nothing. A
+            -- gated-out target of a multi-target rule is a per-target no-op - the rule's OTHER
+            -- targets still proceed, matching castrate's skip. The whole-gate-closed case gets its
+            -- own per-rule WARNING at the top of the rule loop.
             --
             -- NO IDEMPOTENCY GATE, and that is load-bearing rather than an oversight. Skipping a horse
             -- already at riding 100 / dirt 0 would re-import the exact barn-ordering variance the
             -- executor's deferral exists to remove: planning runs INLINE while the care write is
             -- DEFERRED, so at plan time a horse reads 100 on a barn whose own day tick has not run yet
             -- and 0 on one whose has. Selection would then depend on how the barn was acquired.
-            -- The SYSTEMIC nil deserves a WARNING, once per rule, and is NOT the same event as an
-            -- ordinary per-target type mismatch: if AnimalType.HORSE never resolved, horse care
-            -- silently never runs on ANY pen, and at the stable INFO level a per-target DEBUG row
-            -- leaves no evidence of it at all. This matters more than usual because the fail-closed
-            -- nil leg has no automated coverage - the log is its only observability.
-            if horseTypeIndex == nil then
-                Log:warning("%s rule=%s op=horseCare: AnimalType.HORSE did not resolve - NO pen is targetable this tick (fail closed)",
-                    LOG_PREFIX, tostring(rule.id))
-            end
             for _, uid in ipairs(targets) do
-                local h = resolveHusbandry(uid)
+                local h = resolveGatedHusbandry(uid, op, rule.id)
                 if h ~= nil then
-                    if horseTypeIndex == nil or h.animalTypeIndex ~= horseTypeIndex then
-                        Log:debug("%s rule=%s op=horseCare husbandry=%s: non-HORSE target no-op (typeIndex=%s horse=%s); other targets proceed",
-                            LOG_PREFIX, tostring(rule.id), tostring(uid), tostring(h.animalTypeIndex), tostring(horseTypeIndex))
-                    else
-                        local pool = ownedPool(uid)
-                        local candidates = #pool
-                        local selected = matchFromPool(pool, filter, false, claimed)
-                        local n = #selected
-                        local W = wageFor(h.animalTypeIndex)
-                        -- Single-term wage, the NAMING coefficient (25 * 0.15 = 3.75 per horse for a
-                        -- HORSE pen). No min(S, n*5) shortlist component - that term is sell/buy/ai only.
-                        --
-                        -- Why the coefficient is not higher. Full care buys about +3,500 on a mature
-                        -- horse priced off the 36-month sellPrice key of 5,000 - the 0.60 neglected
-                        -- multiplier against the 1.30 ceiling - and that is a ONE-OFF realised on a
-                        -- MANUAL sale, while this wage recurs every real day for the animal's whole
-                        -- life. So the two sides are a rate against a lump sum, and the holding
-                        -- period decides which wins: a horse held to 36 months sits on the books for
-                        -- 36 * daysPerPeriod real days, 324 of them at daysPerPeriod 9. At 0.15 that
-                        -- hold bills 1,215 against the 3,500; the castrate coefficient 0.50 bills
-                        -- 4,050 on the same animal and goes underwater. The coefficient is therefore
-                        -- bounded by the long-season breeder, not by the default settings, where
-                        -- every candidate looks affordable.
-                        --
-                        -- Two honest limits on that argument. 36 months is not the curve's peak -
-                        -- sellPrice keeps rising to 5,500 at 60 months, so the worst-case hold is
-                        -- longer than the one costed above. And 0.15 is not unconditionally safe
-                        -- either: fitness gain floors to zero above daysPerPeriod 25, which drops
-                        -- the realisable delta to about +2,500, so a 36-month hold at the top of the
-                        -- selectable range (28) bills 3,780 against it. The claim is that 0.15 is
-                        -- the only one of the existing coefficients that stays viable across the
-                        -- range players actually use, not that it can never be beaten.
-                        local wage = W * 0.15 * n   -- 3.75/horse/day against a one-off ~+3,500 sale delta
-                        Log:debug("%s rule=%s op=horseCare husbandry=%s candidates=%d selected=%d wage=%.2f",
-                            LOG_PREFIX, tostring(rule.id), tostring(uid), candidates, n, wage)
-                        if n > 0 then
-                            -- Same-op claim (a later horseCare rule cannot re-pick these); the horses
-                            -- STAY in the owned pool so cross-op rules still see them - a horse may be
-                            -- cared for and named the same day.
-                            claimAll(claimed, selected)
-                            actions[#actions + 1] = { ruleId = rule.id, operation = "horseCare", husbandryId = uid,
-                                animals = selected, wage = wage }
-                        end
+                    local pool = ownedPool(uid)
+                    local candidates = #pool
+                    local selected = matchFromPool(pool, filter, false, claimed)
+                    local n = #selected
+                    local W = wageFor(h.animalTypeIndex)
+                    -- Single-term wage, the NAMING coefficient (25 * 0.15 = 3.75 per horse for a
+                    -- HORSE pen). No min(S, n*5) shortlist component - that term is sell/buy/ai only.
+                    --
+                    -- Why the coefficient is not higher. Full care buys about +3,500 on a mature
+                    -- horse priced off the 36-month sellPrice key of 5,000 - the 0.60 neglected
+                    -- multiplier against the 1.30 ceiling - and that is a ONE-OFF realised on a
+                    -- MANUAL sale, while this wage recurs every real day for the animal's whole
+                    -- life. So the two sides are a rate against a lump sum, and the holding
+                    -- period decides which wins: a horse held to 36 months sits on the books for
+                    -- 36 * daysPerPeriod real days, 324 of them at daysPerPeriod 9. At 0.15 that
+                    -- hold bills 1,215 against the 3,500; the castrate coefficient 0.50 bills
+                    -- 4,050 on the same animal and goes underwater. The coefficient is therefore
+                    -- bounded by the long-season breeder, not by the default settings, where
+                    -- every candidate looks affordable.
+                    --
+                    -- Two honest limits on that argument. 36 months is not the curve's peak -
+                    -- sellPrice keeps rising to 5,500 at 60 months, so the worst-case hold is
+                    -- longer than the one costed above. And 0.15 is not unconditionally safe
+                    -- either: fitness gain floors to zero above daysPerPeriod 25, which drops
+                    -- the realisable delta to about +2,500, so a 36-month hold at the top of the
+                    -- selectable range (28) bills 3,780 against it. The claim is that 0.15 is
+                    -- the only one of the existing coefficients that stays viable across the
+                    -- range players actually use, not that it can never be beaten.
+                    local wage = W * 0.15 * n   -- 3.75/horse/day against a one-off ~+3,500 sale delta
+                    Log:debug("%s rule=%s op=horseCare husbandry=%s candidates=%d selected=%d wage=%.2f",
+                        LOG_PREFIX, tostring(rule.id), tostring(uid), candidates, n, wage)
+                    if n > 0 then
+                        -- Same-op claim (a later horseCare rule cannot re-pick these); the horses
+                        -- STAY in the owned pool so cross-op rules still see them - a horse may be
+                        -- cared for and named the same day.
+                        claimAll(claimed, selected)
+                        actions[#actions + 1] = { ruleId = rule.id, operation = "horseCare", husbandryId = uid,
+                            animals = selected, wage = wage }
                     end
                 end
             end

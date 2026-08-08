@@ -169,8 +169,9 @@ source(modDirectory .. "scripts/events/RLHerdsmanRuleDeleteEvent.lua")
 source(modDirectory .. "scripts/events/RLHerdsmanRuleStateEvent.lua")
 
 -- SECTION 11i: Herdsman day-tick planner (M-Tick T1). Pure run-order + candidate
--- selection + sequential claim; consumes RLHerdsmanRuleService.OPERATION_ORDER (11h),
--- RLFilterEvaluator (11g), RLAnimalUtil (top of file). No game state at load.
+-- selection + sequential claim; consumes RLHerdsmanRuleService.OPERATION_ORDER, its
+-- comparator and the operation x animalType gate - all from 11h -
+-- plus RLFilterEvaluator (11g), RLAnimalUtil (top of file). No game state at load.
 source(modDirectory .. "scripts/herdsman/RLHerdsmanPlanner.lua")
 
 -- SECTION 11j: Herdsman day-tick executor (M-Tick T3). Applies the planner's actions in-game
@@ -313,8 +314,11 @@ source(modDirectory .. "scripts/gui/rlmenu/services/RLTransferAdapter.lua")
 source(modDirectory .. "scripts/gui/rlmenu/services/RLFilterCycleHelper.lua")
 source(modDirectory .. "scripts/gui/rlmenu/services/RLFilterChipHelper.lua")
 -- Herdsman rule view-model (M-Frame F1). Pure presenter consumed by the Herdsman
--- frame; depends only on RLFilterUsage (SECTION 11g) + RLHerdsmanRuleService.OPERATIONS
--- (SECTION 11h), both sourced above.
+-- frame; depends on RLFilterUsage (SECTION 11g) + RLHerdsmanRuleService (SECTION 11h),
+-- both sourced above. The service dependency is read at SOURCE TIME and is load-bearing:
+-- besides OPERATIONS it copies OPERATION_ORDER and the three public gate
+-- names (OPERATION_ANIMAL_TYPES, getDeclaredAnimalTypeNames, isOperationAnimalTypeCompatible)
+-- by value at file scope. Sourcing the presenter without the service raises at load.
 source(modDirectory .. "scripts/gui/rlmenu/services/RLHerdsmanRulePresenter.lua")
 -- Herdsman rule edit-model (M-Frame F4b). Pure overlay-merge + op-change carry-over
 -- for the detail pane; depends on RLHerdsmanRulePresenter (above) for the per-operation

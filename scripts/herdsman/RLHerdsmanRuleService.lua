@@ -28,6 +28,11 @@
 --     RLFilterService, no targetHusbandries uniqueId -> live-placeable
 --     resolution. Those belong to the M-Frame picker/validator and the M-Tick
 --     day-tick respectively; the service stores the strings as given.
+--   * ONE deliberate exception: the operation x animalType gate below.
+--     It is cross-layer policy rather than CRUD, and it lives here precisely because BOTH
+--     the editor and the runtime need it and neither may own it - the same argument that
+--     already brought `OPERATION_ORDER` and `compareRulesByName` into this file. It reads
+--     no game state; live indices arrive as data.
 --
 -- Ownership contract:
 --   * Every boundary into/out of the registry performs a defensive deep copy of
@@ -88,6 +93,205 @@ function RLHerdsmanRuleService.compareRulesByName(a, b)
     local bn = string.lower(tostring(b.name or ""))
     if an ~= bn then return an < bn end
     return tostring(a.id) < tostring(b.id)
+end
+
+-- =============================================================================
+-- Operation x animalType gate
+-- =============================================================================
+-- The declarations and the compatibility predicate live here, beside OPERATIONS and
+-- OPERATION_ORDER, because BOTH layers need them and neither may own them: the M-Frame
+-- presenter decides what the player can express, the M-Tick planner decides what actually
+-- runs, and a rule encoded on one side only is honoured by the editor while the runtime
+-- silently ignores it. Third hoist into this file for that reason (OPERATION_ORDER and
+-- compareRulesByName preceded it).
+--
+-- Everything below is a STATIC on the module table, called with `.` and never `:` - none
+-- takes a `self`. Note that `RLHerdsmanRuleService_mt` sets `__index = RLHerdsmanRuleService`,
+-- so `g_rlHerdsmanRuleService:isOperationAnimalTypeCompatible(...)` also resolves and would
+-- silently pass the INSTANCE as `operation`. Call them on the module table.
+
+--- Operation x animalType restrictions, declared by animal type NAME. An operation ABSENT
+--- from this table is unrestricted (every type is targetable).
+---   * `exclude` - valid for every type EXCEPT the named ones. Castrate cannot target
+---     CHICKEN (legacy skips chicken castration in its castrate branch).
+---   * `allow`   - valid ONLY for the named ones. Horse care is horses-only.
+--- NAMES, never indices: an animalType index is assigned at registration order, so a
+--- third-party map or an active bridge shifts the numbering and a hardcoded index becomes a
+--- wrong-species defect that only surfaces on someone else's map. The live index per name is
+--- resolved by the CALLER and injected into the predicate, which is what keeps this module
+--- free of `g_*` reads.
+--- An entry carrying BOTH keys is a declaration error, not a runtime case: `allow` wins.
+local OPERATION_ANIMAL_TYPES = {
+    castrate  = { exclude = { "CHICKEN" } },
+    horseCare = { allow   = { "HORSE" } },
+}
+
+--- Exposed read-only so the frame can resolve exactly the names these declarations reference,
+--- and so a test can assert the declaration and its resolved name union have not drifted apart.
+RLHerdsmanRuleService.OPERATION_ANIMAL_TYPES = OPERATION_ANIMAL_TYPES
+
+--- The union of every animal type NAME the OPERATION_ANIMAL_TYPES declarations reference,
+--- sorted so the order is stable across runs. Callers resolve exactly this set against the
+--- live registry and hand the result to the predicate below, so a declaration naming a new
+--- type is resolved automatically and the two halves cannot drift apart.
+---@return string[] names fresh sorted array of declared animal type names
+function RLHerdsmanRuleService.getDeclaredAnimalTypeNames()
+    local seen, names = {}, {}
+    for _, rule in pairs(OPERATION_ANIMAL_TYPES) do
+        for _, listKey in ipairs({ "allow", "exclude" }) do
+            local list = rule[listKey]
+            if type(list) == "table" then
+                for _, name in ipairs(list) do
+                    if not seen[name] then
+                        seen[name] = true
+                        names[#names + 1] = name
+                    end
+                end
+            end
+        end
+    end
+    table.sort(names)
+    Log:trace("RLHerdsmanRuleService.getDeclaredAnimalTypeNames: %d declared name(s) [%s]",
+        #names, table.concat(names, ","))
+    return names
+end
+
+--- Render a declaration for the trace line: `allow:HORSE`, `exclude:CHICKEN`, or
+--- `unrestricted`. The RULE is logged rather than the injected map, because a map renders as a
+--- per-run table pointer and would make the line unreproducible between sessions.
+---@param rule table|nil an OPERATION_ANIMAL_TYPES entry, or nil for an unrestricted operation
+---@return string
+local function describeAnimalTypeRule(rule)
+    if rule == nil then return "unrestricted" end
+    if rule.allow ~= nil then return "allow:" .. table.concat(rule.allow, ",") end
+    if rule.exclude ~= nil then return "exclude:" .. table.concat(rule.exclude, ",") end
+    return "unrestricted"
+end
+
+--- Resolve the declared animal type NAMES against a registry, as a `name -> index` map. A
+--- name the registry does not carry is OMITTED rather than mapped to nil, which is what gives
+--- the gate its polarity for free.
+---
+--- PURE: the registry arrives as DATA (the caller owns the `AnimalType` read), nothing global
+--- is touched, and the result is NEVER memoized - `AnimalType` is populated well after these
+--- files are sourced, so a cached empty map would close the horse gate for the whole session.
+--- A nil or non-table registry yields an empty map with every declared name missing; it must
+--- never index a non-table.
+---
+--- Logs at TRACE only. The WARNING / DEBUG decisions belong to the callers, which know their
+--- own call frequency and can tell "no registry" apart from "registry present, name absent" -
+--- a distinction these two return values deliberately do not carry.
+---@param registry table|nil the live `AnimalType` registry (name -> index)
+---@return table map resolved NAME -> index (possibly empty)
+---@return string[] missingNames declared names absent from the registry, in the SORTED union order
+function RLHerdsmanRuleService.resolveAnimalTypeIndexMap(registry)
+    local names = RLHerdsmanRuleService.getDeclaredAnimalTypeNames()
+    local map, missing = {}, {}
+    local reg = type(registry) == "table" and registry or nil
+
+    for _, name in ipairs(names) do
+        -- Written as a statement rather than `reg ~= nil and reg[name] or nil`: that idiom reports
+        -- a registry value of `false` as missing. Unreachable with the real AnimalType, but the
+        -- documented contract is any table registry.
+        local idx
+        if reg ~= nil then idx = reg[name] end
+        if idx ~= nil then
+            map[name] = idx
+        else
+            missing[#missing + 1] = name
+        end
+    end
+
+    Log:trace("RLHerdsmanRuleService.resolveAnimalTypeIndexMap: registry=%s %d/%d declared name(s) resolved, missing [%s]",
+        type(registry), #names - #missing, #names, table.concat(missing, ","))
+    return map, missing
+end
+
+--- The ONE operation x animalType compatibility predicate, driven by the OPERATION_ANIMAL_TYPES
+--- declarations: an operation absent from that table is unrestricted, an `exclude` operation is
+--- valid for every type but the named ones, an `allow` operation is valid only for the named
+--- ones. Live indices arrive as an injected name -> index map (never a `g_*`/AnimalType read
+--- inside this pure helper); the caller owns building it. Shared by the presenter's
+--- filterCandidateFilters, husbandry gate, destination gate and revalidate* paths AND by the
+--- planner's per-target gate, so the editor and the runtime cannot drift apart.
+---
+--- ONE rule generates the whole truth table: a declared name that does not resolve does not
+--- match. So an `allow` list fails CLOSED (an unresolvable HORSE matches nothing, nothing is
+--- targetable) and an `exclude` list fails OPEN (an unresolvable CHICKEN excludes nothing) with
+--- no polarity special-casing and no mutable state. A nil `animalTypeIndex` (an ANY-type
+--- candidate) is the same rule again: it matches no resolved index, so exclude admits it and
+--- allow refuses it. This sentence is the NORMATIVE statement of the polarity; other files may
+--- refer to it, but exactly one file defines it.
+---@param operation any rule operation key
+---@param animalTypeIndex any candidate animalType index, or nil for ANY
+---@param animalTypeIndexByName table|nil map of declared animal type NAME -> live animalType index
+---@return boolean
+function RLHerdsmanRuleService.isOperationAnimalTypeCompatible(operation, animalTypeIndex, animalTypeIndexByName)
+    local rule = OPERATION_ANIMAL_TYPES[operation]
+    local compatible
+    if rule == nil then
+        compatible = true
+    else
+        local byName = type(animalTypeIndexByName) == "table" and animalTypeIndexByName or {}
+        if rule.allow ~= nil then
+            compatible = false
+            for _, name in ipairs(rule.allow) do
+                local idx = byName[name]
+                if idx ~= nil and idx == animalTypeIndex then
+                    compatible = true
+                    break
+                end
+            end
+        elseif rule.exclude ~= nil then
+            compatible = true
+            for _, name in ipairs(rule.exclude) do
+                local idx = byName[name]
+                if idx ~= nil and idx == animalTypeIndex then
+                    compatible = false
+                    break
+                end
+            end
+        else
+            -- A declaration entry carrying neither list restricts nothing.
+            compatible = true
+        end
+    end
+    Log:trace("RLHerdsmanRuleService.isOperationAnimalTypeCompatible: operation=%s animalType=%s rule=%s -> %s",
+        tostring(operation), tostring(animalTypeIndex), describeAnimalTypeRule(rule), tostring(compatible))
+    return compatible
+end
+
+--- Is this operation's gate closed for EVERY type - i.e. does it declare an `allow` list none
+--- of whose names resolved? That is the systemic fail-closed case worth a WARNING: the
+--- operation silently runs on NO pen, and at the stable INFO level a per-target DEBUG row
+--- leaves no evidence of it at all.
+---
+--- False for an unrestricted operation, for an `exclude` operation (an exclusion can never
+--- close a gate - it only ever removes types), and for an `allow` operation with at least one
+--- resolution. Coerces a nil / non-table map to empty, exactly as the predicate above does.
+---
+--- Returning the unresolved names is what lets a caller render the diagnosis from the
+--- DECLARATION rather than re-deriving the polarity or naming a specific animal type - so a
+--- future allow-list operation inherits both the warning and its wording.
+---@param operation any rule operation key
+---@param animalTypeIndexByName table|nil map of declared animal type NAME -> live animalType index
+---@return boolean closed
+---@return string[] unresolvedNames the declared `allow` names that did not resolve (empty when not closed)
+function RLHerdsmanRuleService.isOperationTypeGateClosed(operation, animalTypeIndexByName)
+    local rule = OPERATION_ANIMAL_TYPES[operation]
+    if rule == nil or rule.allow == nil then return false, {} end
+
+    local byName = type(animalTypeIndexByName) == "table" and animalTypeIndexByName or {}
+    local unresolved = {}
+    for _, name in ipairs(rule.allow) do
+        if byName[name] == nil then unresolved[#unresolved + 1] = name end
+    end
+
+    local closed = #unresolved == #rule.allow
+    Log:trace("RLHerdsmanRuleService.isOperationTypeGateClosed: operation=%s rule=%s unresolved=[%s] -> %s",
+        tostring(operation), describeAnimalTypeRule(rule), table.concat(unresolved, ","), tostring(closed))
+    if not closed then return false, {} end
+    return true, unresolved
 end
 
 --- Default `version` assigned on create when the caller omits one. Frozen after

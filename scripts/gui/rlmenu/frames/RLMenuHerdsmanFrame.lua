@@ -45,7 +45,7 @@ local OPERATION_TITLE_KEY = {
 }
 
 -- Exposed read-only so a test can sweep it against OPERATION_ORDER and assert every operation has a
--- resolvable player-facing label. Same reason RLHerdsmanRulePresenter.OPERATION_ANIMAL_TYPES and
+-- resolvable player-facing label. Same reason RLHerdsmanRuleService.OPERATION_ANIMAL_TYPES and
 -- RLHerdsmanMessages.ID_FAMILY are exported: a declaration table no test can see is a declaration
 -- nothing checks. Read it; never mutate it.
 RLMenuHerdsmanFrame.OPERATION_TITLE_KEY = OPERATION_TITLE_KEY
@@ -54,39 +54,41 @@ RLMenuHerdsmanFrame.OPERATION_TITLE_KEY = OPERATION_TITLE_KEY
 -- Module-local helpers (pure wiring; no decisions)
 -- =============================================================================
 
---- Resolve the animal type NAMES the presenter's operation x animalType declarations reference
---- into live indices, as a `name -> index` map for the presenter's gate. A name the registry
---- does not carry is OMITTED rather than mapped to nil, which is what gives the gate its
---- polarity for free: an allow-list with an unresolved name admits nothing, an exclude-list
---- with one excludes nothing.
+--- Resolve the animal type NAMES the operation x animalType declarations reference into live
+--- indices, as a `name -> index` map for the gate. A name the registry does not carry is
+--- OMITTED rather than mapped to nil, which is what gives the gate its polarity for free: an
+--- allow-list with an unresolved name admits nothing, an exclude-list with one excludes nothing.
 ---
---- This is the frame's job precisely because it is the `AnimalType` READ. The presenter stays
---- pure and stateless and simply consumes whatever map it is handed - so an absent registry is
---- diagnosed HERE, once per build (menu-open frequency), rather than by a latch in a pure module.
---- Resolution is per call, never memoized: `AnimalType` is populated after this file is sourced.
+--- This is the frame's job precisely because it is the `AnimalType` READ; the resolution itself
+--- belongs to RLHerdsmanRuleService, so the GUI and the planner resolve the same declared union
+--- the same way. The nil-registry check STAYS here, above the delegation, because the resolver's
+--- return cannot express the difference that matters diagnostically: "no registry at all" is a
+--- load-order fault worth a WARNING, while "registry present, a declared name absent from it" is
+--- ordinary DEBUG detail, and both would arrive as an empty map with every name missing.
+---
+--- Resolution is per call, never memoized: `AnimalType` is populated after this file is sourced,
+--- so a cached empty map would close the horse gate for the whole session.
 ---@return table animalTypeIndexByName map of resolved NAME -> live animalType index (possibly empty)
 function RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
-    local names = RLHerdsmanRulePresenter.getDeclaredAnimalTypeNames()
-    local map = {}
+    -- The nil check comes FIRST, above any declaration walk: on this path the names would be
+    -- computed, sorted and thrown away unused.
     if AnimalType == nil then
         Log:warning("RLMenuHerdsmanFrame.buildAnimalTypeIndexMap: AnimalType registry is nil; the operation x animalType gate gets an EMPTY map (allow-lists admit nothing, exclude-lists exclude nothing) - check AnimalSystem load order")
-        return map
+        return {}
     end
 
-    local resolved, missing = {}, {}
-    for _, name in ipairs(names) do
-        local idx = AnimalType[name]
-        if idx ~= nil then
-            map[name] = idx
-            resolved[#resolved + 1] = string.format("%s=%s", name, tostring(idx))
-        else
-            missing[#missing + 1] = name
-        end
+    local map, missing = RLHerdsmanRuleService.resolveAnimalTypeIndexMap(AnimalType)
+
+    -- Rendered sorted so the line is reproducible between runs (a `pairs` walk is hash-ordered).
+    local resolved = {}
+    for name, idx in pairs(map) do
+        resolved[#resolved + 1] = string.format("%s=%s", name, tostring(idx))
     end
+    table.sort(resolved)
 
     if #missing > 0 then
         Log:debug("RLMenuHerdsmanFrame.buildAnimalTypeIndexMap: %d/%d declared type(s) absent from this map [%s]; the gate treats each as no-match",
-            #missing, #names, table.concat(missing, ","))
+            #missing, #resolved + #missing, table.concat(missing, ","))
     end
     Log:trace("RLMenuHerdsmanFrame.buildAnimalTypeIndexMap: resolved [%s]", table.concat(resolved, " "))
     return map

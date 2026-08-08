@@ -16,9 +16,12 @@
 --     the frame layer owns wiring those to g_currentMission.placeableSystem and
 --     RLFilterService.
 --   * Sibling pure-module constants ARE referenced directly: RLFilterUsage.* for the
---     allowed-usage map, and RLHerdsmanRuleService.OPERATIONS for the operation
---     validity set (the canonical set lives there; the presenter does not duplicate
---     it). These are pure constant tables, not game state.
+--     allowed-usage map, and from RLHerdsmanRuleService the operation validity set
+--     (OPERATIONS), the run/visual order (OPERATION_ORDER) and the whole operation x
+--     animalType gate (OPERATION_ANIMAL_TYPES + getDeclaredAnimalTypeNames +
+--     isOperationAnimalTypeCompatible, re-exported below). The canonical copies live there
+--     because the planner needs them too; the presenter does not duplicate them. These are
+--     pure constant tables and pure functions, not game state.
 --
 -- Mirrors RLFilterFieldCatalog's SHAPE (top-level table, module-local Log, module
 -- constants, LuaDoc + logging on every function). 100% dual-run: in-game
@@ -81,25 +84,13 @@ local ALLOWED_USAGES = {
     horseCare = { [RLFilterUsage.ANY] = true, [RLFilterUsage.OWNED]  = true },
 }
 
---- Operation x animalType restrictions, declared by animal type NAME. An operation ABSENT
---- from this table is unrestricted (every type is targetable).
----   * `exclude` - valid for every type EXCEPT the named ones. Castrate cannot target
----     CHICKEN (legacy skips chicken castration in its castrate branch).
----   * `allow`   - valid ONLY for the named ones. Horse care is horses-only.
---- NAMES, never indices: an animalType index is assigned at registration order, so a
---- third-party map or an active bridge shifts the numbering and a hardcoded index becomes a
---- wrong-species defect that only surfaces on someone else's map. The live index per name is
---- resolved by the CALLER and injected into the predicate, which is what keeps this module
---- free of `g_*` reads.
---- An entry carrying BOTH keys is a declaration error, not a runtime case: `allow` wins.
-local OPERATION_ANIMAL_TYPES = {
-    castrate  = { exclude = { "CHICKEN" } },
-    horseCare = { allow   = { "HORSE" } },
-}
-
---- Exposed read-only so the frame can resolve exactly the names these declarations reference,
---- and so a test can assert the declaration and its resolved name union have not drifted apart.
-RLHerdsmanRulePresenter.OPERATION_ANIMAL_TYPES = OPERATION_ANIMAL_TYPES
+--- Operation x animalType restrictions, declared by animal type NAME. OWNED by
+--- RLHerdsmanRuleService.OPERATION_ANIMAL_TYPES: the editor decides what the player
+--- can express and the planner decides what actually runs, so a declaration encoded on one side
+--- only is honoured by the GUI and silently ignored at runtime. Re-exported here, with the two
+--- functions below, so the presenter's own callers + tests keep referencing them under this
+--- name.
+RLHerdsmanRulePresenter.OPERATION_ANIMAL_TYPES = RLHerdsmanRuleService.OPERATION_ANIMAL_TYPES
 
 -- -----------------------------------------------------------------------------
 -- Param value domains
@@ -747,96 +738,21 @@ end
 -- AnimalType compatibility + husbandry targeting (F6)
 -- =============================================================================
 
---- The union of every animal type NAME the OPERATION_ANIMAL_TYPES declarations reference,
---- sorted so the order is stable across runs. The frame resolves exactly this set against the
---- live registry and hands the result to the predicate below, so a declaration naming a new
---- type is resolved automatically and the two halves cannot drift apart.
----@return string[] names fresh sorted array of declared animal type names
-function RLHerdsmanRulePresenter.getDeclaredAnimalTypeNames()
-    local seen, names = {}, {}
-    for _, rule in pairs(OPERATION_ANIMAL_TYPES) do
-        for _, listKey in ipairs({ "allow", "exclude" }) do
-            local list = rule[listKey]
-            if type(list) == "table" then
-                for _, name in ipairs(list) do
-                    if not seen[name] then
-                        seen[name] = true
-                        names[#names + 1] = name
-                    end
-                end
-            end
-        end
-    end
-    table.sort(names)
-    Log:trace("RLHerdsmanRulePresenter.getDeclaredAnimalTypeNames: %d declared name(s) [%s]",
-        #names, table.concat(names, ","))
-    return names
-end
+--- The union of every animal type NAME the OPERATION_ANIMAL_TYPES declarations reference.
+--- OWNED by RLHerdsmanRuleService - see the re-export note on
+--- OPERATION_ANIMAL_TYPES above. Delegation is by source-time VALUE copy, so the presenter's
+--- name and the service's are the same function object; a later reassignment on either side
+--- would break that silently.
+RLHerdsmanRulePresenter.getDeclaredAnimalTypeNames = RLHerdsmanRuleService.getDeclaredAnimalTypeNames
 
---- Render a declaration for the trace line: `allow:HORSE`, `exclude:CHICKEN`, or
---- `unrestricted`. The RULE is logged rather than the injected map, because a map renders as a
---- per-run table pointer and would make the line unreproducible between sessions.
----@param rule table|nil an OPERATION_ANIMAL_TYPES entry, or nil for an unrestricted operation
----@return string
-local function describeAnimalTypeRule(rule)
-    if rule == nil then return "unrestricted" end
-    if rule.allow ~= nil then return "allow:" .. table.concat(rule.allow, ",") end
-    if rule.exclude ~= nil then return "exclude:" .. table.concat(rule.exclude, ",") end
-    return "unrestricted"
-end
-
---- The ONE operation x animalType compatibility predicate, driven by the OPERATION_ANIMAL_TYPES
---- declarations: an operation absent from that table is unrestricted, an `exclude` operation is
---- valid for every type but the named ones, an `allow` operation is valid only for the named
---- ones. Live indices arrive as an injected name -> index map (never a `g_*`/AnimalType read
---- inside this pure helper); the frame owns building it. Shared by filterCandidateFilters, the
---- husbandry gate, the destination gate AND revalidateTargets/revalidateDestination, so
---- open-time gating and rebind cleanup cannot drift apart.
----
---- ONE rule generates the whole truth table: a declared name that does not resolve does not
---- match. So an `allow` list fails CLOSED (an unresolvable HORSE matches nothing, nothing is
---- targetable) and an `exclude` list fails OPEN (an unresolvable CHICKEN excludes nothing) with
---- no polarity special-casing and no mutable state. A nil `animalTypeIndex` (an ANY-type
---- candidate) is the same rule again: it matches no resolved index, so exclude admits it and
---- allow refuses it.
----@param operation any rule operation key
----@param animalTypeIndex any candidate animalType index, or nil for ANY
----@param animalTypeIndexByName table|nil map of declared animal type NAME -> live animalType index
----@return boolean
-function RLHerdsmanRulePresenter.isOperationAnimalTypeCompatible(operation, animalTypeIndex, animalTypeIndexByName)
-    local rule = OPERATION_ANIMAL_TYPES[operation]
-    local compatible
-    if rule == nil then
-        compatible = true
-    else
-        local byName = type(animalTypeIndexByName) == "table" and animalTypeIndexByName or {}
-        if rule.allow ~= nil then
-            compatible = false
-            for _, name in ipairs(rule.allow) do
-                local idx = byName[name]
-                if idx ~= nil and idx == animalTypeIndex then
-                    compatible = true
-                    break
-                end
-            end
-        elseif rule.exclude ~= nil then
-            compatible = true
-            for _, name in ipairs(rule.exclude) do
-                local idx = byName[name]
-                if idx ~= nil and idx == animalTypeIndex then
-                    compatible = false
-                    break
-                end
-            end
-        else
-            -- A declaration entry carrying neither list restricts nothing.
-            compatible = true
-        end
-    end
-    Log:trace("RLHerdsmanRulePresenter.isOperationAnimalTypeCompatible: operation=%s animalType=%s rule=%s -> %s",
-        tostring(operation), tostring(animalTypeIndex), describeAnimalTypeRule(rule), tostring(compatible))
-    return compatible
-end
+--- The ONE operation x animalType compatibility predicate. OWNED by RLHerdsmanRuleService
+--- It is also where the polarity rule that generates the whole truth table is
+--- stated normatively: a declared name that does not resolve does not match, so `allow` fails
+--- CLOSED and `exclude` fails OPEN with no special-casing. Shared by filterCandidateFilters,
+--- the husbandry gate, the destination gate AND revalidateTargets/revalidateDestination, so
+--- open-time gating and rebind cleanup cannot drift apart - and, since the hoist, by the
+--- planner's runtime gate too.
+RLHerdsmanRulePresenter.isOperationAnimalTypeCompatible = RLHerdsmanRuleService.isOperationAnimalTypeCompatible
 
 --- Husbandry keep-gate shared by selectTargetableHusbandries (descriptors) AND
 --- revalidateTargets (resolvable targets) - the single source of truth so open-time listing
@@ -852,7 +768,7 @@ end
 local function keepHusbandryType(animalTypeIndex, filterAnimalType, operation, animalTypeIndexByName)
     if animalTypeIndex == nil then return false end
     if filterAnimalType ~= nil and animalTypeIndex ~= filterAnimalType then return false end
-    return RLHerdsmanRulePresenter.isOperationAnimalTypeCompatible(operation, animalTypeIndex, animalTypeIndexByName)
+    return RLHerdsmanRuleService.isOperationAnimalTypeCompatible(operation, animalTypeIndex, animalTypeIndexByName)
 end
 
 --- Set-aware DESTINATION type gate: `typeSpec` is a scalar animalType index (a
@@ -904,7 +820,7 @@ function RLHerdsmanRulePresenter.filterCandidateFilters(filters, operation, anim
     if type(filters) == "table" then
         for _, f in ipairs(filters) do
             local at = type(f) == "table" and f.animalType or nil
-            if at == nil or RLHerdsmanRulePresenter.isOperationAnimalTypeCompatible(operation, at, animalTypeIndexByName) then
+            if at == nil or RLHerdsmanRuleService.isOperationAnimalTypeCompatible(operation, at, animalTypeIndexByName) then
                 out[#out + 1] = f
             else
                 dropped = dropped + 1
@@ -965,7 +881,7 @@ function RLHerdsmanRulePresenter.filterClearReasonForOperation(operation, filter
     end
 
     local at = filter.animalType
-    if at ~= nil and not RLHerdsmanRulePresenter.isOperationAnimalTypeCompatible(operation, at, animalTypeIndexByName) then
+    if at ~= nil and not RLHerdsmanRuleService.isOperationAnimalTypeCompatible(operation, at, animalTypeIndexByName) then
         Log:trace("RLHerdsmanRulePresenter.filterClearReasonForOperation: operation=%s animalType=%s incompatible -> clear (reason=animalType)",
             tostring(operation), tostring(at))
         return "animalType"
