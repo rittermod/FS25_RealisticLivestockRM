@@ -412,6 +412,17 @@ end
 --- the SmoothList, restore selection by identity.
 --- No canBeSold filter: dealer animals are freshly generated and always
 --- saleable by the dealer; the buy-side filter is server-validated.
+---
+--- DELIBERATELY does NOT clear the pendingBuy* trio, even though this can run
+--- while the confirmation dialog is up (isFrameOpen stays true under a modal, so
+--- refreshIfOpen delegates here on any repopulate - hourly churn, dealer-preset
+--- change, Reset, join snapshot). A pending buy is a RESERVATION: the player has
+--- put those animals in the cart, and a restock replaces the shelf, not the cart.
+--- The purchase completes with the animals they chose, priced at the till.
+--- Clearing the trio here would cancel a confirmed purchase out from under the
+--- player - it looks like the tidy thing to do and is the wrong behaviour.
+--- Design call recorded on RLRM-589 (closed as working-as-designed); the one
+--- open consequence is tracked as RLRM-679.
 function RLMenuBuyFrame:reloadAnimalList()
     Log:trace("RLMenuBuyFrame:reloadAnimalList: begin")
     self:captureCurrentSelection()
