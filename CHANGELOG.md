@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.3.1.0-dev.4:
+- Added a note on each Herdsman task setting that is required but empty, or that holds a number outside its allowed range, so a task that will not run now tells you which field to repair instead of showing the same neutral prompt as a setting you simply have not filled in yet.
+- Added a "Select Section" control to "Choose Animals For Sale" - the S key, or its button, ticks or unticks just the animal group you are on and leaves the rest of the list alone.
+- Changed Space in "Choose Animals For Sale" to tick or untick the whole list at once instead of only the group you were on, matching every other multi-select list in the mod.
+- Fixed stray characters that had been accidentally pasted into ten of the translation files.
+
 ## 1.3.1.0-dev.3:
 - Added "Horse Care" as a Herdsman task - it exercises and grooms the horses in a chosen horse pen every day so their Daily Riding and Cleanliness stay up and they hold their sale value, charging a wage for every horse it looks after.
 - Changed the corrupt-genetics log warnings from one-per-session to counted reports - repeated bad values now log a running total at 10, 100 and 1000 occurrences with the latest offender named, instead of going silent after the first.
