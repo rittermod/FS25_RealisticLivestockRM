@@ -5,12 +5,16 @@
 -- no g_*, GUI, XML, or engine natives - only the RmLogging stub is reached, so the same
 -- file runs under in-game rlTest and the headless harness.
 --
--- Two functions, mirroring the catalog's build/enumerate split (here both are pure -
--- the GUI wiring lives in RLDealerSaleSelectorDialog):
+-- Three groups, all pure (the GUI wiring lives in RLDealerSaleSelectorDialog):
 --   * buildSectionModel(catalog) - one SECTION per catalog subType (dropping any that
 --     yields no keyable row), each row keyed by a composite (subTypeName, minAge) string.
 --   * buildResult(selected, keyMeta, sectionOrder, itemsBySection) - the checked in-scope
 --     rows as a deduped, section/row-ordered array of {subTypeName, minAge}.
+--   * the selection transitions and their predicates - toggleAll / toggleSection and
+--     hasAnySelection / hasSectionSelection. The transitions return a NEW map and mutate
+--     nothing; the predicates are pure reads. They live here rather than in the dialog
+--     because the section arithmetic is off-by-one-prone and no automated tier reaches a
+--     dialog handler.
 --
 -- Composite key scheme: `subTypeName .. U+001F .. tostring(minAge)`. U+001F (unit
 -- separator) cannot occur in a subType identifier, so the join is unambiguous. The key
@@ -207,6 +211,211 @@ function RLDealerSaleSelectorModel.buildResult(selected, keyMeta, sectionOrder, 
     end
 
     Log:debug("RLDealerSaleSelectorModel.buildResult: %d checked in-scope row(s)", #result)
+    return result
+end
+
+-- =============================================================================
+-- Selection transitions + predicates - the state changes SPACE and the section
+-- control drive. Pure: data in, data out; the dialog is thin wiring over them.
+-- =============================================================================
+
+-- The DOMAIN of every transition and predicate below is `sectionOrder` x `itemsBySection`
+-- - the rows the dialog actually rendered. A checked key that is unreachable from
+-- `sectionOrder` is therefore invisible to every DECISION here: it can neither be cleared
+-- by a toggle nor pin a predicate true, which is what stops a leftover key from making
+-- "is anything selected" permanently true and SPACE unable to select-all again.
+--
+-- The transitions still COPY the incoming map first, so such a key survives the round-trip
+-- untouched rather than being silently dropped. That copy is a preservation step, not a
+-- domain walk - it decides nothing.
+
+--- Shallow copy of a selection map, normalizing to the `true`/`nil`-never-`false` invariant.
+---@param selected table {key->true}
+---@return table a NEW map; the argument is never mutated
+local function copySelection(selected)
+    local copy = {}
+    for key, value in pairs(selected) do
+        if value == true then copy[key] = true end
+    end
+    return copy
+end
+
+--- Walk the rows reachable from `sectionOrder` x `itemsBySection`, optionally restricted to
+--- ONE section index. `visit(row, sectionKey, sectionIndex)` returning true stops the walk.
+--- A section whose `itemsBySection` entry is nil/non-table, and a row that is not a table with
+--- a string key, are skipped with a TRACE - never a crash (a nil key would raise on write).
+---@param sectionOrder table [sectionKey]
+---@param itemsBySection table {sectionKey->rows}
+---@param visit function fn(row, sectionKey, sectionIndex) -> boolean stop
+---@param onlySectionIndex number|nil restrict the walk to this sectionOrder index
+---@param context string caller name, for the TRACE lines
+---@return number sectionsVisited count of sections with a usable rows table
+---@return boolean stopped whether `visit` stopped the walk
+local function walkReachable(sectionOrder, itemsBySection, visit, onlySectionIndex, context)
+    local sectionsVisited = 0
+    for sectionIndex, sectionKey in ipairs(sectionOrder) do
+        if onlySectionIndex == nil or sectionIndex == onlySectionIndex then
+            local rows = itemsBySection[sectionKey]
+            if type(rows) ~= "table" then
+                Log:trace("RLDealerSaleSelectorModel.%s: section %d (%s) has a nil/non-table rows entry; skipped",
+                    context, sectionIndex, tostring(sectionKey))
+            else
+                sectionsVisited = sectionsVisited + 1
+                for rowIndex, row in ipairs(rows) do
+                    if type(row) ~= "table" or type(row.key) ~= "string" then
+                        Log:trace("RLDealerSaleSelectorModel.%s: section %d (%s) row %d is malformed; skipped",
+                            context, sectionIndex, tostring(sectionKey), rowIndex)
+                    elseif visit(row, sectionKey, sectionIndex) then
+                        return sectionsVisited, true
+                    end
+                end
+            end
+        end
+    end
+    return sectionsVisited, false
+end
+
+--- Resolve a section INDEX to its `sectionOrder` key, or nil when there is no usable section.
+--- Three arms, each TRACEd by name: nil, the documented `0` sentinel, and an index with no
+--- `sectionOrder` entry (the reachable case - a stale out-of-range index left by a prior open).
+--- A non-numeric index is caught alongside them rather than reaching `sectionOrder[section]`.
+---@param sectionOrder table [sectionKey]
+---@param section any section index
+---@param context string caller name, for the TRACE lines
+---@return string|nil sectionKey nil when no usable section
+local function resolveSectionKey(sectionOrder, section, context)
+    if section == nil then
+        Log:trace("RLDealerSaleSelectorModel.%s: no usable section (nil)", context)
+        return nil
+    end
+    if type(section) ~= "number" then
+        Log:trace("RLDealerSaleSelectorModel.%s: no usable section (non-numeric index, %s)", context, type(section))
+        return nil
+    end
+    if section == 0 then
+        Log:trace("RLDealerSaleSelectorModel.%s: no usable section (0 sentinel)", context)
+        return nil
+    end
+    local sectionKey = sectionOrder[section]
+    if sectionKey == nil then
+        Log:trace("RLDealerSaleSelectorModel.%s: no usable section (index %s has no sectionOrder entry)",
+            context, tostring(section))
+        return nil
+    end
+    return sectionKey
+end
+
+--- True when ANY row anywhere in the rendered list is checked.
+---@param selected table {key->true} the working selection
+---@param sectionOrder table [sectionKey] from buildSectionModel
+---@param itemsBySection table {sectionKey->rows} from buildSectionModel
+---@return boolean
+function RLDealerSaleSelectorModel.hasAnySelection(selected, sectionOrder, itemsBySection)
+    if type(selected) ~= "table" or type(sectionOrder) ~= "table" or type(itemsBySection) ~= "table" then
+        Log:trace("RLDealerSaleSelectorModel.hasAnySelection: malformed args; false")
+        return false
+    end
+    local _, found = walkReachable(sectionOrder, itemsBySection, function(row)
+        return selected[row.key] == true
+    end, nil, "hasAnySelection")
+    return found
+end
+
+--- True when any row in ONE section is checked. No usable section reads as false.
+---@param selected table {key->true} the working selection
+---@param sectionOrder table [sectionKey] from buildSectionModel
+---@param itemsBySection table {sectionKey->rows} from buildSectionModel
+---@param section any section index into sectionOrder
+---@return boolean
+function RLDealerSaleSelectorModel.hasSectionSelection(selected, sectionOrder, itemsBySection, section)
+    if type(selected) ~= "table" or type(sectionOrder) ~= "table" or type(itemsBySection) ~= "table" then
+        Log:trace("RLDealerSaleSelectorModel.hasSectionSelection: malformed args; false")
+        return false
+    end
+    if resolveSectionKey(sectionOrder, section, "hasSectionSelection") == nil then
+        return false
+    end
+    local _, found = walkReachable(sectionOrder, itemsBySection, function(row)
+        return selected[row.key] == true
+    end, section, "hasSectionSelection")
+    return found
+end
+
+--- LIST-WIDE toggle: any row checked anywhere -> clear EVERY row in EVERY section; none
+--- checked -> check them all. Mixed state deselects first, matching the six sibling
+--- select-all surfaces. Focus is irrelevant - this never consults a focused section.
+---@param selected table {key->true} the working selection (never mutated)
+---@param sectionOrder table [sectionKey] from buildSectionModel
+---@param itemsBySection table {sectionKey->rows} from buildSectionModel
+---@return table newSelected a NEW map
+function RLDealerSaleSelectorModel.toggleAll(selected, sectionOrder, itemsBySection)
+    if type(selected) ~= "table" then
+        Log:trace("RLDealerSaleSelectorModel.toggleAll: selected is not a table (%s); empty selection", type(selected))
+        return {}
+    end
+    local result = copySelection(selected)
+    if type(sectionOrder) ~= "table" or type(itemsBySection) ~= "table" then
+        Log:trace("RLDealerSaleSelectorModel.toggleAll: malformed domain (sectionOrder=%s itemsBySection=%s); selection unchanged",
+            type(sectionOrder), type(itemsBySection))
+        return result
+    end
+
+    local clearing  = RLDealerSaleSelectorModel.hasAnySelection(selected, sectionOrder, itemsBySection)
+    local newValue  = (not clearing) and true or nil
+    local transitioned = 0
+    local sectionsVisited = walkReachable(sectionOrder, itemsBySection, function(row)
+        if result[row.key] ~= newValue then transitioned = transitioned + 1 end
+        result[row.key] = newValue
+        return false
+    end, nil, "toggleAll")
+
+    -- Rows TRANSITIONED (not rows now checked), plus the SECTION count - together they
+    -- distinguish a true list-wide sweep from a focused-section-only regression.
+    Log:debug("RLDealerSaleSelectorModel.toggleAll: %s %d row(s) across %d section(s)",
+        clearing and "cleared" or "selected", transitioned, sectionsVisited)
+    return result
+end
+
+--- SECTION-SCOPED toggle: any row in the focused section checked -> clear that section;
+--- none -> check it. Every other section is untouched. No usable section is a NO-OP that
+--- returns a new map equal to the input.
+---@param selected table {key->true} the working selection (never mutated)
+---@param sectionOrder table [sectionKey] from buildSectionModel
+---@param itemsBySection table {sectionKey->rows} from buildSectionModel
+---@param section any section index into sectionOrder
+---@return table newSelected a NEW map
+function RLDealerSaleSelectorModel.toggleSection(selected, sectionOrder, itemsBySection, section)
+    if type(selected) ~= "table" then
+        Log:trace("RLDealerSaleSelectorModel.toggleSection: selected is not a table (%s); empty selection", type(selected))
+        return {}
+    end
+    local result = copySelection(selected)
+    if type(sectionOrder) ~= "table" or type(itemsBySection) ~= "table" then
+        Log:trace("RLDealerSaleSelectorModel.toggleSection: malformed domain (sectionOrder=%s itemsBySection=%s); selection unchanged",
+            type(sectionOrder), type(itemsBySection))
+        return result
+    end
+
+    local sectionKey = resolveSectionKey(sectionOrder, section, "toggleSection")
+    if sectionKey == nil then
+        return result
+    end
+
+    local clearing = RLDealerSaleSelectorModel.hasSectionSelection(selected, sectionOrder, itemsBySection, section)
+    local newValue = (not clearing) and true or nil
+    local transitioned = 0
+    local sectionsVisited = walkReachable(sectionOrder, itemsBySection, function(row)
+        if result[row.key] ~= newValue then transitioned = transitioned + 1 end
+        result[row.key] = newValue
+        return false
+    end, section, "toggleSection")
+
+    -- Report whether the section was actually WALKED. Without it a section whose rows entry is
+    -- malformed logs "0 row(s)" identically to a genuinely empty one, and the TRACE that
+    -- distinguishes them is off at the default level.
+    Log:debug("RLDealerSaleSelectorModel.toggleSection: section %s (%s) -> %s %d row(s)%s",
+        tostring(section), tostring(sectionKey), clearing and "cleared" or "selected", transitioned,
+        sectionsVisited == 0 and " (section skipped: no usable rows table)" or "")
     return result
 end
 

@@ -214,6 +214,8 @@
 		<text name="rl_ui_productivity" text="Produktivität"/>
 		<text name="rl_ui_selectAll" text="Alle auswählen"/>
 		<text name="rl_ui_selectNone" text="Keine auswählen"/>
+		<text name="rl_ui_selectSection" text="Select Section"/>
+		<text name="rl_ui_deselectSection" text="Deselect Section"/>
 		<text name="rl_ui_filters" text="Filter"/>
 		<text name="rl_ui_doesntHaveName" text="Ohne Namen"/>
 		<text name="rl_ui_doesHaveName" text="Hat Namen"/>
@@ -679,6 +681,7 @@
         <text name="input_RL_MONITOR" text="Tierüberwachung anbringen/entfernen"/>
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Tierbildschirm öffnen"/>
         <text name="input_RL_SELECT" text="Tier auswählen/Auswahl aufheben"/>
+        <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s Tiere wurden bei %s geboren"/>
         <text name="rl_message_dailyDeathsSummary" text="%s Tiere starben bei %s - %s"/>
         <text name="rl_message_dailyOvercrowdingSummary" text="Überbelegung: %s Neugeborene bei %s für %s verkauft"/>

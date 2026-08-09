@@ -212,6 +212,8 @@
 		<text name="rl_ui_productivity" text="Produktivitet"/>
 		<text name="rl_ui_selectAll" text="Vælg alle"/>
 		<text name="rl_ui_selectNone" text="Vælg ingen"/>
+		<text name="rl_ui_selectSection" text="Select Section"/>
+		<text name="rl_ui_deselectSection" text="Deselect Section"/>
 		<text name="rl_ui_filters" text="Filtre"/>
 		<text name="rl_ui_doesntHaveName" text="Ingen navn"/>
 		<text name="rl_ui_doesHaveName" text="Har Navn"/>
@@ -673,6 +675,7 @@
         <text name="input_RL_MONITOR" text="Tilføj/Fjern monitor"/>
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Åbn dyreskærm"/>
         <text name="input_RL_SELECT" text="Vælg/Fravælg dyr"/>
+        <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s dyr blev født på %s"/>
         <text name="rl_message_dailyDeathsSummary" text="%s dyr døde på %s - %s"/>
         <text name="rl_message_dailyOvercrowdingSummary" text="Overbelægning: solgt %s nyfødte på %s for %s"/>

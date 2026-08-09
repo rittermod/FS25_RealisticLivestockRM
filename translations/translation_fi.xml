@@ -219,6 +219,8 @@
 		<text name="rl_ui_productivity" text="Tuottavuus"/>
 		<text name="rl_ui_selectAll" text="Valitse kaikki"/>
 		<text name="rl_ui_selectNone" text="Älä valitse mitään"/>
+		<text name="rl_ui_selectSection" text="Select Section"/>
+		<text name="rl_ui_deselectSection" text="Deselect Section"/>
 		<text name="rl_ui_filters" text="Suodattimet"/>
 		<text name="rl_ui_doesntHaveName" text="Ei nimeä"/>
 		<text name="rl_ui_doesHaveName" text="On nimi"/>
@@ -696,6 +698,7 @@
         <text name="input_RL_MONITOR" text="Asenna/Poista monitori"/>
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Avaa eläinnäkymä"/>
         <text name="input_RL_SELECT" text="Valitse/Poista valinta"/>
+        <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s eläintä syntyi kohteessa %s"/>
         <text name="rl_message_dailyDeathsSummary" text="%s eläintä kuoli kohteessa %s - %s"/>
         <text name="rl_message_dailyOvercrowdingSummary" text="Ylikansoitus: myyty %s vastasyntynyttä kohteessa %s hintaan %s"/>

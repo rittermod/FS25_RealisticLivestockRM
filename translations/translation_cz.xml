@@ -79,6 +79,7 @@
         <text name="input_RL_CASTRATE" text="Kastrovat zvíře"/>
         <text name="input_RL_DISEASES" text="Nemoci zvířat"/>
         <text name="input_RL_SELECT" text="Vybrat/Zrušit výběr zvířete"/>
+        <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_ui_openAnimalScreen" text="Spravovat zvířata"/>
         <text name="rl_button_apply" text="Použít"/>
         <text name="rl_button_confirm" text="Potvrdit"/>
@@ -231,6 +232,8 @@
         <text name="rl_ui_productivity" text="Produktivita"/>
         <text name="rl_ui_selectAll" text="Vybrat vše"/>
         <text name="rl_ui_selectNone" text="Nevybrat nic"/>
+        <text name="rl_ui_selectSection" text="Select Section"/>
+        <text name="rl_ui_deselectSection" text="Deselect Section"/>
         <text name="rl_ui_filters" text="Filtry"/>
         <text name="rl_ui_doesntHaveName" text="Bez jména"/>
         <text name="rl_ui_doesHaveName" text="Má jméno"/>

@@ -212,6 +212,8 @@
 		<text name="rl_ui_productivity" text="Productivity"/>
 		<text name="rl_ui_selectAll" text="Select All"/>
 		<text name="rl_ui_selectNone" text="Select None"/>
+		<text name="rl_ui_selectSection" text="Select Section"/>
+		<text name="rl_ui_deselectSection" text="Deselect Section"/>
 		<text name="rl_ui_filters" text="Filters"/>
 		<text name="rl_ui_doesntHaveName" text="No Name"/>
 		<text name="rl_ui_doesHaveName" text="Has Name"/>
@@ -677,6 +679,7 @@
         <text name="input_RL_MONITOR" text="Установить/Снять монитор"/>
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Открыть экран животных"/>
         <text name="input_RL_SELECT" text="Выбрать/Отменить выбор"/>
+        <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s животных родилось в %s"/>
         <text name="rl_message_dailyDeathsSummary" text="%s животных погибло в %s - %s"/>
         <text name="rl_message_dailyOvercrowdingSummary" text="Перенаселение: продано %s новорождённых в %s за %s"/>

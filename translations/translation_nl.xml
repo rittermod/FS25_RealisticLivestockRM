@@ -214,6 +214,8 @@
 		<text name="rl_ui_productivity" text="Zwangerschap"/>
 		<text name="rl_ui_selectAll" text="Selecteer alle"/>
 		<text name="rl_ui_selectNone" text="Selecteer geen"/>
+		<text name="rl_ui_selectSection" text="Select Section"/>
+		<text name="rl_ui_deselectSection" text="Deselect Section"/>
 		<text name="rl_ui_filters" text="Filters"/>
 		<text name="rl_ui_doesntHaveName" text="Geen naam"/>
 		<text name="rl_ui_doesHaveName" text="Heeft naam"/>
@@ -684,6 +686,7 @@
         <text name="input_RL_MONITOR" text="Monitor plaatsen/verwijderen"/>
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Dierenscherm openen"/>
         <text name="input_RL_SELECT" text="Dier selecteren/Deselecteren"/>
+        <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s dieren zijn geboren bij %s"/>
         <text name="rl_message_dailyDeathsSummary" text="%s dieren zijn gestorven bij %s - %s"/>
         <text name="rl_message_dailyOvercrowdingSummary" text="Overbevolking: %s pasgeborenen verkocht bij %s voor %s"/>

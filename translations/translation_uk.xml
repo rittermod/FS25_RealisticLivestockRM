@@ -201,6 +201,8 @@
 		<text name="rl_ui_productivity" text="Вагітність"/>
 		<text name="rl_ui_selectAll" text="Вибрати все"/>
 		<text name="rl_ui_selectNone" text="Виберіть Ні"/>
+		<text name="rl_ui_selectSection" text="Select Section"/>
+		<text name="rl_ui_deselectSection" text="Deselect Section"/>
 		<text name="rl_ui_filters" text="Фільтри"/>
 		<text name="rl_ui_doesntHaveName" text="Немає ім'я"/>
 		<text name="rl_ui_doesHaveName" text="Має ім'я"/>
@@ -659,6 +661,7 @@
         <text name="input_RL_MONITOR" text="Встановити/Зняти монітор"/>
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Відкрити екран тварин"/>
         <text name="input_RL_SELECT" text="Обрати/Скасувати вибір"/>
+        <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s тварин народилося у %s"/>
         <text name="rl_message_dailyDeathsSummary" text="%s тварин загинуло у %s - %s"/>
         <text name="rl_message_dailyOvercrowdingSummary" text="Перенаселення: продано %s новонароджених у %s за %s"/>

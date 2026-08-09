@@ -77,6 +77,7 @@
         <text name="input_RL_CASTRATE" text="Castra animale"/>
         <text name="input_RL_DISEASES" text="Malattie animali"/>
         <text name="input_RL_SELECT" text="Seleziona/Deseleziona animale"/>
+        <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_ui_openAnimalScreen" text="Gestisci animali"/>
         <text name="rl_button_apply" text="Applica"/>
         <text name="rl_button_confirm" text="Conferma"/>
@@ -226,6 +227,8 @@
         <text name="rl_ui_productivity" text="Produttività"/>
         <text name="rl_ui_selectAll" text="Seleziona tutti"/>
         <text name="rl_ui_selectNone" text="Deseleziona tutti"/>
+        <text name="rl_ui_selectSection" text="Select Section"/>
+        <text name="rl_ui_deselectSection" text="Deselect Section"/>
         <text name="rl_ui_filters" text="Filtri"/>
         <text name="rl_ui_doesntHaveName" text="Senza nome"/>
         <text name="rl_ui_doesHaveName" text="Con nome"/>

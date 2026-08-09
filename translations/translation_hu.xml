@@ -79,6 +79,7 @@
 		<text name="input_RL_CASTRATE" text="Állat kasztrálása"/>
 		<text name="input_RL_DISEASES" text="Állatbetegségek"/>
 		<text name="input_RL_SELECT" text="Állat kiválasztása / kiválasztás megszüntetése"/>
+		<text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
 		<text name="rl_ui_openAnimalScreen" text="Állatok kezelése"/>
 		<text name="rl_button_apply" text="Alkalmaz"/>
 		<text name="rl_button_confirm" text="Jóváhagyás"/>
@@ -231,6 +232,8 @@
 		<text name="rl_ui_productivity" text="Termelékenység"/>
 		<text name="rl_ui_selectAll" text="Összes kijelölése"/>
 		<text name="rl_ui_selectNone" text="Kijelölés törlése"/>
+		<text name="rl_ui_selectSection" text="Select Section"/>
+		<text name="rl_ui_deselectSection" text="Deselect Section"/>
 		<text name="rl_ui_filters" text="Szűrők"/>
 		<text name="rl_ui_doesntHaveName" text="Nincs neve"/>
 		<text name="rl_ui_doesHaveName" text="Van neve"/>

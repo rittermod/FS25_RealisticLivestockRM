@@ -16,14 +16,15 @@
     rows per subType, so repeating it per row reads as clutter); the row label is the age band.
 
     Profile-bound input actions: rlButtonSelect -> RL_SELECT (KEY_a), rlButtonMenuActivate ->
-    MENU_ACTIVATE (Space, drives Select all/none), buttonOK -> MENU_ACCEPT, buttonBack ->
+    MENU_ACTIVATE (Space, drives the LIST-WIDE select all/none), rlButtonSelectSection ->
+    RL_SELECT_SECTION (KEY_s, the focused section only), buttonOK -> MENU_ACCEPT, buttonBack ->
     MENU_CANCEL. Geometry mirrors the husbandry picker's list/slider proportion, scaled to a taller
     dialog (long list); confirmed by the per-open onOpen measurement log + the dev opener hot-reload.
 -->
 <GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
     <GuiElement profile="newLayer"/>
     <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
-    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="750px 900px">
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="950px 900px">
         <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
         <ThreePartBitmap profile="fs25_dialogBgTop"/>
         <ThreePartBitmap profile="fs25_dialogBgBottom"/>
@@ -45,14 +46,19 @@
                  small icon + age-range label + right-anchored checkbox, single line. -->
             <SmoothList profile="rl_dealerSaleList" id="dealerSaleList"
                         position="50px -80px"
-                        size="620px 700px"
+                        size="820px 700px"
                         focusInit="onOpen"
                         focusChangeTop="nil"
                         focusChangeBottom="nil"
                         listSectionHeader="section"
                         onClick="onListClick">
 
-                <ListItem profile="rl_dealerSaleListItem" size="605px 55px" name="defaultCell">
+                <!-- NO size attribute: the profile's anchorTopStretchingX makes the row track the
+                     list width, exactly as the section header below does. An explicit width here
+                     does not stretch - it gets centred in the list, indenting the rows away from
+                     the headers by half the difference, which is a misalignment that reappears
+                     every time the dialog is resized. Height comes from the profile. -->
+                <ListItem profile="rl_dealerSaleListItem" name="defaultCell">
                     <Bitmap profile="rl_dealerSaleIcon" name="icon" position="8px 0px"/>
                     <Text profile="rl_dealerSaleLabel" position="66px 0px" size="440px 55px" name="ageRange"/>
                     <Button profile="rlMenu_checkboxButton" name="checkbox" position="-45px -15px">
@@ -75,10 +81,19 @@
 
         </GuiElement>
 
-        <!-- Four-button action bar: Select / Select all / OK / Back (mirror the husbandry picker). -->
+        <!-- Five-button action bar, ONE row, narrowest scope first: Select (one row) / Select
+             section / Select all (list-wide) / OK / Back. Both select-all labels are STATEFUL and
+             these buttons size to their label text, so every toggle re-flows the row - the widest
+             English state needs 740.8px against the 800px this box gets from an 850px dialog. The
+             per-open geometry log measures the span against the container so a longer translation
+             cannot overflow it unnoticed. A second flow was tried and rejected: the base dialog
+             chrome reserves one row's height, so two rows fight it. -->
         <BoxLayout profile="fs25_dialogButtonBox" id="buttonsPC">
             <Button profile="rlButtonSelect" text="$l10n_button_select"
                     onClick="onClickSelect" id="selectButton"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="rlButtonSelectSection" text="$l10n_rl_ui_selectSection"
+                    onClick="onClickSelectSection" id="selectSectionButton"/>
             <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
             <Button profile="rlButtonMenuActivate" text="$l10n_rl_ui_selectAll"
                     onClick="onClickSelectAll" id="selectAllButton"/>
@@ -139,6 +154,12 @@
 
         <Profile name="rlButtonSelect" extends="fs25_wideButton" with="touchButton">
             <inputAction value="RL_SELECT"/>
+        </Profile>
+
+        <!-- The section-scoped toggle. Carrying the inputAction on the profile keeps the button,
+             its glyph and the keybind on ONE source, exactly as the two profiles above do. -->
+        <Profile name="rlButtonSelectSection" extends="fs25_wideButton" with="touchButton">
+            <inputAction value="RL_SELECT_SECTION"/>
         </Profile>
     </GUIProfiles>
 </GUI>

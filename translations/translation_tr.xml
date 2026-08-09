@@ -79,6 +79,7 @@
         <text name="input_RL_CASTRATE" text="Hayvanı Kısırlaştır"/>
         <text name="input_RL_DISEASES" text="Hayvan Hastalıkları"/>
         <text name="input_RL_SELECT" text="Hayvanı Seç/Seçimi Kaldır"/>
+        <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_ui_openAnimalScreen" text="Hayvanları Yönet"/>
         <text name="rl_button_apply" text="Uygula"/>
         <text name="rl_button_confirm" text="Onayla"/>
@@ -231,6 +232,8 @@
         <text name="rl_ui_productivity" text="Verimlilik"/>
         <text name="rl_ui_selectAll" text="Tümünü Seç"/>
         <text name="rl_ui_selectNone" text="Hiçbirini Seçme"/>
+        <text name="rl_ui_selectSection" text="Select Section"/>
+        <text name="rl_ui_deselectSection" text="Deselect Section"/>
         <text name="rl_ui_filters" text="Filtreler"/>
         <text name="rl_ui_doesntHaveName" text="İsim Yok"/>
         <text name="rl_ui_doesHaveName" text="İsim Var"/>

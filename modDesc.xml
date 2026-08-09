@@ -191,6 +191,9 @@ Codice sorgente e tracciamento issue: https://github.com/rittermod/FS25_Realisti
         <actionBinding action="RL_MENU">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_rshift KEY_o" index="1"/>
         </actionBinding>
+        <actionBinding action="RL_SELECT_SECTION">
+            <binding device="KB_MOUSE_DEFAULT" input="KEY_s" index="1"/>
+        </actionBinding>
     </inputBinding>
     <actions>
         <action name="RL_OPEN_ANIMAL_SCREEN"/>
@@ -203,6 +206,7 @@ Codice sorgente e tracciamento issue: https://github.com/rittermod/FS25_Realisti
         <action name="RL_SELECT"/>
         <action name="RL_CYCLE_FILTER"/>
         <action name="RL_MENU"/>
+        <action name="RL_SELECT_SECTION"/>
     </actions>
     <helpLines>
 
