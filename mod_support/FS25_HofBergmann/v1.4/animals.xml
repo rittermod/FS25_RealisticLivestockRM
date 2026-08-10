@@ -189,7 +189,7 @@
 
         <!-- Override: fix RABBIT_MALE reproduction age from default 18 -> 6 months -->
         <subType subType="RABBIT_MALE" minWeight="0.1" targetWeight="3.0" maxWeight="5.5">
-            <reproduction minAgeMonth="6"/>
+		<reproduction minAgeMonth="6" supported="true"/>
         </subType>
     </animal>
 
