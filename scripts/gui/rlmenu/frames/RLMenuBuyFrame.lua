@@ -421,8 +421,8 @@ end
 --- The purchase completes with the animals they chose, priced at the till.
 --- Clearing the trio here would cancel a confirmed purchase out from under the
 --- player - it looks like the tidy thing to do and is the wrong behaviour.
---- Design call recorded on RLRM-589 (closed as working-as-designed); the one
---- open consequence is tracked as RLRM-679.
+--- This is a deliberate design call, not an oversight; its one open consequence
+--- is tracked separately.
 function RLMenuBuyFrame:reloadAnimalList()
     Log:trace("RLMenuBuyFrame:reloadAnimalList: begin")
     self:captureCurrentSelection()

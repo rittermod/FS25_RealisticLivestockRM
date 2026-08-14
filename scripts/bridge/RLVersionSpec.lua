@@ -59,10 +59,10 @@ function RLVersionSpec.normalizeSuffix(rawSuffix)
     end
 
     -- Strip dots, dashes, underscores used as separators within the suffix
-    -- "b.1" → "b1", "beta-1" → "beta1", "RC_1" → "RC1"
+    -- "b.1" -> "b1", "beta-1" -> "beta1", "RC_1" -> "RC1"
     local cleaned = rawSuffix:gsub("[%.%-_]", "")
 
-    -- Extract alpha tag and optional numeric part: "Beta1" → "Beta","1"; "b2" → "b","2"; "dev" → "dev",""
+    -- Extract alpha tag and optional numeric part: "Beta1" -> "Beta","1"; "b2" -> "b","2"; "dev" -> "dev",""
     local tag, numStr = cleaned:match("^(%a+)(%d*)$")
     if tag == nil then
         return nil
@@ -106,11 +106,11 @@ function RLVersionSpec.parseVersion(versionStr)
             table.insert(tuple, num)
         else
             -- Try extracting leading digits with space/dash/underscore separator:
-            -- "0 Beta1" → 0, "Beta1"; "0-RC1" → 0, "RC1"; "0_beta1" → 0, "beta1"
+            -- "0 Beta1" -> 0, "Beta1"; "0-RC1" -> 0, "RC1"; "0_beta1" -> 0, "beta1"
             local digits, trail = part:match("^(%d+)[%s%-_](.+)$")
             if digits == nil then
                 -- Try digits directly followed by alpha (no separator):
-                -- "0beta1" → 0, "beta1"; "0a1" → 0, "a1"
+                -- "0beta1" -> 0, "beta1"; "0a1" -> 0, "a1"
                 digits, trail = part:match("^(%d+)(%a.+)$")
             end
 
@@ -185,9 +185,9 @@ function RLVersionSpec.compareVersions(a, b)
     if aSuffix == nil and bSuffix == nil then
         return 0
     elseif aSuffix == nil then
-        return 1  -- a is release, b has suffix → a > b
+        return 1  -- a is release, b has suffix -> a > b
     elseif bSuffix == nil then
-        return -1 -- a has suffix, b is release → a < b
+        return -1 -- a has suffix, b is release -> a < b
     end
 
     -- Both have suffixes - use normalized pre-release comparison when available

@@ -199,12 +199,12 @@ end
 function AnimalMoveEvent:writeStream(streamId, connection)
 
 	if not connection:getIsServer() then
-		Log:trace("AnimalMoveEvent:writeStream (server→client): errorCode=%d", self.errorCode)
+		Log:trace("AnimalMoveEvent:writeStream (server->client): errorCode=%d", self.errorCode)
 		streamWriteUIntN(streamId, self.errorCode, 3)
 		return
 	end
 
-	Log:trace("AnimalMoveEvent:writeStream (client→server): moveType='%s' numAnimals=%d",
+	Log:trace("AnimalMoveEvent:writeStream (client->server): moveType='%s' numAnimals=%d",
 		tostring(self.moveType), #self.animals)
 
 	streamWriteString(streamId, self.moveType)

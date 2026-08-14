@@ -280,7 +280,7 @@ end
 --- Evaluate all death pathways for an animal during daily update.
 --- Consolidates the death evaluation block from Animal:onDayChanged, including
 --- server/deathEnabled guards and AnimalDeathEvent broadcast.
---- Sequential short-circuit: lowHealth → oldAge (if alive) → random (if alive and spec).
+--- Sequential short-circuit: lowHealth -> oldAge (if alive) -> random (if alive and spec).
 --- @param animal table Animal instance
 --- @param spec table|nil Husbandry animal spec (nil for sale animals)
 --- @return number lowHealthDeath 1 if died from low health, 0 otherwise

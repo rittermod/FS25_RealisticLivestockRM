@@ -63,7 +63,7 @@ local saleRotationWarnLatches = {
 -- every decline looked identical from the log. The hourly summary reports
 -- "restocked 0 of N attempted", which says generation produced nothing but not
 -- WHICH of the three declines fired - and that distinction is the whole
--- diagnosis (RLRM-595).
+-- diagnosis.
 local saleGenerationBailLatches = {}
 
 

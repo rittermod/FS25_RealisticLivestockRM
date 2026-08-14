@@ -1,6 +1,6 @@
 <modDesc descVersion="110">
     <author>Ritter</author>
-    <version>1.3.1.0-dev.4</version>
+    <version>1.3.1.0</version>
     <title>
         <en>Realistic Livestock - Ritter version</en>
         <it>Allevamento Realistico - Versione Ritter</it>
@@ -24,33 +24,42 @@ Source code and issue tracker: https://github.com/rittermod/FS25_RealisticLivest
 
 Changelog
 
-1.3.1.0-dev.4:
-- Added a note on each Herdsman task setting that is required but empty, or that holds a number outside its allowed range, so a task that will not run now tells you which field to repair instead of showing the same neutral prompt as a setting you simply have not filled in yet.
-- Added a "Select Section" control to "Choose Animals For Sale" - the S key, or its button, ticks or unticks just the animal group you are on and leaves the rest of the list alone.
-- Changed Space in "Choose Animals For Sale" to tick or untick the whole list at once instead of only the group you were on, matching every other multi-select list in the mod.
-- Fixed stray characters that had been accidentally pasted into ten of the translation files.
+1.3.1.0:
+Heads up before you update:
+Things that affect existing saves:
+- Dealer animal genetics follow a natural bell curve now. An "Extremely good" animal drops from roughly one in 25 to under one in 200, and "Very bad" ones from about one in 20 to about one in 160. Existing dealer stock is untouched and converges to the new curve as the dealer restocks.
+- Saved genetics filters and herdsman goals keep their stored 0-99 thresholds but now cover a different share of dealer stock. A filter like "overall genetics at least 90" goes from a few percent of the dealer's animals to well under one percent. If a saved filter suddenly returns nothing at the dealer, lower its threshold.
+- Changing "Dealer Animal Quality" discards the current dealer stock and restocks with new animals.
 
-1.3.1.0-dev.3:
-- Added "Horse Care" as a Herdsman task - it exercises and grooms the horses in a chosen horse pen every day so their Daily Riding and Cleanliness stay up and they hold their sale value, charging a wage for every horse it looks after.
-- Changed the corrupt-genetics log warnings from one-per-session to counted reports - repeated bad values now log a running total at 10, 100 and 1000 occurrences with the latest offender named, instead of going silent after the first.
-- Changed the Herdsman task editor to put the task's on/off switch at the bottom of its settings instead of near the top - you fill in the job, filter and pens first and switch the task on last.
-- Fixed a Herdsman task keeping a filter its new job cannot use when you change the Operation - the filter and any now-unsuitable pens are cleared, so the task can be repaired instead of being stuck with a filter the picker will not offer.
-- Fixed a change to an already-enabled Herdsman task being thrown away when it left the task incomplete - the task is now switched off for you and keeps your change, ready to finish and switch back on.
-- Added user-guide coverage for the herdsman's Horse Care task, plus a FAQ entry on why a pen can show only one animal in husbandry.
-- Fixed the user guide still listing a Shift + T keybind for the visual-animals control - that key was removed when the control moved into RL Menu > Settings > General.
-
-1.3.1.0-dev.2:
-- Added "Dealer Animal Quality" in RL Menu > Settings > General - choose whether the animal dealer stocks Budget, Standard or Premium animals. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing it discards the current dealer stock and restocks with new animals, and it does not affect the AI animals used for insemination. Admin only in multiplayer.
-- Fixed the animal dealer's poorest stock lingering forever on established saves - listings now rotate off the shelf after at most two in-game days.
-- Fixed the herdsman ignoring the "Dealer Animal Quality" setting when it buys animals - it always paid the Standard price, so Budget saves were overcharged and Premium saves underpaid; it now pays the same markup the dealer shows.
-- Added user-guide coverage for the dealer animal quality setting.
-
-1.3.1.0-dev.1:
+Added:
 - Added "Choose Animals For Sale" in RL Menu > Settings > General - pick which animals and age groups the animal dealer offers, and the dealer restocks to match. Admins can change it in multiplayer, and every player's dealer updates to match.
+- Added "Dealer Animal Quality" in RL Menu > Settings > General - choose whether the animal dealer stocks Budget, Standard or Premium animals. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing it discards the current dealer stock and restocks with new animals, and it does not affect the AI animals used for insemination. Admin only in multiplayer.
+- Added "Horse Care" as a Herdsman task - it exercises and grooms the horses in a chosen horse pen every day so their Daily Riding and Cleanliness stay up and they hold their sale value, charging a wage for every horse it looks after.
+- Added a "Select Section" control to "Choose Animals For Sale" - the S key, or its button, ticks or unticks just the animal group you are on and leaves the rest of the list alone.
+- Added a note on each Herdsman task setting that is required but empty, or that holds a number outside its allowed range, so a task that will not run now tells you which field to repair instead of showing the same neutral prompt as a setting you simply have not filled in yet.
+
+Changed:
 - Changed animal dealer quality to follow a natural bell curve instead of piling animals up at the best and worst extremes. Most dealer animals are middling: an "Extremely good" one drops from roughly one in 25 to under one in 200, "Very bad" ones from about one in 20 to about one in 160, and an animal's traits now sit closer to each other. Existing dealer stock is untouched and converges to the new curve as the dealer restocks.
 - Changed what saved genetics filters and herdsman goals match - they keep their stored 0-99 thresholds but now cover a different share of dealer stock because of that curve change, so a filter like "overall genetics at least 90" goes from a few percent of the dealer's animals to well under one percent. If a saved filter suddenly returns nothing at the dealer, lower its threshold.
+- Changed the Herdsman task editor to put the task's on/off switch at the bottom of its settings instead of near the top - you fill in the job, filter and pens first and switch the task on last.
+- Changed Space in "Choose Animals For Sale" to tick or untick the whole list at once instead of only the group you were on, matching every other multi-select list in the mod.
+
+Fixed:
+- Fixed the animal dealer's poorest stock lingering forever on established saves - listings now rotate off the shelf after at most two in-game days.
+- Fixed a Herdsman task keeping a filter its new job cannot use when you change the Operation - the filter and any now-unsuitable pens are cleared, so the task can be repaired instead of being stuck with a filter the picker will not offer.
+- Fixed a change to an already-enabled Herdsman task being thrown away when it left the task incomplete - the task is now switched off for you and keeps your change, ready to finish and switch back on.
 - Fixed saved filters and herdsman rules being lost (and overwritten on the next save) when loading a save that has no Realistic Livestock animal data.
-- Added user-guide coverage for choosing which animals the dealer offers.
+
+Translations:
+- Fixed stray characters that had been shipping in ten of the translation files.
+
+Documentation:
+- Added user-guide coverage for the two new dealer controls and the Herdsman's Horse Care task, plus a FAQ entry on why a pen can show only one animal in husbandry.
+- Fixed the user guide still listing a Shift + T keybind for the visual-animals control - that key was removed when the control moved into RL Menu > Settings > General.
+
+Compatibility:
+- Listed the Sheep Breeds Pack for RLRM alongside the Cow Breeds Pack as a supported animal pack.
+
 
 1.3.0.1:
 - Improved the saved-filter editor - comparison operators now read as plain English ("is at least", "is one of", "does not contain", ...) in the Compare dropdown and each condition row, instead of programmer symbols.

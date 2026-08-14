@@ -29,8 +29,9 @@ This is a maintained version of the original mod by Arrow-kb, who has discontinu
 - Animal marking and castration
 - RL Menu: a standalone tabbed menu (default Right Shift + O, also opened from pens, dealers, and trailers) covering all animal management - animal browsing with pedigree/genetics/disease detail, moving, selling, buying, AI straw purchases, messages, and trailer loading/unloading
 - Saveable animal filters: build reusable filters in-game (age, gender, pregnancy, genetics, weight, health, and more) and cycle them with F across the menu tabs
-- Herdsman automation: named daily tasks (sell, buy, castrate, naming, AI insemination, move) driven by saved filters, with per-task caps, budgets, and a herdsman wage
+- Herdsman automation: named daily tasks (sell, buy, castrate, naming, AI insemination, move, horse care) driven by saved filters, with per-task caps, budgets, and a herdsman wage
 - Animal Country of Origin setting: choose the country new animals are registered in (ear tags, identifiers)
+- Dealer controls: choose which animals and age groups the dealer offers, and whether it stocks Budget, Standard or Premium quality animals
 - Daily summary mode for message log
 - In-game help pages covering monitors, pregnancy, production, weight, and genetics
 - Highland cattle bull support
