@@ -71,13 +71,18 @@
                     <Text profile="fs25_subCategoryListItemName" name="name" position="100px -30px"/>
                     <Text profile="fs25_animalSourceListItemPrice" name="price" position="100px -50px"/>
                     <Text profile="rlMenu_animalCardBadge" name="herdsmanPurchase"/>
-                    <!-- Status icons: 4 slots, anchorBottomRight, right-aligned with checkbox.
+                    <!-- Status icons: 6 slots, anchorBottomRight, right-aligned with checkbox.
+                         One row carries all three families - disease, pregnancy/fertility,
+                         production - so the worst case is 5 icons and one slot stays spare.
                          Y=26px: price bottom = 50px top-offset + 24px text height = 74px from top = 26px from bottom.
-                         X: rightmost at -45px (checkbox right edge), 20px spacing (18px icon + 2px gap). -->
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon1" position="-105px 26px"/>
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon2" position="-85px 26px"/>
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon3" position="-65px 26px"/>
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon4" position="-45px 26px"/>
+                         X: rightmost at -45px (checkbox right edge), 20px spacing (18px icon
+                         + 2px gap), so the row spans back to -145px. -->
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon1" position="-145px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon2" position="-125px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon3" position="-105px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon4" position="-85px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon5" position="-65px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon6" position="-45px 26px"/>
                     <!-- Checkbox: outer button (transparent hit area) + box bg + tick icon -->
                     <Button profile="rlMenu_checkboxButton" name="checkbox">
                         <ThreePartBitmap profile="rlMenu_checkboxBox"/>

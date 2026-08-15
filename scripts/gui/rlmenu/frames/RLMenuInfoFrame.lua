@@ -753,11 +753,11 @@ function RLMenuInfoFrame:populateCellForItemInSection(list, section, index, cell
 
     local row = RLAnimalQuery.formatAnimalRow(item)
 
-    -- Cell tint: disease red, marked orange, normal otherwise.
+    -- Cell tint: marked orange, normal otherwise. Disease is signalled by the
+    -- status-icon row, which distinguishes untreated from under-treatment from
+    -- carrier - three states a single tint cannot carry.
     if cell.setImageColor ~= nil then
-        if row.tint == RLAnimalQuery.TINT_DISEASE then
-            cell:setImageColor(GuiOverlay.STATE_NORMAL, 1, 0.08, 0)
-        elseif row.tint == RLAnimalQuery.TINT_MARKED then
+        if row.tint == RLAnimalQuery.TINT_MARKED then
             cell:setImageColor(GuiOverlay.STATE_NORMAL, 1, 0.2, 0)
         else
             cell:setImageColor(GuiOverlay.STATE_NORMAL, 1, 1, 1)
@@ -809,28 +809,11 @@ function RLMenuInfoFrame:populateCellForItemInSection(list, section, index, cell
         end
     end
 
-    -- Status icons: resolve from row state, right-justify into slots 4..1.
-    local icons = RLAnimalQuery.resolveStatusIcons(row)
-    local SLOT_NAMES = { "statusIcon1", "statusIcon2", "statusIcon3", "statusIcon4" }
-    local slotCount = #SLOT_NAMES
-    for i = 1, slotCount do
-        local slot = cell:getAttribute(SLOT_NAMES[i])
-        if slot ~= nil then
-            local iconIndex = i - (slotCount - #icons)
-            local def = icons[iconIndex]
-            if def ~= nil then
-                slot:setImageSlice(GuiOverlay.STATE_NORMAL, def.slice)
-                slot:setImageSlice(GuiOverlay.STATE_SELECTED, def.slice)
-                slot:setImageSlice(GuiOverlay.STATE_HIGHLIGHTED, def.slice)
-                slot:setImageColor(GuiOverlay.STATE_NORMAL, def.r, def.g, def.b)
-                slot:setImageColor(GuiOverlay.STATE_SELECTED, 0.015, 0.017, 0.015)
-                slot:setImageColor(GuiOverlay.STATE_HIGHLIGHTED, 0.015, 0.017, 0.015)
-                slot:setVisible(true)
-            else
-                slot:setVisible(false)
-            end
-        end
-    end
+    -- Status icons: one right-justified row carrying disease, pregnancy/fertility
+    -- and production. The slot names, the ordering and the per-state styling all
+    -- live in RLAnimalQuery so the five list frames cannot drift apart.
+    RLAnimalQuery.applyStatusIconSlots(cell, RLAnimalQuery.SLOT_NAMES,
+        RLAnimalQuery.resolveStatusIcons(row))
 end
 
 -- =============================================================================

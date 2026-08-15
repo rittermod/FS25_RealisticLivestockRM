@@ -21,7 +21,9 @@
 
     Animal card fields: icon / idNoName / id / name / price / herdsmanPurchase.
     idNoName is shown when the animal has no custom name, id + name otherwise.
-    Cell tint (disease red, marked orange) applied by populateCellForItemInSection.
+    Cell tint (marked orange) applied by populateCellForItemInSection; disease is
+    carried by the statusIcon row instead, which distinguishes untreated from
+    under-treatment from carrier.
 -->
 <GUI name="RLMenuInfoFrame">
 
@@ -75,13 +77,18 @@
                     <Text profile="fs25_subCategoryListItemName" name="name" position="100px -30px"/>
                     <Text profile="fs25_animalSourceListItemPrice" name="price" position="100px -50px"/>
                     <Text profile="rlMenu_animalCardBadge" name="herdsmanPurchase"/>
-                    <!-- Status icons: 4 slots, anchorBottomRight, right-justified.
+                    <!-- Status icons: 6 slots, anchorBottomRight, right-justified.
+                         One row carries all three families - disease, pregnancy/fertility,
+                         production - so the worst case is 5 icons and one slot stays spare.
                          Y=26px: price bottom = 50+24 = 74px from top = 26px from bottom.
-                         X: rightmost at -45px (aligned with Move/Sell checkbox position), 20px spacing. -->
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon1" position="-105px 26px"/>
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon2" position="-85px 26px"/>
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon3" position="-65px 26px"/>
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon4" position="-45px 26px"/>
+                         X: rightmost at -45px (aligned with Move/Sell checkbox position),
+                         20px spacing, so the row spans back to -145px. -->
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon1" position="-145px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon2" position="-125px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon3" position="-105px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon4" position="-85px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon5" position="-65px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon6" position="-45px 26px"/>
                 </ListItem>
             </SmoothList>
 

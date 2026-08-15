@@ -61,11 +61,15 @@
                     <Text profile="fs25_subCategoryListItemName" name="name" position="100px -30px"/>
                     <Text profile="fs25_animalSourceListItemPrice" name="price" position="100px -50px"/>
                     <Text profile="rlMenu_animalCardBadge" name="herdsmanPurchase"/>
-                    <!-- Status icons: 4 slots, right-aligned with the checkbox. -->
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon1" position="-105px 26px"/>
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon2" position="-85px 26px"/>
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon3" position="-65px 26px"/>
-                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon4" position="-45px 26px"/>
+                    <!-- Status icons: 6 slots, right-aligned with the checkbox. One row
+                         carries disease, pregnancy/fertility and production; worst case
+                         is 5 icons, so one slot stays spare. -->
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon1" position="-145px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon2" position="-125px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon3" position="-105px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon4" position="-85px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon5" position="-65px 26px"/>
+                    <Bitmap profile="rlMenu_statusIcon" name="statusIcon6" position="-45px 26px"/>
                     <!-- Checkbox: outer button (transparent hit area) + box bg + tick icon -->
                     <Button profile="rlMenu_checkboxButton" name="checkbox">
                         <ThreePartBitmap profile="rlMenu_checkboxBox"/>

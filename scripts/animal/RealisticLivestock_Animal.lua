@@ -1672,6 +1672,53 @@ function Animal:getHasAnyDisease()
     return false
 end
 
+--- Resolve the three display flags the animal-list cards render as status icons.
+--- Gating mirrors getHasAnyDisease exactly: an absent manager, disabled diseases
+--- or an absent diseases table all yield three falses, so turning diseases off
+--- clears the icons the same way it clears every other disease surface.
+---
+--- "Untreated" and "treated" describe ACTIVE records only (neither cured nor a
+--- carrier), so a cured record contributes nothing whatever its beingTreated
+--- flag says. Carrier is keyed on isCarrier alone, cured or not, because it
+--- marks a lifelong carried gene rather than a record state.
+---
+--- WITHIN one record the three are exclusive - a carrier record can never also
+--- report untreated or treated. ACROSS records they are independent, which is
+--- how an animal carrying a gene and running an active infection lights two
+--- icons. A degenerate record (no fields set) reports untreated, matching what
+--- getHasAnyDisease already does with the same input.
+---
+--- Iterates with ipairs to match the list predicate: a sparse diseases table has
+--- to be read the same way by both, or the icons and the section grouping would
+--- disagree about the same animal.
+---@return boolean untreated true iff at least one active record is not being treated
+---@return boolean treated true iff at least one active record is being treated
+---@return boolean carrier true iff at least one record carries the gene
+function Animal:getDiseaseStatusFlags()
+    if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled or self.diseases == nil then
+        return false, false, false
+    end
+
+    local untreated, treated, carrier = false, false, false
+
+    for _, disease in ipairs(self.diseases) do
+        if disease.isCarrier then
+            carrier = true
+        elseif not disease.cured then
+            if disease.beingTreated then
+                treated = true
+            else
+                untreated = true
+            end
+        end
+    end
+
+    Log:trace("getDiseaseStatusFlags: uniqueId=%s untreated=%s treated=%s carrier=%s",
+        tostring(self.uniqueId), tostring(untreated), tostring(treated), tostring(carrier))
+
+    return untreated, treated, carrier
+end
+
 function Animal:createVisual(husbandryId, animalId)
     self.visualAnimal = VisualAnimal.new(self, husbandryId, animalId)
     self.visualAnimal:load()

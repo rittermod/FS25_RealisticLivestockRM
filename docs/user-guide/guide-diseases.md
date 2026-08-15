@@ -21,18 +21,46 @@ Realistic Livestock RM includes five diseases that can infect, spread between, a
 ## How Sick, Cured, and Carrier Animals Show in the Lists
 
 Only animals with a **currently active** disease are treated as sick by the animal lists: they
-group under "Diseased Animals", get the red row tint, sort to the top, and match the disease
-filter (`hasAnyDisease`).
+group under "Diseased Animals", sort to the top, and match the disease filter (`hasAnyDisease`).
+
+### Reading the status icons
+
+Each animal card carries a row of small icons along its bottom edge, to the right of the price.
+Three of them describe health:
+
+| Icon | Meaning |
+|---|---|
+| Medical bag (red) | Actively sick, with no treatment running |
+| Pill bottle (blue) | Actively sick and **under treatment** |
+| DNA strand (grey) | Carries a disease gene (CVM) |
+
+The same row also carries the pregnancy, fertility and production icons, so a card can show a mix
+of health and non-health icons at once.
+
+An animal can show more than one health icon - a cow carrying CVM that also catches mastitis shows
+both the DNA strand and a medical bag. A recovered animal serving out its immunity shows no health
+icon at all, though a recovered CVM carrier still shows the DNA strand, because the carried gene is
+for life. With diseases turned off in the settings, no card shows any health icon.
+
+The icons replace the old red row tint, which could only say "something is wrong" and could not
+tell an untreated animal from one you are already paying to treat. Marked animals keep their
+orange tint, including when they are also sick. The older animal screen still uses the red tint.
+
+One case reads oddly and is worth knowing: a cow that inherited CVM from **both** parents is
+genuinely sick rather than a carrier, so it shows the red medical bag - but CVM has no treatment,
+so there is nothing to start. Those animals rarely survive long.
+
+### Two states that read as healthy
 
 Two states look like a disease record in the animal's detail panel but read as **healthy**
 everywhere else:
 
 - **Cured animals.** After recovery the disease stays listed as "Immune" while the immunity
   countdown runs (12 or 24 months depending on the disease). The animal sits in its normal
-  breed section, untinted, and matches the "Healthy" filter.
+  breed section, carries no status icon, and matches the "Healthy" filter.
 - **CVM carriers.** A carrier cow keeps its CVM entry for life, but it is not sick - it sits in
-  its normal section and matches "Healthy" too. The detail panel is where you check carrier
-  status before breeding.
+  its normal section and matches "Healthy" too. It does carry the grey DNA icon, so you can spot
+  carriers from the list rather than opening each detail panel.
 
 This also applies to herdsman rules built on the disease filter: a "sell animals with any
 disease" rule sells only actively sick animals - it no longer selects cured animals or CVM

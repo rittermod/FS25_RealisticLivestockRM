@@ -268,8 +268,9 @@ RLAnimalQuery.TINT_MARKED  = "marked"
 ---   displayIdentifier         : identifier with genetics tag applied
 ---   price                     : sell price (setValue on the currency cell)
 ---   hasDisease, isMarked, recentlyBoughtByAI : state flags
+---   hasUntreatedDisease, hasTreatedDisease, isDiseaseCarrier : disease icon flags
 ---   descriptorVisible, descriptorText         : herdsman/mark badge
----   tint                      : "normal" | "disease" | "marked"
+---   tint                      : "normal" | "marked"
 ---
 --- Malformed cluster returns a sentinel row with "?" placeholders + a warning.
 --- @param item table|nil
@@ -287,6 +288,12 @@ function RLAnimalQuery.formatAnimalRow(item)
         displayIdentifier  = "?",
         price              = 0,
         hasDisease         = false,
+        -- Initialized false, not left nil: the malformed-cluster early return
+        -- below and an animal shape without the accessor both reach the icon
+        -- resolver, which reads these as plain booleans.
+        hasUntreatedDisease = false,
+        hasTreatedDisease   = false,
+        isDiseaseCarrier    = false,
         isMarked           = false,
         recentlyBoughtByAI = false,
         descriptorVisible  = false,
@@ -335,6 +342,15 @@ function RLAnimalQuery.formatAnimalRow(item)
     if cluster.getHasAnyDisease ~= nil then
         row.hasDisease = cluster:getHasAnyDisease() == true
     end
+    -- Nil-guarded because a row's cluster is not always an RLRM Animal: a
+    -- vanilla world-trailer cluster before conversion, and a Buy-frame store
+    -- item of the same shape, both reach here and render no icons.
+    if cluster.getDiseaseStatusFlags ~= nil then
+        local untreated, treated, carrier = cluster:getDiseaseStatusFlags()
+        row.hasUntreatedDisease = untreated == true
+        row.hasTreatedDisease   = treated == true
+        row.isDiseaseCarrier    = carrier == true
+    end
     if cluster.getMarked ~= nil then
         row.isMarked = cluster:getMarked() == true
     end
@@ -359,10 +375,11 @@ function RLAnimalQuery.formatAnimalRow(item)
         end
     end
 
-    -- Tint: disease beats marked beats normal.
-    if row.hasDisease then
-        row.tint = RLAnimalQuery.TINT_DISEASE
-    elseif row.isMarked then
+    -- Tint: marked beats normal. Disease is carried by the status-icon row
+    -- rather than the tint, because it needs to distinguish untreated from
+    -- under-treatment from carrier and a single tint cannot. A marked animal
+    -- keeps its orange tint whether or not it is also diseased.
+    if row.isMarked then
         row.tint = RLAnimalQuery.TINT_MARKED
     end
 
@@ -403,16 +420,67 @@ end
 -- Status icon resolution
 -- =============================================================================
 
---- Resolve 0-2 status icons for an animal row.
+--- Slot names for the card's status-icon row, left to right. ONE module-level
+--- constant rather than a literal per frame: five copies of a slot-name list is
+--- five places for a rename to miss one, and a missed one shows as a silently
+--- absent icon rather than an error.
+RLAnimalQuery.SLOT_NAMES = {
+    "statusIcon1", "statusIcon2", "statusIcon3",
+    "statusIcon4", "statusIcon5", "statusIcon6",
+}
+
+--- Dev-only: emit every icon for every row, so a layout spike can measure a
+--- fully-populated row against the card's other content without hunting for an
+--- animal in each state. A misspelled slot name shows up as a missing icon
+--- under forced fill, which is the other thing it proves.
+---
+--- Never commit true, and the suite enforces that rather than trusting it: the
+--- resolver's own asserts redden while this is set, so a run with it left on
+--- cannot go green.
+RLAnimalQuery.DEV_FORCE_ALL_ICONS = false
+
+--- Resolve 0-5 status icons for an animal row.
 --- Returns an array of {slice, r, g, b} entries, ordered for right-justified
 --- rendering: first entry = leftmost icon, last entry = rightmost icon.
 ---
---- Category 1 (pregnancy/fertility): mutually exclusive, priority order.
---- Category 2 (production): from productionIcon, already monitor-gated.
+--- Order is disease, then pregnancy/fertility, then production, so health reads
+--- at the left of the row while the production marker keeps the right edge it
+--- has always had. Disease contributes up to three INDEPENDENT icons; the other
+--- two groups are internally exclusive and contribute at most one each - five
+--- concurrent worst case, against six slots.
 --- @param row table  Row from formatAnimalRow
 --- @return table icons  Array of {slice=string, r=number, g=number, b=number}
 function RLAnimalQuery.resolveStatusIcons(row)
     local icons = {}
+
+    -- Dev-only layout fill: one distinct icon per slot, so a spike sees the row
+    -- at full width and an unwired slot shows as a gap. Deliberately exceeds the
+    -- five-icon production worst case - the point is the row's geometry, not a
+    -- reachable animal state - and it takes the whole branch rather than
+    -- widening each real condition, because ORing the flags leaves the
+    -- exclusive groups resolving from live state and under-fills the row.
+    if RLAnimalQuery.DEV_FORCE_ALL_ICONS then
+        return {
+            { slice = "rlStatus.briefcase_medical", r = 0.92, g = 0.34, b = 0.30 },
+            { slice = "rlStatus.pill_bottle",       r = 0.47, g = 0.71, b = 0.91 },
+            { slice = "rlStatus.dna",               r = 0.65, g = 0.65, b = 0.65 },
+            { slice = "rlStatus.baby",              r = 0.85, g = 0.47, b = 0.75 },
+            { slice = "rlStatus.circle_off",        r = 0.65, g = 0.65, b = 0.65 },
+            { slice = "rlStatus.milk",              r = 0.47, g = 0.71, b = 0.91 },
+        }
+    end
+
+    -- Disease: three INDEPENDENT flags, so an animal carrying an untreated
+    -- infection AND a carried gene shows both.
+    if row.hasUntreatedDisease then
+        icons[#icons + 1] = { slice = "rlStatus.briefcase_medical", r = 0.92, g = 0.34, b = 0.30 }
+    end
+    if row.hasTreatedDisease then
+        icons[#icons + 1] = { slice = "rlStatus.pill_bottle", r = 0.47, g = 0.71, b = 0.91 }
+    end
+    if row.isDiseaseCarrier then
+        icons[#icons + 1] = { slice = "rlStatus.dna", r = 0.65, g = 0.65, b = 0.65 }
+    end
 
     -- Category 1: Pregnancy / Fertility (mutually exclusive)
     if row.isPregnant then
@@ -432,12 +500,55 @@ function RLAnimalQuery.resolveStatusIcons(row)
         icons[#icons + 1] = { slice = "rlStatus.egg", r = 0.47, g = 0.71, b = 0.91 }
     end
 
-    Log:trace("RLAnimalQuery.resolveStatusIcons: uniqueId=%s count=%d pregnant=%s recovering=%s infertile=%s production=%s",
-        tostring(row.uniqueId), #icons, tostring(row.isPregnant),
+    Log:trace("RLAnimalQuery.resolveStatusIcons: uniqueId=%s count=%d untreated=%s treated=%s carrier=%s pregnant=%s recovering=%s infertile=%s production=%s",
+        tostring(row.uniqueId), #icons,
+        tostring(row.hasUntreatedDisease), tostring(row.hasTreatedDisease),
+        tostring(row.isDiseaseCarrier), tostring(row.isPregnant),
         tostring(row.isRecoveringFromBirth), tostring(row.isInfertile),
         tostring(row.productionIcon))
 
     return icons
+end
+
+--- Fill a row of icon slots on a cell, right-justified: the LAST icon lands in
+--- the LAST slot, so a partially-filled row hugs the same edge as a full one.
+---
+--- Two boundaries the callers depend on. A nil slot is skipped rather than
+--- raising, because a frame may legitimately not declare every slot. And when
+--- there are more icons than slots the RIGHTMOST slots win, so the icons that
+--- fall off are the leading ones rather than the trailing ones.
+---
+--- Slices are set per visual state because setImageSlice writes one state only;
+--- an unset state falls back to the normal slice, which is why FOCUSED is left
+--- alone and renders through the profile's own focused colour.
+--- @param cell table  SmoothList cell
+--- @param slotNames table  Array of slot attribute names, left to right
+--- @param icons table  Array of {slice, r, g, b} from a resolve* function
+function RLAnimalQuery.applyStatusIconSlots(cell, slotNames, icons)
+    if cell == nil or slotNames == nil or icons == nil then return end
+
+    local slotCount = #slotNames
+    for i = 1, slotCount do
+        local slot = cell:getAttribute(slotNames[i])
+        if slot ~= nil then
+            -- Right-justify: icon N fills slot (slotCount - #icons + N).
+            local iconIndex = i - (slotCount - #icons)
+            local def = icons[iconIndex]
+            if def ~= nil then
+                slot:setImageSlice(GuiOverlay.STATE_NORMAL, def.slice)
+                slot:setImageSlice(GuiOverlay.STATE_SELECTED, def.slice)
+                slot:setImageSlice(GuiOverlay.STATE_HIGHLIGHTED, def.slice)
+                slot:setImageColor(GuiOverlay.STATE_NORMAL, def.r, def.g, def.b)
+                -- Bitmap gamma workaround: 0.015/0.017/0.015 produces #212321
+                -- matching card text (preset_fs25_colorMainDark renders #0E0E0D via bitmaps).
+                slot:setImageColor(GuiOverlay.STATE_SELECTED, 0.015, 0.017, 0.015)
+                slot:setImageColor(GuiOverlay.STATE_HIGHLIGHTED, 0.015, 0.017, 0.015)
+                slot:setVisible(true)
+            else
+                slot:setVisible(false)
+            end
+        end
+    end
 end
 
 -- =============================================================================

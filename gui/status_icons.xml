@@ -4,11 +4,14 @@
 		<size width="256" height="256"/>
 	</meta>
 	<slices>
-		<slice id="baby"        uvs="0px 0px 32px 32px"/>
-		<slice id="milk"        uvs="32px 0px 32px 32px"/>
-		<slice id="circle_off"  uvs="64px 0px 32px 32px"/>
+		<slice id="baby" uvs="0px 0px 32px 32px"/>
+		<slice id="milk" uvs="32px 0px 32px 32px"/>
+		<slice id="circle_off" uvs="64px 0px 32px 32px"/>
 		<slice id="timer_reset" uvs="96px 0px 32px 32px"/>
-		<slice id="egg"         uvs="128px 0px 32px 32px"/>
-		<slice id="scissors"    uvs="160px 0px 32px 32px"/>
+		<slice id="egg" uvs="128px 0px 32px 32px"/>
+		<slice id="scissors" uvs="160px 0px 32px 32px"/>
+		<slice id="briefcase_medical" uvs="192px 0px 32px 32px"/>
+		<slice id="pill_bottle" uvs="224px 0px 32px 32px"/>
+		<slice id="dna" uvs="0px 32px 32px 32px"/>
 	</slices>
 </texture>
