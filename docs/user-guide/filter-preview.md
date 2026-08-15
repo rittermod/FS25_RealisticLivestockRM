@@ -159,7 +159,7 @@ comparator's expected shape.
 | `isPregnant` | bool | `==` | all | `true` / `false`. |
 | `isLactating` | bool | `==` | **COW only** | Other species ignore this field. Goats (a SHEEP subtype, `subType="GOAT"`) do track lactation internally, but this filter field is scoped to COW, so an `isLactating` condition always evaluates false for goats. |
 | `hasName` | bool | `==` | all | True if the animal has a non-empty player-set name. |
-| `hasAnyDisease` | bool | `==` | all | True if at least one disease is currently active. |
+| `hasAnyDisease` | bool | `==` | all | True if at least one disease is currently active. A cured disease (still counting down its immunity) and a genetic carrier state (CVM) do NOT count - those animals match `hasAnyDisease == false`, the same "Healthy" the quick filter offers. This also steers herdsman rules built on this field: a "sell diseased animals" rule no longer selects cured animals or CVM carriers. |
 | `hasAnyMark` | bool | `==` | all | True if any mark is active (player-set or AI-manager). |
 | `name` | string | `contains` `notcontains` | all | Case-insensitive substring match. Unnamed animals are treated as empty string, so `notcontains anything` is true for them. |
 | `weight` | number | `<` `<=` `==` `!=` `>=` `>` `in` `notin` | all | **Monitor-gated.** Returns no value when the animal's monitor is not active; the condition then evaluates to false. |

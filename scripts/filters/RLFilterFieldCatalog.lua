@@ -175,9 +175,24 @@ RLFilterFieldCatalog.FIELDS = {
         type        = "bool",
         cmps        = BOOL_CMPS,
         animalTypes = "all",
+        -- Both branches implement the SAME active-record rule as
+        -- Animal:getHasAnyDisease: a record that is cured or a genetic carrier
+        -- does not count as disease. The fallback is a second implementation of
+        -- that predicate for plain-table animals - keep the two in lockstep,
+        -- including the diseasesEnabled gate. Both branches return a strict
+        -- boolean by construction (the evaluator type-gates, so a nil return
+        -- silently matches nothing): the accessor's answer is coerced here so a
+        -- foreign animal shape cannot leak nil through this field.
         getter      = function(animal)
-            if animal.getHasAnyDisease ~= nil then return animal:getHasAnyDisease() end
-            return animal.diseases ~= nil and #animal.diseases > 0
+            if animal.getHasAnyDisease ~= nil then return animal:getHasAnyDisease() == true end
+            if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled
+                or animal.diseases == nil then
+                return false
+            end
+            for _, disease in ipairs(animal.diseases) do
+                if not disease.cured and not disease.isCarrier then return true end
+            end
+            return false
         end,
         monitorGated = false,
     },

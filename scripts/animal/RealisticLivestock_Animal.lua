@@ -1646,8 +1646,30 @@ function Animal:getCanBeInseminatedByAnimal(animal) return AnimalReproduction.ge
 
 function Animal:setInsemination(animal) AnimalReproduction.setInsemination(self, animal) end
 
+--- Whether this animal currently carries an ACTIVE disease record. A record is
+--- active iff it is neither cured (immunity countdown running) nor a genetic
+--- carrier - both read as healthy on every list surface and in the
+--- hasAnyDisease filter field, while the record itself stays attached (a cured
+--- record blocks re-infection; a carrier record marks the carried gene).
+--- Strict boolean contract: never nil (the filter evaluator type-gates and
+--- would silently match nothing) and never raises on a nil diseases table.
+--- Deliberately unlogged: the three list sort comparators call this per
+--- comparison, so a per-call trace would dominate the log at TRACE.
+---@return boolean hasActiveDisease true iff diseases are enabled AND at least one attached
+---        record is neither cured nor a carrier; false whenever the manager is absent,
+---        diseases are disabled, or the animal carries no diseases table
 function Animal:getHasAnyDisease()
-    return g_diseaseManager ~= nil and g_diseaseManager.diseasesEnabled and #self.diseases > 0
+    if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled or self.diseases == nil then
+        return false
+    end
+
+    for _, disease in ipairs(self.diseases) do
+        if not disease.cured and not disease.isCarrier then
+            return true
+        end
+    end
+
+    return false
 end
 
 function Animal:createVisual(husbandryId, animalId)

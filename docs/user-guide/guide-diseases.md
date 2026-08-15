@@ -18,6 +18,33 @@ Realistic Livestock RM includes five diseases that can infect, spread between, a
 
 ---
 
+## How Sick, Cured, and Carrier Animals Show in the Lists
+
+Only animals with a **currently active** disease are treated as sick by the animal lists: they
+group under "Diseased Animals", get the red row tint, sort to the top, and match the disease
+filter (`hasAnyDisease`).
+
+Two states look like a disease record in the animal's detail panel but read as **healthy**
+everywhere else:
+
+- **Cured animals.** After recovery the disease stays listed as "Immune" while the immunity
+  countdown runs (12 or 24 months depending on the disease). The animal sits in its normal
+  breed section, untinted, and matches the "Healthy" filter.
+- **CVM carriers.** A carrier cow keeps its CVM entry for life, but it is not sick - it sits in
+  its normal section and matches "Healthy" too. The detail panel is where you check carrier
+  status before breeding.
+
+This also applies to herdsman rules built on the disease filter: a "sell animals with any
+disease" rule sells only actively sick animals - it no longer selects cured animals or CVM
+carriers. If you want to cull carriers, pick them manually from the detail panel.
+
+> **Multiplayer note:** on a client, a fresh cure can keep showing as sick until the pen next
+> syncs - which happens whenever an animal is bought, sold, moved, born, or dies in that pen.
+> In an active herd that is usually the same in-game day; in a small, static pen it can take
+> considerably longer. The server always has the correct state.
+
+---
+
 ## Mastitis
 
 **Affects:** Cows, Goats (lactating females only)
