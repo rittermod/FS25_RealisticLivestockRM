@@ -99,6 +99,20 @@ function Disease:onPeriodChanged(animal, deathEnabled)
 
 	elseif self.beingTreated and self.type.treatment ~= nil then
 
+		-- A course that has made no progress is a fresh enrolment, so seed it with the
+		-- configured length; without this the counter never leaves 0 and every treatment
+		-- cures on its first tick. Guarding on no-progress rather than seeding every tick
+		-- is what lets a player stop and restart a course without losing the months
+		-- already served.
+		if self.treatmentDuration <= 0 then
+
+			self.treatmentDuration = self.type.treatment.duration
+
+			Log:trace("Disease:onPeriodChanged: seeded treatment duration (disease=%s duration=%s uniqueId=%s)",
+				tostring(self.type.title), tostring(self.treatmentDuration), tostring(animal.uniqueId))
+
+		end
+
 		self.treatmentDuration = math.max(self.treatmentDuration - 1, 0)
 
 		treatmentCost = self.type.treatment.cost

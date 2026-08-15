@@ -150,7 +150,14 @@ function DiseaseDialog:populateCellForItemInSection(list, section, index, cell)
     local treatment = type.treatment
 
     cell:getAttribute("title"):setText(type.name)
-    cell:getAttribute("duration"):setText(treatment == nil and "N/A" or RealisticLivestock.formatAge(treatment.duration - disease.treatmentDuration))
+    -- Months REMAINING once a course is under way, the configured total otherwise. A
+    -- paused course still counts as under way and reads as remaining; a cured or
+    -- never-started record is back at zero and reads as the total. The nil-treatment
+    -- arm must stay short-circuited - two shipped diseases carry no treatment block,
+    -- so the duration term below may not be evaluated for them.
+    cell:getAttribute("duration"):setText(treatment == nil and "N/A"
+        or RealisticLivestock.formatAge(
+            disease.treatmentDuration > 0 and disease.treatmentDuration or treatment.duration))
     cell:getAttribute("fee"):setText(treatment == nil and "N/A" or string.format(g_i18n:getText("rl_ui_feePerMonth"), g_i18n:formatMoney(treatment.cost, 2, true, true)))
     cell:getAttribute("status"):setText(disease:getStatus())
 

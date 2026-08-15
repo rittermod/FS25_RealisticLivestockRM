@@ -115,7 +115,11 @@ Foot & Mouth is the most widespread disease, affecting three species. It's moder
 
 ### Management Tips
 
-- Treat as soon as possible - 3 months is a long treatment but necessary
+- Treat as soon as possible - the 3-month course is survivable, but it is not a guaranteed save, and
+  starting it early is what decides the odds: an animal put on treatment as soon as it falls ill is
+  roughly twice as likely to pull through as one left for six months first
+- Treating still beats leaving it alone by a wide margin - an untreated animal is the one most likely
+  to die
 - No natural recovery means untreated animals stay sick indefinitely
 - Milk drops severely - devastating for dairy operations
 - Sell price is greatly reduced - selling infected animals is a significant loss
