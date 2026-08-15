@@ -2,6 +2,8 @@ Disease = {}
 
 local disease_mt = Class(Disease)
 
+local Log = RmLogging.getLogger("RLRM")
+
 function Disease.new(type, isCarrier, genes)
 
 	local self = setmetatable({}, disease_mt)
@@ -125,22 +127,35 @@ function Disease:onPeriodChanged(animal, deathEnabled)
 
 	if not self.isCarrier and deathEnabled then
 
-		local fatality = self.type.fatality
-		local fatalityChance = 0
+		-- A cured record never rolls fatality, on the cure tick or anywhere inside
+		-- the immunity window: the animal has already beaten this disease. The skip
+		-- is a branch rather than an extra term on the guard above so that it can be
+		-- observed in a log - a silent skip is undiagnosable.
+		if self.cured then
 
-		for i = 1, #fatality do
+			Log:trace("Disease:onPeriodChanged: cured record skips the fatality roll (disease=%s uniqueId=%s)",
+				tostring(self.type.title), tostring(animal.uniqueId))
 
-			if self.time <= fatality[i].time or i == #fatality then
-				fatalityChance = fatality[i].value
-				break
+		else
+
+			local fatality = self.type.fatality
+			local fatalityChance = 0
+
+			for i = 1, #fatality do
+
+				if self.time <= fatality[i].time or i == #fatality then
+					fatalityChance = fatality[i].value
+					break
+				end
+
 			end
 
-		end
+			if math.random() < fatalityChance then
 
-		if math.random() < fatalityChance then
-	
-			animal:die(self.type.key)
-			return true, treatmentCost
+				animal:die(self.type.key)
+				return true, treatmentCost
+
+			end
 
 		end
 
