@@ -111,7 +111,7 @@ Foot & Mouth is the most widespread disease, affecting three species. It's moder
 | After several months | Low, declining |
 | Long-term survivors | Low but ongoing |
 
-*Fatality decreases the longer the animal survives, but without treatment, chronic infection keeps draining production.*
+*Fatality falls the longer an animal stays infected, but it never reaches zero on its own - only a completed treatment does that, after which the animal faces no further risk from Foot & Mouth until its immunity lapses. For as long as the animal stays infected, chronic infection keeps draining production.*
 
 ### Management Tips
 
@@ -158,7 +158,7 @@ PED is devastating to young piglets - almost always fatal in newborns. Older pig
 | After 1 month | Low risk |
 | 2+ months | Very low - chronic survivors are stable |
 
-*Fatality drops sharply after the first month. The reason newborns rarely survive PED is **not** that fatality changes with age - it's that newborns get infected far more often than adults (spontaneous infection is common at 0 mo, very rare from 24 mo onwards). Once infected, the bulk of deaths happen in the first month regardless of how old the pig was.*
+*Fatality drops sharply after the first month. The reason newborns rarely survive PED is **not** that fatality changes with age - it's that newborns get infected far more often than adults (spontaneous infection is common at 0 mo, very rare from 24 mo onwards). Once infected, the bulk of deaths happen in the first month regardless of how old the pig was. Treatment cures a pig on the next month's tick and spares it that month's risk entirely; left alone, most pigs that survive their first month are cured within a few more. Either way a cured pig faces no further risk from PED until its immunity lapses.*
 
 ### Why PED Is Devastating
 
@@ -183,7 +183,7 @@ Avian Flu is the fastest-spreading disease and has **no treatment**. Infected ch
 | Parameter | Value |
 |-----------|-------|
 | Spread | **Fast** - can infect multiple birds quickly |
-| Fatality | High initially, decreasing for survivors |
+| Fatality | High initially, then much lower while the bird stays infected; none once it recovers, until that immunity lapses |
 | Treatment | **None available** |
 | Natural recovery | 1 month |
 | Immunity after recovery | 24 months |
@@ -201,7 +201,9 @@ Avian Flu is the fastest-spreading disease and has **no treatment**. Infected ch
 |--------------|------------|
 | Just infected | **High - many birds die** |
 | After 1 month | Much lower - risk drops sharply once past the first month |
-| Survivors (past recovery) | Low but ongoing |
+| Recovered (immune) | **None** for the 24-month immunity |
+
+*The first two rows apply while a bird is still infected. Recovery usually arrives after about a month, though some birds stay sick longer. A recovered bird can neither catch nor die of avian flu while its immunity lasts; once that immunity lapses it can be infected again.*
 
 ### Why Avian Flu Is Dangerous
 
@@ -216,7 +218,7 @@ Avian Flu is the fastest-spreading disease and has **no treatment**. Infected ch
 - There is no treatment - prevention is the only strategy
 - Sell infected birds quickly to limit spread and recover some value
 - Keep smaller flocks in separate pens to limit outbreak damage
-- Survivors gain 24-month immunity, creating a resistant flock over time
+- Survivors gain 24-month immunity - while it lasts they can neither catch avian flu again nor die of it, though birds hatched or bought later have no such protection
 - Chickens that survive gain immunity and will be your most valuable layers
 
 ---
