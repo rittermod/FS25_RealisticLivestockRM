@@ -32,6 +32,12 @@ plugins:
   - search
   - mermaid-to-svg:
       renderer: mmdc
+      # Without this the plugin writes its own Puppeteer config, and on CI it adds
+      # --single-process --no-zygote. Chrome 151 (GitHub runner image 20260810)
+      # dies on startup with those, so every build failed on the first diagram
+      # ("Protocol error (Target.setDiscoverTargets): Target closed"). Our file is
+      # the plugin's own default arg set minus that pair.
+      puppeteer_config: puppeteer-config.json
       mermaid_config:
         # Render diagram labels as native SVG <text>, not HTML in <foreignObject>.
         # WeasyPrint (PDF export) cannot render foreignObject, so htmlLabels: true

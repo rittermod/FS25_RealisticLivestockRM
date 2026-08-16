@@ -40,6 +40,12 @@ jobs:
 
       - run: pip install mkdocs-material mkdocs-mermaid-to-svg mkdocs-to-pdf
 
+      # Render with the runner's own Chrome, the binary the plugin used to pick up
+      # by itself. command -v fails the step if the image ever drops it, rather
+      # than silently falling back to Puppeteer's bundled build.
+      - name: Point Puppeteer at the runner's Chrome
+        run: echo "PUPPETEER_EXECUTABLE_PATH=$(command -v google-chrome)" >> "$GITHUB_ENV"
+
       - run: mkdocs build
 
       - uses: actions/upload-pages-artifact@v3
