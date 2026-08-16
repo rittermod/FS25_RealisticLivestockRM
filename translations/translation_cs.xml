@@ -597,6 +597,7 @@
 		<text name="rl_ui_duration" text="持续时间"/>
 		<text name="rl_ui_beingTreated" text="治疗中"/>
 		<text name="rl_ui_notTreated" text="未治疗"/>
+		<text name="rl_ui_treatmentPaused" text="Treatment paused"/>
 		<text name="rl_ui_carrier" text="携带者"/>
 
 		<text name="rl_diseases" text="疾病"/>

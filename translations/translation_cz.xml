@@ -627,6 +627,7 @@
         <text name="rl_ui_duration" text="Trvání"/>
         <text name="rl_ui_beingTreated" text="Probíhá léčba"/>
         <text name="rl_ui_notTreated" text="Neléčeno"/>
+        <text name="rl_ui_treatmentPaused" text="Treatment paused"/>
         <text name="rl_ui_carrier" text="Přenašeč"/>
 
         <text name="rl_diseases" text="Nemoci"/>

@@ -593,6 +593,7 @@
 		<text name="rl_ui_duration" text="Kesto"/>
 		<text name="rl_ui_beingTreated" text="Hoidettavana"/>
 		<text name="rl_ui_notTreated" text="Ei hoidettavana"/>
+		<text name="rl_ui_treatmentPaused" text="Treatment paused"/>
 		<text name="rl_ui_carrier" text="Kantaja"/>
 
 		<text name="rl_diseases" text="Taudit"/>

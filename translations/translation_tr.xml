@@ -628,6 +628,7 @@
         <text name="rl_ui_duration" text="Süre"/>
         <text name="rl_ui_beingTreated" text="Tedavi ediliyor"/>
         <text name="rl_ui_notTreated" text="Tedavi edilmiyor"/>
+        <text name="rl_ui_treatmentPaused" text="Treatment paused"/>
         <text name="rl_ui_carrier" text="Taşıyıcı"/>
 
         <text name="rl_diseases" text="Hastalıklar"/>

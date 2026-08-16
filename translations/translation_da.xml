@@ -569,6 +569,7 @@
 		<text name="rl_ui_duration" text="Varighed"/>
 		<text name="rl_ui_beingTreated" text="Under Behandling"/>
 		<text name="rl_ui_notTreated" text="Ikke Behandlet"/>
+		<text name="rl_ui_treatmentPaused" text="Treatment paused"/>
 		<text name="rl_ui_carrier" text="Sygdomsbærer"/>
 
 		<text name="rl_diseases" text="Sygdomme"/>

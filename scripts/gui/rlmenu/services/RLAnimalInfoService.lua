@@ -67,7 +67,11 @@ end
 
 --- Build disease rows for read-only display. Uses disease.type.name which
 --- is already localized by DiseaseManager. Empty list when the animal has
---- no diseases or when diseases are globally disabled.
+--- no diseases.
+---
+--- NOT gated on `g_diseaseManager.diseasesEnabled`, unlike the card icons and the HUD box.
+--- With diseases off, a record frozen mid-course still renders here while those two show
+--- nothing. Tracked separately; do not add the gate as a drive-by.
 --- @param animal table
 --- @return table rows
 local function buildDiseaseRows(animal)

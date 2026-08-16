@@ -583,6 +583,7 @@
 		<text name="rl_ui_duration" text="Duration"/>
 		<text name="rl_ui_beingTreated" text="Being treated"/>
 		<text name="rl_ui_notTreated" text="Not treated"/>
+		<text name="rl_ui_treatmentPaused" text="Treatment paused"/>
 		<text name="rl_ui_carrier" text="Carrier"/>
 
 		<text name="rl_diseases" text="Diseases"/>

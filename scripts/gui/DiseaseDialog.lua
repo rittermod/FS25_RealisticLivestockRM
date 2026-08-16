@@ -77,7 +77,16 @@ function DiseaseDialog:onClickOk()
     local husbandry = self.animal.clusterSystem.owner
 
     -- Send network event (server broadcasts, client sends to server)
-    Log:trace("DiseaseDialog:onClickOk sending event disease=%s treatment=%s", disease.type.title, tostring(newState))
+    -- treatmentDuration is months REMAINING, captured before the toggle: on a stop it is what
+    -- the paused course resumes from, on a start it is whatever a previous course left behind.
+    -- It is the local machine's value, so on a client it reads 0 while the host holds the real
+    -- count - the toggle event replicates beingTreated and never this field. Read it as "what
+    -- THIS peer will render", not as the authoritative course state.
+    -- uniqueId is what lets this line be correlated with the seed trace in
+    -- Disease:onPeriodChanged, which is the other half of the same diagnostic.
+    Log:trace("DiseaseDialog:onClickOk sending event disease=%s treatment=%s treatmentDuration=%s uniqueId=%s",
+        disease.type.title, tostring(newState), tostring(disease.treatmentDuration),
+        tostring(self.animal.uniqueId))
     DiseaseTreatmentToggleEvent.sendEvent(husbandry, self.animal, disease.type.title, newState)
 
     -- Local UI feedback (immediate)

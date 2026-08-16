@@ -314,6 +314,26 @@ end
 --- animal sync carried until the next one. That is unchanged by which field feeds the
 --- label - the previous rendering was equally stale - but do not read "counts down" as
 --- a per-peer guarantee.
+---
+--- The paused arm keys on `self.treatmentDuration` ALONE and must not learn about
+--- `self.type`: the question is whether THIS record carries unfinished progress, which the
+--- type's configuration cannot answer, and reaching for it would make the label depend on a
+--- field the record does not hold. It sits above `isCarrier` deliberately, on the same
+--- reasoning as `beingTreated` two arms up - that already outranks `isCarrier`, so a
+--- suspended course of the same treatment does too. `or 0` is nil tolerance, not type
+--- safety: it is the only numeric comparison in this function, and a partially-deserialized
+--- record reaches it with the field absent.
+---
+--- That ordering extends the divergence above to a FOURTH answer, and it is deliberate. The
+--- card icons test `isCarrier` first, so a carrier holding progress shows the carrier icon
+--- while this label reads paused; and a plain paused record still shows the untreated icon,
+--- because that icon answers "is a treatment running" and this label answers "does this
+--- record hold progress". Do not unify them.
+---
+--- Add NO logging in here. This is a per-frame formatter - the HUD info box re-renders it
+--- every frame a player stands near a diseased animal - so a TRACE in any arm emits
+--- continuously. The diagnostic that explains a paused course belongs where the state is
+--- produced, which is the dialog's toggle handler.
 ---@return string localised status label
 function Disease:getStatus()
 
@@ -324,6 +344,10 @@ function Disease:getStatus()
 	elseif self.cured then
 
 		status = string.format("%s (%s)", g_i18n:getText("rl_ui_immune"), RLTimeFormat.formatAge(self.immunity))
+
+	elseif (self.treatmentDuration or 0) > 0 then
+
+		status = g_i18n:getText("rl_ui_treatmentPaused")
 
 	elseif self.isCarrier then
 

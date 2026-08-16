@@ -628,6 +628,7 @@
 		<text name="rl_ui_duration" text="Időtartam"/>
 		<text name="rl_ui_beingTreated" text="Kezelés alatt"/>
 		<text name="rl_ui_notTreated" text="Nincs kezelve"/>
+		<text name="rl_ui_treatmentPaused" text="Treatment paused"/>
 		<text name="rl_ui_carrier" text="Hordozó"/>
 
 		<text name="rl_diseases" text="Betegségek"/>

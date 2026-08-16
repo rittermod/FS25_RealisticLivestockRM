@@ -577,6 +577,7 @@
 		<text name="rl_ui_duration" text="Dauer"/>
 		<text name="rl_ui_beingTreated" text="Behandelt werden"/>
 		<text name="rl_ui_notTreated" text="Nicht behandelt"/>
+		<text name="rl_ui_treatmentPaused" text="Treatment paused"/>
 		<text name="rl_ui_carrier" text="Träger"/>
 
 		<text name="rl_diseases" text="Krankheiten"/>

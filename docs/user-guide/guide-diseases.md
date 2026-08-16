@@ -42,6 +42,12 @@ both the DNA strand and a medical bag. A recovered animal serving out its immuni
 icon at all, though a recovered CVM carrier still shows the DNA strand, because the carried gene is
 for life. With diseases turned off in the settings, no card shows any health icon.
 
+If you start a treatment and then stop it part-way, the course keeps the progress it has already
+made - resuming picks up where it left off instead of starting the course again. The animal's
+detail panel says so, reading **Treatment paused** rather than "Not treated". The card still shows
+the red medical bag, because that icon answers "is a treatment running", and while the course is
+paused the answer is no.
+
 The icons replace the old red row tint, which could only say "something is wrong" and could not
 tell an untreated animal from one you are already paying to treat. Marked animals keep their
 orange tint, including when they are also sick. The older animal screen still uses the red tint.
