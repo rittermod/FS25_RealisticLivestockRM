@@ -400,9 +400,6 @@ source(modDirectory .. "scripts/vehicles/specializations/RealisticLivestock_Live
 source(modDirectory .. "scripts/vehicles/specializations/Rideable.lua")
 source(modDirectory .. "scripts/vehicles/RealisticLivestock_VehicleSystem.lua")
 
--- SECTION 20a: Herdsman (automated herd management)
-source(modDirectory .. "scripts/herdsman/AIAnimalManager.lua")
-
 -- SECTION 20b: Insemination (dewar/straw infrastructure)
 source(modDirectory .. "scripts/insemination/AIStrawUpdater.lua")
 

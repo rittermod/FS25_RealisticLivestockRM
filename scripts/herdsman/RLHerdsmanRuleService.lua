@@ -68,9 +68,9 @@ RLHerdsmanRuleService.OPERATIONS = {
 
 --- Canonical run / visual order for the operations (D3 "visual order = run
 --- order"): Sell frees herd space before Buy fills it, mirroring legacy
---- `AIAnimalManager:onDayChanged`. The single source of truth for all THREE consumers -
---- the M-Frame presenter (section placement), the M-Tick planner (run order), and the
---- presenter's legacy-active banner sweep. Each consumer derives its own operation ->
+--- `AIAnimalManager:onDayChanged` (removed 1.3.2.0). The single source of truth for BOTH consumers -
+--- the M-Frame presenter (section placement) and the M-Tick planner (run order).
+--- Each consumer derives its own operation ->
 --- rank map from this list (no shared rank table, so a consumer's load order can never
 --- read a half-built map).
 ---

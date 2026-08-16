@@ -34,9 +34,10 @@
 -- preset exists to eliminate. A ctx missing it therefore RAISES on the buy arithmetic rather than
 -- silently pricing every automated purchase at a stale markup. See the Edge-handling note on
 -- `planActions`.
--- The caller (T4) farm-scopes BOTH `rules` and `ctx.husbandries`, and excludes legacy
--- `reserved` dealer animals from `dealerAnimalsByType` (coexistence: legacy AIAnimalManager
--- claims dealer animals via `animal.reserved`). The planner filters `enabled` itself.
+-- The caller (T4) farm-scopes BOTH `rules` and `ctx.husbandries`, and excludes `reserved`
+-- dealer animals from `dealerAnimalsByType` - an inert exclusion, since nothing sets that flag
+-- TRUE any more (the daily clear-to-false in `AnimalSystem:onDayChanged` is not a producer).
+-- The planner filters `enabled` itself.
 -- `farmBalanceByFarmId` + `dewarsByFarmId` are keyed by `rule.farmId` (the rule's owning farm);
 -- the `farmId` value type MUST match the table key type or both silently read empty.
 -- `freeSlots` is the destination husbandry's total free animal-slot count (T4 sources
@@ -64,7 +65,7 @@
 --
 -- Run order = operation order (RLHerdsmanRuleService.OPERATION_ORDER: sell -> move -> buy ->
 -- castrate -> naming -> ai -> horseCare) then RLHerdsmanRuleService.compareRulesByName within
--- an op (mirrors legacy AIAnimalManager:onDayChanged - sell frees herd space + funds buys
+-- an op (mirrors legacy AIAnimalManager:onDayChanged, removed 1.3.2.0 - sell frees herd space + funds buys
 -- before buy fills the space / spends the proceeds).
 --
 -- Which animal types an operation may target is NOT decided here. The declarations and the
@@ -98,7 +99,7 @@ RLHerdsmanPlanner = {}
 local LOG_PREFIX = "[planActions]"
 
 --- Buy applies the ACTIVE dealer-quality markup on the sell price before adding transport - the
---- buy leg of legacy AIAnimalManager:onDayChanged, with the markup injected as `ctx.buyMarkup`
+--- buy leg of legacy AIAnimalManager:onDayChanged (removed 1.3.2.0), with the markup injected as `ctx.buyMarkup`
 --- rather than compiled in. Sell deliberately applies NO markup (the sell leg of that same
 --- function); note that is not "the raw price" either, because the transport fee is still ADDED
 --- here, where the player sell path subtracts it.
@@ -135,7 +136,7 @@ RLHerdsmanPlanner.OPERATION_TRAITS = {
 }
 
 --- Herdsman daily wage per animal, by animalTypeIndex (reproduced EXACTLY from legacy
---- `AIAnimalManager.ANIMAL_TYPE_TO_WAGE`; M-Tick open item 3 resolved -> reproduce). Keyed
+--- `AIAnimalManager.ANIMAL_TYPE_TO_WAGE` (removed 1.3.2.0); M-Tick open item 3 resolved -> reproduce). Keyed
 --- by the runtime AnimalType.* index so it matches `husbandry.animalTypeIndex`. A type
 --- absent from this table falls back to DEFAULT_WAGE (legacy `... or 5`).
 local DEFAULT_WAGE = 5
@@ -145,7 +146,7 @@ local WAGE_BY_NAME = { COW = 20, SHEEP = 12.5, PIG = 10, HORSE = 25, CHICKEN = 2
 --- index->wage table is built at RUNTIME (first call), NOT at module load: in-game `AnimalType`
 --- is not yet populated when this module is sourced (SECTION 11i), so a load-time build keys
 --- off nil and every wage collapses to DEFAULT_WAGE. Legacy builds it inside
---- `AIAnimalManager.new()` (runtime) for the same reason. We memoize, but only cache once
+--- `AIAnimalManager.new()` (runtime, removed 1.3.2.0) for the same reason. We memoize, but only cache once
 --- `AnimalType` is actually populated, so a too-early call retries instead of poisoning the cache.
 ---@param animalTypeIndex any
 ---@return number wage rate
@@ -303,7 +304,7 @@ local function validateBuyBudget(rule, params)
     return t, b.fixed, b.percentage, false
 end
 
---- Reproduce the per-animal alphabetical-naming cursor walk in `AIAnimalManager:onDayChanged`'s naming leg
+--- Reproduce the per-animal alphabetical-naming cursor walk in `AIAnimalManager:onDayChanged`'s naming leg (removed 1.3.2.0)
 --- on a sorted name list, given the incoming cursor (already normalized "" -> nil by the
 --- caller). Returns the assigned name AND the advanced cursor; `names` is guaranteed non-empty
 --- by the caller (an empty gender list is a caller-side skip, never reaches here).
@@ -620,7 +621,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
     --- Real per-animal price: the REAL getSellPrice scaled by the caller's markup - SELL_MARKUP
     --- for the sell leg, the active dealer-quality `ctx.buyMarkup` for the buy leg - plus the
     --- REAL transport fee, which is ADDED for both legs. The SAME calls as legacy
-    --- AIAnimalManager:onDayChanged (mutation parity), no mock, no re-derivation. Caller
+    --- AIAnimalManager:onDayChanged (removed 1.3.2.0; mutation parity), no mock, no re-derivation. Caller
     --- guarantees `animalSystem` is usable (sell/buy fail closed when it is missing).
     ---@param animal table
     ---@param markup number
@@ -1149,7 +1150,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
             end
 
         elseif op == "castrate" then
-            -- Castrate (legacy `AIAnimalManager:onDayChanged`'s castrate leg): owned-herd, no cap,
+            -- Castrate (legacy `AIAnimalManager:onDayChanged`'s castrate leg, removed 1.3.2.0): owned-herd, no cap,
             -- no sort, sequential.
             -- The husbandry resolve AND the animal-type gate both live in the shared
             -- `resolveGatedHusbandry` (resolve first -> malformed skip + WARN, then gate -> per-target
@@ -1205,7 +1206,7 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
             end
 
         elseif op == "naming" then
-            -- Naming (legacy `AIAnimalManager:onDayChanged`'s naming leg): owned-herd, no filter
+            -- Naming (legacy `AIAnimalManager:onDayChanged`'s naming leg, removed 1.3.2.0): owned-herd, no filter
             -- (selects ALL remaining), narrowed to unnamed-only (exact ~= "" - a whitespace-only
             -- name counts as named).
             -- No cap, no mark. Needs the real name system (DI) for getNamesAlphabetical; a missing one
@@ -1306,8 +1307,8 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
             end
 
         elseif op == "ai" then
-            -- AI / insemination (legacy `AIAnimalManager:onDayChanged`'s AI leg). Owned-herd,
-            -- non-end-task, the LAST op. Ritter-locked genetics-first deviation: legacy assigns
+            -- AI / insemination (legacy `AIAnimalManager:onDayChanged`'s AI leg, removed 1.3.2.0). Owned-herd,
+            -- non-end-task, the LAST op. Deliberate genetics-first deviation: legacy assigns
             -- scarce straws during shortlist build in nondeterministic `pairs` order BEFORE the
             -- genetics sort, during its shortlist build; this planner collects compatible dewars straw-IGNORANT,
             -- sorts candidates genetics-desc FIRST, then greedily assigns scarce straws best-first

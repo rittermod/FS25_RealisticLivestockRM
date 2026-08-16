@@ -185,7 +185,7 @@ end
 --- server. Preserve the two-producer asymmetry (do NOT unify): the DIALOG caller
 --- (AnimalAIDialog:onClickOk) pre-mutates local dewar + animal and calls this with NO
 --- sendLocal (so a listen-server host never runs run() locally - the pre-mutation is its
---- sole apply); the HERDSMAN caller (RLHerdsmanExecutor._doAi / legacy AIAnimalManager)
+--- sole apply); the HERDSMAN caller (RLHerdsmanExecutor._doAi / legacy AIAnimalManager, removed 1.3.2.0)
 --- does NOT pre-mutate and broadcasts with sendLocal=true, applying server-side through
 --- the loopback client branch.
 ---@param object table Husbandry placeable

@@ -920,7 +920,6 @@
 		<text name="rl_menu_herdsman_default_name" text="New rule"/>
 		<text name="rl_menu_herdsman_duplicate_suffix" text=" (copy)"/>
 		<text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copy %d)"/>
-		<text name="rl_menu_herdsman_legacy_banner" text="Legacy herdsman tasks are still active. Disable them on the animal screen to avoid double execution."/>
 		<!-- Filter condition editor (English fallback) -->
 		<text name="rl_menu_filters_add_condition" text="Add condition"/>
 		<text name="rl_menu_filters_add_group_button" text="Add group"/>

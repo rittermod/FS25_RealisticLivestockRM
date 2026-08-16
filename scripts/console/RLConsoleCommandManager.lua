@@ -598,7 +598,7 @@ function RLConsoleCommandManager:createHerdsmanRules()
 	-- list to render; F4's filter summary will read "missing" until pointed at one.
 	local filterId = "rlHerdsmanDev_filter"
 	-- Per-operation params mirror the legacy AIAnimalManager defaults
-	-- (AIAnimalManager.new) so the rules pass RLHerdsmanRuleSerialization's
+	-- (AIAnimalManager.new, removed 1.3.2.0) so the rules pass RLHerdsmanRuleSerialization's
 	-- PARAMS_CODECS completeness gate and actually persist - the service validity
 	-- floor accepts empty params, but saveToXMLFile skips incomplete ones.
 	-- enabled=false keeps them inert regardless.

@@ -2,7 +2,7 @@
 -- M-Tick T5 - the player-notification readout for the new rule-driven herdsman
 -- day-tick. T3 (RLHerdsmanExecutor.executeActions) applies the planned mutations and returns a
 -- per-action summary.results but, by decision 1a, emits NO notifications. Legacy
--- AIAnimalManager:onDayChanged surfaced every executed/marked op as an AI_MANAGER_* message via
+-- AIAnimalManager:onDayChanged (removed 1.3.2.0) surfaced every executed/marked op as an AI_MANAGER_* message via
 -- husbandry:addRLMessage per husbandry. This module restores
 -- that readout (the SAME AI_MANAGER_* ids + args legacy used, per executed/marked op), driven off
 -- summary.results instead of re-deriving it. Parity is on the id/args mapping, NOT a byte-identical
@@ -23,7 +23,7 @@
 --     the addRLMessageDirect chokepoint's incremental broadcast), and logs every emission
 --     decision + skip cause.
 --
--- Parity anchor: AIAnimalManager:onDayChanged - its per-operation emission legs (the SELL / BUY /
+-- Parity anchor: AIAnimalManager:onDayChanged (removed 1.3.2.0) - its per-operation emission legs (the SELL / BUY /
 -- CASTRATE / NAMING / AI sections) each do `husbandry:addRLMessage(id, nil, args)` for the local
 -- sink. Both this module and legacy now rely on the addRLMessageDirect chokepoint to broadcast each
 -- server-added message to connected clients (one incremental HusbandryMessageAddEvent per message,
@@ -51,7 +51,7 @@ RLHerdsmanMessages = {}
 local LOG_PREFIX = "[herdsmanMessages]"
 
 --- operation -> the AI_MANAGER_* id families. sell/buy/castrate/naming/ai mirror the ids
---- AIAnimalManager:onDayChanged emits; move and horseCare follow the SAME count-only shape but are
+--- AIAnimalManager:onDayChanged (removed 1.3.2.0) emits; move and horseCare follow the SAME count-only shape but are
 --- net-new (the legacy day-tick emits neither). `exec` is the executed-op family (and, for sell/buy,
 --- carries the money amount field name; move and horseCare are count-only, no amountField); `mark` is
 --- the mark-mode family (count-only; nil for buy/naming/horseCare, which have no mark family - T3
@@ -116,7 +116,7 @@ end
 --- placeable:addRLMessage forwards to PlaceableHusbandryAnimals:addRLMessageDirect, which
 --- tostring-coerces its args IN PLACE; the wire record must keep its own pristine args table, so
 --- the two sinks must never share one - exactly as
---- AIAnimalManager:onDayChanged builds two separate arg literals per op. (In SUMMARY mode the
+--- AIAnimalManager:onDayChanged (removed 1.3.2.0) builds two separate arg literals per op. (In SUMMARY mode the
 --- aggregator buckets the message and never calls addRLMessageDirect, so the copy is a harmless
 --- no-op there; the copy is load-bearing only on the individual-mode path.)
 ---@param args table

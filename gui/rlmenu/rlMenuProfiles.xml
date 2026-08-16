@@ -638,25 +638,6 @@
         <textAlignment value="left"/>
     </Profile>
 
-    <!--
-        Legacy-active coexistence banner: a fixed-text caution shown in the header, directly
-        below the Herdsman title, while legacy herdsman tasks are still enabled on a husbandry
-        (the migration-window double-execution hazard). Orange ($preset_colorOrange) reads as a
-        caution without the red "error" weight. Hidden by default; RLMenuHerdsmanFrame:refreshBanner
-        toggles it. x matches the title inset; y is a first guess tuned by the onFrameOpen
-        measurement log, not eyeballed.
-    -->
-    <Profile name="rl_herdsmanLegacyBanner" extends="fs25_textDefault" with="anchorTopLeft pivotTopLeft">
-        <size value="1400px 26px"/>
-        <position value="100px -58px"/>
-        <textSize value="19px"/>
-        <textBold value="true"/>
-        <textColor value="$preset_colorOrange"/>
-        <textAlignment value="left"/>
-        <textUpperCase value="false"/>
-        <visible value="false"/>
-    </Profile>
-
     <!-- Per-row help line for the herdsman rule editor (RLMenuHerdsmanFrame). Lives as a
          child of each row's value WIDGET (the legacy rl_aiTooltip home in AnimalScreen.xml), NOT the
          row container (which clips to its bounds). Extends the base tooltip profile and overrides

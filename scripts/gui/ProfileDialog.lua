@@ -52,25 +52,19 @@ function ProfileDialog.createFromExistingGui(gui, _)
 end
 
 
+--- Deliberate no-op: the legacy named-profile store is no longer read.
+---
+--- This runs at BOOT (`register()` -> `new()` -> here) on every load, so it must not
+--- reach the retired per-husbandry manager those stored records described. Emptying the
+--- body rather than guarding it is what leaves that type unreferenced in this file.
+---
+--- `modSettings/<mod>/aiManagerProfiles.xml` is left on disk, unread and unwritten. That
+--- guarantee rests on `saveProfiles` being unreachable, not on it being safe: with `profiles`
+--- permanently empty, a reach through `onClickSave` would rewrite the user's file holding only
+--- the one profile just added, dropping every stored record. Two show paths exist - the dormant
+--- monolith and `createFromExistingGui` below - and both are armed by `RLLegacyTripwire`, so a
+--- reach fires loudly before it writes.
 function ProfileDialog:loadProfiles()
-
-    local xmlFile = XMLFile.loadIfExists("aiManagerProfiles", modSettingsDirectory .. "aiManagerProfiles.xml")
-
-    if xmlFile == nil then return end
-
-    xmlFile:iterate("profiles.profile", function(_, key)
-
-        local name = xmlFile:getString(key .. "#profileName")
-        local manager = AIAnimalManager.new()
-        manager.isProfile = true
-        manager:loadFromXMLFile(xmlFile, key)
-
-        self.profiles[name] = manager
-
-    end)
-
-    xmlFile:delete()
-
 end
 
 

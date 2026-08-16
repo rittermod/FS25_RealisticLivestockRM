@@ -1018,6 +1018,5 @@
 		<text name="rl_menu_herdsman_default_name" text="New task"/>
 		<text name="rl_menu_herdsman_duplicate_suffix" text=" (copy)"/>
 		<text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copy %d)"/>
-		<text name="rl_menu_herdsman_legacy_banner" text="Legacy herdsman tasks are still active. Disable them on the animal screen to avoid double execution."/>
 	</texts>
 </l10n>

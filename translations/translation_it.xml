@@ -900,7 +900,6 @@
 		<text name="rl_menu_herdsman_default_name" text="Nuova regola"/>
 		<text name="rl_menu_herdsman_duplicate_suffix" text=" (copia)"/>
 		<text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copia %d)"/>
-		<text name="rl_menu_herdsman_legacy_banner" text="Le vecchie attività del mandriano sono ancora attive. Disabilitale nella schermata animali per evitare una doppia esecuzione."/>
 		<!-- Filter condition editor (English fallback) -->
 		<text name="rl_menu_filters_add_condition" text="Aggiungi condizione"/>
 		<text name="rl_menu_filters_add_group_button" text="Aggiungi gruppo"/>

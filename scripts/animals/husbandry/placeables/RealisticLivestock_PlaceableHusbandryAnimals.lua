@@ -16,7 +16,6 @@ function RealisticLivestock_PlaceableHusbandryAnimals.registerFunctions(placeabl
 	SpecializationUtil.registerFunction(placeable, "deleteRLMessage", PlaceableHusbandryAnimals.deleteRLMessage)
 	SpecializationUtil.registerFunction(placeable, "getNextRLMessageUniqueId", PlaceableHusbandryAnimals.getNextRLMessageUniqueId)
 	SpecializationUtil.registerFunction(placeable, "setNextRLMessageUniqueId", PlaceableHusbandryAnimals.setNextRLMessageUniqueId)
-	SpecializationUtil.registerFunction(placeable, "getAIManager", PlaceableHusbandryAnimals.getAIManager)
 	SpecializationUtil.registerFunction(placeable, "_flushPenDayChange", PlaceableHusbandryAnimals._flushPenDayChange)
 end
 
@@ -180,8 +179,6 @@ function RealisticLivestock_PlaceableHusbandryAnimals:saveToXMLFile(xmlFile, key
 
     end
 
-    spec.aiAnimalManager:saveToXMLFile(xmlFile, key)
-
 end
 
 PlaceableHusbandryAnimals.saveToXMLFile = Utils.prependedFunction(PlaceableHusbandryAnimals.saveToXMLFile, RealisticLivestock_PlaceableHusbandryAnimals.saveToXMLFile)
@@ -217,27 +214,13 @@ function RealisticLivestock_PlaceableHusbandryAnimals:loadFromXMLFile(xmlFile, k
 
     spec.unreadMessages = xmlFile:getBool(key .. ".messages#unreadMessages", false)
 
-    spec.aiAnimalManager:loadFromXMLFile(xmlFile, key)
-
 end
 
 PlaceableHusbandryAnimals.loadFromXMLFile = Utils.prependedFunction(PlaceableHusbandryAnimals.loadFromXMLFile, RealisticLivestock_PlaceableHusbandryAnimals.loadFromXMLFile)
 
 
-function PlaceableHusbandryAnimals:getAIManager()
-
-    local spec = self.spec_husbandryAnimals
-
-    if spec.aiAnimalManager == nil then spec.aiAnimalManager = AIAnimalManager.new(self) end
-
-    return spec.aiAnimalManager
-
-end
-
-
 function RealisticLivestock_PlaceableHusbandryAnimals:onLoad()
 
-    self.spec_husbandryAnimals.aiAnimalManager = AIAnimalManager.new(self, self.isServer)
     RLMapBridge.onHusbandryLoad(self)
 
 end
@@ -375,11 +358,6 @@ function PlaceableHusbandryAnimals:_flushPenDayChange(spec, totalChildren, total
 end
 
 
--- Module-scope latch so the legacy-herdsman freeze announces itself once per session
--- (resets each map load = each source()). See AIAnimalManager.FREEZE_LEGACY_HERDSMAN.
-local freezeAnnounced = false
-
-
 function RealisticLivestock_PlaceableHusbandryAnimals:onDayChanged()
     RmSafeUtils.safeCall("PlaceableHusbandryAnimals:onDayChanged", function()
 
@@ -498,16 +476,6 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onDayChanged()
 
                 end
 
-            end
-
-            if not AIAnimalManager.FREEZE_LEGACY_HERDSMAN then
-                spec.aiAnimalManager:onDayChanged()
-            else
-                if not freezeAnnounced then
-                    freezeAnnounced = true
-                    Log:debug("legacy-herdsman-freeze: AIAnimalManager legacy day-tick frozen; skipping legacy buy/sell/castrate/name/AI and wage on all pens this session")
-                end
-                Log:trace("legacy-herdsman-freeze: skipped legacy onDayChanged for pen '%s'", tostring(self.getName and self:getName() or self))
             end
 
         end

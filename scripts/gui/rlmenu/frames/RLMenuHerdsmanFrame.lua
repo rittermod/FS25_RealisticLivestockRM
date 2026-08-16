@@ -293,9 +293,6 @@ function RLMenuHerdsmanFrame:onGuiSetupFinished()
     self.ruleEditorContainer = self:getDescendantById("ruleEditorContainer")
     self.rulesEmptyState     = self:getDescendantById("rulesEmptyState")
     self.headerPanel         = self:getDescendantById("headerPanel")
-    -- Legacy-active coexistence banner (D13): a fixed-text warning in the header, below the
-    -- title. Hidden by default; refreshBanner toggles it. nil until the XML element ships.
-    self.legacyBanner        = self:getDescendantById("legacyBanner")
 
     -- Editor layout + empty-state (toggled together: a selection shows the layout,
     -- no selection shows the empty text).
@@ -529,7 +526,6 @@ function RLMenuHerdsmanFrame:onFrameOpen()
     self:updateEmptyState()
     self:selectInitialRule()
     self:updateButtonVisibility()
-    self:refreshBanner(farmId)
 
     if self.rulesList ~= nil then
         FocusManager:setFocus(self.rulesList)
@@ -604,16 +600,6 @@ function RLMenuHerdsmanFrame:logLayoutMeasurements()
             self.headerPanel.absPosition[2] * g_referenceScreenHeight)
     end
 
-    -- Banner placement verification (it sits in the header, below the title): log its size +
-    -- top edge so the orange caution's position is provable from the log, not eyeballed. Only
-    -- meaningful when the banner is visible (enable a legacy op to surface it for measurement).
-    if self.legacyBanner ~= nil and self.legacyBanner.absPosition ~= nil and self.legacyBanner.size ~= nil then
-        Log:debug("RLMenuHerdsmanFrame: legacyBanner measured: %.1fpx x %.1fpx, top=%.1fpx, visible=%s",
-            (self.legacyBanner.size[1] or 0) * g_referenceScreenWidth,
-            (self.legacyBanner.size[2] or 0) * g_referenceScreenHeight,
-            ((self.legacyBanner.absPosition[2] or 0) + (self.legacyBanner.size[2] or 0)) * g_referenceScreenHeight,
-            tostring(self.legacyBanner.getIsVisible ~= nil and self.legacyBanner:getIsVisible()))
-    end
     return true
 end
 
@@ -2453,7 +2439,6 @@ function RLMenuHerdsmanFrame:refreshData()
 
     self:updateEmptyState()
     self:updateButtonVisibility()
-    self:refreshBanner(farmId)
 
     -- Tail the detail render so the right pane reflects the re-pinned selection (or the empty
     -- state when the selection was pruned). refreshRuleDetail re-applies the kept overlay.
@@ -2476,57 +2461,4 @@ function RLMenuHerdsmanFrame:refreshIfOpen()
     else
         Log:debug("RLMenuHerdsmanFrame:refreshIfOpen: frame closed, skipping")
     end
-end
-
--- =============================================================================
--- LEGACY-ACTIVE BANNER (read-only coexistence warning, D13)
--- =============================================================================
-
---- Read-only enumeration of the farm's live husbandries' legacy AI settings into the plain
---- `{ name, settings }` entries RLHerdsmanRulePresenter.isLegacyActive consumes. Every hop is
---- nil-guarded: a husbandry whose manager / getSettings is missing (unloaded placeable)
---- contributes nothing. getAIManager returns the manager built at onLoad (no save/sync side
---- effect); getSettings() (no arg) returns the whole per-op `settings` table keyed by operation.
---- @param farmId number|nil
---- @return table entries array of { name = string, settings = table }
-function RLMenuHerdsmanFrame:gatherLegacyEntries(farmId)
-    local entries = {}
-    if farmId == nil or farmId == 0 then return entries end
-    local husbandries = RLAnimalQuery.listHusbandriesForFarm(farmId)
-    for i, h in ipairs(husbandries) do
-        local settings = nil
-        if h ~= nil and h.getAIManager ~= nil then
-            local mgr = h:getAIManager()
-            if mgr ~= nil and mgr.getSettings ~= nil then
-                settings = mgr:getSettings()
-            end
-        end
-        if type(settings) == "table" then
-            entries[#entries + 1] = { name = RLAnimalQuery.formatHusbandryLabel(h, i), settings = settings }
-        end
-    end
-    return entries
-end
-
---- Re-evaluate + toggle the fixed-text legacy-active banner. Gathers the read-only legacy
---- entries for the given farm, asks the pure RLHerdsmanRulePresenter.isLegacyActive, and
---- setVisible the banner. The caller passes the SAME farmId it read for the rule list so the
---- banner and the list never disagree within one refresh (resolves it itself only if omitted).
---- Best-effort: re-evaluated on frame open + rule/filter refresh only, and AIAnimalManager has
---- no read/writeStream, so a client reflects savegame-loaded legacy state (not an in-session
---- server toggle).
---- @param farmId number|nil owning farm id (resolved from the current farm when nil)
-function RLMenuHerdsmanFrame:refreshBanner(farmId)
-    if self.legacyBanner == nil then return end
-    if AIAnimalManager.FREEZE_LEGACY_HERDSMAN then
-        self.legacyBanner:setVisible(false)
-        Log:trace("RLMenuHerdsmanFrame:refreshBanner: legacy-herdsman-freeze active; banner hidden")
-        return
-    end
-    if farmId == nil then farmId = RLAnimalInfoService.getCurrentFarmId() end
-    local entries = self:gatherLegacyEntries(farmId)
-    local active, affectedNames = RLHerdsmanRulePresenter.isLegacyActive(entries)
-    self.legacyBanner:setVisible(active == true)
-    Log:debug("RLMenuHerdsmanFrame:refreshBanner: farmId=%s entries=%d active=%s affected=%d",
-        tostring(farmId), #entries, tostring(active), #affectedNames)
 end

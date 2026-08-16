@@ -21,10 +21,9 @@
 -- from the handler's `if g_server == nil then return end` early-return. A dedicated server has
 -- g_server, so dedis ARE ticked; clients register an inert listener.
 --
--- The legacy AIAnimalManager tick and the legacy wage hook
--- (RealisticLivestock_FSBaseMission:onDayChanged) are FROZEN behind
--- AIAnimalManager.FREEZE_LEGACY_HERDSMAN - neither runs, so this tick is the only herdsman
--- automation. T3 OWNS the MoneyType.HERDSMAN_WAGES deduction (one addMoney per farm); T4 NEVER
+-- There is no legacy per-pen herdsman tick and no separate wage hook, so this tick is the only
+-- herdsman automation and the only path that charges for it.
+-- T3 OWNS the MoneyType.HERDSMAN_WAGES deduction (one addMoney per farm); T4 NEVER
 -- re-deducts - it only LOGS summary.wageByFarm at DEBUG. Player/GUI wage surfacing is T5.
 --
 -- env contract (subscriber builds it from g_*; tests inject fakes - RAW engine shapes in,
@@ -61,9 +60,9 @@
 --     } },
 --   }
 --
--- Parity anchors in AIAnimalManager:onDayChanged: the per-operation clear-stale-marks legs (sell /
+-- Parity anchors in AIAnimalManager:onDayChanged (removed 1.3.2.0): the per-operation clear-stale-marks legs (sell /
 -- castrate / ai) + their enabled/maxAnimals op gates; the dealer pool + its reserved exclusion; the
--- dewar source. Wage hook + farm loop: RealisticLivestock_FSBaseMission:onDayChanged. The spectator
+-- dewar source. Wage + farm loop now live in this tick and RLHerdsmanExecutor. The spectator
 -- farm (FarmManager.SPECTATOR_FARM_ID) is skipped before any gather.
 
 local Log = RmLogging.getLogger("RLRM")
@@ -79,7 +78,7 @@ RLHerdsmanDayTick = {}
 local LOG_PREFIX = "[herdsmanTick]"
 
 --- operation -> the AI_MANAGER_* mark the clear-stale pass clears (mirrors AIAnimalManager's
---- per-operation clear-stale legs). buy + naming carry no clearable op mark.
+--- per-operation clear-stale legs, removed 1.3.2.0). buy + naming carry no clearable op mark.
 local MARK_BY_OPERATION = {
     sell     = "AI_MANAGER_SELL",
     castrate = "AI_MANAGER_CASTRATE",
@@ -161,7 +160,7 @@ local function clearStaleMarks(enabledRules, husbandriesById, server)
                 else
                     for _, animal in pairs(placeable:getClusters()) do
                         RmSafeUtils.safeAnimalCall(animal, "RLHerdsmanDayTick:clearStaleMark", function()
-                            -- Mirror legacy's gate (AIAnimalManager's clear-stale legs): only clear a set mark.
+                            -- Mirror legacy's gate (AIAnimalManager's clear-stale legs, removed 1.3.2.0): only clear a set mark.
                             if animal:getMarked(markKey) then
                                 animal:setMarked(markKey, false)
                                 -- MP sync: broadcast WITHOUT sendLocal. AnimalMarkEvent:run applies setMarked on
@@ -209,8 +208,11 @@ local function buildPlannerCtx(farm, husbandriesById, env)
             -- getAnimalTypeIndex/getClusters above; the subscriber's safeCall wrap is the isolation boundary.
             freeSlots = placeable:getNumOfFreeAnimalSlots(),
         }
-        -- Reserved-exclusion is parity-critical (legacy AIAnimalManager claims dealer animals
-        -- via animal.reserved). Memoized across same-type husbandries on this farm.
+        -- Reserved-exclusion: nothing sets `animal.reserved` TRUE any more, so this filter
+        -- removes nothing. `AnimalSystem:onDayChanged` still clears it to false on every dealer
+        -- animal daily, which is the only remaining writer - do not read that as a producer.
+        -- Kept as a cheap guard in case a reservation producer returns; removing it is a
+        -- deliberate call, not a tidy-up. Memoized across same-type husbandries on this farm.
         if dealerAnimalsByType[typeIndex] == nil then
             local pool = {}
             for _, animal in pairs(env.rawDealerAnimals(typeIndex)) do
@@ -383,7 +385,7 @@ function RLHerdsmanDayTick.run(env)
                 end
 
                 -- T5 OWNS this hook: surface the executed/marked ops as player messages -
-                -- the parity readout legacy AIAnimalManager:onDayChanged emitted. T4's frozen contract
+                -- the parity readout legacy AIAnimalManager:onDayChanged (removed 1.3.2.0) emitted. T4's frozen contract
                 -- had no message seam; execCtx (carrying husbandryPlaceablesById - the SAME placeable
                 -- handles T3 dispatched its events against) is in scope right here, after executeActions.
                 RLHerdsmanMessages.emit(summary, execCtx)

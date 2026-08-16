@@ -1,7 +1,7 @@
 -- RLHerdsmanExecutor.lua
 -- M-Tick T3 - the in-game executor wall. Turns the pure plan from
 -- RLHerdsmanPlanner.planActions (T1/T2) into the SAME mutations legacy
--- AIAnimalManager:onDayChanged performs (MUTATION PARITY): it dispatches the SAME
+-- AIAnimalManager:onDayChanged (removed 1.3.2.0) performs (MUTATION PARITY): it dispatches the SAME
 -- events (AIAnimalSellEvent / AIAnimalBuyEvent / AIAnimalInseminationEvent), applies
 -- castrate + naming as direct server-side field writes AND broadcasts AnimalCastrateEvent /
 -- AnimalNameChangeEvent per animal (caller-mutates-first, no sendLocal) so those writes sync
@@ -72,15 +72,14 @@
 --   leg whose animals ALL skip membership reports skipReason="not-in-husbandry" (count 0); a mark
 --   leg whose animals all skip keeps skipReason="mark-mode" (its identity is load-bearing for T5).
 --
--- Parity anchors in AIAnimalManager:onDayChanged: Sell broadcast / Buy broadcast /
+-- Parity anchors in AIAnimalManager:onDayChanged (removed 1.3.2.0): Sell broadcast / Buy broadcast /
 -- Castrate field writes + event / Naming walk + event / AI broadcast; wage in
--- RealisticLivestock_FSBaseMission:onDayChanged. T3 SETS marks for mark-mode; clear-stale
+-- this executor's own wage leg. T3 SETS marks for mark-mode; clear-stale
 -- is T4.
 --
 -- T3 wires NO MessageCenter subscription and NO day-tick hook of its own - RLHerdsmanDayTick
--- (T4) is the only caller. The legacy AIAnimalManager tick is frozen behind
--- AIAnimalManager.FREEZE_LEGACY_HERDSMAN, so this executor is the only dispatch and the only
--- HERDSMAN_WAGES charge.
+-- (T4) is the only caller. No legacy herdsman tick exists, so this executor is the only dispatch
+-- and the only HERDSMAN_WAGES charge.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -245,7 +244,7 @@ end
 -- =============================================================================
 
 --- Apply the planned actions in-game (server-only), mirroring legacy
---- AIAnimalManager:onDayChanged. Per action: dispatch the SAME event legacy does (sell /
+--- AIAnimalManager:onDayChanged (removed 1.3.2.0). Per action: dispatch the SAME event legacy does (sell /
 --- buy / ai), apply castrate + naming directly THEN broadcast AnimalCastrateEvent /
 --- AnimalNameChangeEvent per animal so clients sync, OR set the AI_MANAGER_* mark for
 --- a mark-mode action AND broadcast AnimalMarkEvent per animal so the mark syncs to clients;
@@ -297,7 +296,7 @@ function RLHerdsmanExecutor.executeActions(plan, ctx)
     end
 
     -- One HERDSMAN_WAGES deduction per farm with a positive accrued wage (parity with
-    -- RealisticLivestock_FSBaseMission:onDayChanged), in first-seen plan order.
+    -- this executor's own wage leg), in first-seen plan order.
     for _, farmId in ipairs(wageFarmOrder) do
         local wage = summary.wageByFarm[farmId]
         if wage ~= nil and wage > 0 then

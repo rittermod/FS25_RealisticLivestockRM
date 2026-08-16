@@ -941,7 +941,6 @@
 		<text name="rl_menu_herdsman_default_name" text="Nouvelle règle"/>
 		<text name="rl_menu_herdsman_duplicate_suffix" text=" (copie)"/>
 		<text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copie %d)"/>
-		<text name="rl_menu_herdsman_legacy_banner" text="Les tâches héritées du berger sont toujours actives. Désactivez-les sur l'écran des animaux pour éviter une exécution en double."/>
 		<!-- Filter condition editor (English fallback) -->
 		<text name="rl_menu_filters_add_condition" text="Ajouter une condition"/>
 		<text name="rl_menu_filters_add_group_button" text="Ajouter un groupe"/>

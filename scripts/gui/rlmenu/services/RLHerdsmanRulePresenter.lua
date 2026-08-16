@@ -54,7 +54,7 @@ end
 local PARAM_KEYS = { "filter", "maxAnimals", "budget", "mark", "convention", "previous", "semen", "destination" }
 
 --- operation -> set of VISIBLE detail-pane params (true). Grounded in the
---- legacy-parity matrix (AIAnimalManager.new settings defaults): Sell maxAnimals+mark;
+--- legacy-parity matrix (AIAnimalManager.new settings defaults, removed 1.3.2.0): Sell maxAnimals+mark;
 --- Move maxAnimals+mark+destination; Buy budget+maxAnimals; Castrate mark (no cap);
 --- Naming convention+previous (no filter, no cap); AI maxAnimals+mark+semen; Horse care
 --- filter only. `filter` shows for every operation except naming. Params absent from a set
@@ -1175,49 +1175,6 @@ function RLHerdsmanRulePresenter.getFilterSummary(filterId, resolveFilter, label
 
     Log:trace("RLHerdsmanRulePresenter.getFilterSummary: filterId=%s -> '%s'", tostring(filterId), filter.name)
     return filter.name
-end
-
--- =============================================================================
--- Legacy-active banner (D13)
--- =============================================================================
-
---- Coexistence banner predicate (D13). Read-only over the legacy per-husbandry AI
---- settings: a husbandry is "legacy active" when ANY of its five operations is
---- `enabled == true`. Returns `(active, affectedNames)` where affectedNames lists, in
---- input order, the names of husbandries with >= 1 enabled operation. nil / non-table
---- entries -> `(false, {})`; a missing `settings` table or operation entry -> treated
---- as not-enabled. Read-only: never reorders or "fixes" legacy execution.
----@param entries table|nil array of `{ name = string, settings = { buy = { enabled }, sell = ..., castrate = ..., naming = ..., ai = ... } }`
----@return boolean active true when any husbandry has any enabled legacy operation
----@return table affectedNames string[] of names with >= 1 enabled operation (input order)
-function RLHerdsmanRulePresenter.isLegacyActive(entries)
-    local active = false
-    local affectedNames = {}
-    if type(entries) ~= "table" then
-        Log:trace("RLHerdsmanRulePresenter.isLegacyActive: nil/non-table entries -> false")
-        return false, affectedNames
-    end
-
-    for _, entry in ipairs(entries) do
-        local settings = type(entry) == "table" and entry.settings or nil
-        local entryActive = false
-        if type(settings) == "table" then
-            for _, op in ipairs(RLHerdsmanRulePresenter.OPERATION_ORDER) do
-                local opSettings = settings[op]
-                if type(opSettings) == "table" and opSettings.enabled == true then
-                    entryActive = true
-                    break
-                end
-            end
-        end
-        if entryActive then
-            active = true
-            affectedNames[#affectedNames + 1] = entry.name
-        end
-    end
-
-    Log:trace("RLHerdsmanRulePresenter.isLegacyActive: active=%s affected=%d", tostring(active), #affectedNames)
-    return active, affectedNames
 end
 
 -- =============================================================================
