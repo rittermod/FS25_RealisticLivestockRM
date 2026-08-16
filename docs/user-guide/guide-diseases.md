@@ -57,7 +57,8 @@ everywhere else:
 
 - **Cured animals.** After recovery the disease stays listed as "Immune" while the immunity
   countdown runs (12 or 24 months depending on the disease). The animal sits in its normal
-  breed section, carries no status icon, and matches the "Healthy" filter.
+  breed section, carries no status icon, and matches the "Healthy" filter. A recovered animal
+  also stops spreading the disease, so an outbreak burns itself out as the survivors build up.
 - **CVM carriers.** A carrier cow keeps its CVM entry for life, but it is not sick - it sits in
   its normal section and matches "Healthy" too. It does carry the grey DNA icon, so you can spot
   carriers from the list rather than opening each detail panel.
@@ -258,7 +259,7 @@ Avian Flu is the fastest-spreading disease and has **no treatment**. Infected ch
 | After 1 month | Much lower - risk drops sharply once past the first month |
 | Recovered (immune) | **None** for the 24-month immunity |
 
-*The first two rows apply while a bird is still infected. Recovery usually arrives after about a month, though some birds stay sick longer. A recovered bird can neither catch nor die of avian flu while its immunity lasts; once that immunity lapses it can be infected again.*
+*The first two rows apply while a bird is still infected. Recovery usually arrives after about a month, though some birds stay sick longer. A recovered bird can neither catch nor die of avian flu while its immunity lasts, and no longer spreads it to the flock; once that immunity lapses it can be infected again.*
 
 ### Why Avian Flu Is Dangerous
 
@@ -273,7 +274,7 @@ Avian Flu is the fastest-spreading disease and has **no treatment**. Infected ch
 - There is no treatment - prevention is the only strategy
 - Sell infected birds quickly to limit spread and recover some value
 - Keep smaller flocks in separate pens to limit outbreak damage
-- Survivors gain 24-month immunity - while it lasts they can neither catch avian flu again nor die of it, though birds hatched or bought later have no such protection
+- Survivors gain 24-month immunity - while it lasts they cannot catch avian flu again, cannot die of it, and no longer spread it to the rest of the flock, though birds hatched or bought later have no such protection
 - Chickens that survive gain immunity and will be your most valuable layers
 
 ---

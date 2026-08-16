@@ -570,7 +570,7 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onPeriodChanged(_)
             if totalTreatmentCost > 0 then g_currentMission:addMoneyChange(totalTreatmentCost, self.spec_husbandryAnimals:getOwnerFarmId(), MoneyType.MEDICINE, true) end
 
             if RealisticLivestock.testAnimalPrefix == nil then
-                g_diseaseManager:calculateTransmission(animals)
+                g_diseaseManager:calculateTransmission(animals, tostring(self.getName and self:getName() or self))
             end
 
         else
