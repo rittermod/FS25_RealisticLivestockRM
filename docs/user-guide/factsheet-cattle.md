@@ -246,8 +246,8 @@ Cattle almost always produce a single calf. Twins and triplets can happen, more 
 
 | Disease | Spread | Fatal? | Treatment | Impact on Cows |
 |---------|--------|--------|-----------|----------------|
-| **Mastitis** | Slowly | No | Quick, affordable | Stops all milk production |
-| **Foot & Mouth** | Moderately | Yes | Slow, moderate cost | Severe milk reduction, major price loss |
+| **Mastitis** | Slowly | No | 1 month, $200 | Stops all milk production |
+| **Foot & Mouth** | Moderately | Yes | 3 months, $250/mo ($750) | Severe milk reduction, major price loss |
 | **CVM** | Genetic only | Calves die | None | Carrier cows produce extra milk |
 
 *Mastitis only affects lactating cows. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*

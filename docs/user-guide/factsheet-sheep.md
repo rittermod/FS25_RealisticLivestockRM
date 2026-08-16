@@ -208,8 +208,8 @@ Sheep and goats usually produce twins - at every age, including first-time mothe
 
 | Disease | Spread | Fatal? | Treatment | Impact |
 |---------|--------|--------|-----------|--------|
-| **Mastitis** | Slowly | No | Quick, affordable | Stops goat milk (only lactating goats can catch it) |
-| **Foot & Mouth** | Moderately | Yes | Slow, moderate cost | Major price loss; slightly reduces wool/milk while sick |
+| **Mastitis** | Slowly | No | 1 month, $200 | Stops goat milk (only lactating goats can catch it) |
+| **Foot & Mouth** | Moderately | Yes | 3 months, $250/mo ($750) | Major price loss; slightly reduces wool/milk while sick |
 
 *Sheep never lactate, so mastitis only affects lactating goats, stopping their milk. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*
 

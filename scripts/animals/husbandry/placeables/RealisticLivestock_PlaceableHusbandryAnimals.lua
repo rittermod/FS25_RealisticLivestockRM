@@ -547,10 +547,38 @@ end
 PlaceableHusbandryAnimals.onDayChanged = Utils.overwrittenFunction(PlaceableHusbandryAnimals.onDayChanged, RealisticLivestock_PlaceableHusbandryAnimals.onDayChanged)
 
 
+--- Advance every animal in this pen by one month and bill the accumulated treatment fee.
+---
+--- Wired by `Utils.overwrittenFunction` and never calls its base: the per-animal model owns ageing
+--- and reproduction, so the cluster-level tick must not also run.
+---
+--- The fee is charged with `addMoney`, which is the call that moves a farm balance. `addMoneyChange`
+--- produces the HUD entry and the notification but leaves the balance untouched, so a cost billed
+--- through it is free. Passing `addChange` and `forceShowChange` keeps the player-visible half - one
+--- HUD entry plus its broadcast notification - alongside the balance movement.
+---
+--- The amount is NEGATED because the amount is signed and a cost must be negative; positive renders
+--- the charge to the player as income.
+---
+--- The charge is aggregated PER PEN, not per animal: a player treating six animals sees one money
+--- entry, which is what the DEBUG line below exists to reconcile against the animals that produced
+--- it.
+---
+--- The owner farm id is checked against the reserved ids before charging. `addMoney` refuses farm 0
+--- with an error plus a callstack rather than returning quietly, and farm 0 is REACHABLE - deleting
+--- a farm in multiplayer reassigns its placeables to the spectator farm, so a surviving pen holding
+--- a treated animal would emit two error lines every period forever. The test is on the ID, not on
+--- the lookup: resolving farm 0 returns the spectator farm OBJECT, non-nil, so a nil-check does not
+--- catch it.
+---@param _ function Overwritten-function predecessor; deliberately unused.
 function RealisticLivestock_PlaceableHusbandryAnimals:onPeriodChanged(_)
     RmSafeUtils.safeCall("PlaceableHusbandryAnimals:onPeriodChanged", function()
 
+        local penName = tostring(self.getName and self:getName() or self)
+
         if self.isServer then
+
+            Log:trace("onPeriodChanged [%s]: server branch - disease progression, treatment billing and transmission", penName)
 
             local animals = self.spec_husbandryAnimals.clusterSystem:getClusters()
             local totalTreatmentCost = 0
@@ -567,13 +595,32 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onPeriodChanged(_)
                 totalTreatmentCost = totalTreatmentCost + (treatmentCost or 0)
             end
 
-            if totalTreatmentCost > 0 then g_currentMission:addMoneyChange(totalTreatmentCost, self.spec_husbandryAnimals:getOwnerFarmId(), MoneyType.MEDICINE, true) end
+            if totalTreatmentCost > 0 then
+
+                local ownerFarmId = self.spec_husbandryAnimals:getOwnerFarmId()
+
+                if type(ownerFarmId) ~= "number" or ownerFarmId <= 0 or ownerFarmId > FarmManager.MAX_NUM_FARMS then
+                    Log:warning("onPeriodChanged [%s]: skipping treatment charge of %s - owner farm id %s is not a real farm",
+                        penName, tostring(totalTreatmentCost), tostring(ownerFarmId))
+                else
+                    g_currentMission:addMoney(0 - totalTreatmentCost, ownerFarmId, MoneyType.MEDICINE, true, true)
+                    Log:debug("onPeriodChanged [%s]: charged treatment fee %s to farmId=%s",
+                        penName, tostring(totalTreatmentCost), tostring(ownerFarmId))
+                end
+
+            else
+                Log:trace("onPeriodChanged [%s]: no treatment fee accrued this period", penName)
+            end
 
             if RealisticLivestock.testAnimalPrefix == nil then
-                g_diseaseManager:calculateTransmission(animals, tostring(self.getName and self:getName() or self))
+                g_diseaseManager:calculateTransmission(animals, penName)
+            else
+                Log:trace("onPeriodChanged [%s]: test-prefix run - skipping disease transmission", penName)
             end
 
         else
+
+            Log:trace("onPeriodChanged [%s]: client branch - recovery only, no billing or transmission", penName)
 
             -- MP client branch: recovery (monthsSinceLastBirth) is
             -- deterministic and unsynced, so a client advances it locally in
@@ -594,7 +641,7 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onPeriodChanged(_)
             end
 
             Log:debug("onPeriodChanged client recovery [%s]: advanced monthsSinceLastBirth for %d animal(s)",
-                tostring(self.getName and self:getName() or self), nAdvanced)
+                penName, nAdvanced)
 
         end
 

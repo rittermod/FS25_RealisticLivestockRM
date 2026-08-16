@@ -12,7 +12,7 @@ Realistic Livestock RM includes five diseases that can infect, spread between, a
 |---------|---------|--------|-------|-----------|-------------------|
 | **Mastitis** | Cow, Goat | Slow | No | Yes ($200) | Small reduction |
 | **CVM** | Cow only | Genetic | Almost always (calves) | No | Moderate reduction |
-| **Foot & Mouth** | Cow, Sheep, Goat, Pig | Moderate | Yes | Yes ($250) | Major reduction |
+| **Foot & Mouth** | Cow, Sheep, Goat, Pig | Moderate | Yes | Yes ($250/mo) | Major reduction |
 | **PED** | Pig only | Moderate | Devastating to newborns | Yes ($150) | Significant reduction |
 | **Avian Influenza** | Chicken only | Fast | Yes, high fatality | No | Severe reduction |
 
@@ -153,7 +153,7 @@ Foot & Mouth is the most widespread disease, affecting three species. It's moder
 |-----------|-------|
 | Spread | Moderate - noticeable risk to nearby animals |
 | Fatality | Moderate initially, decreasing as the animal builds resistance |
-| Treatment | $250, cured in 3 months |
+| Treatment | $250/month ($750 over 3 months) |
 | Natural recovery | None - requires treatment |
 | Immunity after recovery | 24 months |
 
@@ -180,6 +180,8 @@ Foot & Mouth is the most widespread disease, affecting three species. It's moder
 - Treat as soon as possible - the 3-month course is survivable, but it is not a guaranteed save, and
   starting it early is what decides the odds: an animal put on treatment as soon as it falls ill is
   roughly twice as likely to pull through as one left for six months first
+- Budget $750 per animal - the $250 is charged again at the start of each of the three months, not
+  once, so a whole-herd outbreak is expensive to treat your way out of
 - Treating still beats leaving it alone by a wide margin - an untreated animal is the one most likely
   to die
 - No natural recovery means untreated animals stay sick indefinitely

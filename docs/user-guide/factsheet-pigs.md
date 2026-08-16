@@ -160,8 +160,8 @@ Pig litters are the largest of any animal - typically around 12 piglets, and up 
 
 | Disease | Spread | Fatal? | Treatment | Impact |
 |---------|--------|--------|-----------|--------|
-| **Foot & Mouth** | Moderately | Yes | Slow, moderate cost | Major price loss |
-| **PED** | Moderately | Yes, devastating to newborns | Quick, affordable | Severe diarrhoea (liquid manure drastically increased, solid manure severely reduced) |
+| **Foot & Mouth** | Moderately | Yes | 3 months, $250/mo ($750) | Major price loss |
+| **PED** | Moderately | Yes, devastating to newborns | 1 month, $150 | Severe diarrhoea (liquid manure drastically increased, solid manure severely reduced) |
 
 > **PED warning:** Porcine Epidemic Diarrhoea is extremely fatal in newborn piglets. In a large herd, a PED outbreak can wipe out an entire generation of offspring. Older pigs rarely catch PED on their own, but any pig infected during an outbreak is in danger - treat quickly. See the [Disease Guide](guide-diseases.md).
 
