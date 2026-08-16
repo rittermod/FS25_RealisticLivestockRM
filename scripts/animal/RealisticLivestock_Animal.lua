@@ -1551,14 +1551,31 @@ function Animal:getHasName()
     return self.name ~= nil and self.name ~= ""
 end
 
+--- Detach the first record carrying `title`, silently.
+---
+--- Silence is the CONTRACT, not an omission: the player-facing cured notification belongs to
+--- whichever transition actually cures a record, and `Disease:onPeriodChanged` owns both of
+--- those sites. This function's only production caller is that same function's immunity-expiry
+--- branch, so anything announced from here would announce the END of protection rather than a
+--- cure. Do not restore a notification here.
+---
+--- Matching is by title and stops at the first hit, and the walk is unordered, so an animal
+--- carrying two records of one title loses an UNSPECIFIED one of them - not necessarily the
+--- one whose immunity expired. Pre-existing; stated so the next reader does not infer an
+--- ordering guarantee the walk does not give.
+---@param title string Disease type title to remove.
 function Animal:removeDisease(title)
     for i, disease in pairs(self.diseases) do
         if disease.type.title == title then
-            self:addMessage("DISEASE_CURED", { disease.type.name })
+            Log:trace("removeDisease: removing record (disease=%s uniqueId=%s remaining=%d)",
+                tostring(title), tostring(self.uniqueId), #self.diseases - 1)
             table.remove(self.diseases, i)
             return
         end
     end
+
+    Log:trace("removeDisease: no record carries that title, nothing removed (disease=%s uniqueId=%s)",
+        tostring(title), tostring(self.uniqueId))
 end
 
 function Animal:addDisease(type, isCarrier, genes)

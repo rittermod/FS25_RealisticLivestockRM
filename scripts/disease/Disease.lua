@@ -81,6 +81,30 @@ function Disease:readStream(streamId, connection)
 end
 
 
+--- Advance this record by one month and report what it did to its host.
+---
+--- The player-facing cured notification is emitted HERE, by whichever of the two
+--- transitions actually cures the record - a completed treatment or the natural-recovery
+--- roll. That is the contract: the notification marks the CURE, so the two sites below own
+--- it and record removal is silent. Immunity expiry is deliberately silent too - it ends
+--- protection rather than granting it, so a notification there would tell the player they
+--- are safe at the exact moment they stop being safe.
+---
+--- The two restore paths must never emit. `loadFromXMLFile` and `readStream` both assign
+--- `cured`, and neither is a transition: one rebuilds a saved record, the other applies
+--- server state on a client. Emitting there would re-announce every cured animal on every
+--- load and on every client join.
+---
+--- Placement WITHIN this function is load-bearing. The treatment emission belongs in the
+--- NESTED `treatmentDuration <= 0` block, never at the end of the enclosing `beingTreated`
+--- branch - at the branch end it would fire once per treated month.
+---@param animal table Host animal. Must carry the notification entry point and the identity
+---       fields behind it: both cure sites notify through it, so a table lacking it raises here.
+---@param deathEnabled boolean Whether the fatality roll may run at all.
+---@return boolean died True when this record killed its host on this tick.
+---@return number treatmentCost This month's configured treatment cost; 0 when not treating.
+---       The caller accumulates it per pen - what it does with the total is the caller's
+---       concern, so do not read this as money already taken from the farm.
 function Disease:onPeriodChanged(animal, deathEnabled)
 
 	if not g_diseaseManager.diseasesEnabled then return false, 0 end
@@ -121,6 +145,11 @@ function Disease:onPeriodChanged(animal, deathEnabled)
 			self.cured = true
 			self.beingTreated = false
 			self.immunity = self.type.immunity - 0
+
+			animal:addMessage("DISEASE_CURED", { self.type.name })
+
+			Log:trace("Disease:onPeriodChanged: cured by TREATMENT (disease=%s uniqueId=%s)",
+				tostring(self.type.title), tostring(animal.uniqueId))
 		end
 
 	end
@@ -134,6 +163,11 @@ function Disease:onPeriodChanged(animal, deathEnabled)
 			self.cured = true
 			self.immunity = self.type.immunity - 0
 			self.beingTreated = false
+
+			animal:addMessage("DISEASE_CURED", { self.type.name })
+
+			Log:trace("Disease:onPeriodChanged: cured by RECOVERY (disease=%s uniqueId=%s)",
+				tostring(self.type.title), tostring(animal.uniqueId))
 
 		end
 
