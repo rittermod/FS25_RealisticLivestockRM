@@ -31,6 +31,9 @@ source(modDirectory .. "scripts/utils/RLAnimalUtil.lua")
 source(modDirectory .. "scripts/utils/RLScaleHelper.lua")
 source(modDirectory .. "scripts/utils/RLAnimalDisplayHelper.lua")
 source(modDirectory .. "scripts/utils/RLMoveDestinationHelper.lua")
+-- Shared month-count formatter. Consumed by Disease (SECTION 20e) and by the
+-- RealisticLivestock.formatAge delegate (SECTION 20f), both of which load later.
+source(modDirectory .. "scripts/utils/RLTimeFormat.lua")
 
 -- SECTION 2c: Constants
 source(modDirectory .. "scripts/core/RLConstants.lua")

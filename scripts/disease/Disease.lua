@@ -265,29 +265,31 @@ function Disease:showInfo(box)
 end
 
 
+--- This record's player-facing status label.
+---
+--- Two properties are easy to get backwards. The immune arm's parenthetical is
+--- REMAINING immunity, whereas showInfo's parenthetical is elapsed infection age - the
+--- two render alike and answer opposite questions, so they read from different fields
+--- on purpose. And `cured` is tested before `isCarrier`, so a record that is both reads
+--- Immune; the card icons and the transmission collector answer their own questions
+--- about that same record and give different answers, which is deliberate rather than
+--- an inconsistency to unify.
+---
+--- The immunity a player watches decrease is a SERVER property: the pen's period tick
+--- gates disease progression on `isServer`, so an MP client renders whatever the last
+--- animal sync carried until the next one. That is unchanged by which field feeds the
+--- label - the previous rendering was equally stale - but do not read "counts down" as
+--- a per-peer guarantee.
+---@return string localised status label
 function Disease:getStatus()
 
 	local status
-	local years = math.floor(self.time / 12)
-	local months = self.time - years * 12
 
 	if self.beingTreated then
 		status = g_i18n:getText("rl_ui_beingTreated")
 	elseif self.cured then
 
-		local immunityYears = math.floor(self.immunity / 12)
-		local immunityMonths = self.immunity - immunityYears * 12
-		local immuneTime
-
-		if years == 0 then
-			immuneTime = string.format("%d %s", months, months == 1 and g_i18n:getText("rl_ui_month") or g_i18n:getText("rl_ui_months"))
-		elseif months == 0 then
-			immuneTime = string.format("%d %s", years, years == 1 and g_i18n:getText("rl_ui_year") or g_i18n:getText("rl_ui_years"))
-		else
-			immuneTime = string.format("%d %s, %d %s", years, years == 1 and g_i18n:getText("rl_ui_year") or g_i18n:getText("rl_ui_years"), months, months == 1 and g_i18n:getText("rl_ui_month") or g_i18n:getText("rl_ui_months"))
-		end
-
-		status = string.format("%s (%s)", g_i18n:getText("rl_ui_immune"), immuneTime)
+		status = string.format("%s (%s)", g_i18n:getText("rl_ui_immune"), RLTimeFormat.formatAge(self.immunity))
 
 	elseif self.isCarrier then
 

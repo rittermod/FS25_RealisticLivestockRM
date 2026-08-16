@@ -165,18 +165,12 @@ function RealisticLivestock.getMapCountryIndex()
     return RLMapCountry.resolveIndex(RealisticLivestock.mapAreaCode)
 end
 
+--- Month count rendered as a player-facing duration. Thin delegate: the formatter
+--- lives in RLTimeFormat so it is reachable without this file's load-time font build.
+--- @param age number month count; non-negative integer
+--- @return string localised "N years, M months", or "M months" below one year
 function RealisticLivestock.formatAge(age)
-    local years = math.floor(age / 12)
-    local months = age % 12
-
-    local monthsString = months == 1 and g_i18n:getText("rl_ui_month") or g_i18n:getText("rl_ui_months")
-
-    if years > 0 then
-        return string.format("%s %s, %s %s", years,
-            years == 1 and g_i18n:getText("rl_ui_year") or g_i18n:getText("rl_ui_years"), months, monthsString)
-    end
-
-    return string.format("%s %s", months, monthsString)
+    return RLTimeFormat.formatAge(age)
 end
 
 -- #################################################
