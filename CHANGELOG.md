@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.3.2.0-dev.1:
+
+### Heads up before you update
+
+- Treating a disease now costs money. Any animal already part-way through a course starts charging on the next month - Foot & Mouth bills $250 a month across its three months, mastitis $200 and PED $150.
+
+- Changed the disease signal on animal cards from a red row to status icons, so you can tell an untreated animal from one under treatment and spot a CVM carrier at a glance.
+- Fixed animals dying from a disease they had just beaten - curing an animal, by treatment or by natural recovery, now reliably saves it.
+- Fixed cured animals still dying of the same disease all through the months they were meant to be immune - almost no chicken used to survive avian flu, even after recovering from it.
+- Fixed every treatment curing after a single month regardless of the disease - Foot & Mouth now runs the full three-month course its treatment is meant to take.
+- Fixed animals that had recovered from a disease, and CVM carriers, still being listed as diseased - they now group, sort and filter as healthy, so the Diseased Animals list only shows animals that are actually sick.
+- Fixed recovered animals still spreading the disease they beat, so outbreaks now burn out instead of running for the whole immunity window.
+- Fixed the Immune label counting up from when the animal caught the disease instead of counting down the protection it has left.
+- Fixed the cured notification arriving a year or two late - it now appears on the month the animal actually recovers, instead of when its immunity runs out.
+- Fixed a treatment you stopped part-way reading as Not treated, so the status now agrees with the months left and the Resume button.
+- Fixed disease treatment being free - the fee is now taken from your farm balance and shown as a cost, where it used to appear as income and never leave your account.
+- Updated the disease guide's survival tables to match the new post-recovery rules - a cured animal faces no further risk from the disease it beat until its immunity lapses.
+
 ## 1.3.1.0:
 ### Heads up before you update
 Things that affect existing saves:
