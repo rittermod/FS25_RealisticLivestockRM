@@ -1,42 +1,112 @@
 local Log = RmLogging.getLogger("RLRM")
 
 --- Surviving routing seam for every `AnimalScreen.show` shape, the standalone
---- livestock-trailer activatable, and the EPP butcher direct-open (which bypasses
---- `AnimalScreen.show` and so is caught at `AnimalScreen.onOpen`, redirecting to the
---- MODE_TRAILER EPP counterpart). Lives OUTSIDE the legacy AnimalScreen monolith so the
---- redirects outlive that file's teardown.
+--- livestock-trailer activatable, and any direct `showGui` open (the EPP butcher among
+--- them, which bypasses `AnimalScreen.show` and so is caught at `AnimalScreen.onOpen`).
+--- Lives OUTSIDE the legacy AnimalScreen monolith so the redirects outlive that file's
+--- teardown.
 ---
 --- Contract:
 ---   * Routing parity - `show()` walks the same `(husbandry, vehicle, isDealer)` branch
----     tree the base-game controller uses, so every trigger reaches the RLMenu open that
+---     tree the trigger data produces, so every entry point reaches the RLMenu open that
 ---     matches its legacy landing.
 ---   * Mutation parity - each open goes through `RLMenu.openFromBridge` /
 ---     `openTrailerFromBridge`, which fire the SAME server events the legacy controllers
 ---     did (AnimalBuyEvent / AnimalSellEvent / AnimalMoveEvent / AnimalLoadEvent /
 ---     AnimalUnloadEvent). This module introduces no new event class and no new bridge API.
----   * No vanilla fallback - no path here may open the vanilla screen. A missing menu
----     (`g_rlMenu` nil), a refused open, or an unrecognized / gate-failed shape logs a
----     WARN and no-ops. The activatable deliberately drops its `superFunc` fallback:
----     once the legacy monolith is gone `superFunc` IS the vanilla open.
----   * Routing tripwire - every recognized shape logs an INFO naming the decision, every
----     refusal a WARN. This is the seam's permanent per-call contract, not diagnostics.
+---   * No vanilla fallback - every path here ATTEMPTS an RLMenu open, and no path calls
+---     `superFunc`. A call carrying recognizable context opens the matching view; anything
+---     else - a foreign caller, an unrouted shape, a controller this seam does not know -
+---     opens the DEFAULT view: the full menu on Info, anchored on a husbandry when the call
+---     supplied one and unanchored otherwise. A nil `g_rlMenu` is the only state that can
+---     open nothing at all: `show` and `run` WARN-no-op, while `onOpen` additionally CLOSES,
+---     because there a screen is already displayed and leaving it up is the failure this
+---     seam exists to prevent.
+---   * Routing tripwire - every routing decision logs an INFO naming it, every refusal a
+---     WARN. This is the seam's permanent per-call contract, not diagnostics.
 ---
 --- Load-time inert apart from the three installs at the tail (needs only the base-game
 --- `AnimalScreen` / `LivestockTrailerActivatable` / `Utils` tables and the logger;
 --- `RLMenu` and `g_rlMenu` are read at call time).
 RLAnimalScreenBridge = {}
 
+--- Page the default view lands on (Info, labelled "Manage" in the tab strip). Named rather
+--- than repeated as a literal so the fallback call sites share one definition.
+local DEFAULT_VIEW_PAGE = 4
+
+
+--- Open the DEFAULT view - the full menu landing on Info - and report whether it opened.
+--- This is the ONLY home for that (page, mode) pair, so the four call sites that fall back
+--- to it cannot drift apart.
+---
+--- Short-circuits on a nil `g_rlMenu` WITHOUT calling `openFromBridge`, matching the top
+--- guards the three entry points already carry. WARN ownership stays at the CALL SITES: this
+--- helper logs its routing INFO and returns the boolean, so one refusal cannot stack three
+--- warnings, and the own-pen walk-up keeps ignoring the result exactly as it did before.
+--- @param reason string  routing detail for the INFO line; for a foreign caller this carries
+---   the argument shape, which is the only identification a log reader gets
+--- @param context table|nil  optional `{ husbandry = <placeable> }` anchor; nil opens unanchored
+--- @return boolean opened  false on a nil menu or any refused open
+local function openDefaultView(reason, context)
+    if g_rlMenu == nil then
+        Log:trace("openDefaultView: g_rlMenu nil, refusing without an open attempt (%s)", tostring(reason))
+        return false
+    end
+    -- Name the anchor state: this one helper serves anchored opens (own-pen, and a
+    -- gate-failed shape that carried a husbandry) and unanchored ones (foreign onOpen, the
+    -- activatable), so a log reader counting these lines cannot otherwise tell them apart.
+    Log:info("AnimalScreen -> RLMenu default view (page=%d mode=full anchor=%s): %s",
+        DEFAULT_VIEW_PAGE, context ~= nil and "husbandry" or "none", tostring(reason))
+    return RLMenu.openFromBridge(DEFAULT_VIEW_PAGE, RLMenu.MODE_FULL, context) == true
+end
+
+
+--- Close the displaced screen after a refused redirect. Shared by BOTH `onOpen` refusal
+--- paths.
+---
+--- The `pcall` is load-bearing rather than defensive, and this was MEASURED rather than
+--- theorised: closing the displaced screen can raise when the controller a foreign caller
+--- pre-assigned does not implement everything the close path expects of it. That path is now
+--- reached by arbitrary third-party opens, and a bare raise inside a GUI callback names
+--- nothing - so the failure is logged with its cause instead of propagating.
+--- @param reason string  the refusal that led here, named in the error line
+local function closeVanillaScreen(reason)
+    local ok, err = pcall(function() g_gui:changeScreen(nil) end)
+    if not ok then
+        Log:error("AnimalScreen.onOpen: changeScreen(nil) failed after %s (err=%s); a screen may still be displayed",
+            tostring(reason), tostring(err))
+        return
+    end
+    Log:trace("AnimalScreen.onOpen: closed the displaced screen after %s", tostring(reason))
+end
+
+
+--- Route a real livestock-trailer shape to its dealer / world counterpart. Shared by the
+--- no-husbandry branch and by the failed-pen-gate fall-through, so the two cannot drift.
+--- @param vehicle table  a vehicle carrying `spec_livestockTrailer`
+--- @param isDealer boolean|nil  true selects the dealer counterpart; anything else is world
+--- @param origin string  which branch routed here; the two are indistinguishable in the log
+---   otherwise, and only one of them arrived carrying a husbandry argument
+--- @return boolean opened
+local function openTrailerCounterpart(vehicle, isDealer, origin)
+    local counterpart = (isDealer == true) and RLMenu.TRAILER_DEALER or RLMenu.TRAILER_WORLD
+    Log:info("AnimalScreen.show: %s-trailer -> RLMenu (mode=trailer, via %s)",
+        isDealer == true and "dealer" or "world", tostring(origin))
+    return RLMenu.openFromBridge(nil, RLMenu.MODE_TRAILER,
+        { trailer = vehicle, counterpart = counterpart }) == true
+end
+
 
 --- Route an `AnimalScreen.show(husbandry, vehicle, isDealer)` call to the mapped RLMenu
---- open. The branch tree matches the base-game controller's shape so routing keeps legacy
---- parity; the livestock / animal-husbandry gates fail CLOSED to a terminal WARN no-op
---- rather than open a vanilla controller (those degenerate shapes are never produced by a
---- real trigger). The INFO is a routing-DECISION log, independent of the open's outcome -
---- a refused open additionally WARNs inside openFromBridge, so seeing both is expected.
+--- open. The branch tree keys off the same three arguments the trigger data supplies, so
+--- routing keeps legacy parity; a shape whose gates fail no longer no-ops but opens the
+--- default view, anchored on the husbandry when the call carried one. The INFO is a
+--- routing-DECISION log, independent of the open's outcome - a refused open additionally
+--- WARNs inside openFromBridge, so seeing both is expected.
 --- @param husbandry table|nil animal-husbandry placeable (own-pen / pen-trailer shapes)
 --- @param vehicle table|nil livestock-trailer vehicle (trailer shapes)
 --- @param isDealer boolean|nil true for the dealer trailer walk-up; ignored for the
----   husbandry-present and no-argument leaves (base-game ignores it there too)
+---   husbandry-present and no-argument leaves (the trigger ignores it there too)
 function RLAnimalScreenBridge.show(husbandry, vehicle, isDealer)
     if g_rlMenu == nil then
         Log:warning("AnimalScreen.show: g_rlMenu nil, no-op (never vanilla)")
@@ -53,24 +123,30 @@ function RLAnimalScreenBridge.show(husbandry, vehicle, isDealer)
                     { trailer = vehicle, counterpart = RLMenu.TRAILER_PEN, counterpartHandle = husbandry })
                 return
             end
+            -- A real livestock trailer OUTRANKS a failed pen gate: the pen half is what did
+            -- not resolve, and the trailer flow is still the right destination. The non-pen
+            -- handle is dropped rather than forwarded - TRAILER_PEN is the only counterpart
+            -- that consumes a handle, and it requires a real animal husbandry.
+            if vehicle.spec_livestockTrailer ~= nil then
+                Log:trace("AnimalScreen.show: pen gate failed but the vehicle is a real trailer; routing to its counterpart")
+                openTrailerCounterpart(vehicle, isDealer, "failed pen gate")
+                return
+            end
         else
-            -- Own-pen walk-up: lands the full menu on the Info tab, anchored to THIS pen
-            -- via the one-shot husbandry anchor. Forwards ANY non-nil husbandry (isDealer
-            -- ignored, matching base-game); a non-animal husbandry opens unanchored with
-            -- openFromBridge's own WARN.
-            Log:info("AnimalScreen.show: own-pen walk-up -> RLMenu (mode=full anchored, lands Info)")
-            RLMenu.openFromBridge(4, RLMenu.MODE_FULL, { husbandry = husbandry })
+            -- Own-pen walk-up: the full menu on Info, anchored to THIS pen via the one-shot
+            -- husbandry anchor. Forwards ANY non-nil husbandry (isDealer ignored); a
+            -- non-animal husbandry opens unanchored with openFromBridge's own WARN. The
+            -- return is deliberately ignored - a refusal has already warned inside
+            -- openFromBridge and there is nothing on screen to close.
+            openDefaultView("own-pen walk-up", { husbandry = husbandry })
             return
         end
     elseif vehicle ~= nil then
         -- Trailer at a dealer (isDealer) or a standalone world trigger (falsy isDealer):
         -- the Transfer tab against the dealer / world counterpart. Same Buy/Sell/load
-        -- events legacy fired. A non-livestock vehicle falls to the terminal WARN.
+        -- events legacy fired. A non-livestock vehicle falls to the default view below.
         if vehicle.spec_livestockTrailer ~= nil then
-            local counterpart = (isDealer == true) and RLMenu.TRAILER_DEALER or RLMenu.TRAILER_WORLD
-            Log:info("AnimalScreen.show: %s-trailer -> RLMenu (mode=trailer)",
-                isDealer == true and "dealer" or "world")
-            RLMenu.openFromBridge(nil, RLMenu.MODE_TRAILER, { trailer = vehicle, counterpart = counterpart })
+            openTrailerCounterpart(vehicle, isDealer, "no-husbandry trailer shape")
             return
         end
     else
@@ -81,17 +157,27 @@ function RLAnimalScreenBridge.show(husbandry, vehicle, isDealer)
         return
     end
 
-    Log:warning("AnimalScreen.show: unrecognized shape h=%s v=%s isDealer=%s, no-op (never vanilla)",
+    -- Terminal: a shape this seam does not route directly - either one it does not
+    -- recognize, or one whose gates failed with no usable trailer. It still opens the menu,
+    -- anchored on the husbandry when the call carried one. The reason carries the argument
+    -- shape forward, which is the only identification a log reader gets for a foreign caller.
+    local reason = string.format("unrouted shape h=%s v=%s isDealer=%s",
         tostring(husbandry ~= nil), tostring(vehicle ~= nil), tostring(isDealer))
+    local context = nil
+    if husbandry ~= nil then
+        context = { husbandry = husbandry }
+    end
+    if not openDefaultView(reason, context) then
+        Log:warning("AnimalScreen.show: default view refused for %s, no-op (never vanilla)", reason)
+    end
 end
 
 
 --- Pure shape predicate: is this the EPP (butcher) controller? A third-party EPP
---- trigger direct-opens the vanilla AnimalScreen with its own controller
---- (`AnimalScreenTrailerExtendedProduction`) whose `.husbandry` IS the production point
---- (the loading trigger sets `trigger.husbandry = self`), NOT a real animal pen. Detect
---- by SHAPE, never class name (EPP is an optional third-party mod): the pp carries
---- `animalsTypeData` + `addCluster` + `getNumOfFreeAnimalSlots` and has NO
+--- trigger direct-opens the vanilla AnimalScreen with its own controller whose
+--- `.husbandry` IS the production point (its loading trigger assigns itself there), NOT a
+--- real animal pen. Detect by SHAPE, never class name (EPP is an optional third-party mod):
+--- the pp carries `animalsTypeData` + `addCluster` + `getNumOfFreeAnimalSlots` and has NO
 --- `spec_husbandryAnimals`, whereas a pen-trailer controller's `.husbandry` is a real
 --- husbandry (`spec_husbandryAnimals` present, no `animalsTypeData`). The
 --- `getNumOfFreeAnimalSlots` check makes the gate match the FULL pp contract the redirect
@@ -112,82 +198,116 @@ function RLAnimalScreenBridge.isEPPControllerShape(controller)
 end
 
 
---- Base-game `AnimalScreen.onOpen` wrapper - the redirect for the EPP butcher
---- direct-open. That trigger bypasses `AnimalScreen.show` (it sets its controller then
---- `g_gui:showGui("AnimalScreen")` directly), so the `show()` seam above never catches
---- it; `onOpen` is the earliest hook after the controller is set. Post-cutover NO
---- surviving RLRM flow opens `AnimalScreen` via `showGui` (every RLRM trigger redirects
---- at `.show` / `run`), so this hook fires ONLY for external EPP opens - the shape
---- predicate is the sole guard.
+--- Wrapper for `AnimalScreen.onOpen` - the redirect for any direct `showGui` open.
+--- Such a trigger sets its controller and calls `g_gui:showGui("AnimalScreen")` itself, so
+--- the `show()` seam above never catches it; `onOpen` is the earliest hook after the
+--- controller is set. No surviving RLRM flow opens `AnimalScreen` that way (every RLRM
+--- trigger redirects at `.show` / `run`), so this hook fires only for external opens - the
+--- EPP butcher, or any other mod.
 ---
---- On an EPP-shaped controller: SKIP `superFunc` (the vanilla cluster-style open) and
---- swap to RLMenu MODE_TRAILER with the EPP counterpart. `counterpartHandle` is
---- `controller.husbandry` (the pp itself - no unwrap). On a refused open (`g_rlMenu`
---- nil / a dialog visible / nil trailer or pp) WARN and `g_gui:changeScreen(nil)` to
---- CLOSE the already-shown screen (mirrors base-game `AnimalScreen:onOpen`, which itself
---- `changeScreen(nil)`s from onOpen when there are no animals to show) - NEVER call
---- `superFunc` (post-cutover `superFunc` IS the vanilla open). A non-EPP-shaped
---- controller passes to `superFunc` unchanged (no
---- surviving RLRM flow should reach here).
+--- On an EPP-shaped controller: swap to RLMenu MODE_TRAILER with the EPP counterpart;
+--- `counterpartHandle` is `controller.husbandry` (the pp itself - no unwrap). On ANY other
+--- controller - including none at all - open the unanchored default view instead. Either way
+--- the injected `_superFunc` is never called: by the time this runs a screen is already
+--- displayed by construction, and the contract is that it is never presented as the working
+--- surface. On a refused open (`g_rlMenu` nil / a dialog visible / nil trailer or pp) WARN
+--- and `g_gui:changeScreen(nil)` to CLOSE the displaced screen; closing from within onOpen
+--- is an observed-supported swap, not a re-entrancy hazard (playtested on the EPP flow).
 --- @param self table  the AnimalScreen instance (`self.controller` is pre-assigned)
---- @param superFunc function  base-game AnimalScreen.onOpen
-function RLAnimalScreenBridge.onOpen(self, superFunc, ...)
+--- @param _superFunc function  the wrapped base onOpen; deliberately unused - the wrap
+---   is kept only so a wrapper installed by a mod loading before RLRM is not destroyed
+function RLAnimalScreenBridge.onOpen(self, _superFunc, ...)
     local controller = self ~= nil and self.controller or nil
+
     if not RLAnimalScreenBridge.isEPPControllerShape(controller) then
-        -- Not an EPP butcher open: pass through to the vanilla onOpen unchanged.
-        return superFunc(self, ...)
+        -- Any other pre-assigned controller, or none at all. The view is UNANCHORED on
+        -- purpose: `controller.husbandry` means different things per controller class (on an
+        -- EPP controller it is the production point, not a pen), so only `show()`'s
+        -- documented positional argument is ever safe to anchor on. Nothing below may
+        -- dereference `self` - a malformed dispatch reaches here with self nil.
+        Log:trace("AnimalScreen.onOpen: controller is not EPP-shaped; routing to the default view")
+        if openDefaultView("foreign AnimalScreen open (non-EPP controller)", nil) then
+            return
+        end
+        Log:warning("AnimalScreen.onOpen: non-EPP redirect refused (g_rlMenu=%s), closing screen (never vanilla)",
+            tostring(g_rlMenu ~= nil))
+        closeVanillaScreen("a refused non-EPP redirect")
+        return
     end
 
     local trailer = controller.trailer
     local pp = controller.husbandry
     Log:info("AnimalScreen.onOpen: EPP butcher direct-open -> RLMenu (mode=trailer counterpart=epp)")
 
-    -- Direct swap: openFromBridge -> showGui("RLMenu") replaces the just-shown
-    -- AnimalScreen. Base-game precedent: onOpen itself changeScreen()s mid-open, so
-    -- redirecting from the wrapped onOpen is supported. If in-game testing shows a
-    -- one-frame vanilla flash, defer this swap to the next frame via Timer.createOneshot
-    -- (the documented fallback; primary is this direct swap).
+    -- Direct swap: openFromBridge -> showGui("RLMenu") replaces the just-shown screen.
+    -- If in-game testing shows a one-frame flash of the displaced screen, defer this swap
+    -- to the next frame via Timer.createOneshot (the documented fallback; primary is this
+    -- direct swap).
     if g_rlMenu ~= nil and RLMenu.openFromBridge(nil, RLMenu.MODE_TRAILER,
             { trailer = trailer, counterpart = RLMenu.TRAILER_EPP, counterpartHandle = pp }) == true then
         return
     end
 
-    -- Refused: close the vanilla screen rather than leave the cluster-style EPP
-    -- presentation up, and NEVER call superFunc (post-cutover superFunc IS the vanilla open).
+    -- Refused: close the screen rather than leave the cluster-style EPP presentation up.
     Log:warning("AnimalScreen.onOpen: EPP redirect refused (g_rlMenu=%s), closing screen (never vanilla)",
         tostring(g_rlMenu ~= nil))
-    g_gui:changeScreen(nil)
+    closeVanillaScreen("a refused EPP redirect")
 end
 
 
 --- World-trailer redirect for the standalone `LivestockTrailerActivatable` ("Open animal
 --- screen" prompt on a parked livestock trailer with no loading trigger). This activatable
---- opens the vanilla screen unconditionally once it runs, so a `setController`-level hook
---- cannot suppress it - the interception has to be `run` itself. Redirects to the Transfer
---- tab (world counterpart), firing the same AnimalLoadEvent / AnimalUnloadEvent legacy did.
---- Keeps its OWN `g_rlMenu` / `livestockTrailer` guards (the `show()` top guard
---- does not cover this path, and a nil trailer must never reach openTrailerFromBridge). On any
---- refusal it WARN-no-ops and NEVER calls `_superFunc` - post-cutover `_superFunc` is the
---- vanilla open.
+--- opens a screen unconditionally once it runs, so a `setController`-level hook cannot
+--- suppress it - the interception has to be `run` itself. Redirects to the Transfer tab
+--- (world counterpart), firing the same AnimalLoadEvent / AnimalUnloadEvent legacy did.
 RL_LivestockTrailerActivatable = {}
 
+--- Keeps its OWN `g_rlMenu` guard (the `show()` top guard does not cover this path). A nil
+--- trailer or a refused trailer open falls back to the default view rather than no-opping;
+--- only when THAT is refused too does it WARN-no-op, and it never calls `_superFunc`.
+--- @param _superFunc function  the wrapped activatable run; deliberately unused, since no
+---   branch here may present a screen other than RLMenu
+--- @return nil
 function RL_LivestockTrailerActivatable:run(_superFunc)
-    if g_rlMenu ~= nil and self.livestockTrailer ~= nil
-        and RLMenu.openFromBridge(nil, RLMenu.MODE_TRAILER,
+    if g_rlMenu == nil then
+        Log:warning("LivestockTrailerActivatable:run: g_rlMenu nil, no-op (never vanilla)")
+        return
+    end
+
+    local hasTrailer = self.livestockTrailer ~= nil
+    if hasTrailer and RLMenu.openFromBridge(nil, RLMenu.MODE_TRAILER,
             { trailer = self.livestockTrailer, counterpart = RLMenu.TRAILER_WORLD }) == true then
         Log:info("LivestockTrailerActivatable:run: world-trailer -> RLMenu (mode=trailer counterpart=world)")
         return
     end
-    Log:warning("LivestockTrailerActivatable:run: g_rlMenu nil or bridge refused, no-op (never vanilla)")
+
+    -- Nil trailer, or the trailer open was refused: attempt the default view. The retry is
+    -- UNCONDITIONAL by design rather than conditioned on the refusal cause, because
+    -- openTrailerFromBridge's return does not distinguish the causes and widening it is an
+    -- RLMenu change this seam does not make. Accepted consequence: the two call-independent
+    -- causes (a visible dialog, a showGui throw) refuse this retry for the same reason, so
+    -- the player sees nothing either way - which is why the WARN below has to say so. The
+    -- two arms are kept apart because on the nil-trailer path no trailer open was ever
+    -- attempted, and a WARN claiming one was sends a log reader hunting a second fault.
+    if openDefaultView(hasTrailer and "standalone-trailer activatable (trailer open refused)"
+            or "standalone-trailer activatable (no trailer on the activatable)", nil) then
+        return
+    end
+    if hasTrailer then
+        Log:warning("LivestockTrailerActivatable:run: trailer open AND default view both refused, no-op (never vanilla)")
+    else
+        Log:warning("LivestockTrailerActivatable:run: no trailer to open, and the default view was refused, no-op (never vanilla)")
+    end
 end
 
 
 -- Sole installer for all three overrides (the legacy monolith's own installs are removed
 -- in the same slice, so there is no source-order-decided double-install / double-wrap).
 -- The activatable and the onOpen redirect keep the overwrittenFunction wrap as the
--- interception mechanism; the activatable's injected superFunc is intentionally unused
--- (see RL_LivestockTrailerActivatable:run), while the onOpen wrap DOES call superFunc for
--- any non-EPP-shaped controller (the vanilla open).
+-- interception mechanism; both leave their injected superFunc unused, because no branch in
+-- this file may present a screen other than RLMenu. Note what that does and does not buy:
+-- the wrap preserves an earlier wrapper's existence but never invokes it, so a mod that
+-- wrapped these members before RLRM is bypassed rather than chained.
 AnimalScreen.show = RLAnimalScreenBridge.show
 LivestockTrailerActivatable.run = Utils.overwrittenFunction(LivestockTrailerActivatable.run,
     RL_LivestockTrailerActivatable.run)

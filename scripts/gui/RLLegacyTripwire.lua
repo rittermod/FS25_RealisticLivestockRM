@@ -211,7 +211,11 @@ RLLegacyTripwire.EXCLUSIONS = {
         updateScreen                 = true,
         updateInfoBox                = true,
         onListSelectionChanged       = true,
-        -- (2) cross-ticket intentional call (EPP redirect closes the vanilla screen)
+        -- (2) cross-ticket intentional call. EVERY redirected open depends on this
+        -- exclusion: the onOpen seam redirects any controller shape, and both its success
+        -- path (showGui) and its refusal path (changeScreen(nil)) close the displaced
+        -- screen, which fires onClose. Removing the exclusion would ERROR on ordinary
+        -- third-party opens, not only on the butcher flow.
         onClose                      = true,
         -- (4) boot-only GUI-setup callback (loadGui; never on re-open - setController catches a real open)
         onGuiSetupFinished           = true,
@@ -221,8 +225,10 @@ RLLegacyTripwire.EXCLUSIONS = {
         getValidDestinations      = true,
         buildMoveValidationResult = true,
     },
-    -- (4) boot-only singleton construction/registration; actual use trips the
-    -- usage-path members (show/onOpen/updateContent/...), which stay armed.
+    -- (4) boot-only singleton construction/registration. Note what this no longer buys:
+    -- the seam now redirects every open before the doomed layer is reached, so the armed
+    -- usage-path members are not a reachable signal for a foreign caller either - the
+    -- remaining coverage is a residual RLRM-internal path, not a third-party one.
     AnimalInfoDialog = {
         register = true,
         new      = true,
