@@ -64,15 +64,6 @@ source(modDirectory .. "scripts/animals/husbandry/RealisticLivestock_HusbandrySy
 source(modDirectory .. "scripts/animals/husbandry/RealisticLivestock_AnimalNameSystem.lua")
 source(modDirectory .. "scripts/animals/husbandry/RealisticLivestock_AnimalSystem.lua")
 
--- SECTION 6: Animal Shop - Controllers
-source(modDirectory .. "scripts/animals/shop/controllers/AnimalScreenBase.lua")
-source(modDirectory .. "scripts/animals/shop/controllers/AnimalScreenDealer.lua")
-source(modDirectory .. "scripts/animals/shop/controllers/AnimalScreenDealerFarm.lua")
-source(modDirectory .. "scripts/animals/shop/controllers/AnimalScreenDealerTrailer.lua")
-source(modDirectory .. "scripts/animals/shop/controllers/AnimalScreenTrailer.lua")
-source(modDirectory .. "scripts/animals/shop/controllers/AnimalScreenTrailerFarm.lua")
-source(modDirectory .. "scripts/animals/shop/controllers/AnimalScreenMoveFarm.lua")
-
 -- SECTION 7: Animal Shop - Events
 source(modDirectory .. "scripts/animals/shop/events/AIAnimalBuyEvent.lua")
 source(modDirectory .. "scripts/animals/shop/events/AIAnimalInseminationEvent.lua")
@@ -86,7 +77,6 @@ source(modDirectory .. "scripts/animals/shop/events/AnimalSellEvent.lua")
 source(modDirectory .. "scripts/animals/shop/events/SemenBuyEvent.lua")
 
 -- SECTION 8: Animal Shop - Core
-source(modDirectory .. "scripts/animals/shop/AnimalItemNew.lua")
 source(modDirectory .. "scripts/animals/shop/RealisticLivestock_AnimalItemStock.lua")
 
 -- SECTION 9: Events (General)
@@ -257,14 +247,12 @@ source(modDirectory .. "scripts/gui/elements/RenderElement.lua")
 source(modDirectory .. "scripts/gui/elements/TripleOptionElement.lua")
 
 -- SECTION 13: GUI Dialogs and Frames
-source(modDirectory .. "scripts/gui/RealisticLivestock_AnimalScreen.lua")
 source(modDirectory .. "scripts/gui/VisualAnimalsDialog.lua")
 source(modDirectory .. "scripts/gui/NameInputDialog.lua")
 source(modDirectory .. "scripts/gui/RealisticLivestockFrame.lua")
 source(modDirectory .. "scripts/gui/AnimalAIDialog.lua")
 source(modDirectory .. "scripts/gui/AnimalFilterDialog.lua")
 source(modDirectory .. "scripts/gui/AnimalMoveDestinationDialog.lua")
-source(modDirectory .. "scripts/gui/AnimalInfoDialog.lua")
 source(modDirectory .. "scripts/gui/DiseaseDialog.lua")
 source(modDirectory .. "scripts/gui/EarTagColourPickerDialog.lua")
 source(modDirectory .. "scripts/gui/RLFilterConditionDialog.lua")
@@ -276,15 +264,10 @@ source(modDirectory .. "scripts/gui/RLHerdsmanDestinationPickerDialog.lua")
 -- Thin GUI wiring over the pure RLDealerSaleSelectorModel (sourced in the dealer group above).
 source(modDirectory .. "scripts/gui/RLDealerSaleSelectorDialog.lua")
 source(modDirectory .. "scripts/gui/FileExplorerDialog.lua")
-source(modDirectory .. "scripts/gui/ProfileDialog.lua")
 source(modDirectory .. "scripts/gui/RL_InfoDisplayKeyValueBox.lua")
 source(modDirectory .. "scripts/gui/RealisticLivestock_InGameMenuAnimalsFrame.lua")
--- Temporary legacy-layer tripwire: arms every doomed AnimalScreen-layer member.
--- Sourced LAST in SECTION 13 so every doomed install (controllers, monolith,
--- both dialogs) is complete before it arms. Removed with the legacy layer.
-source(modDirectory .. "scripts/gui/RLLegacyTripwire.lua")
 
--- SECTION 13b: RL Tabbed Menu (new standalone TabbedMenu - migration in progress)
+-- SECTION 13b: RL Tabbed Menu (the standalone TabbedMenu - now the only animal UI)
 -- Services must be sourced before frames that call them; frames must be
 -- sourced before the menu so FrameReference refs resolve.
 source(modDirectory .. "scripts/gui/rlmenu/services/RLMessageService.lua")
@@ -369,7 +352,7 @@ source(modDirectory .. "scripts/gui/rlmenu/services/RLTransferEppAdapter.lua")
 source(modDirectory .. "scripts/gui/rlmenu/RLMenu.lua")
 -- Surviving AnimalScreen routing seam. Sourced last in 13b (after RLMenu) so it is the
 -- SOLE installer of the AnimalScreen.show + LivestockTrailerActivatable.run overrides and
--- reads RLMenu's constants at load. Survives the SECTION 13 monolith teardown.
+-- reads RLMenu's constants at load. Outlived the legacy monolith, deleted in RLRM-476.
 source(modDirectory .. "scripts/gui/rlmenu/RLAnimalScreenBridge.lua")
 
 -- SECTION 14: Migration System

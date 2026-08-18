@@ -73,10 +73,8 @@
 
 
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Otevřít obrazovku zvířat"/>
-        <text name="input_RL_MARK" text="Označit/Odznačit zvíře"/>
         <text name="input_RL_MONITOR" text="Přidat/Odebrat monitor"/>
         <text name="input_RL_AI" text="Umělá inseminace"/>
-        <text name="input_RL_CASTRATE" text="Kastrovat zvíře"/>
         <text name="input_RL_DISEASES" text="Nemoci zvířat"/>
         <text name="input_RL_SELECT" text="Vybrat/Zrušit výběr zvířete"/>
         <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
@@ -117,7 +115,6 @@
         <text name="rl_ui_genetics" text="Genetika"/>
         <text name="rl_ui_overall" text="Celkově"/>
         <text name="rl_ui_rename" text="Změnit jméno"/>
-        <text name="rl_ui_cantFindAnimal" text="Zvíře nebylo nalezeno"/>
         <text name="rl_ui_maleNumImpregnatable" text="Zvířata schopná oplodnění v ohradě"/>
 
         <text name="rl_ui_breederQuality" text="Kvalita chovatele"/>
@@ -151,7 +148,6 @@
         <text name="rl_ui_genetics_high" text="Vysoká"/>
         <text name="rl_ui_genetics_veryHigh" text="Velmi vysoká"/>
         <text name="rl_ui_genetics_extremelyHigh" text="Extrémně vysoká"/>
-        <text name="rl_ui_genetics_highest" text="Nejvyšší"/>
 
         <text name="rl_ui_genetics_extremelyBad" text="Extrémně špatná"/>
         <text name="rl_ui_genetics_veryBad" text="Velmi špatná"/>
@@ -168,11 +164,9 @@
         <text name="rl_ui_buySkippedNotSupported" text="%d zvíře(ta) není podporováno tímto chovem" tag="format"/>
         <text name="rl_ui_buyAllRejected" text="Žádné z vybraných zvířat nelze v tomto chovu zakoupit."/>
         <text name="rl_ui_sellConfirmation" text="Opravdu chcete prodat %s zvířat za %s?" tag="format"/>
-        <text name="rl_ui_moveConfirmation" text="Opravdu chcete přesunout %s zvířat?" tag="format"/>
         <text name="rl_ui_buyBulkResult" text="Koupeno %s zvířat za %s" tag="format"/>
         <text name="rl_ui_sellBulkResult" text="Prodáno %s zvířat za %s" tag="format"/>
         <text name="rl_ui_moveBulkResult" text="Přesunuto %s zvířat" tag="format"/>
-        <text name="rl_ui_moveTab" text="Přesunout"/>
         <text name="rl_ui_moveSingle" text="Přesunout"/>
         <text name="rl_ui_moveSelectDestination" text="Vyberte cíl"/>
         <text name="rl_ui_moveNoDestinations" text="Pro tento typ zvířete nejsou dostupné žádné cíle."/>
@@ -234,7 +228,6 @@
         <text name="rl_ui_selectNone" text="Nevybrat nic"/>
         <text name="rl_ui_selectSection" text="Select Section"/>
         <text name="rl_ui_deselectSection" text="Deselect Section"/>
-        <text name="rl_ui_filters" text="Filtry"/>
         <text name="rl_ui_doesntHaveName" text="Bez jména"/>
         <text name="rl_ui_doesHaveName" text="Má jméno"/>
 
@@ -243,14 +236,7 @@
         <text name="rl_ui_castrated" text="Kastrovaný"/>
         <text name="rl_ui_castrate" text="Kastrovat"/>
 
-        <text name="rl_ui_importance" text="Důležitost"/>
-        <text name="rl_ui_type" text="Typ"/>
-        <text name="rl_ui_date" text="Datum"/>
-        <text name="rl_ui_message" text="Zpráva"/>
-        <text name="rl_ui_messages" text="Zprávy"/>
         <text name="rl_ui_unknownCauses" text="neznámé příčiny"/>
-        <text name="rl_ui_messageNumber" text="%s-%s z %s"/>
-        <text name="rl_ui_deleteMessage" text="Smazat zprávu"/>
         <text name="rl_ui_unreadMessages" text="Chov '%s' má nepřečtené zprávy!"/>
         <text name="rl_ui_herdsman" text="Pastýř"/>
         <text name="rl_ui_budget" text="Rozpočet"/>
@@ -258,9 +244,7 @@
         <text name="rl_ui_fixed" text="Pevný"/>
         <text name="rl_ui_percentage" text="Procentuální"/>
         <text name="rl_ui_maxAnimals" text="Max. zvířat"/>
-        <text name="rl_ui_infinite" text="Neomezený"/>
         <text name="rl_ui_herdsmanRecentlyBought" text="Nedávný nákup pastýře"/>
-        <text name="rl_ui_previousWage" text="Předchozí mzda"/>
         <text name="rl_ui_herdsmanWages" text="Mzdy pastýře"/>
         <text name="finance_herdsmanWages" text="Mzdy pastýře"/>
         <text name="rl_ui_medicine" text="Léky"/>
@@ -269,9 +253,6 @@
         <text name="rl_ui_semenPurchase_github" text="Nákup semene"/>
         <text name="finance_semenPurchase" text="Nákup inseminantu"/>
         <text name="finance_semenPurchase_github" text="Nákup semene"/>
-        <text name="rl_ui_noDiseases" text="Žádné nemoci"/>
-        <text name="rl_ui_onlyDiseases" text="Pouze nemoci"/>
-        <text name="rl_ui_naming" text="Pojmenování"/>
         <text name="rl_ui_alphabetical" text="Abecedně"/>
         <text name="rl_ui_breed" text="Plemeno"/>
         <text name="rl_ui_dontMark" text="Neoznačovat"/>
@@ -279,7 +260,6 @@
         <text name="rl_ui_unmark" text="Odznačit"/>
         <text name="rl_ui_favourite" text="Oblíbené"/>
         <text name="rl_ui_unFavourite" text="Odebrat z oblíbených"/>
-        <text name="rl_ui_quantity" text="Množství"/>
         <text name="rl_ui_dewar" text="Dewar"/>
         <text name="rl_ui_semenPurchase_successful" text="Umělý inseminant byl úspěšně zakoupen. Můžete si ho vyzvednout v obchodě"/>
         <text name="rl_ui_semenPurchase_successful_github" text="Semen bylo úspěšně zakoupeno. Můžete si ho vyzvednout v obchodě"/>
@@ -298,13 +278,8 @@
         <text name="rl_ui_inseminateAnimal" text="Inseminovat %s"/>
         <text name="rl_ui_inseminate" text="Inseminovat"/>
         <text name="rl_ui_strawEmpty" text="Tato sláma je prázdná"/>
-        <text name="rl_ui_averageSuccessColon" text="Průměrný úspěch: "/>
         <text name="rl_ui_averageSuccess" text="Průměrný úspěch"/>
         <text name="rl_ui_success" text="Úspěch"/>
-        <text name="rl_ui_save" text="Uložit"/>
-        <text name="rl_ui_load" text="Načíst"/>
-        <text name="rl_ui_saveProfile" text="Uložit profil"/>
-        <text name="rl_ui_loadProfile" text="Načíst profil"/>
 
         <text name="rl_ui_healthy" text="Zdravé"/>
         <text name="rl_ui_hasDisease" text="Má nemoc"/>
@@ -337,38 +312,16 @@
         <text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Rozpočet na nákup je pevná částka"/>
         <text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Rozpočet na nákup je procentuální část z peněz farmy"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="Pastýř utratí maximálně %s za den"/>
-        <text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="Pastýř utratí maximálně %s z peněz farmy za den"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="Pastýř nakoupí maximálně %s zvířat za den"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_breed" text="Pastýř bude nakupovat pouze zvířata plemene %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_breed_any" text="Pastýř bude nakupovat zvířata jakéhokoli plemene"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="Pastýř bude nakupovat pouze zdravá zvířata bez nemocí"/>
-        <text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="Pastýř bude nakupovat zvířata bez ohledu na nemoci"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_gender_1" text="Pastýř bude nakupovat pouze samice"/>
-        <text name="rl_ui_herdsmanTooltip_buy_gender_2" text="Pastýř bude nakupovat samice i samce"/>
-        <text name="rl_ui_herdsmanTooltip_buy_gender_3" text="Pastýř bude nakupovat pouze samce"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_age_equal" text="Pastýř bude nakupovat pouze zvířata ve věku %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_age_range" text="Pastýř bude nakupovat pouze zvířata ve věku od %s do %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="Pastýř bude nakupovat pouze zvířata s kvalitou %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_quality_range" text="Pastýř bude nakupovat pouze zvířata s kvalitou mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="Pastýř bude nakupovat pouze zvířata s plodností %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="Pastýř bude nakupovat pouze zvířata s plodností mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_health_equal" text="Pastýř bude nakupovat pouze zvířata se zdravím %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_health_range" text="Pastýř bude nakupovat pouze zvířata se zdravím mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="Pastýř bude nakupovat pouze zvířata s produktivitou %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="Pastýř bude nakupovat pouze zvířata s produktivitou mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="Pastýř bude nakupovat pouze zvířata s metabolismem %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="Pastýř bude nakupovat pouze zvířata s metabolismem mezi %s a %s"/>
 
 
         <!-- AI - SELLING -->
@@ -377,35 +330,15 @@
         <text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Pastýř nebude prodávat zvířata"/>
         <text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Pastýř bude prodávat zvířata"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="Pastýř prodá maximálně %s zvířat za den"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_mark_1" text="Pastýř nebude označovat zvířata k prodeji"/>
-        <text name="rl_ui_herdsmanTooltip_sell_mark_2" text="Pastýř bude označovat zvířata k prodeji"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="Pastýř bude prodávat zvířata bez ohledu na nemoci"/>
-        <text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="Pastýř bude prodávat pouze zvířata s nemocí"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_gender_1" text="Pastýř bude prodávat pouze samice"/>
-        <text name="rl_ui_herdsmanTooltip_sell_gender_2" text="Pastýř bude prodávat samice i samce"/>
-        <text name="rl_ui_herdsmanTooltip_sell_gender_3" text="Pastýř bude prodávat pouze samce"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_age_equal" text="Pastýř bude prodávat pouze zvířata ve věku %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_age_range" text="Pastýř bude prodávat pouze zvířata ve věku od %s do %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="Pastýř bude prodávat pouze zvířata s kvalitou %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_quality_range" text="Pastýř bude prodávat pouze zvířata s kvalitou mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="Pastýř bude prodávat pouze zvířata s plodností %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="Pastýř bude prodávat pouze zvířata s plodností mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_health_equal" text="Pastýř bude prodávat pouze zvířata se zdravím %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_health_range" text="Pastýř bude prodávat pouze zvířata se zdravím mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="Pastýř bude prodávat pouze zvířata s produktivitou %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="Pastýř bude prodávat pouze zvířata s produktivitou mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="Pastýř bude prodávat pouze zvířata s metabolismem %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="Pastýř bude prodávat pouze zvířata s metabolismem mezi %s a %s"/>
 
 
         <!-- AI - CASTRATING -->
@@ -414,29 +347,13 @@
         <text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Pastýř nebude kastrovat zvířata"/>
         <text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Pastýř bude kastrovat zvířata"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="Pastýř nebude označovat zvířata ke kastraci"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="Pastýř bude označovat zvířata ke kastraci"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="Pastýř bude kastrovat zvířata bez ohledu na nemoci"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="Pastýř bude kastrovat pouze zvířata s nemocí"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="Pastýř bude kastrovat pouze zvířata ve věku %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_age_range" text="Pastýř bude kastrovat pouze zvířata ve věku od %s do %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="Pastýř bude kastrovat pouze zvířata s kvalitou %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="Pastýř bude kastrovat pouze zvířata s kvalitou mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="Pastýř bude kastrovat pouze zvířata s plodností %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="Pastýř bude kastrovat pouze zvířata s plodností mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="Pastýř bude kastrovat pouze zvířata se zdravím %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_health_range" text="Pastýř bude kastrovat pouze zvířata se zdravím mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="Pastýř bude kastrovat pouze zvířata s produktivitou %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="Pastýř bude kastrovat pouze zvířata s produktivitou mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="Pastýř bude kastrovat pouze zvířata s metabolismem %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="Pastýř bude kastrovat pouze zvířata s metabolismem mezi %s a %s"/>
 
 
         <!-- AI - NAMING -->
@@ -455,36 +372,19 @@
         <text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Pastýř nebude uměle inseminovat zvířata"/>
         <text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Pastýř bude uměle inseminovat zvířata"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="Pastýř uměle inseminuje maximálně %s zvířat za den"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_mark_1" text="Pastýř nebude označovat zvířata k inseminaci"/>
-        <text name="rl_ui_herdsmanTooltip_ai_mark_2" text="Pastýř bude označovat zvířata k inseminaci"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="Pastýř bude uměle inseminovat zvířata bez ohledu na nemoci"/>
-        <text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="Pastýř bude uměle inseminovat pouze zvířata s nemocí"/>
 
         <text name="rl_ui_herdsmanTooltip_ai_semen" text="Pastýř bude používat inseminant z %s"/>
         <text name="rl_ui_herdsmanTooltip_ai_semen_github" text="Pastýř bude používat semen z %s"/>
         <text name="rl_ui_herdsmanTooltip_ai_semen_any" text="Pastýř bude používat jakýkoli vhodný inseminant"/>
         <text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="Pastýř bude používat jakékoli vhodné semen"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_age_equal" text="Pastýř bude uměle inseminovat pouze zvířata ve věku %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_age_range" text="Pastýř bude uměle inseminovat pouze zvířata ve věku od %s do %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="Pastýř bude uměle inseminovat pouze zvířata s kvalitou %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_quality_range" text="Pastýř bude uměle inseminovat pouze zvířata s kvalitou mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="Pastýř bude uměle inseminovat pouze zvířata s plodností %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="Pastýř bude uměle inseminovat pouze zvířata s plodností mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_health_equal" text="Pastýř bude uměle inseminovat pouze zvířata se zdravím %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_health_range" text="Pastýř bude uměle inseminovat pouze zvířata se zdravím mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="Pastýř bude uměle inseminovat pouze zvířata s produktivitou %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="Pastýř bude uměle inseminovat pouze zvířata s produktivitou mezi %s a %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="Pastýř bude uměle inseminovat pouze zvířata s metabolismem %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="Pastýř bude uměle inseminovat pouze zvířata s metabolismem mezi %s a %s"/>
 
 
 

@@ -429,9 +429,9 @@ function RLMenu.open()
     -- g_gui.currentlyReloading flag MUST bracket the re-parse: without it,
     -- re-loading rlMenuProfiles.xml silently keeps the previously-loaded
     -- profile values, so on-disk edits to existing profiles are dropped. Reset
-    -- it on BOTH the success and the throw path -- a stuck `true` makes
-    -- RealisticLivestock_AnimalScreen:updateInfoBox short-circuit its whole
-    -- body, so the pcall guarantees the reset even if setupGui() errors.
+    -- it on BOTH the success and the throw path -- a stuck `true` makes later
+    -- loadProfiles calls silently keep the prior values, so the pcall
+    -- guarantees the reset even if setupGui() errors.
     if RLMenu.DEV_RELOAD_XML then
         Log:debug("RLMenu.open: DEV reloading GUI XML (profiles + frames + menu)")
         g_gui.currentlyReloading = true

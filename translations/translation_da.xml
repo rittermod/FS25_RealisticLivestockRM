@@ -106,7 +106,6 @@
         <text name="rl_ui_genetics" text="Genetik"/>
         <text name="rl_ui_overall" text="Samlet"/>
         <text name="rl_ui_rename" text="Ændre navn"/>
-        <text name="rl_ui_cantFindAnimal" text="Kunne ikke finde dyr"/>
         <text name="rl_ui_maleNumImpregnatable" text="Befrugtningsdygtige dyr i fold"/>
 
         <text name="rl_ui_breederQuality" text="Opdrætterkvalitet"/>
@@ -150,11 +149,9 @@
         <text name="rl_ui_moveSelected" text="Flyt valgte"/>
         <text name="rl_ui_buyConfirmation" text="Er du sikker på, at du vil købe %s dyr for %s?" tag="format"/>
         <text name="rl_ui_sellConfirmation" text="Er du sikker på, at du vil sælge %s dyr for %s?" tag="format"/>
-        <text name="rl_ui_moveConfirmation" text="Er du sikker på, at du vil flytte %s dyr?" tag="format"/>
         <text name="rl_ui_buyBulkResult" text="%s dyr købt for %s" tag="format"/>
         <text name="rl_ui_sellBulkResult" text="%s dyr solgt for %s" tag="format"/>
         <text name="rl_ui_moveBulkResult" text="%s dyr flyttet" tag="format"/>
-		<text name="rl_ui_moveTab" text="Move"/>
 		<text name="rl_ui_moveSingle" text="Move"/>
 		<text name="rl_ui_moveSelectDestination" text="Select Destination"/>
 		<text name="rl_ui_moveNoDestinations" text="No destinations available for this animal type."/>
@@ -214,7 +211,6 @@
 		<text name="rl_ui_selectNone" text="Vælg ingen"/>
 		<text name="rl_ui_selectSection" text="Select Section"/>
 		<text name="rl_ui_deselectSection" text="Deselect Section"/>
-		<text name="rl_ui_filters" text="Filtre"/>
 		<text name="rl_ui_doesntHaveName" text="Ingen navn"/>
 		<text name="rl_ui_doesHaveName" text="Har Navn"/>
 
@@ -222,14 +218,7 @@
 
 		<text name="rl_ui_castrated" text="Steriliseret"/>
 		<text name="rl_ui_castrate" text="Sterilisér"/>
-		<text name="rl_ui_importance" text="Vigtighed"/>
-		<text name="rl_ui_type" text="Type"/>
-		<text name="rl_ui_date" text="Dato"/>
-		<text name="rl_ui_message" text="Beskeder"/>
-		<text name="rl_ui_messages" text="Beskeder"/>
 		<text name="rl_ui_unknownCauses" text="ukendte årsager"/>
-		<text name="rl_ui_messageNumber" text="%s-%s of %s"/>
-		<text name="rl_ui_deleteMessage" text="Slet besked"/>
 		<text name="rl_ui_unreadMessages" text="Dyrehold '%s' har ulæste beskeder!"/>
 		<text name="rl_ui_herdsman" text="Kvæghyrde"/>
 		<text name="rl_ui_budget" text="Budget"/>
@@ -237,9 +226,7 @@
 		<text name="rl_ui_fixed" text="Fixed"/>
 		<text name="rl_ui_percentage" text="Procent"/>
 		<text name="rl_ui_maxAnimals" text="Max dyr"/>
-		<text name="rl_ui_infinite" text="Uendelig"/>
 		<text name="rl_ui_herdsmanRecentlyBought" text="Seneste lønbetaling til dyrepasser"/>
-		<text name="rl_ui_previousWage" text="Forgående løninger"/>
 		<text name="rl_ui_herdsmanWages" text="dyrpasser lønninger"/>
 		<text name="finance_herdsmanWages" text="dyrpasser lønninger"/>
 		<text name="rl_ui_medicine" text="Medicin"/>
@@ -248,9 +235,6 @@
 		<text name="rl_ui_semenPurchase_github" text="Semen Purchase"/>
 		<text name="finance_semenPurchase" text="Sæd indkøb"/>
 		<text name="finance_semenPurchase_github" text="Semen Purchase"/>
-		<text name="rl_ui_noDiseases" text="Ingen sygdomme"/>
-		<text name="rl_ui_onlyDiseases" text="Kun sygdomme"/>
-		<text name="rl_ui_naming" text="Navngivning"/>
 		<text name="rl_ui_alphabetical" text="Alfabetisk"/>
 		<text name="rl_ui_breed" text="Race"/>
 		<text name="rl_ui_dontMark" text="Marker ikke"/>
@@ -258,7 +242,6 @@
 		<text name="rl_ui_unmark" text="Fjern markering"/>
 		<text name="rl_ui_favourite" text="Favorit"/>
 		<text name="rl_ui_unFavourite" text="Fjern favorit"/>
-		<text name="rl_ui_quantity" text="Antal"/>
 		<text name="rl_ui_dewar" text="Dewar"/>
 		<text name="rl_ui_semenPurchase_successful" text="Sæd blev købt med succes. Du kan afhente det i butikken."/>
 		<text name="rl_ui_semenPurchase_successful_github" text="Semen successfully purchased. You can pick it up at the store"/>
@@ -277,13 +260,8 @@
 		<text name="rl_ui_inseminateAnimal" text="Insiminer %s"/>
 		<text name="rl_ui_inseminate" text="Insiminer"/>
 		<text name="rl_ui_strawEmpty" text="Denne sprøjte er tom"/>
-		<text name="rl_ui_averageSuccessColon" text="Middel Succes: "/>
 		<text name="rl_ui_averageSuccess" text="Middel Succes"/>
 		<text name="rl_ui_success" text="Sucess"/>
-		<text name="rl_ui_save" text="Save"/>
-		<text name="rl_ui_load" text="Load"/>
-		<text name="rl_ui_saveProfile" text="Save Profile"/>
-		<text name="rl_ui_loadProfile" text="Load Profile"/>
 
 		<text name="rl_ui_healthy" text="Rask"/>
 		<text name="rl_ui_hasDisease" text="er syg"/>
@@ -316,38 +294,16 @@
 		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Indkøbsbudgettet er et fast beløb"/>
 		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Indkøbsbudgettet er en procentdel af din gårds penge"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="Dyrepasseren vil bruge op til %s om dagen"/>
-		<text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="Dyrepasseren vil bruge op til %s af din gårds penge om dagen"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="Dyrepasseren vil købe op til %s dyr om dagen"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_breed" text="Dyrepasseren vil kun købe %s dyr"/>
-		<text name="rl_ui_herdsmanTooltip_buy_breed_any" text="Dyrepasseren vil købe enhver race"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="Dyrepasseren vil kun købe dyr uden sygdomme"/>
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="Dyrepasseren vil købe dyr uanset sygdomme"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_gender_1" text="Dyrepasseren vil kun købe hunner."/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_2" text="Dyrepasseren vil købe både hunner og hanner."/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_3" text="Dyrepasseren vil kun købe hanner."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_age_equal" text="Dyrpasseren vil kun købe dyr, der er %s gamle."/>
-		<text name="rl_ui_herdsmanTooltip_buy_age_range" text="Dyrpasseren vil kun købe dyr, der er mellem %s og %s gamle."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="Dyrepasseren vil kun købe dyr med %s kvalitet."/>
-		<text name="rl_ui_herdsmanTooltip_buy_quality_range" text="Dyrepasseren vil kun købe dyr med en kvalitet på mellem %s og %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="Dyrepasseren vil kun købe dyr med %s frugtbarhed."/>
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="Dyrepasseren vil kun købe dyr med en frugtbarhed på mellem %s og %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_health_equal" text="Dyrepasseren vil kun købe dyr med %s sundhed."/>
-		<text name="rl_ui_herdsmanTooltip_buy_health_range" text="Dyrepasseren vil kun købe dyr med en sundhed på mellem %s og %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="Dyrepasseren vil kun købe dyr med %s produktivitet."/>
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="Dyrepasseren vil kun købe dyr med en produktivitet på mellem %s og %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="Dyrepasseren vil kun købe dyr med %s stofskifte."/>
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="Dyrepasseren vil kun købe dyr med et stofskifte på mellem %s og %s."/>
 
 
 		<!-- AI - SELLING -->
@@ -356,35 +312,15 @@
 		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Dyrepasseren vil ikke sælge dyr."/>
 		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Dyrepasseren vil godt sælge dyr."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="Dyrepasseren vil sælge op til %s dyr om dagen."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_mark_1" text="Dyrepasseren vil ikke markere dyr til salg."/>
-		<text name="rl_ui_herdsmanTooltip_sell_mark_2" text="Dyrepasseren vil markere dyr til salg."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="Dyrepasseren vil sælge dyr uanset hvilken sygdom de har."/>
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="Dyrepasseren vil kun sælge syge dyr."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_gender_1" text="Dyrepasseren vil kun sælge hunner."/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_2" text="Dyrepasseren vil sælge hunner og hanner"/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_3" text="Dyrepasseren vil kun sælge hanner"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_age_equal" text="Dyrepasseren vil kun sælge dyr, der er %s gamle."/>
-		<text name="rl_ui_herdsmanTooltip_sell_age_range" text="Dyrepasseren vil kun sælge dyr, der er mellem %s og %s gamle."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="Dyrepasseren vil kun sælge dyr med %s kvalitet."/>
-		<text name="rl_ui_herdsmanTooltip_sell_quality_range" text="Dyrepasseren vil kun sælge dyr med en kvalitet på mellem %s og %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="Dyrepasseren vil kun sælge dyr med %s frugtbarhed."/>
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="Dyrepasseren vil kun sælge dyr med en frugtbarhed på mellem %s og %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_health_equal" text="Dyrepasseren vil kun sælge dyr med %s sundhed."/>
-		<text name="rl_ui_herdsmanTooltip_sell_health_range" text="Dyrepasseren vil kun sælge dyr med en sundhed på mellem %s og %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="Dyrepasseren vil kun sælge dyr med %s produktivitet."/>
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="Dyrepasseren vil kun sælge dyr med en produktivitet på mellem %s og %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="Dyrepasseren vil kun sælge dyr med %s stofskifte."/>
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="Dyrepasseren vil kun sælge dyr med et stofskifte på mellem %s og %s."/>
 
 
 		<!-- AI - CASTRATING -->
@@ -393,29 +329,13 @@
 		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Dyrepasseren vil ikke sterilisere"/>
 		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Dyrepasseren vil godt steriliser"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="Dyrepasseren vil ikke markerer for sterilisation"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="Dyrepasseren vil godt markerer for sterilisation"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="Dyrepasseren vil sterilisere dyr uanset sygdomme"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="Dyrepasseren vil kun sterilisere syge dyr"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="Dyrepasseren vil kun steriliserer dyr der er %s gammel"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_age_range" text="Dyrepasseren vil kun steriliserer dyr, der er mellem %s og %s gammel."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="Dyrepasseren vil kun steriliserer dyr med %s kvalitet."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="Dyrepasseren vil kun steriliserer dyr med en kvalitet på mellem %s og %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="Dyrepasseren vil kun steriliserer dyr med %s frugtbarhed."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="Dyrepasseren vil kun steriliser dyr med en produktivitet på mellem %s og %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="Dyrepasseren vil kun sterilisere dyr med %s helbred"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_health_range" text="Dyrepasseren vil kun sterilisere dyr med et helbred mellem %s og %s"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="Dyrepasseren vil kun sterilisere dyr med %s produktivitet"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="Dyrepasseren vil kun sterilisere dyr med en produktivitet mellem %s og %s"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="Dyrepasseren vil kun sterilisere dyr med %s stofskifte"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="Dyrepasseren vil kun sterilisere dyr med et stofskifte mellem %s og %s"/>
 
 
 		<!-- AI - NAMING -->
@@ -434,36 +354,19 @@
 		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Dyrepasseren vil ikke lave assisteret inseminering(AI) af dyrerne"/>
 		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Dyrepasseren vil godt lave assisteret inseminering(AI) af dyrerne"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="Dyrepasseren vil lave AI op til %s dyr om dagen"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_mark_1" text="Dyrepasseren vil ikke mærke dyrerne til inseminering"/>
-		<text name="rl_ui_herdsmanTooltip_ai_mark_2" text="Dyrepasseren vil godt mærke dyrerne til Inseminering"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="Dyrepasseren vil AI-behandle dyrerne uanset sygdomme"/>
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="Dyrepasseren vil kun AI-behandle dyrerne med en sygdom"/>
 
 		<text name="rl_ui_herdsmanTooltip_ai_semen" text="Dyrepasseren vil bruge sæd fra %s"/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="The herdsman will use semen from %s"/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="The herdsman will use any viable male juice"/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="The herdsman will use any viable semen"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_age_equal" text="Dyrepasseren vil kun AI-behandle dyr, der er %s gamle"/>
-		<text name="rl_ui_herdsmanTooltip_ai_age_range" text="Dyrepasseren vil kun AI-behandle dyr, der er mellem %s og %s gamle"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="Dyrepasseren vil kun AI-behandle dyr med %s kvalitet"/>
-		<text name="rl_ui_herdsmanTooltip_ai_quality_range" text="Dyrepasseren vil kun AI-behandle dyr med en kvalitet mellem %s og %s"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="Dyrepasseren vil kun AI-behandle dyr med %s frugtbarhed"/>
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="Dyrepasseren vil kun AI-behandle dyr med en frugtbarhed mellem %s og %s"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_health_equal" text="Dyrepasseren vil kun AI-behandle dyr med %s helbred"/>
-		<text name="rl_ui_herdsmanTooltip_ai_health_range" text="Dyrepasseren vil kun AI-behandle dyr med et helbred mellem %s og %s"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="Dyrepasseren vil kun AI-behandle dyr med %s produktivitet"/>
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="Dyrepasseren vil kun AI-behandle dyr med en produktivitet mellem %s og %s"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="Dyrepasseren vil kun AI-behandle dyr med %s stofskifte"/>
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="Dyrepasseren vil kun AI-behandle dyr med en stofskifte mellem %s og %s"/>
 
 
 		<!-- INDSTILLINGER -->
@@ -670,9 +573,7 @@
 
         <!-- Added missing translations -->
         <text name="input_RL_AI" text="Kunstig befrugtning"/>
-        <text name="input_RL_CASTRATE" text="Kastrer dyr"/>
         <text name="input_RL_DISEASES" text="Dyresygdomme"/>
-        <text name="input_RL_MARK" text="Markér/Fjern markering af dyr"/>
         <text name="input_RL_MONITOR" text="Tilføj/Fjern monitor"/>
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Åbn dyreskærm"/>
         <text name="input_RL_SELECT" text="Vælg/Fravælg dyr"/>
@@ -710,7 +611,6 @@
         <text name="rl_settings_dealerSale_tooltip" text="Choose which animals and age groups the dealer offers for sale. Changing this restocks the dealer."/>
         <text name="rl_settings_dealerSale_text" text="Choose Animals For Sale"/>
         <text name="rl_settings_resetDealer_tooltip" text="Fjern alle forhandlerens dyr og genopfyld lageret med nye dyr"/>
-        <text name="rl_ui_genetics_highest" text="Højest"/>
         <text name="rl_ui_meat_github" text="Kødkvalitet"/>
         <text name="rl_ui_openAnimalScreen" text="Administrer dyr"/>
         <text name="rl_ui_quality" text="Kvalitet"/>

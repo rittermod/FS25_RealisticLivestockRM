@@ -87,11 +87,6 @@
 		<absoluteSizeOffset value="0px 80px"/>
 	</Profile>
 
-	<Profile name="rl_husbandryListImage" extends="baseReference" with="anchorMiddleLeft">
-		<size value="18px 18px"/>
-		<imageSliceId value="realistic_livestock.importance_3"/>
-	</Profile>
-	
 	<Profile name="rl_settingsButton" extends="emptyPanel" with="anchorMiddleRight">
 		<size value="280px 32px"/>
 		<position value="-10px 0px"/>
@@ -136,24 +131,6 @@
 		<size value="33% 100%"/>
 	</Profile>
 	
-	<Profile name="rl_infoPromptButton" extends="baseReference" with="anchorBottomLeft">
-		<size value="10px 15px"/>
-		<iconColor value="$preset_fs25_colorMainLight"/>
-		<iconHighlightedColor value="$preset_fs25_colorMainHighlight"/>
-		<iconSize value="10px 15px"/>
-		<iconSliceId value="gui.dialogType_info"/>
-		<imageColor value="$preset_colorTransparent"/>
-		<imageFocusedColor value="$preset_colorTransparent"/>
-		<imageSelectedColor value="$preset_colorTransparent"/>
-		<imageSliceId value="gui.colorPreset"/>
-	</Profile>
-
-	<Profile name="rl_infoPrompt" extends="baseReference">
-		<size value="300px 70px"/>
-		<imageSliceId value="gui.map_box_selected"/>
-		<imageColor value="$preset_fs25_colorMainHighlight"/>
-	</Profile>
-
 	<!-- Pen feed-forecast: red variant of fs25_animalSmallStatusBar used by
 	     RLDetailPaneHelper.updatePenDisplay when foodMonthsRemaining < 2.
 	     Color uses $preset_colorRed (0.8069 0.0097 0.0097 1, linear space;

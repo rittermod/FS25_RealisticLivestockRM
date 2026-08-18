@@ -232,8 +232,33 @@ end
 
 function RealisticLivestock_FSBaseMission:onStartMission()
 
-    g_gui.guis.AnimalScreen:delete()
-    g_gui:loadGui(modDirectory .. "gui/AnimalScreen.xml", "AnimalScreen", g_animalScreen)
+    -- Re-load the BASE AnimalScreen GUI so its callback bindings re-snapshot.
+    --
+    -- The GUI layer stores `onOpen` / `onClose` / `onCreate` as FUNCTION REFERENCES captured
+    -- when the XML is parsed (`addCallback` does `self[funcName] = self.target[callbackName]`),
+    -- and raises them from that stored reference - it never re-looks-up the class table. So
+    -- RLAnimalScreenBridge's `AnimalScreen.onOpen` wrapper, installed when our scripts are
+    -- sourced, is INVISIBLE to a tree that snapshotted before it: the base game registers this
+    -- GUI during its own init, so its snapshot holds the untouched vanilla `onOpen`.
+    --
+    -- Re-loading here - after our wrappers exist - re-runs the binding and re-points every
+    -- callback at the wrapped versions. This is why the EPP butcher's direct
+    -- `g_gui:showGui("AnimalScreen")` reaches our redirect at all; `AnimalScreen.show` needs no
+    -- such treatment because a plain class-table lookup resolves at call time.
+    --
+    -- Keep the file name pointing at the BASE screen: RLRM ships no AnimalScreen XML any more
+    -- (RLRM-476), and Locked D5 requires the base GUI to stay REGISTERED under this name.
+    -- Do NOT "simplify" this away - deleting it silently orphans the onOpen redirect, and the
+    -- automated suite cannot see that (the bridge tests call the function directly).
+    if g_gui.guis.AnimalScreen ~= nil then
+        g_gui.guis.AnimalScreen:delete()
+        g_gui:loadGui("dataS/gui/AnimalScreen.xml", "AnimalScreen", g_animalScreen)
+        Log:debug("AnimalScreen GUI re-loaded; onOpen bound to wrapper: %s",
+            tostring(g_gui.guis.AnimalScreen ~= nil
+                and g_gui.guis.AnimalScreen.onOpenCallback == AnimalScreen.onOpen))
+    else
+        Log:error("AnimalScreen GUI missing at onStartMission - the onOpen redirect is orphaned")
+    end
 
     local xmlFile = XMLFile.loadIfExists("RealisticLivestock", modSettingsDirectory .. "Settings.xml")
     if xmlFile ~= nil then
@@ -247,10 +272,8 @@ function RealisticLivestock_FSBaseMission:onStartMission()
     Log:info("Maximum number of visual animals: %d", RealisticLivestock_AnimalClusterHusbandry.MAX_HUSBANDRIES)
 
     AnimalAIDialog.register()
-    AnimalInfoDialog.register()
     DiseaseDialog.register()
     FileExplorerDialog.register()
-    ProfileDialog.register()
     NameInputDialog.register()
     EarTagColourPickerDialog.register()
     VisualAnimalsDialog.register()

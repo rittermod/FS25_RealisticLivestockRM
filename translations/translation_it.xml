@@ -71,10 +71,8 @@
         <!-- UI -->
 
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Apri schermata animali"/>
-        <text name="input_RL_MARK" text="Segna/Deseleziona animale"/>
         <text name="input_RL_MONITOR" text="Applica/Rimuovi monitor"/>
         <text name="input_RL_AI" text="Inseminazione artificiale"/>
-        <text name="input_RL_CASTRATE" text="Castra animale"/>
         <text name="input_RL_DISEASES" text="Malattie animali"/>
         <text name="input_RL_SELECT" text="Seleziona/Deseleziona animale"/>
         <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
@@ -115,7 +113,6 @@
         <text name="rl_ui_genetics" text="Genetica"/>
         <text name="rl_ui_overall" text="Generale"/>
         <text name="rl_ui_rename" text="Cambia nome"/>
-        <text name="rl_ui_cantFindAnimal" text="Impossibile trovare l'animale"/>
         <text name="rl_ui_maleNumImpregnatable" text="Animali fecondabili nel recinto"/>
 
         <text name="rl_ui_breederQuality" text="Qualità riproduttiva"/>
@@ -149,7 +146,6 @@
         <text name="rl_ui_genetics_high" text="Alto"/>
         <text name="rl_ui_genetics_veryHigh" text="Molto alto"/>
         <text name="rl_ui_genetics_extremelyHigh" text="Estremamente alto"/>
-        <text name="rl_ui_genetics_highest" text="Massimo"/>
 
         <text name="rl_ui_genetics_extremelyBad" text="Estremamente scarso"/>
         <text name="rl_ui_genetics_veryBad" text="Molto scarso"/>
@@ -163,11 +159,9 @@
         <text name="rl_ui_moveSelected" text="Sposta selezionati"/>
         <text name="rl_ui_buyConfirmation" text="Sei sicuro di voler acquistare %s animali per %s?" tag="format"/>
         <text name="rl_ui_sellConfirmation" text="Sei sicuro di voler vendere %s animali per %s?" tag="format"/>
-        <text name="rl_ui_moveConfirmation" text="Sei sicuro di voler spostare %s animali?" tag="format"/>
         <text name="rl_ui_buyBulkResult" text="%s animali acquistati per %s" tag="format"/>
         <text name="rl_ui_sellBulkResult" text="%s animali venduti per %s" tag="format"/>
         <text name="rl_ui_moveBulkResult" text="%s animali spostati" tag="format"/>
-        <text name="rl_ui_moveTab" text="Sposta"/>
         <text name="rl_ui_moveSingle" text="Sposta"/>
         <text name="rl_ui_moveSelectDestination" text="Seleziona destinazione"/>
         <text name="rl_ui_moveNoDestinations" text="Nessuna destinazione disponibile per questo tipo di animale."/>
@@ -229,19 +223,11 @@
         <text name="rl_ui_selectNone" text="Deseleziona tutti"/>
         <text name="rl_ui_selectSection" text="Select Section"/>
         <text name="rl_ui_deselectSection" text="Deselect Section"/>
-        <text name="rl_ui_filters" text="Filtri"/>
         <text name="rl_ui_doesntHaveName" text="Senza nome"/>
         <text name="rl_ui_doesHaveName" text="Con nome"/>
         <text name="rl_ui_castrated" text="Castrato"/>
         <text name="rl_ui_castrate" text="Castra"/>
-        <text name="rl_ui_importance" text="Importanza"/>
-        <text name="rl_ui_type" text="Tipo"/>
-        <text name="rl_ui_date" text="Data"/>
-        <text name="rl_ui_message" text="Messaggio"/>
-        <text name="rl_ui_messages" text="Messaggi"/>
         <text name="rl_ui_unknownCauses" text="cause sconosciute"/>
-        <text name="rl_ui_messageNumber" text="%s-%s di %s"/>
-        <text name="rl_ui_deleteMessage" text="Elimina messaggio"/>
         <text name="rl_ui_unreadMessages" text="L'allevamento '%s' ha messaggi non letti!"/>
         <text name="rl_ui_herdsman" text="Mandriano"/>
         <text name="rl_ui_budget" text="Budget"/>
@@ -249,9 +235,7 @@
         <text name="rl_ui_fixed" text="Fisso"/>
         <text name="rl_ui_percentage" text="Percentuale"/>
         <text name="rl_ui_maxAnimals" text="Animali max"/>
-        <text name="rl_ui_infinite" text="Infinito"/>
         <text name="rl_ui_herdsmanRecentlyBought" text="Acquisto recente del mandriano"/>
-        <text name="rl_ui_previousWage" text="Stipendio precedente"/>
         <text name="rl_ui_herdsmanWages" text="Stipendi del mandriano"/>
         <text name="finance_herdsmanWages" text="Stipendi del mandriano"/>
         <text name="rl_ui_medicine" text="Medicina"/>
@@ -260,9 +244,6 @@
         <text name="rl_ui_semenPurchase_github" text="Acquisto seme"/>
         <text name="finance_semenPurchase" text="Acquisto seme"/>
         <text name="finance_semenPurchase_github" text="Acquisto seme"/>
-        <text name="rl_ui_noDiseases" text="Nessuna malattia"/>
-        <text name="rl_ui_onlyDiseases" text="Solo malattie"/>
-        <text name="rl_ui_naming" text="Denominazione"/>
         <text name="rl_ui_alphabetical" text="Alfabetico"/>
         <text name="rl_ui_breed" text="Razza"/>
         <text name="rl_ui_dontMark" text="Non contrassegnare"/>
@@ -270,7 +251,6 @@
         <text name="rl_ui_unmark" text="Rimuovi contrassegno"/>
         <text name="rl_ui_favourite" text="Preferito"/>
         <text name="rl_ui_unFavourite" text="Rimuovi dai preferiti"/>
-        <text name="rl_ui_quantity" text="Quantità"/>
         <text name="rl_ui_dewar" text="Dewar"/>
         <text name="rl_ui_semenPurchase_successful" text="Seme per inseminazione acquistato con successo. Puoi ritirarlo al negozio"/>
         <text name="rl_ui_semenPurchase_successful_github" text="Seme acquistato con successo. Puoi ritirarlo al negozio"/>
@@ -289,13 +269,8 @@
         <text name="rl_ui_inseminateAnimal" text="Insemina %s"/>
         <text name="rl_ui_inseminate" text="Insemina"/>
         <text name="rl_ui_strawEmpty" text="Questa paglia è vuota"/>
-        <text name="rl_ui_averageSuccessColon" text="Successo medio: "/>
         <text name="rl_ui_averageSuccess" text="Successo medio"/>
         <text name="rl_ui_success" text="Successo"/>
-        <text name="rl_ui_save" text="Salva"/>
-        <text name="rl_ui_load" text="Carica"/>
-        <text name="rl_ui_saveProfile" text="Salva profilo"/>
-        <text name="rl_ui_loadProfile" text="Carica profilo"/>
 
         <text name="rl_ui_healthy" text="In salute"/>
         <text name="rl_ui_hasDisease" text="Malato"/>
@@ -324,102 +299,44 @@
         <text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Il budget di acquisto è un importo fisso"/>
         <text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Il budget di acquisto è una percentuale del denaro della tua fattoria"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="Il mandriano spenderà fino a %s al giorno"/>
-        <text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="Il mandriano spenderà fino al %s del denaro della tua fattoria al giorno"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="Il mandriano acquisterà fino a %s animali al giorno"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_breed" text="Il mandriano acquisterà solo animali della razza %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_breed_any" text="Il mandriano acquisterà animali di qualsiasi razza"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="Il mandriano acquisterà solo animali senza malattie"/>
-        <text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="Il mandriano acquisterà animali indipendentemente dalle malattie"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_gender_1" text="Il mandriano acquisterà solo femmine"/>
-        <text name="rl_ui_herdsmanTooltip_buy_gender_2" text="Il mandriano acquisterà femmine e maschi"/>
-        <text name="rl_ui_herdsmanTooltip_buy_gender_3" text="Il mandriano acquisterà solo maschi"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_age_equal" text="Il mandriano acquisterà solo animali di età pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_age_range" text="Il mandriano acquisterà solo animali di età compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="Il mandriano acquisterà solo animali con qualità pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_quality_range" text="Il mandriano acquisterà solo animali con qualità compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="Il mandriano acquisterà solo animali con fertilità pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="Il mandriano acquisterà solo animali con fertilità compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_health_equal" text="Il mandriano acquisterà solo animali con salute pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_health_range" text="Il mandriano acquisterà solo animali con salute compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="Il mandriano acquisterà solo animali con produttività pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="Il mandriano acquisterà solo animali con produttività compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="Il mandriano acquisterà solo animali con metabolismo pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="Il mandriano acquisterà solo animali con metabolismo compreso tra %s e %s"/>
 
         <!-- AI - SELLING -->
 
         <text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Il mandriano non venderà animali"/>
         <text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Il mandriano venderà animali"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="Il mandriano venderà fino a %s animali al giorno"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_mark_1" text="Il mandriano non contrassegnerà animali da vendere"/>
-        <text name="rl_ui_herdsmanTooltip_sell_mark_2" text="Il mandriano contrassegnerà animali da vendere"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="Il mandriano venderà animali indipendentemente dalle malattie"/>
-        <text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="Il mandriano venderà solo animali malati"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_gender_1" text="Il mandriano venderà solo femmine"/>
-        <text name="rl_ui_herdsmanTooltip_sell_gender_2" text="Il mandriano venderà femmine e maschi"/>
-        <text name="rl_ui_herdsmanTooltip_sell_gender_3" text="Il mandriano venderà solo maschi"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_age_equal" text="Il mandriano venderà solo animali di età pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_age_range" text="Il mandriano venderà solo animali di età compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="Il mandriano venderà solo animali con qualità pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_quality_range" text="Il mandriano venderà solo animali con qualità compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="Il mandriano venderà solo animali con fertilità pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="Il mandriano venderà solo animali con fertilità compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_health_equal" text="Il mandriano venderà solo animali con salute pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_health_range" text="Il mandriano venderà solo animali con salute compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="Il mandriano venderà solo animali con produttività pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="Il mandriano venderà solo animali con produttività compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="Il mandriano venderà solo animali con metabolismo pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="Il mandriano venderà solo animali con metabolismo compreso tra %s e %s"/>
 
         <!-- AI - CASTRATING -->
 
         <text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Il mandriano non castrerà animali"/>
         <text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Il mandriano castrerà animali"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="Il mandriano non contrassegnerà animali da castrare"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="Il mandriano contrassegnerà animali da castrare"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="Il mandriano castrerà animali indipendentemente dalle malattie"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="Il mandriano castrerà solo animali malati"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="Il mandriano castrerà solo animali di età pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_age_range" text="Il mandriano castrerà solo animali di età compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="Il mandriano castrerà solo animali con qualità pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="Il mandriano castrerà solo animali con qualità compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="Il mandriano castrerà solo animali con fertilità pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="Il mandriano castrerà solo animali con fertilità compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="Il mandriano castrerà solo animali con salute pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_health_range" text="Il mandriano castrerà solo animali con salute compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="Il mandriano castrerà solo animali con produttività pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="Il mandriano castrerà solo animali con produttività compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="Il mandriano castrerà solo animali con metabolismo pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="Il mandriano castrerà solo animali con metabolismo compreso tra %s e %s"/>
 
         <!-- AI - NAMING -->
 
@@ -434,36 +351,19 @@
         <text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Il mandriano non inseminerà animali"/>
         <text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Il mandriano inseminerà animali"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="Il mandriano inseminerà fino a %s animali al giorno"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_mark_1" text="Il mandriano non contrassegnerà animali da inseminare"/>
-        <text name="rl_ui_herdsmanTooltip_ai_mark_2" text="Il mandriano contrassegnerà animali da inseminare"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="Il mandriano inseminerà animali indipendentemente dalle malattie"/>
-        <text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="Il mandriano inseminerà solo animali malati"/>
 
         <text name="rl_ui_herdsmanTooltip_ai_semen" text="Il mandriano userà seme da %s"/>
         <text name="rl_ui_herdsmanTooltip_ai_semen_github" text="Il mandriano userà seme da %s"/>
         <text name="rl_ui_herdsmanTooltip_ai_semen_any" text="Il mandriano userà qualsiasi seme disponibile"/>
         <text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="Il mandriano userà qualsiasi seme disponibile"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_age_equal" text="Il mandriano inseminerà solo animali di età pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_age_range" text="Il mandriano inseminerà solo animali di età compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="Il mandriano inseminerà solo animali con qualità pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_quality_range" text="Il mandriano inseminerà solo animali con qualità compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="Il mandriano inseminerà solo animali con fertilità pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="Il mandriano inseminerà solo animali con fertilità compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_health_equal" text="Il mandriano inseminerà solo animali con salute pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_health_range" text="Il mandriano inseminerà solo animali con salute compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="Il mandriano inseminerà solo animali con produttività pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="Il mandriano inseminerà solo animali con produttività compresa tra %s e %s"/>
 
-        <text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="Il mandriano inseminerà solo animali con metabolismo pari a %s"/>
-        <text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="Il mandriano inseminerà solo animali con metabolismo compreso tra %s e %s"/>
 
         <!-- SETTINGS -->
 

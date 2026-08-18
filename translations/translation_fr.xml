@@ -72,10 +72,8 @@
 		<!-- INTERFACE -->
 
 <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Ouvrir l'écran des animaux"/>
-<text name="input_RL_MARK" text="Marquer/Démarquer l'animal"/>
 <text name="input_RL_MONITOR" text="Activer/Désactiver le suivi"/>
 <text name="input_RL_AI" text="Insémination artificielle"/>
-<text name="input_RL_CASTRATE" text="Castrer l'animal"/>
 <text name="input_RL_DISEASES" text="Maladies animales"/>
 <text name="input_RL_SELECT" text="Sélectionner/Désélectionner l'animal"/>
 <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
@@ -116,7 +114,6 @@
 <text name="rl_ui_genetics" text="Génétique"/>
 <text name="rl_ui_overall" text="Global"/>
 <text name="rl_ui_rename" text="Renommer"/>
-<text name="rl_ui_cantFindAnimal" text="Impossible de trouver l'animal"/>
 <text name="rl_ui_maleNumImpregnatable" text="Femelles fécondables dans l'enclos"/>
 
 		<text name="rl_ui_breederQuality" text="Qualité d'élevage"/>
@@ -150,7 +147,6 @@
 <text name="rl_ui_genetics_high" text="Élevée"/>
 <text name="rl_ui_genetics_veryHigh" text="Très élevée"/>
 <text name="rl_ui_genetics_extremelyHigh" text="Extrêmement élevée"/>
-<text name="rl_ui_genetics_highest" text="Maximale"/>
 
 		<text name="rl_ui_genetics_extremelyBad" text="Extrêmement mauvaise"/>
 <text name="rl_ui_genetics_veryBad" text="Très mauvaise"/>
@@ -167,11 +163,9 @@
 <text name="rl_ui_buySkippedNotSupported" text="%d animal(aux) non pris en charge par cet élevage" tag="format"/>
 <text name="rl_ui_buyAllRejected" text="Aucun des animaux sélectionnés ne peut être acheté dans cet élevage."/>
 <text name="rl_ui_sellConfirmation" text="Êtes-vous sûr de vouloir vendre %s animaux pour %s ?" tag="format"/>
-<text name="rl_ui_moveConfirmation" text="Êtes-vous sûr de vouloir déplacer %s animaux ?" tag="format"/>
 <text name="rl_ui_buyBulkResult" text="%s animaux achetés pour %s" tag="format"/>
 <text name="rl_ui_sellBulkResult" text="%s animaux vendus pour %s" tag="format"/>
 <text name="rl_ui_moveBulkResult" text="%s animaux déplacés" tag="format"/>
-<text name="rl_ui_moveTab" text="Déplacer"/>
 <text name="rl_ui_moveSingle" text="Déplacer"/>
 <text name="rl_ui_moveSelectDestination" text="Sélectionner une destination"/>
 <text name="rl_ui_moveNoDestinations" text="Aucune destination disponible pour ce type d'animal."/>
@@ -233,7 +227,6 @@
 <text name="rl_ui_selectNone" text="Tout désélectionner"/>
 <text name="rl_ui_selectSection" text="Select Section"/>
 <text name="rl_ui_deselectSection" text="Deselect Section"/>
-<text name="rl_ui_filters" text="Filtres"/>
 <text name="rl_ui_doesntHaveName" text="Sans nom"/>
 <text name="rl_ui_doesHaveName" text="Avec nom"/>
 
@@ -242,14 +235,7 @@
 		<text name="rl_ui_castrated" text="Castré"/>
 <text name="rl_ui_castrate" text="Castrer"/>
 
-		<text name="rl_ui_importance" text="Importance"/>
-<text name="rl_ui_type" text="Type"/>
-<text name="rl_ui_date" text="Date"/>
-<text name="rl_ui_message" text="Message"/>
-<text name="rl_ui_messages" text="Messages"/>
 <text name="rl_ui_unknownCauses" text="causes inconnues"/>
-<text name="rl_ui_messageNumber" text="%s-%s sur %s"/>
-<text name="rl_ui_deleteMessage" text="Supprimer le message"/>
 <text name="rl_ui_unreadMessages" text="L'élevage '%s' a des messages non lus !"/>
 <text name="rl_ui_herdsman" text="Éleveur"/>
 <text name="rl_ui_budget" text="Budget"/>
@@ -257,9 +243,7 @@
 <text name="rl_ui_fixed" text="Fixe"/>
 <text name="rl_ui_percentage" text="Pourcentage"/>
 <text name="rl_ui_maxAnimals" text="Nombre max d'animaux"/>
-<text name="rl_ui_infinite" text="Illimité"/>
 <text name="rl_ui_herdsmanRecentlyBought" text="Achat récent d'éleveur"/>
-<text name="rl_ui_previousWage" text="Salaire précédent"/>
 <text name="rl_ui_herdsmanWages" text="Salaires de l'éleveur"/>
 <text name="finance_herdsmanWages" text="Salaires de l'éleveur"/>
 <text name="rl_ui_medicine" text="Médicaments"/>
@@ -268,9 +252,6 @@
 <text name="rl_ui_semenPurchase_github" text="Achat de semence"/>
 <text name="finance_semenPurchase" text="Achat de semence"/>
 <text name="finance_semenPurchase_github" text="Achat de semence"/>
-<text name="rl_ui_noDiseases" text="Sans maladies"/>
-<text name="rl_ui_onlyDiseases" text="Maladies uniquement"/>
-<text name="rl_ui_naming" text="Nommage"/>
 <text name="rl_ui_alphabetical" text="Alphabétique"/>
 <text name="rl_ui_breed" text="Race"/>
 <text name="rl_ui_dontMark" text="Ne pas marquer"/>
@@ -278,7 +259,6 @@
 <text name="rl_ui_unmark" text="Démarquer"/>
 <text name="rl_ui_favourite" text="Favori"/>
 <text name="rl_ui_unFavourite" text="Retirer des favoris"/>
-<text name="rl_ui_quantity" text="Quantité"/>
 <text name="rl_ui_dewar" text="Réservoir Dewar"/>
 <text name="rl_ui_semenPurchase_successful" text="Semence achetée avec succès. Vous pouvez la récupérer au magasin"/>
 <text name="rl_ui_semenPurchase_successful_github" text="Semence achetée avec succès. Vous pouvez la récupérer au magasin"/>
@@ -297,13 +277,8 @@
 <text name="rl_ui_inseminateAnimal" text="Inséminer %s"/>
 <text name="rl_ui_inseminate" text="Inséminer"/>
 <text name="rl_ui_strawEmpty" text="Cette paille est vide"/>
-<text name="rl_ui_averageSuccessColon" text="Succès moyen : "/>
 <text name="rl_ui_averageSuccess" text="Succès moyen"/>
 <text name="rl_ui_success" text="Succès"/>
-<text name="rl_ui_save" text="Sauvegarder"/>
-<text name="rl_ui_load" text="Charger"/>
-<text name="rl_ui_saveProfile" text="Sauvegarder le profil"/>
-<text name="rl_ui_loadProfile" text="Charger le profil"/>
 
 		<text name="rl_ui_healthy" text="Sain"/>
 <text name="rl_ui_hasDisease" text="Malade"/>
@@ -336,38 +311,16 @@
 <text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Le budget d'achat est un montant fixe"/>
 <text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Le budget d'achat est un pourcentage de l'argent de la ferme"/>
 
-<text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="L'éleveur dépensera jusqu'à %s par jour"/>
-<text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="L'éleveur dépensera jusqu'à %s de l'argent de la ferme par jour"/>
 
-<text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="L'éleveur achètera jusqu'à %s animaux par jour"/>
 
-<text name="rl_ui_herdsmanTooltip_buy_breed" text="L'éleveur achètera uniquement des animaux de race %s"/>
-<text name="rl_ui_herdsmanTooltip_buy_breed_any" text="L'éleveur achètera n'importe quelle race"/>
 
-<text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="L'éleveur achètera uniquement des animaux sans maladie"/>
-<text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="L'éleveur achètera des animaux avec ou sans maladie"/>
 
-<text name="rl_ui_herdsmanTooltip_buy_gender_1" text="L'éleveur achètera uniquement des femelles"/>
-<text name="rl_ui_herdsmanTooltip_buy_gender_2" text="L'éleveur achètera des mâles et des femelles"/>
-<text name="rl_ui_herdsmanTooltip_buy_gender_3" text="L'éleveur achètera uniquement des mâles"/>
 
-<text name="rl_ui_herdsmanTooltip_buy_age_equal" text="L'éleveur achètera uniquement des animaux âgés de %s"/>
-<text name="rl_ui_herdsmanTooltip_buy_age_range" text="L'éleveur achètera uniquement des animaux âgés entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="L'éleveur achètera uniquement des animaux de qualité %s"/>
-<text name="rl_ui_herdsmanTooltip_buy_quality_range" text="L'éleveur achètera uniquement des animaux avec une qualité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="L'éleveur achètera uniquement des animaux avec une fertilité de %s"/>
-<text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="L'éleveur achètera uniquement des animaux avec une fertilité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_buy_health_equal" text="L'éleveur achètera uniquement des animaux avec une santé de %s"/>
-<text name="rl_ui_herdsmanTooltip_buy_health_range" text="L'éleveur achètera uniquement des animaux avec une santé entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="L'éleveur achètera uniquement des animaux avec une productivité de %s"/>
-<text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="L'éleveur achètera uniquement des animaux avec une productivité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="L'éleveur achètera uniquement des animaux avec un métabolisme de %s"/>
-<text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="L'éleveur achètera uniquement des animaux avec un métabolisme entre %s et %s"/>
 
 
 		<!-- IA - VENTE -->
@@ -376,35 +329,15 @@
 <text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="L'éleveur ne vendra pas d'animaux"/>
 <text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="L'éleveur vendra des animaux"/>
 
-<text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="L'éleveur vendra jusqu'à %s animaux par jour"/>
 
-<text name="rl_ui_herdsmanTooltip_sell_mark_1" text="L'éleveur ne marquera pas d'animaux pour la vente"/>
-<text name="rl_ui_herdsmanTooltip_sell_mark_2" text="L'éleveur marquera des animaux pour la vente"/>
 
-<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="L'éleveur vendra des animaux avec ou sans maladie"/>
-<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="L'éleveur vendra uniquement des animaux malades"/>
 
-<text name="rl_ui_herdsmanTooltip_sell_gender_1" text="L'éleveur vendra uniquement des femelles"/>
-<text name="rl_ui_herdsmanTooltip_sell_gender_2" text="L'éleveur vendra des mâles et des femelles"/>
-<text name="rl_ui_herdsmanTooltip_sell_gender_3" text="L'éleveur vendra uniquement des mâles"/>
 
-<text name="rl_ui_herdsmanTooltip_sell_age_equal" text="L'éleveur vendra uniquement des animaux âgés de %s"/>
-<text name="rl_ui_herdsmanTooltip_sell_age_range" text="L'éleveur vendra uniquement des animaux âgés entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="L'éleveur vendra uniquement des animaux de qualité %s"/>
-<text name="rl_ui_herdsmanTooltip_sell_quality_range" text="L'éleveur vendra uniquement des animaux avec une qualité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="L'éleveur vendra uniquement des animaux avec une fertilité de %s"/>
-<text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="L'éleveur vendra uniquement des animaux avec une fertilité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_sell_health_equal" text="L'éleveur vendra uniquement des animaux avec une santé de %s"/>
-<text name="rl_ui_herdsmanTooltip_sell_health_range" text="L'éleveur vendra uniquement des animaux avec une santé entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="L'éleveur vendra uniquement des animaux avec une productivité de %s"/>
-<text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="L'éleveur vendra uniquement des animaux avec une productivité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="L'éleveur vendra uniquement des animaux avec un métabolisme de %s"/>
-<text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="L'éleveur vendra uniquement des animaux avec un métabolisme entre %s et %s"/>
 
 
 		<!-- IA - CASTRATION -->
@@ -413,29 +346,13 @@
 <text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="L'éleveur ne castrera pas les animaux"/>
 <text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="L'éleveur castrera les animaux"/>
 
-<text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="L'éleveur ne marquera pas les animaux pour castration"/>
-<text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="L'éleveur marquera les animaux pour castration"/>
 
-<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="L'éleveur castrera les animaux avec ou sans maladie"/>
-<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="L'éleveur castrera uniquement les animaux malades"/>
 
-<text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="L'éleveur castrera uniquement des animaux âgés de %s"/>
-<text name="rl_ui_herdsmanTooltip_castrate_age_range" text="L'éleveur castrera uniquement des animaux âgés entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="L'éleveur castrera uniquement des animaux de qualité %s"/>
-<text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="L'éleveur castrera uniquement des animaux avec une qualité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="L'éleveur castrera uniquement des animaux avec une fertilité de %s"/>
-<text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="L'éleveur castrera uniquement des animaux avec une fertilité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="L'éleveur castrera uniquement des animaux avec une santé de %s"/>
-<text name="rl_ui_herdsmanTooltip_castrate_health_range" text="L'éleveur castrera uniquement des animaux avec une santé entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="L'éleveur castrera uniquement des animaux avec une productivité de %s"/>
-<text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="L'éleveur castrera uniquement des animaux avec une productivité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="L'éleveur castrera uniquement des animaux avec un métabolisme de %s"/>
-<text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="L'éleveur castrera uniquement des animaux avec un métabolisme entre %s et %s"/>
 
 
 		<!-- IA - NOMMAGE -->
@@ -454,36 +371,19 @@
 <text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="L'éleveur n'effectuera pas d'insémination artificielle"/>
 <text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="L'éleveur effectuera des inséminations artificielles"/>
 
-<text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="L'éleveur inséminera jusqu'à %s animaux par jour"/>
 
-<text name="rl_ui_herdsmanTooltip_ai_mark_1" text="L'éleveur ne marquera pas les animaux à inséminer"/>
-<text name="rl_ui_herdsmanTooltip_ai_mark_2" text="L'éleveur marquera les animaux à inséminer"/>
 
-<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="L'éleveur inséminera les animaux avec ou sans maladie"/>
-<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="L'éleveur inséminera uniquement des animaux malades"/>
 
 <text name="rl_ui_herdsmanTooltip_ai_semen" text="L'éleveur utilisera du sperme provenant de %s"/>
 <text name="rl_ui_herdsmanTooltip_ai_semen_github" text="L'éleveur utilisera du sperme provenant de %s"/>
 <text name="rl_ui_herdsmanTooltip_ai_semen_any" text="L'éleveur utilisera tout sperme viable"/>
 <text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="L'éleveur utilisera tout sperme viable"/>
 
-<text name="rl_ui_herdsmanTooltip_ai_age_equal" text="L'éleveur inséminera uniquement des animaux âgés de %s"/>
-<text name="rl_ui_herdsmanTooltip_ai_age_range" text="L'éleveur inséminera uniquement des animaux âgés entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="L'éleveur inséminera uniquement des animaux de qualité %s"/>
-<text name="rl_ui_herdsmanTooltip_ai_quality_range" text="L'éleveur inséminera uniquement des animaux avec une qualité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="L'éleveur inséminera uniquement des animaux avec une fertilité de %s"/>
-<text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="L'éleveur inséminera uniquement des animaux avec une fertilité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_ai_health_equal" text="L'éleveur inséminera uniquement des animaux avec une santé de %s"/>
-<text name="rl_ui_herdsmanTooltip_ai_health_range" text="L'éleveur inséminera uniquement des animaux avec une santé entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="L'éleveur inséminera uniquement des animaux avec une productivité de %s"/>
-<text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="L'éleveur inséminera uniquement des animaux avec une productivité entre %s et %s"/>
 
-<text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="L'éleveur inséminera uniquement des animaux avec un métabolisme de %s"/>
-<text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="L'éleveur inséminera uniquement des animaux avec un métabolisme entre %s et %s"/>
 
 
 

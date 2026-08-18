@@ -195,17 +195,11 @@ Codice sorgente e tracciamento issue: https://github.com/rittermod/FS25_Realisti
         <actionBinding action="RL_OPEN_ANIMAL_SCREEN">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_r" index="1"/>
         </actionBinding>
-        <actionBinding action="RL_MARK">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_x" index="1"/>
-        </actionBinding>
         <actionBinding action="RL_MONITOR">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_m" index="1"/>
         </actionBinding>
         <actionBinding action="RL_AI">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_i" index="1"/>
-        </actionBinding>
-        <actionBinding action="RL_CASTRATE">
-            <binding device="KB_MOUSE_DEFAULT" input="KEY_c" index="1"/>
         </actionBinding>
         <actionBinding action="RL_DISEASES">
             <binding device="KB_MOUSE_DEFAULT" input="KEY_d" index="1"/>
@@ -228,10 +222,8 @@ Codice sorgente e tracciamento issue: https://github.com/rittermod/FS25_Realisti
     </inputBinding>
     <actions>
         <action name="RL_OPEN_ANIMAL_SCREEN"/>
-        <action name="RL_MARK"/>
         <action name="RL_MONITOR"/>
         <action name="RL_AI"/>
-        <action name="RL_CASTRATE"/>
         <action name="RL_DISEASES"/>
         <action name="RL_RENAME"/>
         <action name="RL_SELECT"/>

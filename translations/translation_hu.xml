@@ -73,10 +73,8 @@
 
 
 		<text name="input_RL_OPEN_ANIMAL_SCREEN" text="Állatok menü megnyitása"/>
-		<text name="input_RL_MARK" text="Állat megjelölése / jelölés törlése"/>
 		<text name="input_RL_MONITOR" text="Monitor alkalmazása / eltávolítása"/>
 		<text name="input_RL_AI" text="Mesterséges megtermékenyítés"/>
-		<text name="input_RL_CASTRATE" text="Állat kasztrálása"/>
 		<text name="input_RL_DISEASES" text="Állatbetegségek"/>
 		<text name="input_RL_SELECT" text="Állat kiválasztása / kiválasztás megszüntetése"/>
 		<text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
@@ -117,7 +115,6 @@
 		<text name="rl_ui_genetics" text="Genetika"/>
 		<text name="rl_ui_overall" text="Összesített"/>
 		<text name="rl_ui_rename" text="Átnevezés"/>
-		<text name="rl_ui_cantFindAnimal" text="Az állat nem található"/>
 		<text name="rl_ui_maleNumImpregnatable" text="Megtermékenyíthető állatok a karámban"/>
 
 		<text name="rl_ui_breederQuality" text="Tenyészminőség"/>
@@ -151,7 +148,6 @@
 		<text name="rl_ui_genetics_high" text="Magas"/>
 		<text name="rl_ui_genetics_veryHigh" text="Nagyon magas"/>
 		<text name="rl_ui_genetics_extremelyHigh" text="Rendkívül magas"/>
-		<text name="rl_ui_genetics_highest" text="Legmagasabb"/>
 
 		<text name="rl_ui_genetics_extremelyBad" text="Rendkívül rossz"/>
 		<text name="rl_ui_genetics_veryBad" text="Nagyon rossz"/>
@@ -168,11 +164,9 @@
 		<text name="rl_ui_buySkippedNotSupported" text="%d állatot nem támogat ez az állattartó épület" tag="format"/>
 		<text name="rl_ui_buyAllRejected" text="A kiválasztott állatok egyike sem vásárolható meg ebbe az állattartó épületbe."/>
 		<text name="rl_ui_sellConfirmation" text="Biztosan el akarsz adni %s állatot %s összegért?" tag="format"/>
-		<text name="rl_ui_moveConfirmation" text="Biztosan át akarsz helyezni %s állatot?" tag="format"/>
 		<text name="rl_ui_buyBulkResult" text="%s állat megvásárolva %s összegért" tag="format"/>
 		<text name="rl_ui_sellBulkResult" text="%s állat eladva %s összegért" tag="format"/>
 		<text name="rl_ui_moveBulkResult" text="%s állat áthelyezve" tag="format"/>
-		<text name="rl_ui_moveTab" text="Áthelyezés"/>
 		<text name="rl_ui_moveSingle" text="Áthelyez"/>
 		<text name="rl_ui_moveSelectDestination" text="Célállomás kiválasztása"/>
 		<text name="rl_ui_moveNoDestinations" text="Nincs elérhető célállomás ehhez az állatfajhoz."/>
@@ -234,7 +228,6 @@
 		<text name="rl_ui_selectNone" text="Kijelölés törlése"/>
 		<text name="rl_ui_selectSection" text="Select Section"/>
 		<text name="rl_ui_deselectSection" text="Deselect Section"/>
-		<text name="rl_ui_filters" text="Szűrők"/>
 		<text name="rl_ui_doesntHaveName" text="Nincs neve"/>
 		<text name="rl_ui_doesHaveName" text="Van neve"/>
 
@@ -243,14 +236,7 @@
 		<text name="rl_ui_castrated" text="Kasztrált"/>
 		<text name="rl_ui_castrate" text="Kasztrálás"/>
 
-		<text name="rl_ui_importance" text="Fontosság"/>
-		<text name="rl_ui_type" text="Típus"/>
-		<text name="rl_ui_date" text="Dátum"/>
-		<text name="rl_ui_message" text="Üzenet"/>
-		<text name="rl_ui_messages" text="Üzenetek"/>
 		<text name="rl_ui_unknownCauses" text="ismeretlen okok"/>
-		<text name="rl_ui_messageNumber" text="%s-%s / %s"/>
-		<text name="rl_ui_deleteMessage" text="Üzenet törlése"/>
 		<text name="rl_ui_unreadMessages" text="A(z) '%s' istállóban olvasatlan üzeneteid vannak!"/>
 		<text name="rl_ui_herdsman" text="Állatgondozó"/>
 		<text name="rl_ui_budget" text="Költségvetés"/>
@@ -258,9 +244,7 @@
 		<text name="rl_ui_fixed" text="Fix"/>
 		<text name="rl_ui_percentage" text="Százalékos"/>
 		<text name="rl_ui_maxAnimals" text="Állatok max. száma"/>
-		<text name="rl_ui_infinite" text="Végtelen"/>
 		<text name="rl_ui_herdsmanRecentlyBought" text="Legutóbbi állatgondozói vásárlás"/>
-		<text name="rl_ui_previousWage" text="Előző bér"/>
 		<text name="rl_ui_herdsmanWages" text="Állatgondozó bére"/>
 		<text name="finance_herdsmanWages" text="Állatgondozó bére"/>
 		<text name="rl_ui_medicine" text="Gyógyszer"/>
@@ -269,9 +253,6 @@
 		<text name="rl_ui_semenPurchase_github" text="Sperma vásárlása"/>
 		<text name="finance_semenPurchase" text="Szaporítóanyag vásárlása"/>
 		<text name="finance_semenPurchase_github" text="Sperma vásárlása"/>
-		<text name="rl_ui_noDiseases" text="Nincs betegség"/>
-		<text name="rl_ui_onlyDiseases" text="Csak betegségek"/>
-		<text name="rl_ui_naming" text="Elnevezés"/>
 		<text name="rl_ui_alphabetical" text="Betűrendben"/>
 		<text name="rl_ui_breed" text="Fajta"/>
 		<text name="rl_ui_dontMark" text="Ne jelölje meg"/>
@@ -279,7 +260,6 @@
 		<text name="rl_ui_unmark" text="Jelölés törlése"/>
 		<text name="rl_ui_favourite" text="Kedvenc"/>
 		<text name="rl_ui_unFavourite" text="Kedvenc törlése"/>
-		<text name="rl_ui_quantity" text="Mennyiség"/>
 		<text name="rl_ui_dewar" text="Dewar-edény"/>
 		<text name="rl_ui_semenPurchase_successful" text="Mesterséges szaporítóanyag sikeresen megvásárolva. Átvehető a boltban."/>
 		<text name="rl_ui_semenPurchase_successful_github" text="Sperma sikeresen megvásárolva. Átvehető a boltban."/>
@@ -298,13 +278,8 @@
 		<text name="rl_ui_inseminateAnimal" text="%s megtermékenyítése"/>
 		<text name="rl_ui_inseminate" text="Megtermékenyítés"/>
 		<text name="rl_ui_strawEmpty" text="Ez a fiola üres"/>
-		<text name="rl_ui_averageSuccessColon" text="Átlagos sikeresség: "/>
 		<text name="rl_ui_averageSuccess" text="Átlagos sikeresség"/>
 		<text name="rl_ui_success" text="Sikeresség"/>
-		<text name="rl_ui_save" text="Mentés"/>
-		<text name="rl_ui_load" text="Betöltés"/>
-		<text name="rl_ui_saveProfile" text="Profil mentése"/>
-		<text name="rl_ui_loadProfile" text="Profil betöltése"/>
 
 		<text name="rl_ui_healthy" text="Egészséges"/>
 		<text name="rl_ui_hasDisease" text="Beteg"/>
@@ -337,38 +312,16 @@
 		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="A vásárlási keret egy fix összeg"/>
 		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="A vásárlási keret a gazdaság pénzének százalékos aránya"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="Az állatgondozó legfeljebb %s összeget költ naponta"/>
-		<text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="Az állatgondozó a gazdaság pénzének legfeljebb %s-át költi el naponta"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="Az állatgondozó legfeljebb %s állatot vásárol naponta"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_breed" text="Az állatgondozó csak %s állatokat fog vásárolni"/>
-		<text name="rl_ui_herdsmanTooltip_buy_breed_any" text="Az állatgondozó bármilyen fajtát megvásárol"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="Az állatgondozó csak betegségmentes állatokat vásárol"/>
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="Az állatgondozó a betegségektől függetlenül vásárol állatokat"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_gender_1" text="Az állatgondozó csak nőstény állatokat vásárol"/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_2" text="Az állatgondozó nőstény és hím állatokat is vásárol"/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_3" text="Az állatgondozó csak hím állatokat vásárol"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_age_equal" text="Az állatgondozó csak %s korú állatokat vásárol"/>
-		<text name="rl_ui_herdsmanTooltip_buy_age_range" text="Az állatgondozó csak %s és %s kor közötti állatokat vásárol"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="Az állatgondozó csak %s minőségű állatokat vásárol"/>
-		<text name="rl_ui_herdsmanTooltip_buy_quality_range" text="Az állatgondozó csak %s és %s közötti minőségű állatokat vásárol"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="Az állatgondozó csak %s termékenységű állatokat vásárol"/>
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="Az állatgondozó csak %s és %s közötti termékenységű állatokat vásárol"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_health_equal" text="Az állatgondozó csak %s egészségi állapotú állatokat vásárol"/>
-		<text name="rl_ui_herdsmanTooltip_buy_health_range" text="Az állatgondozó csak %s és %s közötti egészségi állapotú állatokat vásárol"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="Az állatgondozó csak %s termelékenységű állatokat vásárol"/>
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="Az állatgondozó csak %s és %s közötti termelékenységű állatokat vásárol"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="Az állatgondozó csak %s anyagcseréjű állatokat vásárol"/>
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="Az állatgondozó csak %s és %s közötti anyagcseréjű állatokat vásárol"/>
 
 
 		<!-- AI - SELLING -->
@@ -377,35 +330,15 @@
 		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Az állatgondozó nem fog állatokat eladni"/>
 		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Az állatgondozó állatokat fog eladni"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="Az állatgondozó legfeljebb %s állatot ad el naponta"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_mark_1" text="Az állatgondozó nem jelöli meg az eladásra szánt állatokat"/>
-		<text name="rl_ui_herdsmanTooltip_sell_mark_2" text="Az állatgondozó megjelöli az eladásra szánt állatokat"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="Az állatgondozó a betegségektől függetlenül ad el állatokat"/>
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="Az állatgondozó csak a beteg állatokat adja el"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_gender_1" text="Az állatgondozó csak nőstény állatokat ad el"/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_2" text="Az állatgondozó nőstény és hím állatokat is elad"/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_3" text="Az állatgondozó csak hím állatokat ad el"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_age_equal" text="Az állatgondozó csak %s korú állatokat ad el"/>
-		<text name="rl_ui_herdsmanTooltip_sell_age_range" text="Az állatgondozó csak %s és %s kor közötti állatokat ad el"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="Az állatgondozó csak %s minőségű állatokat ad el"/>
-		<text name="rl_ui_herdsmanTooltip_sell_quality_range" text="Az állatgondozó csak %s és %s közötti minőségű állatokat ad el"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="Az állatgondozó csak %s termékenységű állatokat ad el"/>
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="Az állatgondozó csak %s és %s közötti termékenységű állatokat ad el"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_health_equal" text="Az állatgondozó csak %s egészségi állapotú állatokat ad el"/>
-		<text name="rl_ui_herdsmanTooltip_sell_health_range" text="Az állatgondozó csak %s és %s közötti egészségi állapotú állatokat ad el"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="Az állatgondozó csak %s termelékenységű állatokat ad el"/>
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="Az állatgondozó csak %s és %s közötti termelékenységű állatokat ad el"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="Az állatgondozó csak %s anyagcseréjű állatokat ad el"/>
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="Az állatgondozó csak %s és %s közötti anyagcseréjű állatokat ad el"/>
 
 
 		<!-- AI - CASTRATING -->
@@ -414,29 +347,13 @@
 		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Az állatgondozó nem fog állatokat kasztrálni"/>
 		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Az állatgondozó állatokat fog kasztrálni"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="Az állatgondozó nem jelöli meg az állatokat kasztrálásra"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="Az állatgondozó megjelöli az állatokat kasztrálásra"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="Az állatgondozó a betegségektől függetlenül kasztrál állatokat"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="Az állatgondozó csak a beteg állatokat kasztrálja"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="Az állatgondozó csak %s korú állatokat kasztrál"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_age_range" text="Az állatgondozó csak %s és %s kor közötti állatokat kasztrál"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="Az állatgondozó csak %s minőségű állatokat kasztrál"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="Az állatgondozó csak %s és %s közötti minőségű állatokat kasztrál"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="Az állatgondozó csak %s termékenységű állatokat kasztrál"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="Az állatgondozó csak %s és %s közötti termékenységű állatokat kasztrál"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="Az állatgondozó csak %s egészségi állapotú állatokat kasztrál"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_health_range" text="Az állatgondozó csak %s és %s közötti egészségi állapotú állatokat kasztrál"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="Az állatgondozó csak %s termelékenységű állatokat kasztrál"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="Az állatgondozó csak %s és %s közötti termelékenységű állatokat kasztrál"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="Az állatgondozó csak %s anyagcseréjű állatokat kasztrál"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="Az állatgondozó csak %s és %s közötti anyagcseréjű állatokat kasztrál"/>
 
 
 		<!-- AI - NAMING -->
@@ -455,36 +372,19 @@
 		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Az állatgondozó nem végez mesterséges megtermékenyítést"/>
 		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Az állatgondozó mesterségesen megtermékenyíti az állatokat"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="Az állatgondozó legfeljebb %s állatot termékenyít meg naponta"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_mark_1" text="Az állatgondozó nem jelöli meg a megtermékenyítésre váró állatokat"/>
-		<text name="rl_ui_herdsmanTooltip_ai_mark_2" text="Az állatgondozó megjelöli a megtermékenyítésre váró állatokat"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="Az állatgondozó a betegségektől függetlenül végzi a megtermékenyítést"/>
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="Az állatgondozó csak a beteg állatokat termékenyíti meg"/>
 
 		<text name="rl_ui_herdsmanTooltip_ai_semen" text="Az állatgondozó %s szaporítóanyagát fogja használni"/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="Az állatgondozó %s spermáját fogja használni"/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="Az állatgondozó bármilyen életképes szaporítóanyagot felhasznál"/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="Az állatgondozó bármilyen életképes spermát felhasznál"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_age_equal" text="Az állatgondozó csak %s korú állatokat termékenyít meg"/>
-		<text name="rl_ui_herdsmanTooltip_ai_age_range" text="Az állatgondozó csak %s és %s kor közötti állatokat termékenyít meg"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="Az állatgondozó csak %s minőségű állatokat termékenyít meg"/>
-		<text name="rl_ui_herdsmanTooltip_ai_quality_range" text="Az állatgondozó csak %s és %s közötti minőségű állatokat termékenyít meg"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="Az állatgondozó csak %s termékenységű állatokat termékenyít meg"/>
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="Az állatgondozó csak %s és %s közötti termékenységű állatokat termékenyít meg"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_health_equal" text="Az állatgondozó csak %s egészségi állapotú állatokat termékenyít meg"/>
-		<text name="rl_ui_herdsmanTooltip_ai_health_range" text="Az állatgondozó csak %s és %s közötti egészségi állapotú állatokat termékenyít meg"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="Az állatgondozó csak %s termelékenységű állatokat termékenyít meg"/>
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="Az állatgondozó csak %s és %s közötti termelékenységű állatokat termékenyít meg"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="Az állatgondozó csak %s anyagcseréjű állatokat termékenyít meg"/>
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="Az állatgondozó csak %s és %s közötti anyagcseréjű állatokat termékenyít meg"/>
 
 
 

@@ -109,7 +109,6 @@
 		<text name="rl_ui_genetics" text="Genetiikka"/>
 		<text name="rl_ui_overall" text="Kokonais"/>
 		<text name="rl_ui_rename" text="Vaihda nimi"/>
-		<text name="rl_ui_cantFindAnimal" text="Eläintä ei löytynyt"/>
 		<text name="rl_ui_maleNumImpregnatable" text="Siitettäviä eläimiä aitauksessa"/>
 
 		<text name="rl_ui_breederQuality" text="Siittäjän laatu"/>
@@ -143,7 +142,6 @@
 		<text name="rl_ui_genetics_high" text="Korkea"/>
 		<text name="rl_ui_genetics_veryHigh" text="Erittäin korkea"/>
 		<text name="rl_ui_genetics_extremelyHigh" text="Äärimmäisen korkea"/>
-		<text name="rl_ui_genetics_highest" text="Korkein mahdollinen"/>
 
 		<text name="rl_ui_genetics_extremelyBad" text="Äärimmäisen huono"/>
 		<text name="rl_ui_genetics_veryBad" text="Erittäin huono"/>
@@ -157,11 +155,9 @@
 		<text name="rl_ui_moveSelected" text="Siirrä valitut"/>
 		<text name="rl_ui_buyConfirmation" text="Haluatko varmasti ostaa %s eläintä %s:lla?" tag="format"/>
 		<text name="rl_ui_sellConfirmation" text="Haluatko varmasti myydä %s eläintä %s:lla?" tag="format"/>
-		<text name="rl_ui_moveConfirmation" text="Haluatko varmasti siirtää %s eläintä?" tag="format"/>
 		<text name="rl_ui_buyBulkResult" text="%s eläintä ostettiin %s:lla" tag="format"/>
 		<text name="rl_ui_sellBulkResult" text="%s eläintä myytiin %s:lla" tag="format"/>
 		<text name="rl_ui_moveBulkResult" text="%s eläintä siirrettiin" tag="format"/>
-		<text name="rl_ui_moveTab" text="Move"/>
 		<text name="rl_ui_moveSingle" text="Move"/>
 		<text name="rl_ui_moveSelectDestination" text="Select Destination"/>
 		<text name="rl_ui_moveNoDestinations" text="No destinations available for this animal type."/>
@@ -221,7 +217,6 @@
 		<text name="rl_ui_selectNone" text="Älä valitse mitään"/>
 		<text name="rl_ui_selectSection" text="Select Section"/>
 		<text name="rl_ui_deselectSection" text="Deselect Section"/>
-		<text name="rl_ui_filters" text="Suodattimet"/>
 		<text name="rl_ui_doesntHaveName" text="Ei nimeä"/>
 		<text name="rl_ui_doesHaveName" text="On nimi"/>
 
@@ -229,13 +224,7 @@
 
 		<text name="rl_ui_castrated" text="Kastroitu"/>
 		<text name="rl_ui_castrate" text="Kastroi"/>
-		<text name="rl_ui_type" text="Tyyppi"/>
-		<text name="rl_ui_date" text="Päivämäärä"/>
-		<text name="rl_ui_message" text="Viesti"/>
-		<text name="rl_ui_messages" text="Viestit"/>
 		<text name="rl_ui_unknownCauses" text="tuntemattomia syitä"/>
-		<text name="rl_ui_messageNumber" text="%s-%s / %s"/>
-		<text name="rl_ui_deleteMessage" text="Poista viesti"/>
 		<text name="rl_ui_unreadMessages" text="Navetalla '%s' on lukemattomia viestejä!"/>
 		<text name="rl_ui_herdsman" text="Lomittaja"/>
 		<text name="rl_ui_budget" text="Budjetti"/>
@@ -243,9 +232,7 @@
 		<text name="rl_ui_fixed" text="Kiinteä"/>
 		<text name="rl_ui_percentage" text="Prosenttiosuus"/>
 		<text name="rl_ui_maxAnimals" text="Eläimiä enintään"/>
-		<text name="rl_ui_infinite" text="Loputon"/>
 		<text name="rl_ui_herdsmanRecentlyBought" text="Lomittajan viimeisimmät ostot"/>
-		<text name="rl_ui_previousWage" text="Edellinen palkka"/>
 		<text name="rl_ui_herdsmanWages" text="Lomittajan palkat"/>
 		<text name="finance_herdsmanWages" text="Lomittajan palkat"/>
 		<text name="rl_ui_medicine" text="Lääke"/>
@@ -254,9 +241,6 @@
 		<text name="rl_ui_semenPurchase_github" text="Siemennyskapillaari"/>
 		<text name="finance_semenPurchase" text="Siemennyskapillaari"/>
 		<text name="finance_semenPurchase_github" text="Siemennyskapillaari"/>
-		<text name="rl_ui_noDiseases" text="Ei tauteja"/>
-		<text name="rl_ui_onlyDiseases" text="Vain taudit"/>
-		<text name="rl_ui_naming" text="Nimeäminen"/>
 		<text name="rl_ui_alphabetical" text="Aakkosjärjestys"/>
 		<text name="rl_ui_breed" text="Rotu"/>
 		<text name="rl_ui_dontMark" text="Älä merkitse"/>
@@ -264,7 +248,6 @@
 		<text name="rl_ui_unmark" text="Poista merkintä"/>
 		<text name="rl_ui_favourite" text="Suosikki"/>
 		<text name="rl_ui_unFavourite" text="Poista suosikki"/>
-		<text name="rl_ui_quantity" text="Määrä"/>
 		<text name="rl_ui_dewar" text="Säiliö"/>
 		<text name="rl_ui_semenPurchase_successful" text="Siemennystuote ostetty onnistuneesti. Voit noutaa sen kaupalta"/>
 		<text name="rl_ui_semenPurchase_successful_github" text="Siemennystuote ostettu onnistuneesti. Voit noutaa sen kaupalta"/>
@@ -283,13 +266,8 @@
 		<text name="rl_ui_inseminateAnimal" text="Siemennä %s"/>
 		<text name="rl_ui_inseminate" text="Siemennä"/>
 		<text name="rl_ui_strawEmpty" text="Tämä siemennyskapillaari on tyhjä"/>
-		<text name="rl_ui_averageSuccessColon" text="Keskiarvo onnistumisesta: "/>
 		<text name="rl_ui_averageSuccess" text="Keskiarvo onnistumisessa"/>
 		<text name="rl_ui_success" text="Onnistui"/>
-		<text name="rl_ui_save" text="Tallenna"/>
-		<text name="rl_ui_load" text="Lataa"/>
-		<text name="rl_ui_saveProfile" text="Tallenna profiili"/>
-		<text name="rl_ui_loadProfile" text="Lataa profiili"/>
 
 		<text name="rl_ui_healthy" text="Healthy"/>
 		<text name="rl_ui_hasDisease" text="Has Disease"/>
@@ -322,38 +300,16 @@
 		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Ostobudjetti on kiinteä määrä."/>
 		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Ostobudjetti on prosenttiosuus tilan rahoista."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="Lomittaja käyttää enintään %s per päivä."/>
-		<text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="Lomittaja käyttää enintään %s tilan rahoista päivässä."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="Lomittaja ostaa enintään %s eläintä päivässä."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_breed" text="Lomittaja ostaa vain %s -rodun eläimiä."/>
-		<text name="rl_ui_herdsmanTooltip_buy_breed_any" text="Lomittaja ostaa minkä tahansa rodun eläimiä."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="Lomittaja ostaa vain terveitä eläimiä."/>
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="Lomittaja ostaa eläimiä taudeista riippumatta."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_gender_1" text="Lomittaja ostaa vain naaraseläimiä."/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_2" text="Lomittaja ostaa sekä naaras- että uroseläimiä."/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_3" text="Lomittaja ostaa vain uroseläimiä."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_age_equal" text="Lomittaja ostaa vain eläimiä, joiden ikä on %s."/>
-		<text name="rl_ui_herdsmanTooltip_buy_age_range" text="Lomittaja ostaa vain eläimiä, joiden ikä on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="Lomittaja ostaa vain eläimiä, joiden laatu on %s."/>
-		<text name="rl_ui_herdsmanTooltip_buy_quality_range" text="Lomittaja ostaa vain eläimiä, joiden laatu on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="Lomittaja ostaa vain eläimiä, joiden hedelmällisyys on %s."/>
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="Lomittaja ostaa vain eläimiä, joiden hedelmällisyys on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_health_equal" text="Lomittaja ostaa vain eläimiä, joiden terveys on %s."/>
-		<text name="rl_ui_herdsmanTooltip_buy_health_range" text="Lomittaja ostaa vain eläimiä, joiden terveys on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="Lomittaja ostaa vain eläimiä, joiden tuottavuus on %s."/>
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="Lomittaja ostaa vain eläimiä, joiden tuottavuus on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="Lomittaja ostaa vain eläimiä, joiden aineenvaihdunta on %s."/>
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="Lomittaja ostaa vain eläimiä, joiden aineenvaihdunta on %s ja %s välillä."/>
 
 
 	<!-- AI - SELLING -->
@@ -362,35 +318,15 @@
 		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Lomittaja ei myy eläimiä."/>
 		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Lomittaja myy eläimiä."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="Lomittaja myy korkeintaan %s eläintä päivässä."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_mark_1" text="Lomittaja ei merkitse eläimiä myytäväksi."/>
-		<text name="rl_ui_herdsmanTooltip_sell_mark_2" text="Lomittaja merkitsee eläimiä myytäväksi."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="Lomittaja myy eläimiä riippumatta sairauksista."/>
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="Lomittaja myy vain sairaita eläimiä."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_gender_1" text="Lomittaja myy vain naaraseläimiä."/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_2" text="Lomittaja myy sekä naaras- että uroseläimiä."/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_3" text="Lomittaja myy vain uroseläimiä."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_age_equal" text="Lomittaja myy vain eläimiä, joiden ikä on %s."/>
-		<text name="rl_ui_herdsmanTooltip_sell_age_range" text="Lomittaja myy vain eläimiä, joiden ikä on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="Lomittaja myy vain eläimiä, joiden laatu on %s."/>
-		<text name="rl_ui_herdsmanTooltip_sell_quality_range" text="Lomittaja myy vain eläimiä, joiden laatu on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="Lomittaja myy vain eläimiä, joiden hedelmällisyys on %s."/>
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="Lomittaja myy vain eläimiä, joiden hedelmällisyys on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_health_equal" text="Lomittaja myy vain eläimiä, joiden terveys on %s."/>
-		<text name="rl_ui_herdsmanTooltip_sell_health_range" text="Lomittaja myy vain eläimiä, joiden terveys on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="Lomittaja myy vain eläimiä, joiden tuottavuus on %s."/>
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="Lomittaja myy vain eläimiä, joiden tuottavuus on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="Lomittaja myy vain eläimiä, joiden aineenvaihdunta on %s."/>
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="Lomittaja myy vain eläimiä, joiden aineenvaihdunta on %s ja %s välillä."/>
 
 
 	<!-- AI - CASTRATING -->
@@ -399,29 +335,13 @@
 		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Lomittaja ei kastroi eläimiä."/>
 		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Lomittaja kastroi eläimiä."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="Lomittaja ei merkitse eläimiä kastraatiota varten."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="Lomittaja merkitsee eläimiä kastraatiota varten."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="Lomittaja kastroi eläimiä riippumatta sairauksista."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="Lomittaja kastroi vain sairaita eläimiä."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="Lomittaja kastroi vain eläimiä, joiden ikä on %s."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_age_range" text="Lomittaja kastroi vain eläimiä, joiden ikä on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="Lomittaja kastroi vain eläimiä, joiden laatu on %s."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="Lomittaja kastroi vain eläimiä, joiden laatu on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="Lomittaja kastroi vain eläimiä, joiden hedelmällisyys on %s."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="Lomittaja kastroi vain eläimiä, joiden hedelmällisyys on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="Lomittaja kastroi vain eläimiä, joiden terveys on %s."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_health_range" text="Lomittaja kastroi vain eläimiä, joiden terveys on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="Lomittaja kastroi vain eläimiä, joiden tuottavuus on %s."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="Lomittaja kastroi vain eläimiä, joiden tuottavuus on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="Lomittaja kastroi vain eläimiä, joiden aineenvaihdunta on %s."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="Lomittaja kastroi vain eläimiä, joiden aineenvaihdunta on %s ja %s välillä."/>
 
 
 	<!-- AI - NAMING -->
@@ -440,36 +360,19 @@
 		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Lomittaja ei tee keinohedelmöityksiä."/>
 		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Lomittaja tekee keinohedelmöityksiä."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="Lomittaja keinohedelmöittää enintään %s eläintä päivässä."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_mark_1" text="Lomittaja ei merkitse eläimiä keinohedelmöitettäväksi."/>
-		<text name="rl_ui_herdsmanTooltip_ai_mark_2" text="Lomittaja merkitsee eläimiä keinohedelmöitettäväksi."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="Lomittaja keinohedelmöittää eläimiä riippumatta sairauksista."/>
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="Lomittaja keinohedelmöittää vain sairaita eläimiä."/>
 
 		<text name="rl_ui_herdsmanTooltip_ai_semen" text="Lomittaja käyttää siementä lähteestä %s."/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="Lomittaja käyttää siementä lähteestä %s."/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="Lomittaja käyttää mitä tahansa kelvollista siementä."/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="Lomittaja käyttää mitä tahansa kelvollista siementä."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_age_equal" text="Lomittaja keinohedelmöittää vain eläimiä, joiden ikä on %s."/>
-		<text name="rl_ui_herdsmanTooltip_ai_age_range" text="Lomittaja keinohedelmöittää vain eläimiä, joiden ikä on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="Lomittaja keinohedelmöittää vain eläimiä, joiden laatu on %s."/>
-		<text name="rl_ui_herdsmanTooltip_ai_quality_range" text="Lomittaja keinohedelmöittää vain eläimiä, joiden laatu on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="Lomittaja keinohedelmöittää vain eläimiä, joiden hedelmällisyys on %s."/>
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="Lomittaja keinohedelmöittää vain eläimiä, joiden hedelmällisyys on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_health_equal" text="Lomittaja keinohedelmöittää vain eläimiä, joiden terveys on %s."/>
-		<text name="rl_ui_herdsmanTooltip_ai_health_range" text="Lomittaja keinohedelmöittää vain eläimiä, joiden terveys on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="Lomittaja keinohedelmöittää vain eläimiä, joiden tuottavuus on %s."/>
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="Lomittaja keinohedelmöittää vain eläimiä, joiden tuottavuus on %s ja %s välillä."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="Lomittaja keinohedelmöittää vain eläimiä, joiden aineenvaihdunta on %s."/>
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="Lomittaja keinohedelmöittää vain eläimiä, joiden aineenvaihdunta on %s ja %s välillä."/>
 
 
 
@@ -691,11 +594,8 @@
 		<text name="rl_ui_dependency_missing_notInstalled" text="- %s (Not Installed)"/>
 		<text name="rl_ui_dependency_missing_installed" text="- %s (Installed: %s, Minimum Required: %s)"/>
         <!-- Added missing translations -->
-        <text name="rl_ui_importance" text="Tärkeys"/>
         <text name="input_RL_AI" text="Keinosiemennys"/>
-        <text name="input_RL_CASTRATE" text="Kastroi eläin"/>
         <text name="input_RL_DISEASES" text="Eläintaudit"/>
-        <text name="input_RL_MARK" text="Merkitse/Poista merkintä"/>
         <text name="input_RL_MONITOR" text="Asenna/Poista monitori"/>
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Avaa eläinnäkymä"/>
         <text name="input_RL_SELECT" text="Valitse/Poista valinta"/>

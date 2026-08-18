@@ -108,7 +108,6 @@
 		<text name="rl_ui_genetics" text="Genetik"/>
 		<text name="rl_ui_overall" text="Insgesamt"/>
 		<text name="rl_ui_rename" text="Name ändern"/>
-		<text name="rl_ui_cantFindAnimal" text="Konnte kein Tier finden"/>
 		<text name="rl_ui_maleNumImpregnatable" text="Befruchtbare Tiere im Stall"/>
 
 		<text name="rl_ui_breederQuality" text="Qualität des Züchters"/>
@@ -152,11 +151,9 @@
 		<text name="rl_ui_moveSelected" text="Auswahl verschieben"/>
 		<text name="rl_ui_buyConfirmation" text="Bist Du sicher, dass Du %s Tiere für %s kaufen willst?" tag="format"/>
 		<text name="rl_ui_sellConfirmation" text="Bist Du sicher, dass Du %s Tiere für %s verkaufen willst?" tag="format"/>
-		<text name="rl_ui_moveConfirmation" text="Bist Du sicher, dass Du %s Tiere verschieben willst?" tag="format"/>
 		<text name="rl_ui_buyBulkResult" text="%s Tiere für %s gekauft" tag="format"/>
 		<text name="rl_ui_sellBulkResult" text="%s Tiere für %s verkauft" tag="format"/>
 		<text name="rl_ui_moveBulkResult" text="%s Tiere verschoben" tag="format"/>
-		<text name="rl_ui_moveTab" text="Verschieben"/>
 		<text name="rl_ui_moveSingle" text="Verschieben"/>
 		<text name="rl_ui_moveSelectDestination" text="Zielort auswählen"/>
 		<text name="rl_ui_moveNoDestinations" text="Kein Zielort für diesen Tiertyp verfügbar."/>
@@ -216,7 +213,6 @@
 		<text name="rl_ui_selectNone" text="Keine auswählen"/>
 		<text name="rl_ui_selectSection" text="Select Section"/>
 		<text name="rl_ui_deselectSection" text="Deselect Section"/>
-		<text name="rl_ui_filters" text="Filter"/>
 		<text name="rl_ui_doesntHaveName" text="Ohne Namen"/>
 		<text name="rl_ui_doesHaveName" text="Hat Namen"/>
 
@@ -224,14 +220,7 @@
 
 		<text name="rl_ui_castrated" text="Kastriert"/>
 		<text name="rl_ui_castrate" text="Kastrieren"/>
-		<text name="rl_ui_importance" text="Priorität"/>
-		<text name="rl_ui_type" text="Typ"/>
-		<text name="rl_ui_date" text="Datum"/>
-		<text name="rl_ui_message" text="Nachricht"/>
-		<text name="rl_ui_messages" text="Nachrichten"/>
 		<text name="rl_ui_unknownCauses" text="unbekannte Ursachen"/>
-		<text name="rl_ui_messageNumber" text="%s-%s von %s"/>
-		<text name="rl_ui_deleteMessage" text="Nachricht Löschen"/>
 		<text name="rl_ui_unreadMessages" text="Stall '%s' hat ungelesene Nachrichten!"/>
 		<text name="rl_ui_herdsman" text="Herdenmanager"/>
 		<text name="rl_ui_budget" text="Budget"/>
@@ -239,9 +228,7 @@
 		<text name="rl_ui_fixed" text="Behoben"/>
 		<text name="rl_ui_percentage" text="Prozent"/>
 		<text name="rl_ui_maxAnimals" text="Max Tiere"/>
-		<text name="rl_ui_infinite" text="Unendlich"/>
 		<text name="rl_ui_herdsmanRecentlyBought" text="Kürzlich getätigter Kauf des Herdenmanagers"/>
-		<text name="rl_ui_previousWage" text="Vorheriges Gehalt"/>
 		<text name="rl_ui_herdsmanWages" text="Herdenmanager Lohn"/>
 		<text name="finance_herdsmanWages" text="Herdenmanager Löhne"/>
 		<text name="rl_ui_medicine" text="Arzneimittel"/>
@@ -250,9 +237,6 @@
 		<text name="rl_ui_semenPurchase_github" text="Spermakauf"/>
 		<text name="finance_semenPurchase" text="Kauf von Sperma"/>
 		<text name="finance_semenPurchase_github" text="Spermakauf"/>
-		<text name="rl_ui_noDiseases" text="Keine Krankheiten"/>
-		<text name="rl_ui_onlyDiseases" text="Nur Krankheiten"/>
-		<text name="rl_ui_naming" text="Benennung"/>
 		<text name="rl_ui_alphabetical" text="Alphabetisch"/>
 		<text name="rl_ui_breed" text="Rasse"/>
 		<text name="rl_ui_dontMark" text="Nicht markieren"/>
@@ -260,7 +244,6 @@
 		<text name="rl_ui_unmark" text="Markierung aufheben"/>
 		<text name="rl_ui_favourite" text="Favorit"/>
 		<text name="rl_ui_unFavourite" text="Nicht favorisiert"/>
-		<text name="rl_ui_quantity" text="Menge"/>
 		<text name="rl_ui_dewar" text="Dewarbehälter"/>
 		<text name="rl_ui_semenPurchase_successful" text="Sperma erfolgreich gekauft. Sie können es im Laden abholen."/>
 		<text name="rl_ui_semenPurchase_successful_github" text="Sperma erfolgreich gekauft. Sie können es im Laden abholen."/>
@@ -279,13 +262,8 @@
 		<text name="rl_ui_inseminateAnimal" text="Besamen %s"/>
 		<text name="rl_ui_inseminate" text="Besamen"/>
 		<text name="rl_ui_strawEmpty" text="Dieses Besamungsröhrchen ist leer."/>
-		<text name="rl_ui_averageSuccessColon" text="Durchschnittlicher Erfolg: "/>
 		<text name="rl_ui_averageSuccess" text="Durchschnittlicher Erfolg"/>
 		<text name="rl_ui_success" text="Erfolg"/>
-		<text name="rl_ui_save" text="Speichern"/>
-		<text name="rl_ui_load" text="Laden"/>
-		<text name="rl_ui_saveProfile" text="Profil speichern"/>
-		<text name="rl_ui_loadProfile" text="Profil laden"/>
 
 
 		<text name="rl_insemination_male" text="Nur weibliche Tiere können künstlich besamt werden."/>
@@ -318,38 +296,16 @@
 		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Das Einkaufsbudget ist ein fester Betrag."/>
 		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Das Einkaufsbudget ist ein Prozentsatz des Geldes Ihrer Farm."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="Der Herdenmanager wird bis zu %s pro Tag ausgeben."/>
-		<text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="Der Herdenmanager gibt täglich bis zu %s des Geldes Ihrer Farm aus."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="Der Herdenmanager wird bis zu %s Tiere pro Tag kaufen."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_breed" text="Der Herdenmanager wird nur %s Tiere kaufen."/>
-		<text name="rl_ui_herdsmanTooltip_buy_breed_any" text="Der Herdenmanager wird jede Rasse kaufen."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="Der Herdenmanager kauft nur Tiere, die frei von Krankheiten sind."/>
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="Der Herdenmanager wird Tiere unabhängig von Krankheiten kaufen."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_gender_1" text="Der Herdenmanager wird nur weibliche Tiere kaufen."/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_2" text="Der Herdenmanager wird weibliche und männliche Tiere kaufen."/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_3" text="Der Herdenmanager wird nur männliche Tiere kaufen."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_age_equal" text="Der Herdenmanager kauft nur Tiere, die %s alt sind."/>
-		<text name="rl_ui_herdsmanTooltip_buy_age_range" text="Der Herdenmanager kauft nur Tiere, die zwischen %s und %s alt sind."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="Der Herdenmanager kauft nur Tiere mit einer Qualität von %s."/>
-		<text name="rl_ui_herdsmanTooltip_buy_quality_range" text="Der Herdenmanager kauft nur Tiere mit einer Qualität zwischen %s und %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="Der Herdenmanager kauft nur Tiere mit einer Fruchtbarkeit von %s."/>
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="Der Herdenmanager kauft nur Tiere mit einer Fruchtbarkeit zwischen %s und %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_health_equal" text="Der Hirte kauft nur Tiere mit einer Gesundheit von %s."/>
-		<text name="rl_ui_herdsmanTooltip_buy_health_range" text="Der Hirte kauft nur Tiere mit einem Gesundheitszustand zwischen %s und %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="Der Herdenmanager kauft nur Tiere mit einer Produktivität von %s."/>
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="Der Herdenmanager kauft nur Tiere mit einer Produktivität zwischen %s und %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="Der Herdenmanager kauft nur Tiere mit einem Metabolismus von %s."/>
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="Der Herdenmanager kauft nur Tiere mit einem Metabolismus zwischen %s und %s."/>
 
 
 		<!-- AI - SELLING -->
@@ -358,35 +314,15 @@
 		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Der Herdenmanager wird keine Tiere verkaufen."/>
 		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Der Herdenmanager wird Tiere verkaufen."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="Der Herdenmanager wird bis zu %s Tiere pro Tag verkaufen."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_mark_1" text="Der Herdenmanager wird die zum Verkauf stehenden Tiere nicht markieren."/>
-		<text name="rl_ui_herdsmanTooltip_sell_mark_2" text="Der Herdenmanager wird die Tiere markieren, die verkauft werden sollen."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="Der Herdenmanager wird Tiere unabhängig von Krankheiten verkaufen."/>
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="Der Herdenmanager verkauft nur Tiere mit einer Krankheit."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_gender_1" text="Der Herdenmanager verkauft nur weibliche Tiere."/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_2" text="Der Herdenmanager verkauft weibliche und männliche Tiere."/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_3" text="Der Herdenmanager verkauft nur männliche Tiere."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_age_equal" text="Der Herdenmanager verkauft nur Tiere, die %s alt sind."/>
-		<text name="rl_ui_herdsmanTooltip_sell_age_range" text="Der Herdenmanager verkauft nur Tiere, die zwischen %s und %s alt sind."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="Der Herdenmanager verkauft nur Tiere mit einer Qualität von %s."/>
-		<text name="rl_ui_herdsmanTooltip_sell_quality_range" text="Der Herdenmanager verkauft nur Tiere mit einer Qualität zwischen %s und %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="Der Herdenmanager verkauft nur Tiere mit einer Fruchtbarkeit von %s."/>
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="Der Herdenmanager verkauft nur Tiere mit einer Fruchtbarkeit zwischen %s und %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_health_equal" text="Der Herdenmanager verkauft nur Tiere mit einer Gesundheit von %s."/>
-		<text name="rl_ui_herdsmanTooltip_sell_health_range" text="Der Herdenmanager verkauft nur Tiere mit einem Gesundheitszustand zwischen %s und %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="Der Herdenmanager verkauft nur Tiere mit einer Produktivität von %s."/>
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="Der Herdenmanager verkauft nur Tiere mit einer Produktivität zwischen %s und %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="Der Herdenmanager verkauft nur Tiere mit einem Metabolismus von %s."/>
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="Der Herdenmanager verkauft nur Tiere mit einem Metabolismus zwischen %s und %s."/>
 
 
 		<!-- AI - CASTRATING -->
@@ -395,29 +331,13 @@
 		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Der Herdenmanager wird keine Tiere kastrieren."/>
 		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Der Herdenmanager wird Tiere kastrieren."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="Der Herdenmanager wird die Tiere nicht zur Kastration markieren."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="Der Herdenmanager wird die Tiere zur Kastration markieren."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="Der Herdenmanager wird Tiere unabhängig von Krankheiten kastrieren."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="Der Herdenmanager kastriert nur Tiere, die an einer Krankheit leiden."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="Der Herdenmanager kastriert nur Tiere, die %s alt sind."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_age_range" text="Der Herdenmanager kastriert nur Tiere, die zwischen %s und %s alt sind."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="Der Herdenmanager kastriert nur Tiere mit einer Qualität von %s."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="Der Herdenmanager kastriert nur Tiere mit einer Qualität zwischen %s und %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="Der Herdenmanager kastriert nur Tiere mit einer Fruchtbarkeit von %s."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="Der Herdenmanager kastriert nur Tiere mit einer Fruchtbarkeit zwischen %s und %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="Der Herdenmanager kastriert nur Tiere mit einer Gesundheit von %s."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_health_range" text="Der Herdenmanager kastriert nur Tiere, deren Gesundheitszustand zwischen %s und %s liegt."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="Der Herdenmanager kastriert nur Tiere mit einer Produktivität von %s."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="Der Herdenmanager kastriert nur Tiere mit einer Produktivität zwischen %s und %s."/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="Der Herdenmanager kastriert nur Tiere mit einem Metabolismus von %s."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="Der Herdenmanager kastriert nur Tiere mit einem Metabolismus zwischen %s und %s."/>
 
 
 		<!-- AI - NAMING -->
@@ -436,36 +356,19 @@
 		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Der Herdenmanager wird keine Tiere künstlich besamen."/>
 		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Der Herdenmanager wird Tiere künstlich besamen."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="Der Herdenmanager wird bis zu %s Tiere pro Tag besamen."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_mark_1" text="Der Herdenmanager wird die zu besamenden Tiere nicht markieren."/>
-		<text name="rl_ui_herdsmanTooltip_ai_mark_2" text="Der Herdenmanager wird die zu besamenden Tiere markieren."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="Der Herdenmanager wird Tiere unabhängig von Krankheiten besamen."/>
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="Der Herdenmanager wird nur Tiere mit einer Krankheit besamen."/>
 
 		<text name="rl_ui_herdsmanTooltip_ai_semen" text="Der Herdenmanager wird Sperma von %s verwenden."/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="Der Herdenmanager wird Sperma von %s verwenden."/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="Der Herdenmanager wird jedes brauchbare Sperma verwenden."/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="Der Herdenmanager wird jedes brauchbare Sperma verwenden."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_age_equal" text="Der Herdenmanager wird nur Tiere besamen, die %s alt sind."/>
-		<text name="rl_ui_herdsmanTooltip_ai_age_range" text="Der Herdenmanager wird nur Tiere besamen, die zwischen %s und %s alt sind."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="Der Herdenmanager wird nur Tiere mit einer Qualität von %s besamen."/>
-		<text name="rl_ui_herdsmanTooltip_ai_quality_range" text="Der Herdenmanager wird nur Tiere mit einer Qualität zwischen %s und %s besamen."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="Der Herdenmanager wird nur Tiere mit einer Fruchtbarkeit von %s besamen."/>
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="Der Herdenmanager wird nur Tiere mit einer Fruchtbarkeit zwischen %s und %s besamen."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_health_equal" text="Der Herdenmanager wird nur Tiere mit einer Gesundheit von %s besamen."/>
-		<text name="rl_ui_herdsmanTooltip_ai_health_range" text="Der Herdenmanager wird nur Tiere mit einem Gesundheitszustand zwischen %s und %s besamen."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="Der Herdenmanager wird nur Tiere mit einer Produktivität von %s besamen."/>
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="Der Herdenmanager wird nur Tiere mit einer Produktivität zwischen %s und %s besamen."/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="Der Herdenmanager wird nur Tiere mit %s-Metabolismus besamen."/>
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="Der Herdenmanager wird nur Tiere mit einem Metabolismus zwischen %s und %s besamen."/>
 
 
 
@@ -676,9 +579,7 @@
 		<text name="rl_ui_dependency_missing_installed" text="- %s (Installiert: %s, Mindestanforderung: %s)"/>
         <!-- Added missing translations -->
         <text name="input_RL_AI" text="Künstliche Besamung"/>
-        <text name="input_RL_CASTRATE" text="Tier kastrieren"/>
         <text name="input_RL_DISEASES" text="Tierkrankheiten"/>
-        <text name="input_RL_MARK" text="Tier markieren/Markierung aufheben"/>
         <text name="input_RL_MONITOR" text="Tierüberwachung anbringen/entfernen"/>
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Tierbildschirm öffnen"/>
         <text name="input_RL_SELECT" text="Tier auswählen/Auswahl aufheben"/>
@@ -714,7 +615,6 @@
         <text name="rl_settings_dealerSale_tooltip" text="Choose which animals and age groups the dealer offers for sale. Changing this restocks the dealer."/>
         <text name="rl_settings_dealerSale_text" text="Choose Animals For Sale"/>
         <text name="rl_settings_resetDealer_tooltip" text="Entfernen Sie alle Tiere des Händlers und füllen Sie den Bestand mit neuen Tieren auf"/>
-        <text name="rl_ui_genetics_highest" text="Maximum"/>
         <text name="rl_ui_meat_github" text="Fleischqualität"/>
         <text name="rl_ui_openAnimalScreen" text="Tiere verwalten"/>
         <text name="rl_ui_quality" text="Qualität"/>

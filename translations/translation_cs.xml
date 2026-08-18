@@ -108,7 +108,6 @@
 		<text name="rl_ui_genetics" text="遗传学"/>
 		<text name="rl_ui_overall" text="总体"/>
 		<text name="rl_ui_rename" text="重命名"/>
-		<text name="rl_ui_cantFindAnimal" text="无法找到动物"/>
 		<text name="rl_ui_maleNumImpregnatable" text="圈舍内可受孕动物数量"/>
 
 		<text name="rl_ui_breederQuality" text="育种质量"/>
@@ -142,7 +141,6 @@
 		<text name="rl_ui_genetics_high" text="高"/>
 		<text name="rl_ui_genetics_veryHigh" text="很高"/>
 		<text name="rl_ui_genetics_extremelyHigh" text="极高"/>
-		<text name="rl_ui_genetics_highest" text="最高"/>
 
 		<text name="rl_ui_genetics_extremelyBad" text="极差"/>
 		<text name="rl_ui_genetics_veryBad" text="很差"/>
@@ -156,11 +154,9 @@
 		<text name="rl_ui_moveSelected" text="移动选中"/>
 		<text name="rl_ui_buyConfirmation" text="确定要以 %s 的价格购买 %s 头动物吗？" tag="format"/>
 		<text name="rl_ui_sellConfirmation" text="确定要以 %s 的价格出售 %s 头动物吗？" tag="format"/>
-		<text name="rl_ui_moveConfirmation" text="确定要移动 %s 头动物吗？" tag="format"/>
 		<text name="rl_ui_buyBulkResult" text="以 %s 的价格购买了 %s 头动物" tag="format"/>
 		<text name="rl_ui_sellBulkResult" text="以 %s 的价格出售了 %s 头动物" tag="format"/>
 		<text name="rl_ui_moveBulkResult" text="移动了 %s 头动物" tag="format"/>
-		<text name="rl_ui_moveTab" text="Move"/>
 		<text name="rl_ui_moveSingle" text="Move"/>
 		<text name="rl_ui_moveSelectDestination" text="Select Destination"/>
 		<text name="rl_ui_moveNoDestinations" text="No destinations available for this animal type."/>
@@ -220,7 +216,6 @@
 		<text name="rl_ui_selectNone" text="全不选"/>
 		<text name="rl_ui_selectSection" text="Select Section"/>
 		<text name="rl_ui_deselectSection" text="Deselect Section"/>
-		<text name="rl_ui_filters" text="筛选器"/>
 		<text name="rl_ui_doesntHaveName" text="未命名"/>
 		<text name="rl_ui_doesHaveName" text="已命名"/>
 
@@ -229,14 +224,7 @@
 		<text name="rl_ui_castrated" text="已阉割"/>
 		<text name="rl_ui_castrate" text="阉割"/>
 
-		<text name="rl_ui_importance" text="重要性"/>
-		<text name="rl_ui_type" text="类型"/>
-		<text name="rl_ui_date" text="日期"/>
-		<text name="rl_ui_message" text="消息"/>
-		<text name="rl_ui_messages" text="消息"/>
 		<text name="rl_ui_unknownCauses" text="未知原因"/>
-		<text name="rl_ui_messageNumber" text="%s-%s，共%s条"/>
-		<text name="rl_ui_deleteMessage" text="删除消息"/>
 		<text name="rl_ui_unreadMessages" text="畜牧场'%s'有未读消息！"/>
 		<text name="rl_ui_herdsman" text="牧工"/>
 		<text name="rl_ui_budget" text="预算"/>
@@ -244,9 +232,7 @@
 		<text name="rl_ui_fixed" text="固定"/>
 		<text name="rl_ui_percentage" text="百分比"/>
 		<text name="rl_ui_maxAnimals" text="最大动物数"/>
-		<text name="rl_ui_infinite" text="无限"/>
 		<text name="rl_ui_herdsmanRecentlyBought" text="近期牧工采购"/>
-		<text name="rl_ui_previousWage" text="先前工资"/>
 		<text name="rl_ui_herdsmanWages" text="牧工工资"/>
 		<text name="finance_herdsmanWages" text="牧工工资"/>
 		<text name="rl_ui_medicine" text="兽药"/>
@@ -255,9 +241,6 @@
 		<text name="rl_ui_semenPurchase_github" text="购买精液"/>
 		<text name="finance_semenPurchase" text="购买精液"/>
 		<text name="finance_semenPurchase_github" text="购买精液"/>
-		<text name="rl_ui_noDiseases" text="无疾病"/>
-		<text name="rl_ui_onlyDiseases" text="仅患病"/>
-		<text name="rl_ui_naming" text="命名"/>
 		<text name="rl_ui_alphabetical" text="按字母顺序"/>
 		<text name="rl_ui_breed" text="品种"/>
 		<text name="rl_ui_dontMark" text="不标记"/>
@@ -265,7 +248,6 @@
 		<text name="rl_ui_unmark" text="取消标记"/>
 		<text name="rl_ui_favourite" text="收藏"/>
 		<text name="rl_ui_unFavourite" text="取消收藏"/>
-		<text name="rl_ui_quantity" text="数量"/>
 		<text name="rl_ui_dewar" text="液氮罐"/>
 		<text name="rl_ui_semenPurchase_successful" text="成功购买人工精液。您可以在商店领取"/>
 		<text name="rl_ui_semenPurchase_successful_github" text="成功购买精液。您可以在商店领取"/>
@@ -284,13 +266,8 @@
 		<text name="rl_ui_inseminateAnimal" text="为%s授精"/>
 		<text name="rl_ui_inseminate" text="授精"/>
 		<text name="rl_ui_strawEmpty" text="此支精液为空"/>
-		<text name="rl_ui_averageSuccessColon" text="平均成功率："/>
 		<text name="rl_ui_averageSuccess" text="平均成功率"/>
 		<text name="rl_ui_success" text="成功率"/>
-		<text name="rl_ui_save" text="保存"/>
-		<text name="rl_ui_load" text="加载"/>
-		<text name="rl_ui_saveProfile" text="保存配置"/>
-		<text name="rl_ui_loadProfile" text="加载配置"/>
 
 		<text name="rl_ui_healthy" text="健康"/>
 		<text name="rl_ui_hasDisease" text="患病"/>
@@ -323,38 +300,16 @@
 		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="采购预算为固定金额"/>
 		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="采购预算为农场资金的百分比"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_budget|fixed" text="牧工每日最多支出%s"/>
-		<text name="rl_ui_herdsmanTooltip_buy_budget|percentage" text="牧工每日最多支出农场资金的%s"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_maxAnimals" text="牧工每日最多购买%s头动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_breed" text="牧工仅购买%s动物"/>
-		<text name="rl_ui_herdsmanTooltip_buy_breed_any" text="牧工会购买任何品种"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_1" text="牧工仅购买无疾病动物"/>
-		<text name="rl_ui_herdsmanTooltip_buy_diseases_2" text="牧工会购买动物，无论是否患病"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_gender_1" text="牧工仅购买雌性动物"/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_2" text="牧工会购买雌性和雄性动物"/>
-		<text name="rl_ui_herdsmanTooltip_buy_gender_3" text="牧工仅购买雄性动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_age_equal" text="牧工仅购买%s月龄的动物"/>
-		<text name="rl_ui_herdsmanTooltip_buy_age_range" text="牧工仅购买%s至%s月龄的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_quality_equal" text="牧工仅购买%s品质的动物"/>
-		<text name="rl_ui_herdsmanTooltip_buy_quality_range" text="牧工仅购买品质在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_equal" text="牧工仅购买%s繁殖力的动物"/>
-		<text name="rl_ui_herdsmanTooltip_buy_fertility_range" text="牧工仅购买繁殖力在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_health_equal" text="牧工仅购买%s健康状况的动物"/>
-		<text name="rl_ui_herdsmanTooltip_buy_health_range" text="牧工仅购买健康状况在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_equal" text="牧工仅购买%s生产力的动物"/>
-		<text name="rl_ui_herdsmanTooltip_buy_productivity_range" text="牧工仅购买生产力在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_equal" text="牧工仅购买%s新陈代谢的动物"/>
-		<text name="rl_ui_herdsmanTooltip_buy_metabolism_range" text="牧工仅购买新陈代谢在%s至%s之间的动物"/>
 
 
 		<!-- AI - SELLING -->
@@ -363,35 +318,15 @@
 		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="牧工不会出售动物"/>
 		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="牧工会出售动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_maxAnimals" text="牧工每日最多出售%s头动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_mark_1" text="牧工不会标记待售动物"/>
-		<text name="rl_ui_herdsmanTooltip_sell_mark_2" text="牧工会标记待售动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_1" text="牧工会出售动物，无论是否患病"/>
-		<text name="rl_ui_herdsmanTooltip_sell_diseasesSecondary_2" text="牧工仅出售患病动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_gender_1" text="牧工仅出售雌性动物"/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_2" text="牧工会出售雌性和雄性动物"/>
-		<text name="rl_ui_herdsmanTooltip_sell_gender_3" text="牧工仅出售雄性动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_age_equal" text="牧工仅出售%s月龄的动物"/>
-		<text name="rl_ui_herdsmanTooltip_sell_age_range" text="牧工仅出售%s至%s月龄的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_quality_equal" text="牧工仅出售%s品质的动物"/>
-		<text name="rl_ui_herdsmanTooltip_sell_quality_range" text="牧工仅出售品质在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_equal" text="牧工仅出售%s繁殖力的动物"/>
-		<text name="rl_ui_herdsmanTooltip_sell_fertility_range" text="牧工仅出售繁殖力在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_health_equal" text="牧工仅出售%s健康状况的动物"/>
-		<text name="rl_ui_herdsmanTooltip_sell_health_range" text="牧工仅出售健康状况在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_equal" text="牧工仅出售%s生产力的动物"/>
-		<text name="rl_ui_herdsmanTooltip_sell_productivity_range" text="牧工仅出售生产力在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_equal" text="牧工仅出售%s新陈代谢的动物"/>
-		<text name="rl_ui_herdsmanTooltip_sell_metabolism_range" text="牧工仅出售新陈代谢在%s至%s之间的动物"/>
 
 
 		<!-- AI - CASTRATING -->
@@ -400,29 +335,13 @@
 		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="牧工不会阉割动物"/>
 		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="牧工会阉割动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_1" text="牧工不会标记待阉割动物"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_mark_2" text="牧工会标记待阉割动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_1" text="牧工会阉割动物，无论是否患病"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_diseasesSecondary_2" text="牧工仅阉割患病动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_age_equal" text="牧工仅阉割%s月龄的动物"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_age_range" text="牧工仅阉割%s至%s月龄的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_equal" text="牧工仅阉割%s品质的动物"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_quality_range" text="牧工仅阉割品质在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_equal" text="牧工仅阉割%s繁殖力的动物"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_fertility_range" text="牧工仅阉割繁殖力在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_health_equal" text="牧工仅阉割%s健康状况的动物"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_health_range" text="牧工仅阉割健康状况在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_equal" text="牧工仅阉割%s生产力的动物"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_productivity_range" text="牧工仅阉割生产力在%s至%s之间的动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_equal" text="牧工仅阉割%s新陈代谢的动物"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_metabolism_range" text="牧工仅阉割新陈代谢在%s至%s之间的动物"/>
 
 
 		<!-- AI - NAMING -->
@@ -441,36 +360,19 @@
 		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="牧工不会进行人工授精"/>
 		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="牧工会进行人工授精"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_maxAnimals" text="牧工每日最多为%s头动物授精"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_mark_1" text="牧工不会标记待授精动物"/>
-		<text name="rl_ui_herdsmanTooltip_ai_mark_2" text="牧工会标记待授精动物"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_1" text="牧工会进行授精，无论是否患病"/>
-		<text name="rl_ui_herdsmanTooltip_ai_diseasesSecondary_2" text="牧工仅对患病动物进行授精"/>
 
 		<text name="rl_ui_herdsmanTooltip_ai_semen" text="牧工将使用%s的精液"/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="牧工将使用%s的精液"/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="牧工会使用任何可用精液"/>
 		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="牧工会使用任何可用精液"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_age_equal" text="牧工仅对%s月龄的动物授精"/>
-		<text name="rl_ui_herdsmanTooltip_ai_age_range" text="牧工仅对%s至%s月龄的动物授精"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_quality_equal" text="牧工仅对%s品质的动物授精"/>
-		<text name="rl_ui_herdsmanTooltip_ai_quality_range" text="牧工仅对品质在%s至%s之间的动物授精"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_equal" text="牧工仅对%s繁殖力的动物授精"/>
-		<text name="rl_ui_herdsmanTooltip_ai_fertility_range" text="牧工仅对繁殖力在%s至%s之间的动物授精"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_health_equal" text="牧工仅对%s健康状况的动物授精"/>
-		<text name="rl_ui_herdsmanTooltip_ai_health_range" text="牧工仅对健康状况在%s至%s之间的动物授精"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_equal" text="牧工仅对%s生产力的动物授精"/>
-		<text name="rl_ui_herdsmanTooltip_ai_productivity_range" text="牧工仅对生产力在%s至%s之间的动物授精"/>
 
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_equal" text="牧工仅对%s新陈代谢的动物授精"/>
-		<text name="rl_ui_herdsmanTooltip_ai_metabolism_range" text="牧工仅对新陈代谢在%s至%s之间的动物授精"/>
 
 
 
@@ -729,9 +631,7 @@
 		<text name="rm_rl_migration_quit" text="Quit"/>
         <!-- Added missing translations -->
         <text name="input_RL_AI" text="人工授精"/>
-        <text name="input_RL_CASTRATE" text="阉割动物"/>
         <text name="input_RL_DISEASES" text="动物疾病"/>
-        <text name="input_RL_MARK" text="标记/取消标记动物"/>
         <text name="input_RL_MONITOR" text="安装/移除监测器"/>
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="打开动物界面"/>
         <text name="input_RL_SELECT" text="选择/取消选择动物"/>
