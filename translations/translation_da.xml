@@ -575,7 +575,7 @@
         <text name="input_RL_AI" text="Kunstig befrugtning"/>
         <text name="input_RL_DISEASES" text="Dyresygdomme"/>
         <text name="input_RL_MONITOR" text="Tilføj/Fjern monitor"/>
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Åbn dyreskærm"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Administrer dyr"/>
         <text name="input_RL_SELECT" text="Vælg/Fravælg dyr"/>
         <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s dyr blev født på %s"/>

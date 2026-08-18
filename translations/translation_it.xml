@@ -70,7 +70,7 @@
 
         <!-- UI -->
 
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Apri schermata animali"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Gestisci animali"/>
         <text name="input_RL_MONITOR" text="Applica/Rimuovi monitor"/>
         <text name="input_RL_AI" text="Inseminazione artificiale"/>
         <text name="input_RL_DISEASES" text="Malattie animali"/>

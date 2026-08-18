@@ -72,7 +72,7 @@
 		<!-- UI -->
 
 
-		<text name="input_RL_OPEN_ANIMAL_SCREEN" text="Állatok menü megnyitása"/>
+		<text name="input_RL_OPEN_ANIMAL_SCREEN" text="Állatok kezelése"/>
 		<text name="input_RL_MONITOR" text="Monitor alkalmazása / eltávolítása"/>
 		<text name="input_RL_AI" text="Mesterséges megtermékenyítés"/>
 		<text name="input_RL_DISEASES" text="Állatbetegségek"/>

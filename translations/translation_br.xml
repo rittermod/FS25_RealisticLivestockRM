@@ -587,7 +587,7 @@
         <text name="input_RL_AI" text="Inseminação Artificial"/>
         <text name="input_RL_DISEASES" text="Doenças dos Animais"/>
         <text name="input_RL_MONITOR" text="Aplicar/Remover Monitor"/>
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Abrir Tela de Animais"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Gerenciar Animais"/>
         <text name="input_RL_SELECT" text="Selecionar/Deselecionar Animal"/>
         <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s animais nasceram em %s"/>

@@ -579,7 +579,7 @@
         <text name="input_RL_AI" text="Искусственное осеменение"/>
         <text name="input_RL_DISEASES" text="Болезни животных"/>
         <text name="input_RL_MONITOR" text="Установить/Снять монитор"/>
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Открыть экран животных"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Управление животными"/>
         <text name="input_RL_SELECT" text="Выбрать/Отменить выбор"/>
         <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s животных родилось в %s"/>

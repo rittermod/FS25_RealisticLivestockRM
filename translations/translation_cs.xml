@@ -633,7 +633,7 @@
         <text name="input_RL_AI" text="人工授精"/>
         <text name="input_RL_DISEASES" text="动物疾病"/>
         <text name="input_RL_MONITOR" text="安装/移除监测器"/>
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="打开动物界面"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="管理动物"/>
         <text name="input_RL_SELECT" text="选择/取消选择动物"/>
         <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_settings_resetAIAnimals_label" text="重置AI动物"/>

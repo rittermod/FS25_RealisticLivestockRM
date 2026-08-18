@@ -72,7 +72,7 @@
         <!-- UI -->
 
 
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Hayvan Ekranını Aç"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Hayvanları Yönet"/>
         <text name="input_RL_MONITOR" text="Monitör Ekle/Çıkar"/>
         <text name="input_RL_AI" text="Suni Tohumlama"/>
         <text name="input_RL_DISEASES" text="Hayvan Hastalıkları"/>

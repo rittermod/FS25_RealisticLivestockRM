@@ -597,7 +597,7 @@
         <text name="input_RL_AI" text="Keinosiemennys"/>
         <text name="input_RL_DISEASES" text="Eläintaudit"/>
         <text name="input_RL_MONITOR" text="Asenna/Poista monitori"/>
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Avaa eläinnäkymä"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Hallitse eläimiä"/>
         <text name="input_RL_SELECT" text="Valitse/Poista valinta"/>
         <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s eläintä syntyi kohteessa %s"/>

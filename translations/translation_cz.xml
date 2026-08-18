@@ -72,7 +72,7 @@
         <!-- UI -->
 
 
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Otevřít obrazovku zvířat"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Spravovat zvířata"/>
         <text name="input_RL_MONITOR" text="Přidat/Odebrat monitor"/>
         <text name="input_RL_AI" text="Umělá inseminace"/>
         <text name="input_RL_DISEASES" text="Nemoci zvířat"/>

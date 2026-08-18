@@ -561,7 +561,7 @@
         <text name="input_RL_AI" text="Штучне запліднення"/>
         <text name="input_RL_DISEASES" text="Хвороби тварин"/>
         <text name="input_RL_MONITOR" text="Встановити/Зняти монітор"/>
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Відкрити екран тварин"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Керування тваринами"/>
         <text name="input_RL_SELECT" text="Обрати/Скасувати вибір"/>
         <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s тварин народилося у %s"/>

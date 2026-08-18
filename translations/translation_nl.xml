@@ -586,7 +586,7 @@
         <text name="input_RL_AI" text="Kunstmatige inseminatie"/>
         <text name="input_RL_DISEASES" text="Dierziekten"/>
         <text name="input_RL_MONITOR" text="Monitor plaatsen/verwijderen"/>
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Dierenscherm openen"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Dieren beheren"/>
         <text name="input_RL_SELECT" text="Dier selecteren/Deselecteren"/>
         <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s dieren zijn geboren bij %s"/>

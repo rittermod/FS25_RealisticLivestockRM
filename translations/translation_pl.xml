@@ -581,7 +581,7 @@
         <text name="input_RL_AI" text="Sztuczne zapłodnienie"/>
         <text name="input_RL_DISEASES" text="Choroby zwierząt"/>
         <text name="input_RL_MONITOR" text="Załóż/Zdejmij monitor"/>
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Otwórz ekran zwierząt"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Zarządzaj zwierzętami"/>
         <text name="input_RL_SELECT" text="Zaznacz/Odznacz zwierzę"/>
         <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s zwierząt urodziło się w %s"/>

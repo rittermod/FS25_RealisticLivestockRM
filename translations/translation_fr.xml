@@ -71,7 +71,7 @@
 
 		<!-- INTERFACE -->
 
-<text name="input_RL_OPEN_ANIMAL_SCREEN" text="Ouvrir l'écran des animaux"/>
+<text name="input_RL_OPEN_ANIMAL_SCREEN" text="Gérer les animaux"/>
 <text name="input_RL_MONITOR" text="Activer/Désactiver le suivi"/>
 <text name="input_RL_AI" text="Insémination artificielle"/>
 <text name="input_RL_DISEASES" text="Maladies animales"/>

@@ -581,7 +581,7 @@
         <text name="input_RL_AI" text="Künstliche Besamung"/>
         <text name="input_RL_DISEASES" text="Tierkrankheiten"/>
         <text name="input_RL_MONITOR" text="Tierüberwachung anbringen/entfernen"/>
-        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Tierbildschirm öffnen"/>
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Tiere verwalten"/>
         <text name="input_RL_SELECT" text="Tier auswählen/Auswahl aufheben"/>
         <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
         <text name="rl_message_dailyBirthsSummary" text="%s Tiere wurden bei %s geboren"/>

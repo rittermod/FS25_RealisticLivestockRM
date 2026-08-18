@@ -72,7 +72,7 @@
 		<!-- UI -->
 
 
-		<text name="input_RL_OPEN_ANIMAL_SCREEN" text="Open Animal Screen"/>
+		<text name="input_RL_OPEN_ANIMAL_SCREEN" text="Manage Animals"/>
 		<text name="input_RL_MONITOR" text="Apply/Remove Monitor"/>
 		<text name="input_RL_AI" text="Artificial Insemination"/>
 		<text name="input_RL_DISEASES" text="Animal Diseases"/>
