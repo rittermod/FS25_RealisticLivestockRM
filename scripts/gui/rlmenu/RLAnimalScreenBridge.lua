@@ -61,6 +61,36 @@ local function openDefaultView(reason, context)
 end
 
 
+--- Make the displaced screen CLOSABLE before anything tries to close it.
+---
+--- Base-game `AnimalScreen:onClose` opens with `self.controller:reset()`, and that is the
+--- ONLY controller method it calls (grep-verified against the base screen). A third-party
+--- caller that pre-assigns a duck-typed table rather than an `AnimalScreenBase` subclass has
+--- no `reset`, so that first statement raises - and everything AFTER it is skipped:
+--- `removeActionEvents`, `toggleCustomInputContext(false, ...)` and
+--- `g_currentMission:resetGameState()` never run. The player is then left on a screen that
+--- neither the redirect nor Esc can clear, because both travel the same `onClose`.
+---
+--- MEASURED 2026-08-18 under ModTest, not theorised: a `{ someForeignField = true }`
+--- controller left `g_gui.currentGuiName == "AnimalScreen"` with a synthesized Esc unable to
+--- shift it, and supplying `reset` alone recovered both the redirect and the close.
+---
+--- Injecting a no-op onto the caller's own table is deliberate and is the smallest fix that
+--- works: the swap is what displaces the screen, so RLRM owns the failure, and a controller
+--- reaching here without `reset` is ALREADY malformed against the base-game contract this
+--- seam is keeping coherent. A real `AnimalScreenBase` subclass resolves `reset` through its
+--- metatable, so the nil test never fires for one and no live controller is ever touched.
+--- @param controller table|nil  whatever the foreign caller pre-assigned
+local function ensureDisplacedScreenCanClose(controller)
+    if type(controller) ~= "table" or controller.reset ~= nil then
+        return
+    end
+    controller.reset = function() end
+    Log:warning("AnimalScreen.onOpen: foreign controller has no reset(); injected a no-op so " ..
+        "the displaced screen can close (base onClose raises on it before restoring input)")
+end
+
+
 --- Close the displaced screen after a refused redirect. Shared by BOTH `onOpen` refusal
 --- paths.
 ---
@@ -218,6 +248,12 @@ end
 ---   is kept only so a wrapper installed by a mod loading before RLRM is not destroyed
 function RLAnimalScreenBridge.onOpen(self, _superFunc, ...)
     local controller = self ~= nil and self.controller or nil
+
+    -- BEFORE any branch below, because every one of them ends with this screen being
+    -- displaced: the successful swap closes it through `showGui("RLMenu")`, and both refusal
+    -- paths close it through `closeVanillaScreen`. All three travel base `onClose`, so a
+    -- controller without `reset` strands the player whichever way this call goes.
+    ensureDisplacedScreenCanClose(controller)
 
     if not RLAnimalScreenBridge.isEPPControllerShape(controller) then
         -- Any other pre-assigned controller, or none at all. The view is UNANCHORED on
