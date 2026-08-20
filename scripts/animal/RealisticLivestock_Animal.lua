@@ -1563,12 +1563,24 @@ end
 --- carrying two records of one title loses an UNSPECIFIED one of them - not necessarily the
 --- one whose immunity expired. Pre-existing; stated so the next reader does not infer an
 --- ordering guarantee the walk does not give.
+---
+--- The dirty flag LEADS `table.remove`, and only inside the match branch. Leading is the
+--- contract: the flag is the sole cause of replication, so writing it last puts it behind the
+--- statement that can raise and a mid-removal failure would leave the server holding a record
+--- no client can see, with nothing scheduled to correct it. The asymmetry is what settles the
+--- order - an under-flag is a silent divergence with no bound on how long it lasts, an
+--- over-flag costs one extra pen broadcast. The no-match arm must NOT flag: it changes
+--- nothing, and the flush it would buy ships the whole pen.
 ---@param title string Disease type title to remove.
 function Animal:removeDisease(title)
     for i, disease in pairs(self.diseases) do
         if disease.type.title == title then
-            Log:trace("removeDisease: removing record (disease=%s uniqueId=%s remaining=%d)",
-                tostring(title), tostring(self.uniqueId), #self.diseases - 1)
+            Log:trace("removeDisease: removing record (disease=%s farmId=%s uniqueId=%s remaining=%d)",
+                tostring(title), tostring(self.farmId), tostring(self.uniqueId), #self.diseases - 1)
+
+            -- Nothing between this and the removal: the flag is what makes the removal replicate,
+            -- so anything placed in the gap is a statement that can raise between them.
+            self:setDirty()
             table.remove(self.diseases, i)
             return
         end
@@ -1578,7 +1590,26 @@ function Animal:removeDisease(title)
         tostring(title), tostring(self.uniqueId))
 end
 
+--- Attach a new disease record to this animal.
+---
+--- The dirty flag LEADS the insert, for the reason spelled out on `removeDisease` above: it is
+--- the only thing that causes the pen to replicate, so it must not sit behind a statement that
+--- can raise. Flag-first is safe only because nothing can flush in the window - `setDirty`
+--- marks the cluster system and wakes the owning placeable, whose own later `update(dt)` runs
+--- the flush - so do not introduce a synchronous flush between the flag and the insert.
+---
+--- Sale, dealer and AI animals reach this too and carry no cluster system. `setDirty` nil-guards
+--- that delegate, so the flag is set locally and goes nowhere; those pools replicate through
+--- their own state event instead. Harmless, and not a claim that this path syncs them.
+---@param type table Disease type table from the disease manager.
+---@param isCarrier boolean|nil True for an asymptomatic carrier record.
+---@param genes number|nil Count of affected genes inherited, 0 when not genetic.
 function Animal:addDisease(type, isCarrier, genes)
+    self:setDirty()
+
+    Log:trace("addDisease: contracted, animal flagged dirty (disease=%s farmId=%s uniqueId=%s)",
+        tostring(type.title), tostring(self.farmId), tostring(self.uniqueId))
+
     table.insert(self.diseases, Disease.new(type, isCarrier, genes))
 
     self:addMessage("DISEASE_CONTRACTED", { type.name })

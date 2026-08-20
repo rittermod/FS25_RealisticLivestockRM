@@ -79,9 +79,13 @@ function DiseaseDialog:onClickOk()
     -- Send network event (server broadcasts, client sends to server)
     -- treatmentDuration is months REMAINING, captured before the toggle: on a stop it is what
     -- the paused course resumes from, on a start it is whatever a previous course left behind.
-    -- It is the local machine's value, so on a client it reads 0 while the host holds the real
-    -- count - the toggle event replicates beingTreated and never this field. Read it as "what
-    -- THIS peer will render", not as the authoritative course state.
+    -- It is the local machine's value, so read it as "what THIS peer will render" rather than as
+    -- the authoritative course state: the toggle event replicates beingTreated and never this
+    -- field. A client's copy arrives on the pen flush that each disease transition schedules, so
+    -- it is accurate as of the last contract, cure or expiry and drifts from there, because the
+    -- per-month decrement is deliberately not synced. A course STARTED since that flush is the
+    -- widest gap: seeding this counter is itself an unflagged tick, so a client reads 0 for the
+    -- whole course.
     -- uniqueId is what lets this line be correlated with the seed trace in
     -- Disease:onPeriodChanged, which is the other half of the same diagnostic.
     Log:trace("DiseaseDialog:onClickOk sending event disease=%s treatment=%s treatmentDuration=%s uniqueId=%s",
