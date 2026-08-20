@@ -608,7 +608,13 @@ function RLMenuInfoFrame:updateButtonVisibility()
         -- Rename - always shown
         table.insert(self.menuButtonInfo, self.renameButtonInfo)
 
-        -- Diseases - always shown
+        -- Diseases - always shown, disabled without trade permission. Opening the
+        -- dialog commits the farm to a recurring per-period treatment fee, which is
+        -- why this button gates on a permission at all while its neighbours here
+        -- disable only on per-animal state (already castrated, monitor removed).
+        -- Written unconditionally within this block: the buttonInfo table is reused
+        -- across calls, so a stale `true` would survive a permission grant.
+        self.diseasesButtonInfo.disabled = not RLPermissionHelper.hasLocalPermission("tradeAnimals")
         table.insert(self.menuButtonInfo, self.diseasesButtonInfo)
 
         -- Castrate - males only, not chickens
@@ -938,6 +944,12 @@ function RLMenuInfoFrame:onClickDiseases()
     local animal = self:getSelectedAnimal()
     if animal == nil then
         Log:trace("RLMenuInfoFrame:onClickDiseases: no animal selected, early return")
+        return
+    end
+    -- Click-time recheck: the footer flag is computed when the button list is built,
+    -- so it goes stale if the permission is revoked while the menu is open.
+    if not RLPermissionHelper.hasLocalPermission("tradeAnimals") then
+        Log:trace("RLMenuInfoFrame:onClickDiseases: no tradeAnimals permission, early return")
         return
     end
     if DiseaseDialog == nil or DiseaseDialog.show == nil then

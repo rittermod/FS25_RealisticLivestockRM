@@ -28,6 +28,9 @@ source(modDirectory .. "scripts/gui/MPLoadingScreen.lua")
 -- SECTION 2b: Utilities
 source(modDirectory .. "scripts/utils/RmSafeUtils.lua")
 source(modDirectory .. "scripts/utils/RLAnimalUtil.lua")
+-- Reads FarmManager at call time only, so this early slot is safe. Consumed by the
+-- server-side event validation and by the Info frame's client-side button gate.
+source(modDirectory .. "scripts/utils/RLPermissionHelper.lua")
 source(modDirectory .. "scripts/utils/RLScaleHelper.lua")
 source(modDirectory .. "scripts/utils/RLAnimalDisplayHelper.lua")
 source(modDirectory .. "scripts/utils/RLMoveDestinationHelper.lua")
@@ -352,7 +355,7 @@ source(modDirectory .. "scripts/gui/rlmenu/services/RLTransferEppAdapter.lua")
 source(modDirectory .. "scripts/gui/rlmenu/RLMenu.lua")
 -- Surviving AnimalScreen routing seam. Sourced last in 13b (after RLMenu) so it is the
 -- SOLE installer of the AnimalScreen.show + LivestockTrailerActivatable.run overrides and
--- reads RLMenu's constants at load. Outlived the legacy monolith, deleted in RLRM-476.
+-- reads RLMenu's constants at load.
 source(modDirectory .. "scripts/gui/rlmenu/RLAnimalScreenBridge.lua")
 
 -- SECTION 14: Migration System
