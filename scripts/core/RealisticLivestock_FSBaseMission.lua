@@ -246,8 +246,9 @@ function RealisticLivestock_FSBaseMission:onStartMission()
     -- `g_gui:showGui("AnimalScreen")` reaches our redirect at all; `AnimalScreen.show` needs no
     -- such treatment because a plain class-table lookup resolves at call time.
     --
-    -- Keep the file name pointing at the BASE screen: RLRM ships no AnimalScreen XML any more
-    -- (RLRM-476), and Locked D5 requires the base GUI to stay REGISTERED under this name.
+    -- Keep the file name pointing at the BASE screen: RLRM ships no AnimalScreen XML
+    -- any more, and the onOpen redirect requires the base GUI to stay REGISTERED
+    -- under this name.
     -- Do NOT "simplify" this away - deleting it silently orphans the onOpen redirect, and the
     -- automated suite cannot see that (the bridge tests call the function directly).
     if g_gui.guis.AnimalScreen ~= nil then
