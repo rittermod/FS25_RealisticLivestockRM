@@ -35,8 +35,8 @@
 
 		<text name="fillType_ram" text="Ram"/>
 		<text name="fillType_ram_landrace" text="Landras van Bentheim Ram"/>
-		<text name="fillType_ram_steinschaf" text="Steinschaf Ram"/>
-		<text name="fillType_ram_black_welsh" text="Black Welsh Mountain Ram"/>
+		<text name="fillType_ram_steinschaf" text="Steinschaf-ram"/>
+		<text name="fillType_ram_black_welsh" text="Black Welsh Mountain-ram"/>
 		<text name="fillType_ram_swiss_mountain" text="Schwarzbraunes Bergschaf Ram"/>
 		<text name="animal_descriptionRamFeed" text="Rammen eten gras en hooi."/>
 		<text name="animal_descriptionRamYoung" text="Dit is een mannelijk lammetje."/>
@@ -154,20 +154,20 @@
 		<text name="rl_ui_buyBulkResult" text="%s dieren gekocht voor %s" tag="format"/>
 		<text name="rl_ui_sellBulkResult" text="%s dieren verkocht voor %s" tag="format"/>
 		<text name="rl_ui_moveBulkResult" text="%s dieren verplaatst" tag="format"/>
-		<text name="rl_ui_moveSingle" text="Move"/>
-		<text name="rl_ui_moveSelectDestination" text="Select Destination"/>
-		<text name="rl_ui_moveNoDestinations" text="No destinations available for this animal type."/>
-		<text name="rl_ui_moveEPPAgeFormat" text="ages %d-%d mo" tag="format"/>
-		<text name="rl_ui_moveValidSummary" text="%d animal(s) will be moved" tag="format"/>
-		<text name="rl_ui_moveRejectedAge" text="%d animal(s) skipped: does not meet age requirement (%d-%d months)" tag="format"/>
-		<text name="rl_ui_moveRejectedCapacity" text="%d animal(s) skipped: not enough space at destination" tag="format"/>
-		<text name="rl_ui_moveAllRejected" text="No animals can be moved to this destination."/>
-		<text name="rl_ui_moveBulkConfirmTitle" text="Move Animals"/>
-		<text name="rl_ui_moveErrorNoPermission" text="You don't have permission to move animals here."/>
-		<text name="rl_ui_moveErrorNotSupported" text="This destination doesn't support this animal type."/>
-		<text name="rl_ui_moveErrorNoSpace" text="Not enough space at the destination."/>
-		<text name="rl_ui_tradeRequestInProgress" text="A trade is already in progress. Please wait."/>
-		<text name="rl_ui_tradeRequestTimeout" text="The server did not respond. Please try again."/>
+		<text name="rl_ui_moveSingle" text="Verplaatsen"/>
+		<text name="rl_ui_moveSelectDestination" text="Bestemming kiezen"/>
+		<text name="rl_ui_moveNoDestinations" text="Geen bestemmingen beschikbaar voor dit dierentype."/>
+		<text name="rl_ui_moveEPPAgeFormat" text="leeftijd %d-%d mnd" tag="format"/>
+		<text name="rl_ui_moveValidSummary" text="%d dier(en) worden verplaatst" tag="format"/>
+		<text name="rl_ui_moveRejectedAge" text="%d dier(en) overgeslagen: voldoet niet aan leeftijdseis (%d-%d maanden)" tag="format"/>
+		<text name="rl_ui_moveRejectedCapacity" text="%d dier(en) overgeslagen: niet genoeg ruimte op bestemming" tag="format"/>
+		<text name="rl_ui_moveAllRejected" text="Er kunnen geen dieren naar deze bestemming worden verplaatst."/>
+		<text name="rl_ui_moveBulkConfirmTitle" text="Dieren verplaatsen"/>
+		<text name="rl_ui_moveErrorNoPermission" text="Je hebt geen toestemming om hier dieren te verplaatsen."/>
+		<text name="rl_ui_moveErrorNotSupported" text="Deze bestemming ondersteunt dit dierentype niet."/>
+		<text name="rl_ui_moveErrorNoSpace" text="Niet genoeg ruimte op de bestemming."/>
+		<text name="rl_ui_tradeRequestInProgress" text="Er loopt al een transactie. Even geduld a.u.b."/>
+		<text name="rl_ui_tradeRequestTimeout" text="De server reageerde niet. Probeer het opnieuw."/>
 
 		<text name="rl_ui_monitor" text="Monitor"/>
 		<text name="rl_ui_monitorSubscriptions" text="Monitor abonnement"/>
@@ -185,7 +185,7 @@
 		<text name="rl_ui_output_pallets_wool" text="Wol"/>
 		<text name="rl_ui_output_pallets_goatMilk" text="Geitenmelk"/>
 		<text name="rl_ui_amountPerDay" text="%.0fL / dag" tag="format"/>
-		<text name="rl_ui_feePerMonth" text="%s / month" tag="format"/>
+		<text name="rl_ui_feePerMonth" text="%s / maand" tag="format"/>
 
 		<text name="rl_ui_animalType" text="Type"/>
 		<text name="rl_ui_amountMonitored" text="Gemonitord"/>
@@ -211,90 +211,90 @@
 		<text name="rl_ui_productivity" text="Zwangerschap"/>
 		<text name="rl_ui_selectAll" text="Selecteer alle"/>
 		<text name="rl_ui_selectNone" text="Selecteer geen"/>
-		<text name="rl_ui_selectSection" text="Select Section"/>
-		<text name="rl_ui_deselectSection" text="Deselect Section"/>
+		<text name="rl_ui_selectSection" text="Sectie selecteren"/>
+		<text name="rl_ui_deselectSection" text="Sectie deselecteren"/>
 		<text name="rl_ui_doesntHaveName" text="Geen naam"/>
 		<text name="rl_ui_doesHaveName" text="Heeft naam"/>
 
 
 
-		<text name="rl_ui_castrated" text="Castrated"/>
-		<text name="rl_ui_castrate" text="Castrate"/>
-		<text name="rl_ui_unknownCauses" text="unknown causes"/>
-		<text name="rl_ui_unreadMessages" text="Husbandry '%s' has unread messages!"/>
-		<text name="rl_ui_herdsman" text="Herdsman"/>
+		<text name="rl_ui_castrated" text="Gecastreerd"/>
+		<text name="rl_ui_castrate" text="Castreren"/>
+		<text name="rl_ui_unknownCauses" text="onbekende oorzaak"/>
+		<text name="rl_ui_unreadMessages" text="Bedrijf '%s' heeft ongelezen berichten!"/>
+		<text name="rl_ui_herdsman" text="Veehoeder"/>
 		<text name="rl_ui_budget" text="Budget"/>
-		<text name="rl_ui_budgetType" text="Budget Type"/>
-		<text name="rl_ui_fixed" text="Fixed"/>
+		<text name="rl_ui_budgetType" text="Budgettype"/>
+		<text name="rl_ui_fixed" text="Vast bedrag"/>
 		<text name="rl_ui_percentage" text="Percentage"/>
-		<text name="rl_ui_maxAnimals" text="Max Animals"/>
-		<text name="rl_ui_herdsmanRecentlyBought" text="Recent Herdsman Purchase"/>
-		<text name="rl_ui_herdsmanWages" text="Herdsman Wages"/>
-		<text name="finance_herdsmanWages" text="Herdsman Wages"/>
-		<text name="rl_ui_medicine" text="Medicine"/>
-		<text name="finance_medicine" text="Medicine"/>
-		<text name="rl_ui_semenPurchase" text="Inseminant Purchase"/>
-		<text name="rl_ui_semenPurchase_github" text="Semen Purchase"/>
-		<text name="finance_semenPurchase" text="Inseminant Purchase"/>
-		<text name="finance_semenPurchase_github" text="Semen Purchase"/>
-		<text name="rl_ui_alphabetical" text="Alphabetical"/>
-		<text name="rl_ui_breed" text="Breed"/>
-		<text name="rl_ui_dontMark" text="Don't Mark"/>
-		<text name="rl_ui_mark" text="Mark"/>
-		<text name="rl_ui_unmark" text="Unmark"/>
-		<text name="rl_ui_favourite" text="Favourite"/>
-		<text name="rl_ui_unFavourite" text="Unfavourite"/>
-		<text name="rl_ui_dewar" text="Dewar"/>
-		<text name="rl_ui_semenPurchase_successful" text="Artificial inseminant successfully purchased. You can pick it up at the store"/>
-		<text name="rl_ui_semenPurchase_successful_github" text="Semen successfully purchased. You can pick it up at the store"/>
-		<text name="rl_ui_semenPurchase_unsuccessful" text="Artificial inseminant could not be purchased"/>
-		<text name="rl_ui_semenPurchase_unsuccessful_github" text="Semen could not be purchased"/>
-		<text name="rl_ui_earTag" text="Ear Tag"/>
-		<text name="rl_ui_species" text="Species"/>
-		<text name="rl_ui_strawSingle" text="Straw"/>
-		<text name="rl_ui_strawMultiple" text="Straws"/>
-		<text name="rl_ui_artificialInsemination" text="Artificial Insemination"/>
-		<text name="rl_ui_semenPurchaseNoPermission" text="You don't have to permission to trade animals or purchase inseminant."/>
-		<text name="rl_ui_semenPurchaseNoPermission_github" text="You don't have to permission to trade animals or purchase semen."/>
-		<text name="rl_ui_semenPurchaseNoMoney" text="You don't have enough money to purchase this inseminant."/>
-		<text name="rl_ui_semenPurchaseNoMoney_github" text="You don't have enough money to purchase this semen."/>
-		<text name="rl_ui_takeStraw" text="Take Straw"/>
-		<text name="rl_ui_inseminateAnimal" text="Inseminate %s"/>
-		<text name="rl_ui_inseminate" text="Inseminate"/>
-		<text name="rl_ui_strawEmpty" text="This straw is empty"/>
-		<text name="rl_ui_averageSuccess" text="Average Success"/>
-		<text name="rl_ui_success" text="Success"/>
+		<text name="rl_ui_maxAnimals" text="Max. dieren"/>
+		<text name="rl_ui_herdsmanRecentlyBought" text="Recente aankoop veehoeder"/>
+		<text name="rl_ui_herdsmanWages" text="Loon veehoeder"/>
+		<text name="finance_herdsmanWages" text="Loon veehoeder"/>
+		<text name="rl_ui_medicine" text="Medicijnen"/>
+		<text name="finance_medicine" text="Medicijnen"/>
+		<text name="rl_ui_semenPurchase" text="Aankoop inseminant"/>
+		<text name="rl_ui_semenPurchase_github" text="Aankoop sperma"/>
+		<text name="finance_semenPurchase" text="Aankoop inseminant"/>
+		<text name="finance_semenPurchase_github" text="Aankoop sperma"/>
+		<text name="rl_ui_alphabetical" text="Alfabetisch"/>
+		<text name="rl_ui_breed" text="Ras"/>
+		<text name="rl_ui_dontMark" text="Niet markeren"/>
+		<text name="rl_ui_mark" text="Markeren"/>
+		<text name="rl_ui_unmark" text="Markering opheffen"/>
+		<text name="rl_ui_favourite" text="Favoriet"/>
+		<text name="rl_ui_unFavourite" text="Favoriet opheffen"/>
+		<text name="rl_ui_dewar" text="Dewarvat"/>
+		<text name="rl_ui_semenPurchase_successful" text="Kunstmatig inseminant succesvol gekocht. Je kunt het ophalen bij de winkel"/>
+		<text name="rl_ui_semenPurchase_successful_github" text="Sperma succesvol gekocht. Je kunt het ophalen bij de winkel"/>
+		<text name="rl_ui_semenPurchase_unsuccessful" text="Kunstmatig inseminant kon niet gekocht worden"/>
+		<text name="rl_ui_semenPurchase_unsuccessful_github" text="Sperma kon niet gekocht worden"/>
+		<text name="rl_ui_earTag" text="Oormerk"/>
+		<text name="rl_ui_species" text="Diersoort"/>
+		<text name="rl_ui_strawSingle" text="Rietje"/>
+		<text name="rl_ui_strawMultiple" text="Rietjes"/>
+		<text name="rl_ui_artificialInsemination" text="Kunstmatige inseminatie"/>
+		<text name="rl_ui_semenPurchaseNoPermission" text="Je hebt geen toestemming om dieren te verhandelen of inseminant te kopen."/>
+		<text name="rl_ui_semenPurchaseNoPermission_github" text="Je hebt geen toestemming om dieren te verhandelen of sperma te kopen."/>
+		<text name="rl_ui_semenPurchaseNoMoney" text="Je hebt niet genoeg geld om dit inseminant te kopen."/>
+		<text name="rl_ui_semenPurchaseNoMoney_github" text="Je hebt niet genoeg geld om dit sperma te kopen."/>
+		<text name="rl_ui_takeStraw" text="Rietje pakken"/>
+		<text name="rl_ui_inseminateAnimal" text="%s insemineren"/>
+		<text name="rl_ui_inseminate" text="Insemineren"/>
+		<text name="rl_ui_strawEmpty" text="Dit rietje is leeg"/>
+		<text name="rl_ui_averageSuccess" text="Gemiddeld succes"/>
+		<text name="rl_ui_success" text="Succes"/>
 
-		<text name="rl_ui_healthy" text="Healthy"/>
-		<text name="rl_ui_hasDisease" text="Has Disease"/>
-		<text name="rl_ui_diseasedAnimals" text="Diseased Animals"/>
-
-
-		<text name="rl_insemination_male" text="Only females can be artificially inseminated"/>
-		<text name="rl_insemination_pregnant" text="This animal is already pregnant"/>
-		<text name="rl_insemination_animalType" text="Animal must be of the same species as the father"/>
-		<text name="rl_insemination_inseminated" text="This animal has already been artificially inseminated"/>
-		<text name="rl_insemination_recovering" text="This animal is still recovering from its previous pregnancy"/>
-		<text name="rl_insemination_father" text="Inbreeding is not permitted"/>
-		<text name="rl_insemination_young" text="This animal is too young to be artificially inseminated"/>
+		<text name="rl_ui_healthy" text="Gezond"/>
+		<text name="rl_ui_hasDisease" text="Heeft ziekte"/>
+		<text name="rl_ui_diseasedAnimals" text="Zieke dieren"/>
 
 
-		<text name="rl_mark_aiManager_sell" text="Herdsman marked for selling"/>
-		<text name="rl_mark_aiManager_castrate" text="Herdsman marked for castrating"/>
-		<text name="rl_mark_aiManager_disease" text="Herdsman marked for treating"/>
-		<text name="rl_mark_aiManager_ai" text="Herdsman marked for artificial insemination"/>
-		<text name="rl_mark_aiManager_move" text="Herdsman marked for moving"/>
-		<text name="rl_mark_player" text="Marked by player"/>
+		<text name="rl_insemination_male" text="Alleen vrouwelijke dieren kunnen kunstmatig geïnsemineerd worden"/>
+		<text name="rl_insemination_pregnant" text="Dit dier is al drachtig"/>
+		<text name="rl_insemination_animalType" text="Het dier moet dezelfde diersoort zijn als de vader"/>
+		<text name="rl_insemination_inseminated" text="Dit dier is al kunstmatig geïnsemineerd"/>
+		<text name="rl_insemination_recovering" text="Dit dier herstelt nog van de vorige dracht"/>
+		<text name="rl_insemination_father" text="Inteelt is niet toegestaan"/>
+		<text name="rl_insemination_young" text="Dit dier is te jong om kunstmatig geïnsemineerd te worden"/>
+
+
+		<text name="rl_mark_aiManager_sell" text="Door veehoeder gemarkeerd om te verkopen"/>
+		<text name="rl_mark_aiManager_castrate" text="Door veehoeder gemarkeerd om te castreren"/>
+		<text name="rl_mark_aiManager_disease" text="Door veehoeder gemarkeerd voor behandeling"/>
+		<text name="rl_mark_aiManager_ai" text="Door veehoeder gemarkeerd voor kunstmatige inseminatie"/>
+		<text name="rl_mark_aiManager_move" text="Door veehoeder gemarkeerd om te verplaatsen"/>
+		<text name="rl_mark_player" text="Gemarkeerd door speler"/>
 
 
 		<!-- AI - BUYING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="The herdsman will not purchase animals"/>
-		<text name="rl_ui_herdsmanTooltip_buy_enabled_2" text="The herdsman will purchase animals"/>
+		<text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="De veehoeder koopt geen dieren"/>
+		<text name="rl_ui_herdsmanTooltip_buy_enabled_2" text="De veehoeder koopt dieren"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Purchasing budget is a fixed amount"/>
-		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Purchasing budget is a percentage of your farm's money"/>
+		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Het aankoopbudget is een vast bedrag"/>
+		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Het aankoopbudget is een percentage van het geld van je bedrijf"/>
 
 
 
@@ -311,8 +311,8 @@
 		<!-- AI - SELLING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="The herdsman will not sell animals"/>
-		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="The herdsman will sell animals"/>
+		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="De veehoeder verkoopt geen dieren"/>
+		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="De veehoeder verkoopt dieren"/>
 
 
 
@@ -328,8 +328,8 @@
 		<!-- AI - CASTRATING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="The herdsman will not castrate animals"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="The herdsman will castrate animals"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="De veehoeder castreert geen dieren"/>
+		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="De veehoeder castreert dieren"/>
 
 
 
@@ -343,26 +343,26 @@
 		<!-- AI - NAMING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_naming_enabled_1" text="The herdsman will not name animals"/>
-		<text name="rl_ui_herdsmanTooltip_naming_enabled_2" text="The herdsman will name animals"/>
+		<text name="rl_ui_herdsmanTooltip_naming_enabled_1" text="De veehoeder geeft dieren geen naam"/>
+		<text name="rl_ui_herdsmanTooltip_naming_enabled_2" text="De veehoeder geeft dieren een naam"/>
 
-		<text name="rl_ui_herdsmanTooltip_naming_convention_1" text="The herdsman will name animals randomly"/>
-		<text name="rl_ui_herdsmanTooltip_naming_convention_2" text="The herdsman will name animals alphabetically"/>
+		<text name="rl_ui_herdsmanTooltip_naming_convention_1" text="De veehoeder geeft dieren willekeurige namen"/>
+		<text name="rl_ui_herdsmanTooltip_naming_convention_2" text="De veehoeder geeft dieren namen op alfabetische volgorde"/>
 
 
 		<!-- AI - AI -->
 
 
-		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="The herdsman will not AI animals"/>
-		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="The herdsman will AI animals"/>
+		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="De veehoeder insemineert geen dieren"/>
+		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="De veehoeder insemineert dieren"/>
 
 
 
 
-		<text name="rl_ui_herdsmanTooltip_ai_semen" text="The herdsman will use inseminant from %s"/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="The herdsman will use semen from %s"/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="The herdsman will use any viable inseminant"/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="The herdsman will use any viable semen"/>
+		<text name="rl_ui_herdsmanTooltip_ai_semen" text="De veehoeder gebruikt inseminant van %s"/>
+		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="De veehoeder gebruikt sperma van %s"/>
+		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="De veehoeder gebruikt elk bruikbaar inseminant"/>
+		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="De veehoeder gebruikt elk bruikbaar sperma"/>
 
 
 
@@ -393,10 +393,10 @@
 
 		<text name="rl_settings_maxDealerAnimals_label" text="Maximale veehandelaar dieren"/>
 		<text name="rl_settings_maxDealerAnimals_tooltip" text="Wijzig het maximale aantal dieren dat de veehandelaar op voorraad zal hebben per diertype"/>
-		<text name="rl_settings_dealerQuality_label" text="Dealer Animal Quality"/>
-		<text name="rl_settings_dealerQuality_tooltip" text="Sets how good - and how expensive - the animals the dealer offers are. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing this discards the current dealer stock and restocks with new animals. Does not affect the AI animals used for insemination."/>
+		<text name="rl_settings_dealerQuality_label" text="Kwaliteit dieren handelaar"/>
+		<text name="rl_settings_dealerQuality_tooltip" text="Bepaalt hoe goed - en hoe duur - de dieren zijn die de handelaar aanbiedt. Budget-voorraad is zwakker en goedkoper; Premium-voorraad is sterker en kost meer. Deze instelling wijzigen verwijdert de huidige voorraad van de handelaar en vult deze aan met nieuwe dieren. Heeft geen effect op de AI-dieren die voor inseminatie worden gebruikt."/>
 		<text name="rl_settings_dealerQuality_texts_1" text="Budget"/>
-		<text name="rl_settings_dealerQuality_texts_2" text="Standard"/>
+		<text name="rl_settings_dealerQuality_texts_2" text="Standaard"/>
 		<text name="rl_settings_dealerQuality_texts_3" text="Premium"/>
 
 		<text name="rl_settings_mapCountry_label" text="Land van herkomst van dieren"/>
@@ -407,38 +407,38 @@
 		<text name="rl_settings_resetDealer_tooltip" text="Verwijder alle dieren van de veehandelaar en vul de voorraad aan met nieuwe dieren"/>
 		<text name="rl_settings_resetDealer_text" text="Reset Veehandelaar"/>
 
-		<text name="rl_settings_dealerSale_label" text="Choose Animals For Sale"/>
-		<text name="rl_settings_dealerSale_tooltip" text="Choose which animals and age groups the dealer offers for sale. Changing this restocks the dealer."/>
-		<text name="rl_settings_dealerSale_text" text="Choose Animals For Sale"/>
+		<text name="rl_settings_dealerSale_label" text="Kies dieren te koop"/>
+		<text name="rl_settings_dealerSale_tooltip" text="Kies welke dieren en leeftijdsgroepen de handelaar te koop aanbiedt. Deze instelling wijzigen vult de voorraad van de handelaar opnieuw aan."/>
+		<text name="rl_settings_dealerSale_text" text="Kies dieren te koop"/>
 
 		<text name="rl_settings_tagColour_label" text="Wijzig Tag kleur"/>
 		<text name="rl_settings_tagColour_tooltip" text="Wijzig de kleur van de oor tags"/>
 		<text name="rl_settings_tagColour_text" text="Wijzig Tag kleur"/>
-		<text name="rl_settings_maxVisualAnimals_label" text="Set Maximum Visual Animals"/>
-		<text name="rl_settings_maxVisualAnimals_text" text="Set Maximum Visual Animals"/>
-		<text name="rl_settings_maxVisualAnimals_tooltip" text="Set the maximum number of animals rendered per pen. Per-machine display setting; not synced in multiplayer."/>
+		<text name="rl_settings_maxVisualAnimals_label" text="Maximaal aantal visuele dieren"/>
+		<text name="rl_settings_maxVisualAnimals_text" text="Maximaal aantal visuele dieren"/>
+		<text name="rl_settings_maxVisualAnimals_tooltip" text="Stel het maximale aantal dieren in dat per hok wordt weergegeven. Instelling per machine; wordt niet gesynchroniseerd in multiplayer."/>
 
 		<text name="rl_settings_exportCSV_label" text="Exporteer naar CSV"/>
 		<text name="rl_settings_exportCSV_tooltip" text="Exporteer statistieken naar CSV"/>
 		<text name="rl_settings_exportCSV_text" text="Exporteer naar CSV"/>
 
-		<text name="rl_settings_maxNumMessages_label" text="Maximum Amount of Messages"/>
-		<text name="rl_settings_maxNumMessages_tooltip" text="A higher amount will result in your save folder taking up more space. After this limit is reached, the earliest messages will be deleted."/>
+		<text name="rl_settings_maxNumMessages_label" text="Maximaal aantal berichten"/>
+		<text name="rl_settings_maxNumMessages_tooltip" text="Een hoger aantal zorgt ervoor dat je savegame-map meer ruimte inneemt. Als dit maximum bereikt is, worden de oudste berichten verwijderd."/>
 
-		<text name="rl_settings_diseasesEnabled_label" text="Diseases Enabled"/>
-		<text name="rl_settings_diseasesEnabled_tooltip_1" text="Animals cannot catch or inherit diseases"/>
-		<text name="rl_settings_diseasesEnabled_tooltip_2" text="Animals can catch or inherit diseases"/>
+		<text name="rl_settings_diseasesEnabled_label" text="Ziektes ingeschakeld"/>
+		<text name="rl_settings_diseasesEnabled_tooltip_1" text="Dieren kunnen geen ziektes oplopen of erven"/>
+		<text name="rl_settings_diseasesEnabled_tooltip_2" text="Dieren kunnen ziektes oplopen of erven"/>
 
-		<text name="rl_settings_diseasesChance_label" text="Disease Chance"/>
-		<text name="rl_settings_diseasesChance_tooltip" text="Change the likelihood of animals contracting diseases"/>
+		<text name="rl_settings_diseasesChance_label" text="Ziektekans"/>
+		<text name="rl_settings_diseasesChance_tooltip" text="Wijzig de kans dat dieren een ziekte oplopen"/>
 
-		<text name="rl_settings_useCustomAnimals_label" text="Use Custom Animals"/>
-		<text name="rl_settings_useCustomAnimals_tooltip_1" text="Use RealisticLivestock animal models (requires restart)"/>
+		<text name="rl_settings_useCustomAnimals_label" text="Aangepaste dieren gebruiken"/>
+		<text name="rl_settings_useCustomAnimals_tooltip_1" text="Gebruik RealisticLivestock-diermodellen (herstart vereist)"/>
 		<text name="rl_settings_useCustomAnimals_tooltip_2" text="Use custom animal models (experimental, requires restart, must be unzipped)"/>
 
-		<text name="rl_settings_animalsXML_label" text="Set Animals XML Path"/>
-		<text name="rl_settings_animalsXML_tooltip" text="Set path to a custom animals XML file"/>
-		<text name="rl_settings_animalsXML_text" text="Set Animals XML Path"/>
+		<text name="rl_settings_animalsXML_label" text="Pad naar Animals XML instellen"/>
+		<text name="rl_settings_animalsXML_tooltip" text="Stel het pad in naar een aangepast animals XML-bestand"/>
+		<text name="rl_settings_animalsXML_text" text="Pad naar Animals XML instellen"/>
 
 
 		<!--  HELP  -->
@@ -478,130 +478,130 @@
 		<!--  DISEASES  -->
 
 
-		<text name="rl_ui_immune" text="Immune"/>
-		<text name="rl_ui_startTreatment" text="Start Treatment"/>
-		<text name="rl_ui_resumeTreatment" text="Resume Treatment"/>
-		<text name="rl_ui_stopTreatment" text="Stop Treatment"/>
-		<text name="rl_ui_duration" text="Duration"/>
-		<text name="rl_ui_beingTreated" text="Being treated"/>
-		<text name="rl_ui_notTreated" text="Not treated"/>
+		<text name="rl_ui_immune" text="Immuun"/>
+		<text name="rl_ui_startTreatment" text="Behandeling starten"/>
+		<text name="rl_ui_resumeTreatment" text="Behandeling hervatten"/>
+		<text name="rl_ui_stopTreatment" text="Behandeling stoppen"/>
+		<text name="rl_ui_duration" text="Duur"/>
+		<text name="rl_ui_beingTreated" text="Wordt behandeld"/>
+		<text name="rl_ui_notTreated" text="Niet behandeld"/>
 		<text name="rl_ui_treatmentPaused" text="Treatment paused"/>
-		<text name="rl_ui_carrier" text="Carrier"/>
+		<text name="rl_ui_carrier" text="Drager"/>
 
-		<text name="rl_diseases" text="Diseases"/>
-		<text name="rl_disease" text="Disease"/>
+		<text name="rl_diseases" text="Ziektes"/>
+		<text name="rl_disease" text="Ziekte"/>
 
-		<text name="rl_disease_mastitis" text="Mastitis"/>
+		<text name="rl_disease_mastitis" text="Uierontsteking"/>
 
 		<text name="rl_disease_cvm" text="CVM"/>
 
-		<text name="rl_disease_footAndMouth" text="Foot and Mouth"/>
+		<text name="rl_disease_footAndMouth" text="Mond-en-klauwzeer"/>
 
-		<text name="rl_disease_ped" text="Porcine Epidemic Diarrhoea"/>
+		<text name="rl_disease_ped" text="Varkensdiarree (PED)"/>
 
-		<text name="rl_disease_avianFlu" text="Avian Influenza"/>
+		<text name="rl_disease_avianFlu" text="Vogelgriep"/>
 
 
 
 		<!--  MESSAGES  -->
 
 
-		<text name="rl_messageTitle_pregnancy" text="Pregnancy"/>
-		<text name="rl_messageTitle_death" text="Removal"/>
-		<text name="rl_messageTitle_death_github" text="Death"/>
-		<text name="rl_messageTitle_disease" text="Disease"/>
-		<text name="rl_messageTitle_name" text="Name"/>
-		<text name="rl_messageTitle_movement" text="Movement"/>
-		<text name="rl_messageTitle_aiManager" text="Herdsman"/>
-		<text name="rl_messageTitle_insemination" text="Artificial Insemination"/>
+		<text name="rl_messageTitle_pregnancy" text="Dracht"/>
+		<text name="rl_messageTitle_death" text="Verwijdering"/>
+		<text name="rl_messageTitle_death_github" text="Overlijden"/>
+		<text name="rl_messageTitle_disease" text="Ziekte"/>
+		<text name="rl_messageTitle_name" text="Naam"/>
+		<text name="rl_messageTitle_movement" text="Verplaatsing"/>
+		<text name="rl_messageTitle_aiManager" text="Veehoeder"/>
+		<text name="rl_messageTitle_insemination" text="Kunstmatige inseminatie"/>
 
-		<text name="rl_message_pregnancySingle" text="Gave birth to 1 baby"/>
-		<text name="rl_message_pregnancyMultiple" text="Gave birth to %s babies"/>
-		<text name="rl_message_pregnancySold" text="%s babies were sold for %s due to overcrowding"/>
-		<text name="rl_message_pregnancyDied" text="%s babies were removed at birth"/>
-		<text name="rl_message_pregnancyDied_github" text="%s babies died at birth"/>
-		<text name="rl_message_death" text="Removed due to %s"/>
-		<text name="rl_message_death_github" text="Died due to %s"/>
-		<text name="rl_message_diseaseContracted" text="Contracted %s"/>
-		<text name="rl_message_diseaseCured" text="Cured from %s"/>
-		<text name="rl_message_diseaseTreatment_start" text="Started treatment for %s at %s"/>
-		<text name="rl_message_diseaseTreatment_resume" text="Resumed treatment for %s at %s"/>
-		<text name="rl_message_diseaseTreatment_stop" text="Stopped treatment for %s"/>
-		<text name="rl_message_nameChange" text="Name changed from '%s' to '%s'"/>
-		<text name="rl_message_nameAdded" text="Given name '%s'"/>
-		<text name="rl_message_nameDeleted" text="Name '%s' was removed"/>
-		<text name="rl_message_boughtAnimals_single" text="1 animal was bought for %s"/>
-		<text name="rl_message_boughtAnimals_multiple" text="%s animals were bought for %s"/>
-		<text name="rl_message_soldAnimals_single" text="1 animal was sold for %s"/>
-		<text name="rl_message_soldAnimals_multiple" text="%s animals were sold for %s"/>
-		<text name="rl_message_movedAnimalsTo_single" text="1 animal was moved to %s"/>
-		<text name="rl_message_movedAnimalsTo_multiple" text="%s animals were moved to %s"/>
-		<text name="rl_message_movedAnimalsFrom_single" text="1 animal was moved from %s"/>
-		<text name="rl_message_movedAnimalsFrom_multiple" text="%s animals were moved from %s"/>
-		<text name="rl_message_aiManager_boughtAnimals_single" text="Herdsman bought 1 animal for %s"/>
-		<text name="rl_message_aiManager_boughtAnimals_multiple" text="Herdsman bought %s animals for %s"/>
-		<text name="rl_message_aiManager_soldAnimals_single" text="Herdsman sold 1 animal for %s"/>
-		<text name="rl_message_aiManager_soldAnimals_multiple" text="Herdsman sold %s animals for %s"/>
-		<text name="rl_message_aiManager_castrated_single" text="Herdsman castrated 1 animal"/>
-		<text name="rl_message_aiManager_castrated_multiple" text="Herdsman castrated %s animals"/>
-		<text name="rl_message_aiManager_named_single" text="Herdsman named 1 animal"/>
-		<text name="rl_message_aiManager_named_multiple" text="Herdsman named %s animals"/>
-		<text name="rl_message_aiManager_mark_sell_single" text="Herdsman marked 1 animal for selling"/>
-		<text name="rl_message_aiManager_mark_sell_multiple" text="Herdsman marked %s animals for selling"/>
-		<text name="rl_message_aiManager_mark_castrate_single" text="Herdsman marked 1 animal for castrating"/>
-		<text name="rl_message_aiManager_mark_castrate_multiple" text="Herdsman marked %s animals for castrating"/>
-		<text name="rl_message_aiManager_mark_disease_single" text="Herdsman marked 1 animal for treatment"/>
-		<text name="rl_message_aiManager_mark_disease_multiple" text="Herdsman marked %s animals for treatment"/>
-		<text name="rl_message_insemination_success" text="Insemination was successful"/>
-		<text name="rl_message_insemination_fail" text="Insemination was unsuccessful"/>
-		<text name="rl_message_aiManager_mark_ai_single" text="Herdsman marked 1 animal for AI"/>
-		<text name="rl_message_aiManager_mark_ai_multiple" text="Herdsman marked %s animals for AI"/>
-		<text name="rl_message_aiManager_ai_single" text="Herdsman inseminated 1 animal"/>
-		<text name="rl_message_aiManager_ai_multiple" text="Herdsman inseminated %s animals"/>
-		<text name="rl_message_aiManager_movedAnimals_single" text="Herdsman moved 1 animal"/>
-		<text name="rl_message_aiManager_movedAnimals_multiple" text="Herdsman moved %s animals"/>
-		<text name="rl_message_aiManager_mark_move_single" text="Herdsman marked 1 animal for moving"/>
-		<text name="rl_message_aiManager_mark_move_multiple" text="Herdsman marked %s animals for moving"/>
-		<text name="rl_message_aiManager_moveSkippedAge_single" text="Herdsman skipped 1 animal (wrong age for the butcher)"/>
-		<text name="rl_message_aiManager_moveSkippedAge_multiple" text="Herdsman skipped %s animals (wrong age for the butcher)"/>
-		<text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
-		<text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
+		<text name="rl_message_pregnancySingle" text="1 baby geboren"/>
+		<text name="rl_message_pregnancyMultiple" text="%s baby's geboren"/>
+		<text name="rl_message_pregnancySold" text="%s baby's zijn verkocht voor %s wegens overbevolking"/>
+		<text name="rl_message_pregnancyDied" text="%s baby's zijn bij geboorte verwijderd"/>
+		<text name="rl_message_pregnancyDied_github" text="%s baby's zijn bij geboorte overleden"/>
+		<text name="rl_message_death" text="Verwijderd door %s"/>
+		<text name="rl_message_death_github" text="Overleden door %s"/>
+		<text name="rl_message_diseaseContracted" text="%s opgelopen"/>
+		<text name="rl_message_diseaseCured" text="Genezen van %s"/>
+		<text name="rl_message_diseaseTreatment_start" text="Behandeling voor %s gestart op %s"/>
+		<text name="rl_message_diseaseTreatment_resume" text="Behandeling voor %s hervat op %s"/>
+		<text name="rl_message_diseaseTreatment_stop" text="Behandeling voor %s gestopt"/>
+		<text name="rl_message_nameChange" text="Naam gewijzigd van '%s' naar '%s'"/>
+		<text name="rl_message_nameAdded" text="Naam '%s' gegeven"/>
+		<text name="rl_message_nameDeleted" text="Naam '%s' is verwijderd"/>
+		<text name="rl_message_boughtAnimals_single" text="1 dier is gekocht voor %s"/>
+		<text name="rl_message_boughtAnimals_multiple" text="%s dieren zijn gekocht voor %s"/>
+		<text name="rl_message_soldAnimals_single" text="1 dier is verkocht voor %s"/>
+		<text name="rl_message_soldAnimals_multiple" text="%s dieren zijn verkocht voor %s"/>
+		<text name="rl_message_movedAnimalsTo_single" text="1 dier is verplaatst naar %s"/>
+		<text name="rl_message_movedAnimalsTo_multiple" text="%s dieren zijn verplaatst naar %s"/>
+		<text name="rl_message_movedAnimalsFrom_single" text="1 dier is verplaatst vanaf %s"/>
+		<text name="rl_message_movedAnimalsFrom_multiple" text="%s dieren zijn verplaatst vanaf %s"/>
+		<text name="rl_message_aiManager_boughtAnimals_single" text="Veehoeder kocht 1 dier voor %s"/>
+		<text name="rl_message_aiManager_boughtAnimals_multiple" text="Veehoeder kocht %s dieren voor %s"/>
+		<text name="rl_message_aiManager_soldAnimals_single" text="Veehoeder verkocht 1 dier voor %s"/>
+		<text name="rl_message_aiManager_soldAnimals_multiple" text="Veehoeder verkocht %s dieren voor %s"/>
+		<text name="rl_message_aiManager_castrated_single" text="Veehoeder castreerde 1 dier"/>
+		<text name="rl_message_aiManager_castrated_multiple" text="Veehoeder castreerde %s dieren"/>
+		<text name="rl_message_aiManager_named_single" text="Veehoeder gaf 1 dier een naam"/>
+		<text name="rl_message_aiManager_named_multiple" text="Veehoeder gaf %s dieren een naam"/>
+		<text name="rl_message_aiManager_mark_sell_single" text="Veehoeder markeerde 1 dier om te verkopen"/>
+		<text name="rl_message_aiManager_mark_sell_multiple" text="Veehoeder markeerde %s dieren om te verkopen"/>
+		<text name="rl_message_aiManager_mark_castrate_single" text="Veehoeder markeerde 1 dier om te castreren"/>
+		<text name="rl_message_aiManager_mark_castrate_multiple" text="Veehoeder markeerde %s dieren om te castreren"/>
+		<text name="rl_message_aiManager_mark_disease_single" text="Veehoeder markeerde 1 dier voor behandeling"/>
+		<text name="rl_message_aiManager_mark_disease_multiple" text="Veehoeder markeerde %s dieren voor behandeling"/>
+		<text name="rl_message_insemination_success" text="Inseminatie was succesvol"/>
+		<text name="rl_message_insemination_fail" text="Inseminatie was niet succesvol"/>
+		<text name="rl_message_aiManager_mark_ai_single" text="Veehoeder markeerde 1 dier voor kunstmatige inseminatie"/>
+		<text name="rl_message_aiManager_mark_ai_multiple" text="Veehoeder markeerde %s dieren voor kunstmatige inseminatie"/>
+		<text name="rl_message_aiManager_ai_single" text="Veehoeder insemineerde 1 dier"/>
+		<text name="rl_message_aiManager_ai_multiple" text="Veehoeder insemineerde %s dieren"/>
+		<text name="rl_message_aiManager_movedAnimals_single" text="Veehoeder verplaatste 1 dier"/>
+		<text name="rl_message_aiManager_movedAnimals_multiple" text="Veehoeder verplaatste %s dieren"/>
+		<text name="rl_message_aiManager_mark_move_single" text="Veehoeder markeerde 1 dier om te verplaatsen"/>
+		<text name="rl_message_aiManager_mark_move_multiple" text="Veehoeder markeerde %s dieren om te verplaatsen"/>
+		<text name="rl_message_aiManager_moveSkippedAge_single" text="Veehoeder sloeg 1 dier over (verkeerde leeftijd voor de slachter)"/>
+		<text name="rl_message_aiManager_moveSkippedAge_multiple" text="Veehoeder sloeg %s dieren over (verkeerde leeftijd voor de slachter)"/>
+		<text name="rl_message_aiManager_horseCare_single" text="Veehoeder verzorgde 1 paard"/>
+		<text name="rl_message_aiManager_horseCare_multiple" text="Veehoeder verzorgde %s paarden"/>
 
 
 
 		<!--  DEATHS  -->
 
 
-		<text name="rl_death_pregnancy" text="a bad pregnancy"/>
-		<text name="rl_death_health" text="low health"/>
-		<text name="rl_death_age" text="old age"/>
-		<text name="rl_death_accident" text="an accident"/>
+		<text name="rl_death_pregnancy" text="een slechte dracht"/>
+		<text name="rl_death_health" text="een slechte gezondheid"/>
+		<text name="rl_death_age" text="ouderdom"/>
+		<text name="rl_death_accident" text="een ongeluk"/>
 
 
 
-		<text name="rl_ui_dependencies_missing" text="RealisticLivestock requires the following dependencies:"/>
-		<text name="rl_ui_dependency_missing_notInstalled" text="- %s (Not Installed)"/>
-		<text name="rl_ui_dependency_missing_installed" text="- %s (Installed: %s, Minimum Required: %s)"/>
+		<text name="rl_ui_dependencies_missing" text="RealisticLivestock vereist de volgende afhankelijkheden:"/>
+		<text name="rl_ui_dependency_missing_notInstalled" text="- %s (Niet geïnstalleerd)"/>
+		<text name="rl_ui_dependency_missing_installed" text="- %s (Geïnstalleerd: %s, Minimaal vereist: %s)"/>
         <!-- Added missing translations -->
         <text name="input_RL_AI" text="Kunstmatige inseminatie"/>
         <text name="input_RL_DISEASES" text="Dierziekten"/>
         <text name="input_RL_MONITOR" text="Monitor plaatsen/verwijderen"/>
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Dieren beheren"/>
         <text name="input_RL_SELECT" text="Dier selecteren/Deselecteren"/>
-        <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
+        <text name="input_RL_SELECT_SECTION" text="Sectie selecteren/deselecteren"/>
         <text name="rl_message_dailyBirthsSummary" text="%s dieren zijn geboren bij %s"/>
         <text name="rl_message_dailyDeathsSummary" text="%s dieren zijn gestorven bij %s - %s"/>
         <text name="rl_message_dailyOvercrowdingSummary" text="Overbevolking: %s pasgeborenen verkocht bij %s voor %s"/>
         <text name="rl_message_dailyPurchasesSummary" text="%s dieren gekocht bij %s voor %s"/>
-        <text name="rl_message_dailyCastrationsSummary" text="Castrated %s animals at %s"/>
-        <text name="rl_message_dailyNamingsSummary" text="Named %s animals at %s"/>
-        <text name="rl_message_dailyInseminationsSummary" text="Inseminated %s animals at %s"/>
-        <text name="rl_message_dailyMarkSellSummary" text="Marked %s animals for sale at %s"/>
-        <text name="rl_message_dailyMarkCastrateSummary" text="Marked %s animals for castration at %s"/>
-        <text name="rl_message_dailyMarkInseminateSummary" text="Marked %s animals for insemination at %s"/>
-        <text name="rl_message_dailyMovesSummary" text="Moved %s animals from %s"/>
-        <text name="rl_message_dailyMarkMoveSummary" text="Marked %s animals for moving from %s"/>
-        <text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
+        <text name="rl_message_dailyCastrationsSummary" text="%s dieren gecastreerd bij %s"/>
+        <text name="rl_message_dailyNamingsSummary" text="%s dieren een naam gegeven bij %s"/>
+        <text name="rl_message_dailyInseminationsSummary" text="%s dieren geïnsemineerd bij %s"/>
+        <text name="rl_message_dailyMarkSellSummary" text="%s dieren gemarkeerd om te verkopen bij %s"/>
+        <text name="rl_message_dailyMarkCastrateSummary" text="%s dieren gemarkeerd voor castratie bij %s"/>
+        <text name="rl_message_dailyMarkInseminateSummary" text="%s dieren gemarkeerd voor inseminatie bij %s"/>
+        <text name="rl_message_dailyMovesSummary" text="%s dieren verplaatst vanaf %s"/>
+        <text name="rl_message_dailyMarkMoveSummary" text="%s dieren gemarkeerd om te verplaatsen vanaf %s"/>
+        <text name="rl_message_dailyHorseCareSummary" text="%s paarden verzorgd bij %s"/>
         <text name="rl_message_dailySalesSummary" text="%s dieren verkocht bij %s voor %s"/>
         <text name="rl_settings_accidentsChance_tooltip_github" text="Verander de kans dat dieren sterven door willekeurige ongevallen"/>
         <text name="rl_settings_deathEnabled_label_github" text="Sterfte"/>
@@ -627,244 +627,244 @@
         <text name="rm_rl_migration_title" text="Melding gegevensmigratie"/>
         <text name="rm_rl_mod_conflict_message" text="De volgende mod(s) conflicteren met 'Realistic Livestock - Ritter version' en kunnen niet samen worden gebruikt: %s &#10;&#10;Schakel de conflicterende mod(s) uit en herstart het spel."/>
 
-        <text name="rl_mod_warn_title" text="Mod Compatibility Warning"/>
-        <text name="rl_mod_warn_message" text="The following mod(s) loaded with Realistic Livestock RM may cause issues:%s&#10;&#10;See %s for details. The game will continue."/>
+        <text name="rl_mod_warn_title" text="Waarschuwing modcompatibiliteit"/>
+        <text name="rl_mod_warn_message" text="De volgende mod(s) geladen samen met Realistic Livestock RM kunnen problemen veroorzaken:%s&#10;&#10;Zie %s voor meer details. Het spel gaat door."/>
         <text name="rl_mod_compat_url" text="https://rittermod.github.io/FS25_RealisticLivestockRM/user-guide/reference-mod-compatibility"/>
-        <text name="rl_mod_warn_FS25_AnimalFoodCalculator" text="FS25_AnimalFoodCalculator: significant performance impact that grows with herd size."/>
+        <text name="rl_mod_warn_FS25_AnimalFoodCalculator" text="FS25_AnimalFoodCalculator: aanzienlijke impact op prestaties die groeit met de omvang van de kudde."/>
 
 
 
         <!-- Missing keys (English fallback) -->
-        <text name="input_RL_MENU" text="Open RL Menu"/>
-        <text name="input_RL_RENAME" text="Rename"/>
-        <text name="input_RL_CYCLE_FILTER" text="Cycle Saved Filter"/>
-        <text name="rl_bridge_version_unknown" text="Realistic Livestock: %s version %s has not been tested with version %s of Realistic Livestock. Using config '%s'. If you experience issues with exotic animals, please report them at %s."/>
+        <text name="input_RL_MENU" text="RL-menu openen"/>
+        <text name="input_RL_RENAME" text="Hernoemen"/>
+        <text name="input_RL_CYCLE_FILTER" text="Opgeslagen filter wisselen"/>
+        <text name="rl_bridge_version_unknown" text="Realistic Livestock: %s versie %s is niet getest met versie %s van Realistic Livestock. Configuratie '%s' wordt gebruikt. Meld problemen met exotische dieren op %s."/>
         <!-- TODO: localise -->
-        <text name="rl_bridge_configoverride_conflict_header" text="Realistic Livestock: Conflict detected. Two or more bridges/packs replaced configuration for the same animal type. Last-loaded mod wins. If you continue you will have visual glitches and ghost animals."/>
+        <text name="rl_bridge_configoverride_conflict_header" text="Realistic Livestock: Conflict gedetecteerd. Twee of meer bruggen/packs hebben de configuratie voor hetzelfde dierentype vervangen. De laatst geladen mod wint. Als je doorgaat, krijg je visuele fouten en spookdieren."/>
         <!-- TODO: localise -->
-        <text name="rl_bridge_configoverride_conflict_line" text="%s: applied by %s"/>
-        <text name="rl_menu_info_children" text="Children"/>
-        <text name="rl_menu_info_diseases_header" text="Diseases"/>
-        <text name="rl_menu_info_empty_no_animals" text="No animals in this husbandry"/>
-        <text name="rl_menu_info_empty_no_husbandries" text="You need at least one husbandry to view animals"/>
+        <text name="rl_bridge_configoverride_conflict_line" text="%s: toegepast door %s"/>
+        <text name="rl_menu_info_children" text="Kinderen"/>
+        <text name="rl_menu_info_diseases_header" text="Ziektes"/>
+        <text name="rl_menu_info_empty_no_animals" text="Geen dieren in dit bedrijf"/>
+        <text name="rl_menu_info_empty_no_husbandries" text="Je hebt minstens één bedrijf nodig om dieren te bekijken"/>
         <text name="rl_menu_info_filter_button" text="Filter"/>
-        <text name="rl_menu_info_genetics_header" text="Genetics"/>
-        <text name="rl_menu_info_input_header" text="Input (monitored)"/>
-        <text name="rl_menu_info_output_header" text="Output (monitored)"/>
-        <text name="rl_menu_info_pedigree_header" text="Pedigree"/>
-        <text name="rl_menu_info_pen_information" text="Pen Information"/>
-        <text name="rl_menu_info_title" text="Manage"/>
-        <text name="rl_menu_messages_col_animal" text="Animal"/>
-        <text name="rl_menu_messages_col_date" text="Date"/>
-        <text name="rl_menu_messages_col_husbandry" text="Husbandry"/>
-        <text name="rl_menu_messages_col_message" text="Message"/>
+        <text name="rl_menu_info_genetics_header" text="Genetica"/>
+        <text name="rl_menu_info_input_header" text="Input (gemonitord)"/>
+        <text name="rl_menu_info_output_header" text="Output (gemonitord)"/>
+        <text name="rl_menu_info_pedigree_header" text="Stamboom"/>
+        <text name="rl_menu_info_pen_information" text="Hokinformatie"/>
+        <text name="rl_menu_info_title" text="Beheren"/>
+        <text name="rl_menu_messages_col_animal" text="Dier"/>
+        <text name="rl_menu_messages_col_date" text="Datum"/>
+        <text name="rl_menu_messages_col_husbandry" text="Bedrijf"/>
+        <text name="rl_menu_messages_col_message" text="Bericht"/>
         <text name="rl_menu_messages_col_type" text="Type"/>
-        <text name="rl_menu_messages_confirm_delete_all" text="Delete all %s messages? This cannot be undone."/>
-        <text name="rl_menu_messages_delete_all_button" text="Delete all"/>
-        <text name="rl_menu_messages_delete_button" text="Delete"/>
-        <text name="rl_menu_messages_empty" text="No messages yet"/>
-        <text name="rl_menu_messages_no_farm" text="You need to own a farm to view messages"/>
-        <text name="rl_menu_messages_summary" text="%s messages"/>
-        <text name="rl_menu_messages_title" text="Messages"/>
-        <text name="rl_menu_messages_unknown" text="Unknown: %s"/>
-        <text name="rl_menu_move_summary" text="%d animals" tag="format"/>
-        <text name="rl_menu_move_title" text="Move"/>
+        <text name="rl_menu_messages_confirm_delete_all" text="Alle %s berichten verwijderen? Dit kan niet ongedaan worden gemaakt."/>
+        <text name="rl_menu_messages_delete_all_button" text="Alles verwijderen"/>
+        <text name="rl_menu_messages_delete_button" text="Verwijderen"/>
+        <text name="rl_menu_messages_empty" text="Nog geen berichten"/>
+        <text name="rl_menu_messages_no_farm" text="Je hebt een bedrijf nodig om berichten te bekijken"/>
+        <text name="rl_menu_messages_summary" text="%s berichten"/>
+        <text name="rl_menu_messages_title" text="Berichten"/>
+        <text name="rl_menu_messages_unknown" text="Onbekend: %s"/>
+        <text name="rl_menu_move_summary" text="%d dieren" tag="format"/>
+        <text name="rl_menu_move_title" text="Verplaatsen"/>
         <!-- Transfer tab -->
-        <text name="rl_menu_transfer_title" text="Transfer"/>
-        <text name="rl_menu_transfer_load" text="Load"/>
-        <text name="rl_menu_transfer_unload" text="Unload"/>
-        <text name="rl_menu_transfer_empty_no_animals" text="No animals on this side"/>
-        <text name="rl_menu_transfer_counterpart" text="Destination"/>
-        <text name="rl_menu_transfer_world" text="Nearby Animals"/>
-        <text name="rl_menu_transfer_deliver" text="Deliver"/>
-        <text name="rl_menu_sell_title" text="Sell"/>
-        <text name="rl_menu_sell_cart_header" text="Sale Summary"/>
-        <text name="rl_menu_sell_cart_selected" text="Selected"/>
-        <text name="rl_menu_sell_cart_empty" text="Select animals to sell"/>
+        <text name="rl_menu_transfer_title" text="Overdragen"/>
+        <text name="rl_menu_transfer_load" text="Laden"/>
+        <text name="rl_menu_transfer_unload" text="Lossen"/>
+        <text name="rl_menu_transfer_empty_no_animals" text="Geen dieren aan deze kant"/>
+        <text name="rl_menu_transfer_counterpart" text="Bestemming"/>
+        <text name="rl_menu_transfer_world" text="Dieren in de buurt"/>
+        <text name="rl_menu_transfer_deliver" text="Afleveren"/>
+        <text name="rl_menu_sell_title" text="Verkopen"/>
+        <text name="rl_menu_sell_cart_header" text="Verkoopoverzicht"/>
+        <text name="rl_menu_sell_cart_selected" text="Geselecteerd"/>
+        <text name="rl_menu_sell_cart_empty" text="Selecteer dieren om te verkopen"/>
 
         <!-- Buy tab -->
-        <text name="rl_menu_buy_title" text="Buy"/>
-        <text name="rl_menu_buy_empty_no_types" text="The dealer has no animal types available"/>
-        <text name="rl_menu_buy_empty_no_animals" text="No animals available at the dealer for this type"/>
-        <text name="rl_menu_buy_cart_header" text="Purchase Summary"/>
-        <text name="rl_menu_buy_cart_selected" text="Selected"/>
+        <text name="rl_menu_buy_title" text="Kopen"/>
+        <text name="rl_menu_buy_empty_no_types" text="De handelaar heeft geen diertypes beschikbaar"/>
+        <text name="rl_menu_buy_empty_no_animals" text="Geen dieren beschikbaar bij de handelaar voor dit type"/>
+        <text name="rl_menu_buy_cart_header" text="Aankoopoverzicht"/>
+        <text name="rl_menu_buy_cart_selected" text="Geselecteerd"/>
         <!-- AI tab (English fallback) -->
-        <text name="rl_menu_ai_title" text="Artificial Insemination"/>
-        <text name="rl_menu_ai_quantity" text="Quantity"/>
-        <text name="rl_menu_ai_price" text="Price"/>
-        <text name="rl_menu_ai_empty_no_stock" text="No bulls available at the dealer for this species"/>
-        <text name="rl_menu_ai_empty_no_species" text="No animal species registered"/>
-        <text name="rl_menu_herdsman_title" text="Herdsman"/>
-        <text name="rl_menu_herdsman_detail_action" text="Action"/>
-        <text name="rl_menu_herdsman_action_perform" text="Perform"/>
-        <text name="rl_menu_herdsman_action_markOnly" text="Mark only"/>
-        <text name="rl_menu_herdsman_action_perform_tooltip" text="The herdsman performs this task on matching animals."/>
-        <text name="rl_menu_herdsman_action_markOnly_tooltip" text="The herdsman only flags matching animals - the task is not performed, at reduced wage."/>
-        <text name="rl_menu_herdsman_operation_tooltip" text="The task the herdsman performs on matching animals."/>
-        <text name="rl_menu_herdsman_name_tooltip" text="A name to identify this task."/>
-        <text name="rl_menu_herdsman_filter_tooltip" text="The saved filter that decides which animals this task matches."/>
-        <text name="rl_menu_herdsman_husbandries_tooltip" text="The husbandries this task runs in. Budget and limits apply to each one separately."/>
-        <text name="rl_menu_herdsman_maxAnimals_sell_tooltip" text="The herdsman sells up to %s matching animals per day, in each selected husbandry."/>
-        <text name="rl_menu_herdsman_maxAnimals_buy_tooltip" text="The herdsman buys up to %s matching animals per day, in each selected husbandry."/>
-        <text name="rl_menu_herdsman_maxAnimals_ai_tooltip" text="The herdsman inseminates up to %s matching animals per day, in each selected husbandry."/>
-        <text name="rl_menu_herdsman_maxAnimals_move_tooltip" text="The herdsman moves up to %s matching animals per day, in each selected husbandry."/>
-        <text name="rl_menu_herdsman_budgetFixed_tooltip" text="The herdsman spends up to %s per day, in each selected husbandry."/>
-        <text name="rl_menu_herdsman_budgetPercentage_tooltip" text="The herdsman spends up to %s of your farm's money per day, in each selected husbandry."/>
-        <text name="rl_menu_herdsman_destination_tooltip" text="The husbandry the herdsman moves matching animals into."/>
-        <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Whether the herdsman runs this horse care task each day."/>
-        <text name="rl_menu_herdsman_enabled_move_tooltip" text="Whether the herdsman runs this move task each day."/>
+        <text name="rl_menu_ai_title" text="Kunstmatige inseminatie"/>
+        <text name="rl_menu_ai_quantity" text="Aantal"/>
+        <text name="rl_menu_ai_price" text="Prijs"/>
+        <text name="rl_menu_ai_empty_no_stock" text="Geen stieren beschikbaar bij de handelaar voor deze diersoort"/>
+        <text name="rl_menu_ai_empty_no_species" text="Geen diersoorten geregistreerd"/>
+        <text name="rl_menu_herdsman_title" text="Veehoeder"/>
+        <text name="rl_menu_herdsman_detail_action" text="Actie"/>
+        <text name="rl_menu_herdsman_action_perform" text="Uitvoeren"/>
+        <text name="rl_menu_herdsman_action_markOnly" text="Alleen markeren"/>
+        <text name="rl_menu_herdsman_action_perform_tooltip" text="De veehoeder voert deze taak uit op de bijpassende dieren."/>
+        <text name="rl_menu_herdsman_action_markOnly_tooltip" text="De veehoeder markeert alleen de bijpassende dieren - de taak wordt niet uitgevoerd, tegen verlaagd loon."/>
+        <text name="rl_menu_herdsman_operation_tooltip" text="De taak die de veehoeder uitvoert op de bijpassende dieren."/>
+        <text name="rl_menu_herdsman_name_tooltip" text="Een naam om deze taak te herkennen."/>
+        <text name="rl_menu_herdsman_filter_tooltip" text="Het opgeslagen filter dat bepaalt welke dieren bij deze taak passen."/>
+        <text name="rl_menu_herdsman_husbandries_tooltip" text="De bedrijven waarin deze taak wordt uitgevoerd. Budget en limieten gelden per bedrijf apart."/>
+        <text name="rl_menu_herdsman_maxAnimals_sell_tooltip" text="De veehoeder verkoopt tot %s bijpassende dieren per dag, in elk geselecteerd bedrijf."/>
+        <text name="rl_menu_herdsman_maxAnimals_buy_tooltip" text="De veehoeder koopt tot %s bijpassende dieren per dag, in elk geselecteerd bedrijf."/>
+        <text name="rl_menu_herdsman_maxAnimals_ai_tooltip" text="De veehoeder insemineert tot %s bijpassende dieren per dag, in elk geselecteerd bedrijf."/>
+        <text name="rl_menu_herdsman_maxAnimals_move_tooltip" text="De veehoeder verplaatst tot %s bijpassende dieren per dag, in elk geselecteerd bedrijf."/>
+        <text name="rl_menu_herdsman_budgetFixed_tooltip" text="De veehoeder besteedt tot %s per dag, in elk geselecteerd bedrijf."/>
+        <text name="rl_menu_herdsman_budgetPercentage_tooltip" text="De veehoeder besteedt tot %s van het geld van je bedrijf per dag, in elk geselecteerd bedrijf."/>
+        <text name="rl_menu_herdsman_destination_tooltip" text="Het bedrijf waar de veehoeder bijpassende dieren naartoe verplaatst."/>
+        <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Of de veehoeder deze verzorgingstaak voor paarden elke dag uitvoert."/>
+        <text name="rl_menu_herdsman_enabled_move_tooltip" text="Of de veehoeder deze verplaatsingstaak elke dag uitvoert."/>
         <text name="rl_menu_herdsman_empty" text="No herdsman rules yet"/>
         <text name="rl_menu_herdsman_empty_editor" text="Select a rule to edit"/>
-        <text name="rl_menu_herdsman_section_sell" text="Sell"/>
-        <text name="rl_menu_herdsman_section_buy" text="Buy"/>
-        <text name="rl_menu_herdsman_section_castrate" text="Castrate"/>
-        <text name="rl_menu_herdsman_section_naming" text="Naming"/>
-        <text name="rl_menu_herdsman_section_ai" text="Artificial Insemination"/>
-        <text name="rl_menu_herdsman_section_horsecare" text="Horse Care"/>
+        <text name="rl_menu_herdsman_section_sell" text="Verkopen"/>
+        <text name="rl_menu_herdsman_section_buy" text="Kopen"/>
+        <text name="rl_menu_herdsman_section_castrate" text="Castreren"/>
+        <text name="rl_menu_herdsman_section_naming" text="Naamgeving"/>
+        <text name="rl_menu_herdsman_section_ai" text="Kunstmatige inseminatie"/>
+        <text name="rl_menu_herdsman_section_horsecare" text="Paardenverzorging"/>
         <text name="rl_menu_herdsman_detail_operation" text="Operation"/>
-        <text name="rl_menu_herdsman_detail_enabled" text="Enabled"/>
-        <text name="rl_menu_herdsman_detail_convention" text="Naming Convention"/>
-        <text name="rl_menu_herdsman_detail_budgetfixed" text="Fixed Amount"/>
+        <text name="rl_menu_herdsman_detail_enabled" text="Ingeschakeld"/>
+        <text name="rl_menu_herdsman_detail_convention" text="Naamgevingsconventie"/>
+        <text name="rl_menu_herdsman_detail_budgetfixed" text="Vast bedrag"/>
         <text name="rl_menu_herdsman_detail_budgetpercentage" text="Herd Value %"/>
-        <text name="rl_menu_herdsman_detail_semen" text="Semen"/>
-        <text name="rl_menu_herdsman_detail_husbandries" text="Husbandries"/>
-        <text name="rl_menu_herdsman_detail_none" text="(none)"/>
-        <text name="rl_menu_herdsman_detail_missing" text="(missing)"/>
-        <text name="rl_menu_herdsman_detail_required" text="Required"/>
-        <text name="rl_menu_herdsman_detail_wholeNumberRange" text="Value must be a whole number between %d and %d"/>
-        <text name="rl_menu_herdsman_detail_wholeNumberMin" text="Value must be a whole number, %d or more"/>
-        <text name="rl_menu_herdsman_filter_select" text="Select filter"/>
-        <text name="rl_menu_herdsman_filter_picker_title" text="Select Filter"/>
+        <text name="rl_menu_herdsman_detail_semen" text="Sperma"/>
+        <text name="rl_menu_herdsman_detail_husbandries" text="Bedrijven"/>
+        <text name="rl_menu_herdsman_detail_none" text="(geen)"/>
+        <text name="rl_menu_herdsman_detail_missing" text="(ontbreekt)"/>
+        <text name="rl_menu_herdsman_detail_required" text="Verplicht"/>
+        <text name="rl_menu_herdsman_detail_wholeNumberRange" text="Waarde moet een heel getal zijn tussen %d en %d"/>
+        <text name="rl_menu_herdsman_detail_wholeNumberMin" text="Waarde moet een heel getal zijn, %d of hoger"/>
+        <text name="rl_menu_herdsman_filter_select" text="Filter selecteren"/>
+        <text name="rl_menu_herdsman_filter_picker_title" text="Filter selecteren"/>
         <text name="rl_menu_herdsman_filter_picker_empty" text="No filters available for this operation."/>
-        <text name="rl_menu_herdsman_husbandry_select" text="Select husbandries"/>
-        <text name="rl_menu_herdsman_husbandry_count" text="%d selected"/>
-        <text name="rl_menu_herdsman_husbandry_picker_title" text="Select Husbandries"/>
+        <text name="rl_menu_herdsman_husbandry_select" text="Bedrijven selecteren"/>
+        <text name="rl_menu_herdsman_husbandry_count" text="%d geselecteerd"/>
+        <text name="rl_menu_herdsman_husbandry_picker_title" text="Bedrijven selecteren"/>
         <text name="rl_menu_herdsman_husbandry_picker_empty" text="No husbandries available for this rule."/>
-        <text name="rl_menu_dealerSale_title" text="Animals for Sale"/>
-        <text name="rl_menu_dealerSale_empty" text="No animals available at this dealer."/>
-        <text name="rl_menu_herdsman_husbandry_emptyRejected" text="Select at least one husbandry."/>
+        <text name="rl_menu_dealerSale_title" text="Dieren te koop"/>
+        <text name="rl_menu_dealerSale_empty" text="Geen dieren beschikbaar bij deze handelaar."/>
+        <text name="rl_menu_herdsman_husbandry_emptyRejected" text="Selecteer minstens één bedrijf."/>
         <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Current filter unavailable for this operation."/>
-			<text name="rl_menu_herdsman_section_move" text="Move"/>
-			<text name="rl_menu_herdsman_detail_destination" text="Destination"/>
-			<text name="rl_menu_herdsman_destination_select" text="Select destination"/>
-			<text name="rl_menu_herdsman_destination_butcher_suffix" text="(butcher)"/>
-			<text name="rl_menu_herdsman_destination_picker_title" text="Select Destination"/>
+			<text name="rl_menu_herdsman_section_move" text="Verplaatsen"/>
+			<text name="rl_menu_herdsman_detail_destination" text="Bestemming"/>
+			<text name="rl_menu_herdsman_destination_select" text="Bestemming selecteren"/>
+			<text name="rl_menu_herdsman_destination_butcher_suffix" text="(slachter)"/>
+			<text name="rl_menu_herdsman_destination_picker_title" text="Bestemming selecteren"/>
 			<text name="rl_menu_herdsman_destination_picker_empty" text="No destination husbandry available for this rule."/>
 			<text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Current destination unavailable for this rule."/>
         <!-- Settings tab shell (English fallback) -->
-        <text name="rl_menu_settings_title" text="Settings"/>
-        <text name="rl_menu_settings_tab_general" text="General"/>
+        <text name="rl_menu_settings_title" text="Instellingen"/>
+        <text name="rl_menu_settings_tab_general" text="Algemeen"/>
         <text name="rl_menu_settings_tab_filters" text="Filters"/>
 
 		<!-- Filters tab list -->
-		<text name="rl_menu_filters_quick_filter_title" text="Quick filter"/>
-		<text name="rl_ui_qf_saveFilter" text="Save filter"/>
-		<text name="rl_ui_qf_saveDropsValue" text="Saved filters don't support Value; this condition will not be carried over."/>
-		<text name="rl_menu_filters_empty" text="No saved filters yet"/>
-		<text name="rl_menu_filters_empty_no_farm" text="You need a farm to save filters"/>
-		<text name="rl_menu_filters_new_button" text="New filter"/>
-		<text name="rl_menu_filters_default_name" text="New filter"/>
-		<text name="rl_menu_filters_detail_placeholder" text="To be implemented"/>
+		<text name="rl_menu_filters_quick_filter_title" text="Snelfilter"/>
+		<text name="rl_ui_qf_saveFilter" text="Filter opslaan"/>
+		<text name="rl_ui_qf_saveDropsValue" text="Opgeslagen filters ondersteunen geen Waarde; deze voorwaarde wordt niet overgenomen."/>
+		<text name="rl_menu_filters_empty" text="Nog geen opgeslagen filters"/>
+		<text name="rl_menu_filters_empty_no_farm" text="Je hebt een bedrijf nodig om filters op te slaan"/>
+		<text name="rl_menu_filters_new_button" text="Nieuw filter"/>
+		<text name="rl_menu_filters_default_name" text="Nieuw filter"/>
+		<text name="rl_menu_filters_detail_placeholder" text="Nog te implementeren"/>
 		<!-- Editor + Duplicate/Delete (English fallback) -->
-		<text name="rl_menu_filters_empty_editor" text="Select a filter to edit"/>
-		<text name="rl_menu_filters_editor_title_name" text="Name"/>
-		<text name="rl_menu_filters_editor_title_animal_type" text="Animal type"/>
-		<text name="rl_menu_filters_editor_title_op" text="Conditions"/>
-		<text name="rl_menu_filters_animal_type_any" text="Any"/>
-		<text name="rl_menu_filters_op_and" text="Match ALL"/>
-		<text name="rl_menu_filters_op_or" text="Match ANY"/>
-		<text name="rl_menu_filters_add_group_not_implemented" text="Add group is not yet implemented in this version."/>
-		<text name="rl_menu_filters_duplicate_button" text="Duplicate"/>
-		<text name="rl_menu_filters_delete_button" text="Delete"/>
-		<text name="rl_menu_filters_duplicate_suffix" text=" (copy)"/>
-		<text name="rl_menu_filters_duplicate_suffix_n" text=" (copy %d)"/>
-		<text name="rl_menu_filters_delete_confirm_text" text="Delete filter &quot;%s&quot;? This cannot be undone."/>
+		<text name="rl_menu_filters_empty_editor" text="Selecteer een filter om te bewerken"/>
+		<text name="rl_menu_filters_editor_title_name" text="Naam"/>
+		<text name="rl_menu_filters_editor_title_animal_type" text="Diertype"/>
+		<text name="rl_menu_filters_editor_title_op" text="Voorwaarden"/>
+		<text name="rl_menu_filters_animal_type_any" text="Alle"/>
+		<text name="rl_menu_filters_op_and" text="Voldoet aan ALLE"/>
+		<text name="rl_menu_filters_op_or" text="Voldoet aan MINSTENS ÉÉN"/>
+		<text name="rl_menu_filters_add_group_not_implemented" text="Groep toevoegen is nog niet geïmplementeerd in deze versie."/>
+		<text name="rl_menu_filters_duplicate_button" text="Dupliceren"/>
+		<text name="rl_menu_filters_delete_button" text="Verwijderen"/>
+		<text name="rl_menu_filters_duplicate_suffix" text=" (kopie)"/>
+		<text name="rl_menu_filters_duplicate_suffix_n" text=" (kopie %d)"/>
+		<text name="rl_menu_filters_delete_confirm_text" text="Filter &quot;%s&quot; verwijderen? Dit kan niet ongedaan worden gemaakt."/>
 		<!-- Usage scope axis -->
-		<text name="rl_menu_filters_editor_title_usage" text="Show on"/>
-		<text name="rl_menu_filters_usage_any" text="All screens"/>
-		<text name="rl_menu_filters_usage_owned" text="Owned-herd screens"/>
-		<text name="rl_menu_filters_usage_dealer" text="Dealer screens"/>
-		<text name="rl_menu_filters_valueOutOfRange_both" text="Value must be between %d and %d"/>
-		<text name="rl_menu_filters_valueOutOfRange_min" text="Value must be at least %d"/>
-		<text name="rl_menu_filters_valueOutOfRange_max" text="Value must be at most %d"/>
+		<text name="rl_menu_filters_editor_title_usage" text="Tonen op"/>
+		<text name="rl_menu_filters_usage_any" text="Alle schermen"/>
+		<text name="rl_menu_filters_usage_owned" text="Schermen eigen kudde"/>
+		<text name="rl_menu_filters_usage_dealer" text="Schermen handelaar"/>
+		<text name="rl_menu_filters_valueOutOfRange_both" text="Waarde moet tussen %d en %d liggen"/>
+		<text name="rl_menu_filters_valueOutOfRange_min" text="Waarde moet minstens %d zijn"/>
+		<text name="rl_menu_filters_valueOutOfRange_max" text="Waarde mag maximaal %d zijn"/>
 
 		<!-- Filter cycle + chip MVP -->
-		<text name="rl_menu_filter_chip_none" text="No filter"/>
+		<text name="rl_menu_filter_chip_none" text="Geen filter"/>
 		<text name="rl_menu_filter_chip_active" text="Filter: %s"/>
-		<text name="rl_menu_filter_chip_quick" text="Filter: QF"/>
-		<text name="rl_menu_filter_chip_quick_plus_saved" text="Filter: QF + %s"/>
-		<text name="rl_menu_cycle_filter_button" text="Cycle filter"/>
-		<text name="rl_menu_filter_chip_unnamed" text="(unnamed)"/>
-        <text name="rl_settings_geneticsDisplay_label" text="Genetics Display"/>
-        <text name="rl_settings_geneticsDisplay_texts_1" text="Off"/>
-        <text name="rl_settings_geneticsDisplay_texts_2" text="Short"/>
-        <text name="rl_settings_geneticsDisplay_texts_3" text="Long"/>
-        <text name="rl_settings_geneticsDisplay_tooltip" text="Show numeric genetics values in animal names"/>
-        <text name="rl_settings_geneticsPosition_label" text="Genetics Position"/>
-        <text name="rl_settings_geneticsPosition_texts_1" text="Prefix"/>
-        <text name="rl_settings_geneticsPosition_texts_2" text="Postfix"/>
-        <text name="rl_settings_geneticsPosition_tooltip" text="Where to show genetics in the name"/>
-        <text name="rl_settings_sortByGenetics_label" text="Sort by Genetics"/>
-        <text name="rl_settings_sortByGenetics_tooltip_1" text="Animals are sorted by type and age"/>
-        <text name="rl_settings_sortByGenetics_tooltip_2" text="Animals are sorted by genetics (highest first)"/>
-        <text name="rl_ui_buyAllRejected" text="None of the selected animals can be purchased in this husbandry."/>
-        <text name="rl_ui_buyPartialConfirmation" text="Buy %d of %d selected animals for %s?" tag="format"/>
-        <text name="rl_ui_buySkippedNotSupported" text="%d animal(s) not supported by this husbandry" tag="format"/>
+		<text name="rl_menu_filter_chip_quick" text="Filter: SF"/>
+		<text name="rl_menu_filter_chip_quick_plus_saved" text="Filter: SF + %s"/>
+		<text name="rl_menu_cycle_filter_button" text="Filter wisselen"/>
+		<text name="rl_menu_filter_chip_unnamed" text="(naamloos)"/>
+        <text name="rl_settings_geneticsDisplay_label" text="Genetica weergave"/>
+        <text name="rl_settings_geneticsDisplay_texts_1" text="Uit"/>
+        <text name="rl_settings_geneticsDisplay_texts_2" text="Kort"/>
+        <text name="rl_settings_geneticsDisplay_texts_3" text="Lang"/>
+        <text name="rl_settings_geneticsDisplay_tooltip" text="Toon numerieke genetica-waardes in dierennamen"/>
+        <text name="rl_settings_geneticsPosition_label" text="Positie genetica"/>
+        <text name="rl_settings_geneticsPosition_texts_1" text="Ervoor"/>
+        <text name="rl_settings_geneticsPosition_texts_2" text="Erachter"/>
+        <text name="rl_settings_geneticsPosition_tooltip" text="Waar de genetica bij de naam getoond wordt"/>
+        <text name="rl_settings_sortByGenetics_label" text="Sorteren op genetica"/>
+        <text name="rl_settings_sortByGenetics_tooltip_1" text="Dieren worden gesorteerd op type en leeftijd"/>
+        <text name="rl_settings_sortByGenetics_tooltip_2" text="Dieren worden gesorteerd op genetica (hoogste eerst)"/>
+        <text name="rl_ui_buyAllRejected" text="Geen van de geselecteerde dieren kan in dit bedrijf worden gekocht."/>
+        <text name="rl_ui_buyPartialConfirmation" text="%d van %d geselecteerde dieren kopen voor %s?" tag="format"/>
+        <text name="rl_ui_buySkippedNotSupported" text="%d dier(en) niet ondersteund door dit bedrijf" tag="format"/>
 		<!-- Herdsman rule lifecycle -->
 		<text name="rl_menu_herdsman_new_button" text="New rule"/>
-		<text name="rl_menu_herdsman_duplicate_button" text="Duplicate"/>
-		<text name="rl_menu_herdsman_delete_button" text="Delete"/>
+		<text name="rl_menu_herdsman_duplicate_button" text="Dupliceren"/>
+		<text name="rl_menu_herdsman_delete_button" text="Verwijderen"/>
 		<text name="rl_menu_herdsman_delete_confirm_text" text="Delete rule &quot;%s&quot;? This cannot be undone."/>
 		<text name="rl_menu_herdsman_default_name" text="New rule"/>
-		<text name="rl_menu_herdsman_duplicate_suffix" text=" (copy)"/>
-		<text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copy %d)"/>
+		<text name="rl_menu_herdsman_duplicate_suffix" text=" (kopie)"/>
+		<text name="rl_menu_herdsman_duplicate_suffix_n" text=" (kopie %d)"/>
 		<!-- Filter condition editor (English fallback) -->
-		<text name="rl_menu_filters_add_condition" text="Add condition"/>
-		<text name="rl_menu_filters_add_group_button" text="Add group"/>
-		<text name="rl_menu_filters_edit_condition" text="Edit condition"/>
-		<text name="rl_menu_filters_delete_condition" text="Delete condition"/>
-		<text name="rl_menu_filters_dialog_title" text="Edit condition"/>
-		<text name="rl_menu_filters_field_label" text="Field"/>
-		<text name="rl_menu_filters_cmp_label" text="Compare"/>
-		<text name="rl_menu_filters_cmp_lt" text="is less than"/>
-		<text name="rl_menu_filters_cmp_le" text="is at most"/>
+		<text name="rl_menu_filters_add_condition" text="Voorwaarde toevoegen"/>
+		<text name="rl_menu_filters_add_group_button" text="Groep toevoegen"/>
+		<text name="rl_menu_filters_edit_condition" text="Voorwaarde bewerken"/>
+		<text name="rl_menu_filters_delete_condition" text="Voorwaarde verwijderen"/>
+		<text name="rl_menu_filters_dialog_title" text="Voorwaarde bewerken"/>
+		<text name="rl_menu_filters_field_label" text="Veld"/>
+		<text name="rl_menu_filters_cmp_label" text="Vergelijk"/>
+		<text name="rl_menu_filters_cmp_lt" text="is minder dan"/>
+		<text name="rl_menu_filters_cmp_le" text="is hoogstens"/>
 		<text name="rl_menu_filters_cmp_eq" text="is"/>
-		<text name="rl_menu_filters_cmp_ne" text="is not"/>
-		<text name="rl_menu_filters_cmp_ge" text="is at least"/>
-		<text name="rl_menu_filters_cmp_gt" text="is more than"/>
-		<text name="rl_menu_filters_cmp_in" text="is one of"/>
-		<text name="rl_menu_filters_cmp_notin" text="is none of"/>
-		<text name="rl_menu_filters_cmp_contains" text="contains"/>
-		<text name="rl_menu_filters_cmp_notcontains" text="does not contain"/>
-		<text name="rl_menu_filters_value_label" text="Value"/>
-		<text name="rl_menu_filters_value_invalid_number" text="Invalid number"/>
-		<text name="rl_menu_filters_preserved_banner" text="%d condition(s) hidden - editable in a later phase. Saved on close."/>
-		<text name="rl_menu_filters_field_age" text="Age"/>
-		<text name="rl_menu_filters_field_isCastrated" text="Castrated"/>
-		<text name="rl_menu_filters_field_isPregnant" text="Pregnant"/>
-		<text name="rl_menu_filters_field_isLactating" text="Lactating"/>
-		<text name="rl_menu_filters_field_hasName" text="Has name"/>
-		<text name="rl_menu_filters_field_hasAnyDisease" text="Has any disease"/>
-		<text name="rl_menu_filters_field_hasAnyMark" text="Has any mark"/>
-		<text name="rl_menu_filters_field_weight" text="Weight"/>
-		<text name="rl_menu_filters_field_health" text="Health"/>
-		<text name="rl_menu_filters_field_genetics_metabolism" text="Genetics: metabolism"/>
-		<text name="rl_menu_filters_field_genetics_health" text="Genetics: health"/>
-		<text name="rl_menu_filters_field_genetics_fertility" text="Genetics: fertility"/>
-		<text name="rl_menu_filters_field_genetics_quality" text="Genetics: quality"/>
-		<text name="rl_menu_filters_field_genetics_productivity" text="Genetics: productivity"/>
-		<text name="rl_menu_filters_field_genetics_overall" text="Genetics: overall"/>
-		<text name="rl_menu_filters_field_gender" text="Gender"/>
-		<text name="rl_menu_filters_field_subType" text="Breed"/>
-		<text name="rl_menu_filters_field_name" text="Name"/>
-		<text name="rl_menu_filters_gender_male" text="Male"/>
-		<text name="rl_menu_filters_gender_female" text="Female"/>
-		<text name="rl_menu_filters_emptyValueRejected" text="Value cannot be empty"/>
-		<text name="rl_menu_filters_subtypeRequiresAnimalType" text="Set the filter's animal type first to edit this condition"/>
-		<text name="rl_menu_filters_invalidNumber" text="Enter a valid number"/>
-		<text name="rl_menu_filters_enumValueDrifted" text="Stored value no longer valid - pick a replacement"/>
-		<text name="rl_menu_filters_valueSet_title" text="Select values"/>
-		<text name="rl_menu_filters_valueSet_summary" text="%d selected"/>
-		<text name="rl_menu_filters_valueSet_button" text="Edit values..."/>
+		<text name="rl_menu_filters_cmp_ne" text="is niet"/>
+		<text name="rl_menu_filters_cmp_ge" text="is minstens"/>
+		<text name="rl_menu_filters_cmp_gt" text="is meer dan"/>
+		<text name="rl_menu_filters_cmp_in" text="is een van"/>
+		<text name="rl_menu_filters_cmp_notin" text="is geen van"/>
+		<text name="rl_menu_filters_cmp_contains" text="bevat"/>
+		<text name="rl_menu_filters_cmp_notcontains" text="bevat niet"/>
+		<text name="rl_menu_filters_value_label" text="Waarde"/>
+		<text name="rl_menu_filters_value_invalid_number" text="Ongeldig getal"/>
+		<text name="rl_menu_filters_preserved_banner" text="%d voorwaarde(n) verborgen - bewerkbaar in een latere fase. Opgeslagen bij sluiten."/>
+		<text name="rl_menu_filters_field_age" text="Leeftijd"/>
+		<text name="rl_menu_filters_field_isCastrated" text="Gecastreerd"/>
+		<text name="rl_menu_filters_field_isPregnant" text="Drachtig"/>
+		<text name="rl_menu_filters_field_isLactating" text="Melkgevend"/>
+		<text name="rl_menu_filters_field_hasName" text="Heeft naam"/>
+		<text name="rl_menu_filters_field_hasAnyDisease" text="Heeft een ziekte"/>
+		<text name="rl_menu_filters_field_hasAnyMark" text="Heeft een markering"/>
+		<text name="rl_menu_filters_field_weight" text="Gewicht"/>
+		<text name="rl_menu_filters_field_health" text="Gezondheid"/>
+		<text name="rl_menu_filters_field_genetics_metabolism" text="Genetica: metabolisme"/>
+		<text name="rl_menu_filters_field_genetics_health" text="Genetica: gezondheid"/>
+		<text name="rl_menu_filters_field_genetics_fertility" text="Genetica: vruchtbaarheid"/>
+		<text name="rl_menu_filters_field_genetics_quality" text="Genetica: kwaliteit"/>
+		<text name="rl_menu_filters_field_genetics_productivity" text="Genetica: productiviteit"/>
+		<text name="rl_menu_filters_field_genetics_overall" text="Genetica: gemiddeld"/>
+		<text name="rl_menu_filters_field_gender" text="Geslacht"/>
+		<text name="rl_menu_filters_field_subType" text="Ras"/>
+		<text name="rl_menu_filters_field_name" text="Naam"/>
+		<text name="rl_menu_filters_gender_male" text="Man"/>
+		<text name="rl_menu_filters_gender_female" text="Vrouw"/>
+		<text name="rl_menu_filters_emptyValueRejected" text="Waarde mag niet leeg zijn"/>
+		<text name="rl_menu_filters_subtypeRequiresAnimalType" text="Stel eerst het diertype van het filter in om deze voorwaarde te bewerken"/>
+		<text name="rl_menu_filters_invalidNumber" text="Voer een geldig getal in"/>
+		<text name="rl_menu_filters_enumValueDrifted" text="Opgeslagen waarde is niet meer geldig - kies een vervanging"/>
+		<text name="rl_menu_filters_valueSet_title" text="Waardes selecteren"/>
+		<text name="rl_menu_filters_valueSet_summary" text="%d geselecteerd"/>
+		<text name="rl_menu_filters_valueSet_button" text="Waardes bewerken..."/>
 	</texts>
 </l10n>
