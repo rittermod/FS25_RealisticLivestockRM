@@ -305,9 +305,16 @@ end
 ---
 --- Call it with the DOT form. DiseaseManager carries a Class() metatable, so a colon
 --- call resolves and passes the manager itself as `animals`; the walk then reaches a
---- scalar field and RAISES on `animal.isDead`. Loud rather than silent - but the sole
---- caller wraps its body in a safe-call that swallows the raise and abandons the rest
---- of that pen's period tick, so the mistake still costs a tick.
+--- scalar field and RAISES on `animal.isDead`. Loud rather than silent - but the pen's
+--- period tick runs inside a safe-call that swallows the raise, so the mistake still
+--- costs a tick.
+---
+--- The sole production caller is `snapshotTransmission`, and the blast radius of a raise
+--- here is wider than it looks: the pen takes that snapshot ABOVE its per-animal loop, so
+--- a raise abandons disease progression and the treatment charge for that pen that period,
+--- not just the transmission pass. The reachable producer is a savegame naming a disease
+--- title absent from `xml/diseases.xml` - a mod removed or downgraded between sessions -
+--- which yields `disease.type == nil`. Guarding that loader is deliberately not done here.
 ---
 ---@param animals table|nil the pen's animals; nil yields no sources rather than raising
 ---@return table sources keyed by disease title -> { type = <type table>, amount = <integer> }; ALWAYS a table
@@ -387,6 +394,51 @@ function DiseaseManager.collectTransmissionSources(animals)
 end
 
 
+--- Take a pen's contagious-source snapshot, for a caller that must roll the susceptibles
+--- LATER in the same tick.
+---
+--- The pen's period tick advances every disease record before it rolls transmission, and
+--- the collector skips cured records and dead animals whole - so a snapshot taken after
+--- progression has already dropped every infection that resolved during it. The animal was
+--- contagious for the whole month and shed to nobody. Snapshotting ahead of the progression
+--- loop and handing the result to `calculateTransmission` restores that month.
+---
+--- Carries the SAME `diseasesEnabled` guard as `calculateTransmission`, deliberately. This is the
+--- SOLE production caller of the collector - `calculateTransmission` reaches it only through here -
+--- so an unguarded path at this level is what a player who toggled diseases off would fall through.
+---
+--- Calls the collector in the DOT form, from inside the manager, which is what stops any
+--- caller becoming its first production colon-caller - see the call-shape warning on
+--- `collectTransmissionSources`.
+---
+--- `penName` is DISPLAY-ONLY and carries the same weight it does on `calculateTransmission`: these
+--- lines report per-pen facts, and a multi-pen save otherwise emits a stream of them with nothing
+--- to attribute them to.
+---@param animals table|nil the pen's animals; nil yields an empty snapshot rather than raising
+---@param penName string|nil the husbandry's display name, for log attribution only
+---@return table|nil snapshot `{ sources = <table>, hasSources = <boolean>, stats = <table> }`
+--- carrying the collector's three return values verbatim, or nil when diseases are disabled
+function DiseaseManager:snapshotTransmission(animals, penName)
+
+	if not self.diseasesEnabled then
+
+		Log:trace("snapshotTransmission [%s]: no snapshot, reason=diseases disabled", tostring(penName))
+
+		return nil
+
+	end
+
+	local sources, hasSources, stats = DiseaseManager.collectTransmissionSources(animals)
+
+	Log:trace("snapshotTransmission [%s]: %s animal(s), hasSources=%s (skipped %s cured record(s), %s dead animal(s))",
+		tostring(penName), tostring(stats.animals), tostring(hasSources),
+		tostring(stats.curedSkipped), tostring(stats.deadSkipped))
+
+	return { sources = sources, hasSources = hasSources, stats = stats }
+
+end
+
+
 --- Run one pen's transmission pass: collect the shedding sources, then roll each
 --- susceptible animal against them.
 ---
@@ -394,13 +446,41 @@ end
 --- walkthrough's oracle: without it a multi-pen save emits a stream of indistinguishable
 --- lines and "this pen reached zero sources" cannot be attributed to the pen under test.
 --- Nil-tolerant on purpose - a missing name degrades the line, never the pass.
+---
+--- `snapshot` is how the pen tick rolls against the state the pen was in BEFORE its own
+--- progression loop ran. Every other caller omits it and gets today's behaviour unchanged:
+--- the sources are collected here, from the pen as it stands now.
 ---@param animals table the pen's animals
 ---@param penName string|nil the husbandry's display name, for log attribution only
-function DiseaseManager:calculateTransmission(animals, penName)
+---@param snapshot table|nil a record from `DiseaseManager:snapshotTransmission` taken earlier
+--- in this tick; nil collects the sources now
+function DiseaseManager:calculateTransmission(animals, penName, snapshot)
 
-	if not self.diseasesEnabled then return end
+	if not self.diseasesEnabled then
 
-	local diseases, hasDiseases, stats = DiseaseManager.collectTransmissionSources(animals)
+		Log:trace("calculateTransmission [%s]: nothing to roll, reason=diseases disabled", tostring(penName))
+
+		return
+
+	end
+
+	if snapshot == nil then
+
+		-- The guard above has already returned when diseases are off, so the nil arm of
+		-- snapshotTransmission is unreachable from here and needs no second guard.
+		snapshot = self:snapshotTransmission(animals, penName)
+
+		Log:trace("calculateTransmission [%s]: no snapshot supplied, collected the sources now",
+			tostring(penName))
+
+	else
+
+		Log:trace("calculateTransmission [%s]: rolling against the caller's pre-progression snapshot",
+			tostring(penName))
+
+	end
+
+	local diseases, hasDiseases, stats = snapshot.sources, snapshot.hasSources, snapshot.stats
 
 	-- Emitted BEFORE the early return below: the walkthrough's terminal condition is
 	-- the source count reaching zero, which a summary placed after it could never
@@ -411,7 +491,14 @@ function DiseaseManager:calculateTransmission(animals, penName)
 	Log:debug("calculateTransmission [%s]: %d animal(s), sources: %s (skipped %d cured record(s), %d dead animal(s))",
 		tostring(penName), stats.animals, sourceSummary, stats.curedSkipped, stats.deadSkipped)
 
-	if not hasDiseases then return end
+	if not hasDiseases then
+
+		Log:trace("calculateTransmission [%s]: nothing to roll, reason=no shedding source in the snapshot",
+			tostring(penName))
+
+		return
+
+	end
 
 
 	for _, animal in pairs(animals) do

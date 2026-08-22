@@ -551,6 +551,34 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onPeriodChanged(_)
             local animals = self.spec_husbandryAnimals.clusterSystem:getClusters()
             local totalTreatmentCost = 0
 
+            -- ONE evaluation of the test-prefix gate, bound to a single local, for BOTH halves of
+            -- the transmission pass below. Two independent `if` blocks would also put the snapshot
+            -- local out of scope at the apply site.
+            local transmissionOn = RealisticLivestock.testAnimalPrefix == nil
+
+            -- Taken BEFORE the progression loop, and the placement is the contract. Progression
+            -- cures records and kills their hosts, while the collector skips cured records and dead
+            -- animals whole - so sources collected afterwards have already lost every infection that
+            -- resolved this tick, and the animal shed to nobody despite being contagious all month.
+            -- The apply half still runs after progression, so an animal infected by this pass does
+            -- not also progress in the tick that created it.
+            local snapshot = transmissionOn and g_diseaseManager:snapshotTransmission(animals, penName) or nil
+
+            -- Keyed on `transmissionOn`, never on `snapshot ~= nil`: a nil snapshot has TWO causes,
+            -- the prefix gate and a player who switched diseases off, and a branch on the result
+            -- reports the wrong one for the second. The prefix case is reported ONCE, by the apply
+            -- arm below, so a prefixed tick emits one line rather than two.
+            if transmissionOn then
+                if snapshot == nil then
+                    Log:trace("onPeriodChanged [%s]: no transmission snapshot, reason=diseases disabled", penName)
+                else
+                    local sourceTitles = 0
+                    for _ in pairs(snapshot.sources) do sourceTitles = sourceTitles + 1 end
+                    Log:trace("onPeriodChanged [%s]: pre-progression transmission snapshot taken - %s shedding title(s) across %s animal(s) scanned",
+                        penName, tostring(sourceTitles), tostring(snapshot.stats.animals))
+                end
+            end
+
             for _, animal in pairs(animals) do
                 if RealisticLivestock.testAnimalPrefix ~= nil then
                     if not string.startsWith(animal.uniqueId, RealisticLivestock.testAnimalPrefix) then
@@ -580,8 +608,8 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onPeriodChanged(_)
                 Log:trace("onPeriodChanged [%s]: no treatment fee accrued this period", penName)
             end
 
-            if RealisticLivestock.testAnimalPrefix == nil then
-                g_diseaseManager:calculateTransmission(animals, penName)
+            if transmissionOn then
+                g_diseaseManager:calculateTransmission(animals, penName, snapshot)
             else
                 Log:trace("onPeriodChanged [%s]: test-prefix run - skipping disease transmission", penName)
             end
