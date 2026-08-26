@@ -161,6 +161,109 @@ function DiseaseManager:getDiseaseByTitle(title)
 end
 
 
+--- Render a caller-supplied identity table as a stable "key=value" list for a warning line.
+---
+--- The sort is load-bearing rather than cosmetic: pairs order is undefined, so an unsorted line
+--- names the same fields in a different order on every call and defeats a grep across a load.
+---
+--- TOTAL by construction, and that is the point rather than defensiveness: this renders the
+--- argument of a WARNING, so a raise in here would turn a benign dropped record into an aborted
+--- stream read - the one outcome the drop exists to avoid. Two things buy it. A non-table
+--- identity degrades instead of reaching `pairs`, and the sort keys through `tostring` rather
+--- than comparing raw keys, because `table.sort` raises on a mixed-type key set and a caller
+--- that hands over a table with one positional entry would otherwise take the read down with it.
+--- Values go through `tostring` because a bare `string.format` raises on an argument that does not
+--- match its specifier, and not every runtime this code has to survive wraps that call.
+---@param identity table|nil whatever the call site holds; nil and a non-table both degrade
+---@return string a sorted "key=value ..." list, or "no identity" when there is nothing to name
+local function formatIdentity(identity)
+
+    if type(identity) ~= "table" then
+        if identity == nil then return "no identity" end
+        return tostring(identity)
+    end
+
+    local rendered = {}
+
+    for key, value in pairs(identity) do
+        table.insert(rendered, string.format("%s=%s", tostring(key), tostring(value)))
+    end
+
+    if #rendered == 0 then return "no identity" end
+
+    table.sort(rendered)
+
+    return table.concat(rendered, " ")
+
+end
+
+
+--- Resolve a persisted or transmitted disease title to its registry type, refusing any title the
+--- shipped definition file no longer carries.
+---
+--- Every reconstruction path routes through here, so no `Disease` carrying a nil `type` is ever
+--- RETAINED. That is what lets `saveToXMLFile`, `writeStream`, `onPeriodChanged`, `modifyValue`,
+--- `modifyOutput`, `showInfo`, `affectReproduction` and `collectTransmissionSources` dereference
+--- `self.type` unguarded. Do NOT add nil-type tolerance to any of them; the one pre-existing
+--- guard, in `RLAnimalInfoService.buildDiseaseRows`, is now dead against these paths rather than
+--- load-bearing. Note "retained" rather than "exists": both stream paths deliberately CONSTRUCT a
+--- nil-type record and read it off the wire before discarding it, because the bytes have to leave
+--- the stream either way.
+---
+--- The reachable producer is a savegame or a join snapshot naming a title the registry has since
+--- lost - a disease renamed or removed between sessions. Refusing the record costs the animal its
+--- immunity window, its `genes` and its `isCarrier` state, and because `Animal:getHasAnyDisease`
+--- then reads it as healthy it also changes what a herdsman rule bound to the saved-filter
+--- `hasAnyDisease` field does with that animal. The alternative is a save that RAISES on the next
+--- write, because `Disease:saveToXMLFile` opens with `self.type.title`.
+---
+--- A migration that RENAMES a title must install its old-to-new mapping AHEAD of this call: the
+--- record is discarded here, inside the codec, before any consumer could map it.
+---
+--- WARNING rather than ERROR: the load continues, the animal's other records survive, and the
+--- audience is a player or a server admin rather than a developer.
+---
+--- Deliberately does NOT validate the definition file itself. A malformed definition is authored
+--- inside the mod archive and reaches its author on the first run.
+---@param title string|nil the title as it was persisted or transmitted
+---@param identity table|nil whatever the calling path can actually name - farmId, uniqueId,
+--- subTypeIndex, context - rendered verbatim into the warning. A path holding none of them passes
+--- nil rather than inventing a field it does not have. Callers `tostring` their values on the way
+--- in, so an absent field renders as nil rather than vanishing from the line.
+---@return table|nil the registry's own type table, or nil when the record must be dropped. NEVER
+--- `false`: both stream call sites fold the result through an `and`/`or` chain that would turn a
+--- false into nil, so the two outcomes must stay distinguishable by nilness alone.
+function DiseaseManager:resolveRecordType(title, identity)
+
+    if title == nil or title == "" then
+
+        Log:warning("resolveRecordType: dropping a disease record, reason=no title (title=%s %s)",
+            tostring(title), formatIdentity(identity))
+
+        return nil
+
+    end
+
+    local diseaseType = self:getDiseaseByTitle(title)
+
+    if diseaseType == nil then
+
+        Log:warning("resolveRecordType: dropping a disease record, reason=title is not a defined disease (title=%s %s)",
+            tostring(title), formatIdentity(identity))
+
+        return nil
+
+    end
+
+    -- No line on the RESOLVED path, deliberately. Lua evaluates a log call's arguments before the
+    -- logger tests the level, so a trace here would render the identity - a table walk, a sort and
+    -- a concat - for every record of every animal on every savegame load and every join, at every
+    -- level including production INFO. The two refusal arms above are where the diagnosis lives.
+    return diseaseType
+
+end
+
+
 function DiseaseManager:onDayChanged(animal)
 
 	if not self.diseasesEnabled then return end
@@ -312,9 +415,11 @@ end
 --- The sole production caller is `snapshotTransmission`, and the blast radius of a raise
 --- here is wider than it looks: the pen takes that snapshot ABOVE its per-animal loop, so
 --- a raise abandons disease progression and the treatment charge for that pen that period,
---- not just the transmission pass. The reachable producer is a savegame naming a disease
---- title absent from `xml/diseases.xml` - a mod removed or downgraded between sessions -
---- which yields `disease.type == nil`. Guarding that loader is deliberately not done here.
+--- not just the transmission pass. `type` is read unguarded on purpose: the reachable
+--- producer of a nil one - a savegame or a join snapshot naming a title the registry no
+--- longer carries - is refused at the reconstruction paths instead, so no record here can
+--- carry one.
+--- @see DiseaseManager.resolveRecordType
 ---
 ---@param animals table|nil the pen's animals; nil yields no sources rather than raising
 ---@return table sources keyed by disease title -> { type = <type table>, amount = <integer> }; ALWAYS a table

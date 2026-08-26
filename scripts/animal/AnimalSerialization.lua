@@ -336,16 +336,29 @@ function AnimalSerialization.readStream(animal, streamId, connection)
 
     for i = 1, numDiseases do
         local diseaseTitle = streamReadString(streamId)
-        local diseaseType = g_diseaseManager ~= nil and g_diseaseManager:getDiseaseByTitle(diseaseTitle) or nil
+        -- Both identifiers are read off the wire well before this block, so they name the animal
+        -- this record belongs to rather than whatever the target shell held. tostring on the way
+        -- in keeps the key present even when a field is absent, so a grep cannot under-count.
+        local diseaseType = g_diseaseManager ~= nil
+            and g_diseaseManager:resolveRecordType(diseaseTitle,
+                { farmId = tostring(animal.farmId), uniqueId = tostring(animal.uniqueId),
+                  context = "stream" })
+            or nil
+
+        -- CONSTRUCT and read regardless of whether the type resolved. Disease:readStream is what
+        -- consumes the eight fields the sender wrote after the title, so skipping it would leave
+        -- them on the wire and every field after this block would decode from the wrong offset.
+        -- Only the insert below is gated, and the nil-type record never escapes this loop.
         local disease = Disease.new(diseaseType)
 
         disease:readStream(streamId, connection)
 
-        table.insert(diseases, disease)
+        if diseaseType ~= nil then table.insert(diseases, disease) end
     end
 
     if g_diseaseManager == nil and numDiseases > 0 then
-        Log:warning("g_diseaseManager unavailable during readStream, %d disease(s) loaded without type", numDiseases)
+        Log:warning("readStream: dropped %s disease record(s), reason=no disease manager (farmId=%s uniqueId=%s)",
+            tostring(numDiseases), tostring(animal.farmId), tostring(animal.uniqueId))
     end
 
     animal.diseases = diseases
@@ -462,17 +475,26 @@ function AnimalSerialization.readStreamUnborn(animal, streamId, connection)
 
     for i = 1, numDiseases do
         local diseaseTitle = streamReadString(streamId)
-        local diseaseType = g_diseaseManager ~= nil and g_diseaseManager:getDiseaseByTitle(diseaseTitle) or nil
+        -- subTypeIndex is the only identifier this path holds: an unborn animal is assigned
+        -- neither uniqueId nor farmId, so naming either would put a nil in every warning.
+        local diseaseType = g_diseaseManager ~= nil
+            and g_diseaseManager:resolveRecordType(diseaseTitle,
+                { subTypeIndex = tostring(animal.subTypeIndex), context = "streamUnborn" })
+            or nil
+
+        -- Construct and read regardless, exactly as readStream does - the eight fields must leave
+        -- the wire whether or not the record survives. This block is the LAST read of the unborn
+        -- payload, so a skipped read strands the bytes rather than corrupting a following field.
         local disease = Disease.new(diseaseType)
 
         disease:readStream(streamId, connection)
 
-        table.insert(diseases, disease)
+        if diseaseType ~= nil then table.insert(diseases, disease) end
     end
 
     if g_diseaseManager == nil and numDiseases > 0 then
-        Log:warning("g_diseaseManager unavailable during readStreamUnborn, %d disease(s) loaded without type",
-            numDiseases)
+        Log:warning("readStreamUnborn: dropped %s disease record(s), reason=no disease manager (subTypeIndex=%s)",
+            tostring(numDiseases), tostring(animal.subTypeIndex))
     end
 
     animal.diseases = diseases

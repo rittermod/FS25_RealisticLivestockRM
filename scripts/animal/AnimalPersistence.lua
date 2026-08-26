@@ -198,14 +198,27 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
 
     local diseases = {}
 
+    -- Every skip below is a BARE return, never `return false`. Returning exactly false from an
+    -- iterate callback ends the walk, so it would drop every REMAINING disease on this animal
+    -- rather than just the one that could not be resolved. Returning nothing continues it.
     xmlFile:iterate(key .. ".diseases.disease", function (_, diseaseKey)
 
         if g_diseaseManager == nil then
-            Log:warning("Skipping disease load: g_diseaseManager unavailable")
+            Log:warning("loadAnimal: dropping a disease record, reason=no disease manager (farmId=%s uniqueId=%s)",
+                tostring(farmId), tostring(id))
             return
         end
 
-        local diseaseType = g_diseaseManager:getDiseaseByTitle(xmlFile:getString(diseaseKey .. "#title"))
+        -- tostring on the way IN, not inside the renderer: an absent field would otherwise not be
+        -- a key at all, so the warning would silently omit it rather than render it as nil - and a
+        -- grep for `uniqueId=` would under-count exactly the records that lost their identity. An
+        -- unborn child loaded through the pregnancy recursion is the reachable case: it reads its
+        -- id and farm off a key that carries neither.
+        local diseaseType = g_diseaseManager:resolveRecordType(xmlFile:getString(diseaseKey .. "#title"),
+            { farmId = tostring(farmId), uniqueId = tostring(id), context = "savegame" })
+
+        if diseaseType == nil then return end
+
         local disease = Disease.new(diseaseType)
 
         disease:loadFromXMLFile(xmlFile, diseaseKey)
