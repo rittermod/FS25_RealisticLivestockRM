@@ -73,6 +73,10 @@ local REASON_INVALID = {
     },
 }
 
+-- Exposed read-only for the same reason as OPERATION_TITLE_KEY above: a declaration table no test can
+-- see is a declaration nothing checks. Read it; never mutate it.
+RLMenuHerdsmanFrame.REASON_INVALID = REASON_INVALID
+
 -- =============================================================================
 -- Module-local helpers (pure wiring; no decisions)
 -- =============================================================================
