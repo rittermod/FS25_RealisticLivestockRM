@@ -1,316 +1,317 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <l10n>
-	<texts>
-		<!-- COWS -->
-
-		<text name="fillType_bull" text="Bika"/>
-		<text name="fillType_bull_swiss_brown" text="Barna-Svájci bika"/>
-		<text name="fillType_bull_holstein" text="Holstein bika"/>
-		<text name="fillType_bull_angus" text="Angus bika"/>
-		<text name="fillType_bull_limousin" text="Limousin bika"/>
-		<text name="fillType_cow_hereford" text="Hereford"/>
-		<text name="fillType_bull_hereford" text="Hereford bika"/>
-		<text name="fillType_cow_highland_cattle" text="Skót felföldi marha"/>
-		<text name="fillType_bull_highland_cattle" text="Skót felföldi bika"/>
-		<text name="animal_descriptionBullFeed" text="A bikák szeretik a füvet, a szénát és a TMR-t."/>
-		<text name="animal_descriptionBullYoung" text="Ez egy bikaborjú."/>
-		<text name="animal_descriptionBullReproduction" text="Az egészséges és 12 hónapnál idősebb bikák képesek szaporodni."/>
-		<text name="rl_descriptionCowReproduction" text="Az egészséges és 12 hónapnál idősebb tehenek képesek szaporodni."/>
-
-		<!-- WATER BUFFALOS -->
-
-		<text name="fillType_bull_waterbuffalo" text="Vízibivaly bika"/>
-
-		<!-- PIGS -->
-
-		<text name="fillType_boar" text="Kan"/>
-		<text name="fillType_boar_landrace" text="Landrace kan"/>
-		<text name="fillType_boar_black_pied" text="Fekete-tarka kan"/>
-		<text name="fillType_boar_berkshire" text="Berkshire kan"/>
-		<text name="animal_descriptionBoarReproduction" text="Az egészséges és 8 hónapnál idősebb kanok képesek szaporodni."/>
-		<text name="rl_descriptionPigReproduction" text="Az egészséges és 6 hónapnál idősebb kocák képesek szaporodni."/>
-		<text name="animal_descriptionBoarFeed" text="A kanok szinte bármit megesznek. Etheted őket kukoricával, búzával, árpával, repcével, napraforgóval, szójababbal, burgonyával, cirokkal és cukorrépával."/>
-		<text name="animal_descriptionBoarYoung" text="Ez egy kanmalac."/>
-
-		<!-- SHEEP -->
-
-		<text name="fillType_ram" text="Kos"/>
-		<text name="fillType_ram_landrace" text="Bentheim Landrace kos"/>
-		<text name="fillType_ram_steinschaf" text="Steinschaf kos"/>
-		<text name="fillType_ram_black_welsh" text="Fekete walesi hegyi kos"/>
-		<text name="fillType_ram_swiss_mountain" text="Svájci fekete-barna hegyi kos"/>
-		<text name="animal_descriptionRamFeed" text="A kosok füvet és szénát esznek."/>
-		<text name="animal_descriptionRamYoung" text="Ez egy kosbárány."/>
-		<text name="animal_descriptionRamReproduction" text="Az egészséges és 5 hónapnál idősebb kosok képesek szaporodni."/>
-		<text name="rl_descriptionSheepReproduction" text="Az egészséges és 8 hónapnál idősebb anyajuhok képesek szaporodni."/>
-
-		<!-- GOATS -->
-
-		<text name="fillType_ram_goat" text="Kecskebak"/>
-		<text name="rl_descriptionGoatReproduction" text="Az egészséges és 16 hónapnál idősebb anyakecskék képesek szaporodni."/>
-
-		<!-- HORSES -->
-
-		<text name="fillType_stallion" text="Csődör"/>
-		<text name="fillType_stallion_gray" text="Szürke csődör"/>
-		<text name="fillType_stallion_pinto" text="Pinto csődör"/>
-		<text name="fillType_stallion_palomino" text="Palomino csődör"/>
-		<text name="fillType_stallion_chestnut" text="Sárga csődör"/>
-		<text name="fillType_stallion_bay" text="Pej csődör"/>
-		<text name="fillType_stallion_black" text="Fekete csődör"/>
-		<text name="fillType_stallion_seal_brown" text="Sötétpej csődör"/>
-		<text name="fillType_stallion_dun" text="Fakó csődör"/>
-		<text name="animal_descriptionStallionFeed" text="A csődörök szeretik a szénát, a zabot és a cirkot."/>
-		<text name="animal_descriptionStallionProfit" text="A csődörök haszonnal eladhatók."/>
-		<text name="animal_descriptionStallionReproduction" text="Az egészséges és 36 hónapnál idősebb csődörök képesek szaporodni."/>
-		<text name="rl_descriptionHorseReproduction" text="Az egészséges és 22 hónapnál idősebb kancák képesek szaporodni."/>
-
-		<!-- CHICKENS -->
-
-		<text name="rl_descriptionChickenReproduction" text="Az egészséges és 6 hónapnál idősebb tyúkok képesek szaporodni."/>
-
-
-		<!-- UI -->
-
-
-		<text name="input_RL_OPEN_ANIMAL_SCREEN" text="Állatok kezelése"/>
-		<text name="input_RL_MONITOR" text="Monitor alkalmazása / eltávolítása"/>
-		<text name="input_RL_AI" text="Mesterséges megtermékenyítés"/>
-		<text name="input_RL_DISEASES" text="Állatbetegségek"/>
-		<text name="input_RL_SELECT" text="Állat kiválasztása / kiválasztás megszüntetése"/>
-		<text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
-		<text name="rl_ui_openAnimalScreen" text="Állatok kezelése"/>
-		<text name="rl_button_apply" text="Alkalmaz"/>
-		<text name="rl_button_confirm" text="Jóváhagyás"/>
-		<text name="rl_button_recommended" text="Ajánlott"/>
-		<text name="rl_button_cancel" text="Mégse"/>
-		<text name="rl_button_random" text="Véletlenszerű"/>
-		<text name="rl_dialog_title" text="Látható állatok maximális számának beállítása"/>
-
-		<text name="rl_ui_unhealthy" text="Túl beteg"/>
-		<text name="rl_ui_unhealthyBracketed" text="Nem (túl beteg)"/>
-		<text name="rl_ui_noMaleAnimal" text="Nincs megfelelő hím állat"/>
-		<text name="rl_ui_noMaleAnimalBracketed" text="Nem (nincs megfelelő hím állat)"/>
-		<text name="rl_ui_recoveringLastBirth" text="Ellés utáni lábadozás"/>
-		<text name="rl_ui_recoveringLastBirthBracketed" text="Nem (ellés utáni lábadozás)"/>
-		<text name="rl_ui_tooYoung" text="Túl fiatal"/>
-		<text name="rl_ui_tooYoungBracketed" text="Nem (túl fiatal)"/>
-		<text name="rl_ui_pregnant" text="Vemhes"/>
-		<text name="rl_ui_lactating" text="Tejelő / Szoptat"/>
-		<text name="rl_ui_canReproduce" text="Szaporodóképes"/>
-		<text name="rl_ui_impregnatedBy" text="Megtermékenyítette:"/>
-		<text name="rl_ui_unknown" text="Ismeretlen"/>
-		<text name="rl_ui_yes" text="Igen"/>
-		<text name="rl_ui_no" text="Nem"/>
-		<text name="rl_ui_mother" text="Anya"/>
-		<text name="rl_ui_father" text="Apa"/>
-		<text name="rl_ui_uniqueId" text="Egyedi azonosító"/>
-		<text name="rl_ui_farmId" text="Farm azonosító"/>
-		<text name="rl_ui_gender" text="Nem"/>
-		<text name="rl_ui_male" text="Hím"/>
-		<text name="rl_ui_female" text="Nőstény"/>
-		<text name="rl_ui_weight" text="Súly"/>
-		<text name="rl_ui_targetWeight" text="Célsúly"/>
-		<text name="rl_ui_value" text="Érték"/>
-		<text name="rl_ui_valuePerKilo" text="Érték / kg"/>
-		<text name="rl_ui_genetics" text="Genetika"/>
-		<text name="rl_ui_overall" text="Összesített"/>
-		<text name="rl_ui_rename" text="Átnevezés"/>
-		<text name="rl_ui_maleNumImpregnatable" text="Megtermékenyíthető állatok a karámban"/>
-
-		<text name="rl_ui_breederQuality" text="Tenyészminőség"/>
-		<text name="rl_ui_birthday" text="Születési idő"/>
-		<text name="rl_ui_pregnancyExpected" text="Várható"/>
-		<text name="rl_ui_pregnancyExpecting" text="Várható utód:"/>
-		<text name="rl_ui_pregnancyBaby" text="utód"/>
-		<text name="rl_ui_pregnancyBabies" text="utód"/>
-		<text name="rl_ui_animalOrigin" text="Származás"/>
-		<text name="rl_ui_months" text="hónap"/>
-		<text name="rl_ui_month" text="hónap"/>
-		<text name="rl_ui_years" text="év"/>
-		<text name="rl_ui_year" text="év"/>
-
-		<text name="rl_ui_milk" text="Tejtermelés"/>
-		<text name="rl_ui_wool" text="Gyapjútermelés"/>
-		<text name="rl_ui_eggs" text="Tojástermelés"/>
-		<text name="rl_ui_metabolism" text="Anyagcsere"/>
-		<text name="rl_ui_meat" text="Minőség"/>
-		<text name="rl_ui_meat_github" text="Húsminőség"/>
-		<text name="rl_ui_quality" text="Minőség"/>
-		<text name="rl_ui_quality_github" text="Húsminőség"/>
-		<text name="rl_ui_health" text="Egészség"/>
-		<text name="rl_ui_fertility" text="Termékenység"/>
-
-		<text name="rl_ui_genetics_infertile" text="Terméketlen"/>
-		<text name="rl_ui_genetics_extremelyLow" text="Rendkívül alacsony"/>
-		<text name="rl_ui_genetics_veryLow" text="Nagyon alacsony"/>
-		<text name="rl_ui_genetics_low" text="Alacsony"/>
-		<text name="rl_ui_genetics_average" text="Átlagos"/>
-		<text name="rl_ui_genetics_high" text="Magas"/>
-		<text name="rl_ui_genetics_veryHigh" text="Nagyon magas"/>
-		<text name="rl_ui_genetics_extremelyHigh" text="Rendkívül magas"/>
-
-		<text name="rl_ui_genetics_extremelyBad" text="Rendkívül rossz"/>
-		<text name="rl_ui_genetics_veryBad" text="Nagyon rossz"/>
-		<text name="rl_ui_genetics_bad" text="Rossz"/>
-		<text name="rl_ui_genetics_good" text="Jó"/>
-		<text name="rl_ui_genetics_veryGood" text="Nagyon jó"/>
-		<text name="rl_ui_genetics_extremelyGood" text="Rendkívül jó"/>
-
-		<text name="rl_ui_buySelected" text="Kiválasztottak megvásárlása"/>
-		<text name="rl_ui_sellSelected" text="Kiválasztottak eladása"/>
-		<text name="rl_ui_moveSelected" text="Kiválasztottak áthelyezése"/>
-		<text name="rl_ui_buyConfirmation" text="Biztosan meg akarsz vásárolni %s állatot %s összegért?" tag="format"/>
-		<text name="rl_ui_buyPartialConfirmation" text="Megvásárolsz %d állatot a kiválasztott %d közül ennyiért: %s?" tag="format"/>
-		<text name="rl_ui_buySkippedNotSupported" text="%d állatot nem támogat ez az állattartó épület" tag="format"/>
-		<text name="rl_ui_buyAllRejected" text="A kiválasztott állatok egyike sem vásárolható meg ebbe az állattartó épületbe."/>
-		<text name="rl_ui_sellConfirmation" text="Biztosan el akarsz adni %s állatot %s összegért?" tag="format"/>
-		<text name="rl_ui_buyBulkResult" text="%s állat megvásárolva %s összegért" tag="format"/>
-		<text name="rl_ui_sellBulkResult" text="%s állat eladva %s összegért" tag="format"/>
-		<text name="rl_ui_moveBulkResult" text="%s állat áthelyezve" tag="format"/>
-		<text name="rl_ui_moveSingle" text="Áthelyez"/>
-		<text name="rl_ui_moveSelectDestination" text="Célállomás kiválasztása"/>
-		<text name="rl_ui_moveNoDestinations" text="Nincs elérhető célállomás ehhez az állatfajhoz."/>
-		<text name="rl_ui_moveEPPAgeFormat" text="%d-%d hó kor közötti" tag="format"/>
-		<text name="rl_ui_moveValidSummary" text="%d állat lesz áthelyezve" tag="format"/>
-		<text name="rl_ui_moveRejectedAge" text="%d állat kihagyva: nem felel meg az életkori követelménynek (%d-%d hónap)" tag="format"/>
-		<text name="rl_ui_moveRejectedCapacity" text="%d állat kihagyva: nincs elég hely a célállomáson" tag="format"/>
-		<text name="rl_ui_moveAllRejected" text="Egyetlen állat sem helyezhető át erre a célállomásra."/>
-		<text name="rl_ui_moveBulkConfirmTitle" text="Állatok áthelyezése"/>
-		<text name="rl_ui_moveErrorNoPermission" text="Nincs jogosultságod ide állatokat áthelyezni."/>
-		<text name="rl_ui_moveErrorNotSupported" text="Ez a célállomás nem támogatja ezt az állatfajt."/>
-		<text name="rl_ui_moveErrorNoSpace" text="Nincs elég hely a célállomáson."/>
-		<text name="rl_ui_tradeRequestInProgress" text="Egy tranzakció már folyamatban van. Kérlek, várj."/>
-		<text name="rl_ui_tradeRequestTimeout" text="A szerver nem válaszolt. Kérlek, próbáld újra."/>
-
-		<text name="rl_ui_monitor" text="Monitor"/>
-		<text name="rl_ui_monitorSubscriptions" text="Monitor előfizetések"/>
-		<text name="finance_monitorSubscriptions" text="Monitor előfizetések"/>
-		<text name="rl_ui_monitorFee" text="Monitor díja"/>
-		<text name="rl_ui_applyMonitor" text="Monitor felhelyezése"/>
-		<text name="rl_ui_removeMonitor" text="Monitor eltávolítása"/>
-		<text name="rl_ui_removingMonitor" text="Eltávolítás..."/>
-		<text name="rl_ui_input_food" text="Takarmány"/>
-		<text name="rl_ui_input_water" text="Víz"/>
-		<text name="rl_ui_input_straw" text="Szalma"/>
-		<text name="rl_ui_output_milk" text="Tej"/>
-		<text name="rl_ui_output_manure" text="Trágya"/>
-		<text name="rl_ui_output_liquidManure" text="Hígtrágya"/>
-		<text name="rl_ui_output_pallets_eggs" text="Tojás"/>
-		<text name="rl_ui_output_pallets_wool" text="Gyapjú"/>
-		<text name="rl_ui_output_pallets_goatMilk" text="Kecsketej"/>
-		<text name="rl_ui_amountPerDay" text="%.0f l / nap" tag="format"/>
-		<text name="rl_ui_feePerMonth" text="%s / hónap" tag="format"/>
-
-		<text name="rl_ui_animalType" text="Típus"/>
-		<text name="rl_ui_amountMonitored" text="Monitorozott"/>
-		<text name="rl_ui_production" text="Termékek"/>
-		<text name="rl_ui_applyAllMonitor" text="Összes monitor felhelyezése"/>
-		<text name="rl_ui_removeAllMonitor" text="Összes monitor eltávolítása"/>
-		<text name="rl_ui_removingAllMonitor" text="Összes eltávolítása..."/>
-		<text name="rl_ui_fee" text="Díj"/>
-
-		<text name="rl_ui_leftEarTag" text="Bal füljelző"/>
-		<text name="rl_ui_rightEarTag" text="Jobb füljelző"/>
-		<text name="rl_ui_backgroundColour" text="Háttérszín"/>
-		<text name="rl_ui_backgroundHue" text="Háttér színárnyalat"/>
-		<text name="rl_ui_backgroundRgb" text="Háttér RGB"/>
-		<text name="rl_ui_textColour" text="Szövegszín"/>
-		<text name="rl_ui_textHue" text="Szöveg színárnyalat"/>
-		<text name="rl_ui_textRgb" text="Szöveg RGB"/>
-
-		<text name="rl_ui_formatMonths" text="%s hónap"/>
-		<text name="rl_ui_formatMonth" text="%s hónap"/>
-		<text name="rl_ui_notPregnant" text="Nem vemhes"/>
-		<text name="rl_ui_any" text="Bármilyen"/>
-		<text name="rl_ui_pregnancy" text="Vemhesség"/>
-		<text name="rl_ui_productivity" text="Termelékenység"/>
-		<text name="rl_ui_selectAll" text="Összes kijelölése"/>
-		<text name="rl_ui_selectNone" text="Kijelölés törlése"/>
-		<text name="rl_ui_selectSection" text="Select Section"/>
-		<text name="rl_ui_deselectSection" text="Deselect Section"/>
-		<text name="rl_ui_doesntHaveName" text="Nincs neve"/>
-		<text name="rl_ui_doesHaveName" text="Van neve"/>
-
-
-
-		<text name="rl_ui_castrated" text="Kasztrált"/>
-		<text name="rl_ui_castrate" text="Kasztrálás"/>
-
-		<text name="rl_ui_unknownCauses" text="ismeretlen okok"/>
-		<text name="rl_ui_unreadMessages" text="A(z) '%s' istállóban olvasatlan üzeneteid vannak!"/>
-		<text name="rl_ui_herdsman" text="Állatgondozó"/>
-		<text name="rl_ui_budget" text="Költségvetés"/>
-		<text name="rl_ui_budgetType" text="Költségvetés típusa"/>
-		<text name="rl_ui_fixed" text="Fix"/>
-		<text name="rl_ui_percentage" text="Százalékos"/>
-		<text name="rl_ui_maxAnimals" text="Állatok max. száma"/>
-		<text name="rl_ui_herdsmanRecentlyBought" text="Legutóbbi állatgondozói vásárlás"/>
-		<text name="rl_ui_herdsmanWages" text="Állatgondozó bére"/>
-		<text name="finance_herdsmanWages" text="Állatgondozó bére"/>
-		<text name="rl_ui_medicine" text="Gyógyszer"/>
-		<text name="finance_medicine" text="Gyógyszer"/>
-		<text name="rl_ui_semenPurchase" text="Szaporítóanyag vásárlása"/>
-		<text name="rl_ui_semenPurchase_github" text="Sperma vásárlása"/>
-		<text name="finance_semenPurchase" text="Szaporítóanyag vásárlása"/>
-		<text name="finance_semenPurchase_github" text="Sperma vásárlása"/>
-		<text name="rl_ui_alphabetical" text="Betűrendben"/>
-		<text name="rl_ui_breed" text="Fajta"/>
-		<text name="rl_ui_dontMark" text="Ne jelölje meg"/>
-		<text name="rl_ui_mark" text="Megjelölés"/>
-		<text name="rl_ui_unmark" text="Jelölés törlése"/>
-		<text name="rl_ui_favourite" text="Kedvenc"/>
-		<text name="rl_ui_unFavourite" text="Kedvenc törlése"/>
-		<text name="rl_ui_dewar" text="Dewar-edény"/>
-		<text name="rl_ui_semenPurchase_successful" text="Mesterséges szaporítóanyag sikeresen megvásárolva. Átvehető a boltban."/>
-		<text name="rl_ui_semenPurchase_successful_github" text="Sperma sikeresen megvásárolva. Átvehető a boltban."/>
-		<text name="rl_ui_semenPurchase_unsuccessful" text="A mesterséges szaporítóanyag vásárlása sikertelen."/>
-		<text name="rl_ui_semenPurchase_unsuccessful_github" text="A sperma vásárlása sikertelen."/>
-		<text name="rl_ui_earTag" text="Füljelző"/>
-		<text name="rl_ui_species" text="Faj"/>
-		<text name="rl_ui_strawSingle" text="Fiola"/>
-		<text name="rl_ui_strawMultiple" text="Fiolák"/>
-		<text name="rl_ui_artificialInsemination" text="Mesterséges megtermékenyítés"/>
-		<text name="rl_ui_semenPurchaseNoPermission" text="Nincs jogosultságod állatokkal kereskedni vagy szaporítóanyagot vásárolni."/>
-		<text name="rl_ui_semenPurchaseNoPermission_github" text="Nincs jogosultságod állatokkal kereskedni vagy spermát vásárolni."/>
-		<text name="rl_ui_semenPurchaseNoMoney" text="Nincs elég pénzed a szaporítóanyag megvásárlásához."/>
-		<text name="rl_ui_semenPurchaseNoMoney_github" text="Nincs elég pénzed a sperma megvásárlásához."/>
-		<text name="rl_ui_takeStraw" text="Fiola kivétele"/>
-		<text name="rl_ui_inseminateAnimal" text="%s megtermékenyítése"/>
-		<text name="rl_ui_inseminate" text="Megtermékenyítés"/>
-		<text name="rl_ui_strawEmpty" text="Ez a fiola üres"/>
-		<text name="rl_ui_averageSuccess" text="Átlagos sikeresség"/>
-		<text name="rl_ui_success" text="Sikeresség"/>
+    <texts>
+        <!-- COWS -->
+
+        <text name="fillType_bull" text="Bika"/>
+        <text name="fillType_bull_swiss_brown" text="Barna-Svájci bika"/>
+        <text name="fillType_bull_holstein" text="Holstein bika"/>
+        <text name="fillType_bull_angus" text="Angus bika"/>
+        <text name="fillType_bull_limousin" text="Limousin bika"/>
+        <text name="fillType_cow_hereford" text="Hereford"/>
+        <text name="fillType_bull_hereford" text="Hereford bika"/>
+        <text name="fillType_cow_highland_cattle" text="Skót felföldi marha"/>
+        <text name="fillType_bull_highland_cattle" text="Skót felföldi bika"/>
+        <text name="animal_descriptionBullFeed" text="A bikák szeretik a füvet, a szénát és a TMR-t."/>
+        <text name="animal_descriptionBullYoung" text="Ez egy bikaborjú."/>
+        <text name="animal_descriptionBullReproduction" text="Az egészséges és 12 hónapnál idősebb bikák képesek szaporodni."/>
+        <text name="rl_descriptionCowReproduction" text="Az egészséges és 12 hónapnál idősebb tehenek képesek szaporodni."/>
+
+        <!-- WATER BUFFALOS -->
+
+        <text name="fillType_bull_waterbuffalo" text="Vízibivaly bika"/>
+
+        <!-- PIGS -->
+
+        <text name="fillType_boar" text="Kan"/>
+        <text name="fillType_boar_landrace" text="Landrace kan"/>
+        <text name="fillType_boar_black_pied" text="Fekete-tarka kan"/>
+        <text name="fillType_boar_berkshire" text="Berkshire kan"/>
+        <text name="animal_descriptionBoarReproduction" text="Az egészséges és 8 hónapnál idősebb kanok képesek szaporodni."/>
+        <text name="rl_descriptionPigReproduction" text="Az egészséges és 6 hónapnál idősebb kocák képesek szaporodni."/>
+        <text name="animal_descriptionBoarFeed" text="A kanok szinte bármit megesznek. Etheted őket kukoricával, búzával, árpával, repcével, napraforgóval, szójababbal, burgonyával, cirokkal és cukorrépával."/>
+        <text name="animal_descriptionBoarYoung" text="Ez egy kanmalac."/>
+
+        <!-- SHEEP -->
+
+        <text name="fillType_ram" text="Kos"/>
+        <text name="fillType_ram_landrace" text="Bentheim Landrace kos"/>
+        <text name="fillType_ram_steinschaf" text="Steinschaf kos"/>
+        <text name="fillType_ram_black_welsh" text="Fekete walesi hegyi kos"/>
+        <text name="fillType_ram_swiss_mountain" text="Svájci fekete-barna hegyi kos"/>
+        <text name="animal_descriptionRamFeed" text="A kosok füvet és szénát esznek."/>
+        <text name="animal_descriptionRamYoung" text="Ez egy kosbárány."/>
+        <text name="animal_descriptionRamReproduction" text="Az egészséges és 5 hónapnál idősebb kosok képesek szaporodni."/>
+        <text name="rl_descriptionSheepReproduction" text="Az egészséges és 8 hónapnál idősebb anyajuhok képesek szaporodni."/>
+
+        <!-- GOATS -->
+
+        <text name="fillType_ram_goat" text="Kecskebak"/>
+        <text name="rl_descriptionGoatReproduction" text="Az egészséges és 16 hónapnál idősebb anyakecskék képesek szaporodni."/>
+
+        <!-- HORSES -->
+
+        <text name="fillType_stallion" text="Csődör"/>
+        <text name="fillType_stallion_gray" text="Szürke csődör"/>
+        <text name="fillType_stallion_pinto" text="Pinto csődör"/>
+        <text name="fillType_stallion_palomino" text="Palomino csődör"/>
+        <text name="fillType_stallion_chestnut" text="Sárga csődör"/>
+        <text name="fillType_stallion_bay" text="Pej csődör"/>
+        <text name="fillType_stallion_black" text="Fekete csődör"/>
+        <text name="fillType_stallion_seal_brown" text="Sötétpej csődör"/>
+        <text name="fillType_stallion_dun" text="Fakó csődör"/>
+        <text name="animal_descriptionStallionFeed" text="A csődörök szeretik a szénát, a zabot és a cirkot."/>
+        <text name="animal_descriptionStallionProfit" text="A csődörök haszonnal eladhatók."/>
+        <text name="animal_descriptionStallionReproduction" text="Az egészséges és 36 hónapnál idősebb csődörök képesek szaporodni."/>
+        <text name="rl_descriptionHorseReproduction" text="Az egészséges és 22 hónapnál idősebb kancák képesek szaporodni."/>
+
+        <!-- CHICKENS -->
+
+        <text name="rl_descriptionChickenReproduction" text="Az egészséges és 6 hónapnál idősebb tyúkok képesek szaporodni."/>
+
+
+        <!-- UI -->
+
+
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Állatok kezelése"/>
+        <text name="input_RL_MONITOR" text="Monitor alkalmazása / eltávolítása"/>
+        <text name="input_RL_AI" text="Mesterséges megtermékenyítés"/>
+        <text name="input_RL_DISEASES" text="Állatbetegségek"/>
+        <text name="input_RL_SELECT" text="Állat kiválasztása / kiválasztás megszüntetése"/>
+        <text name="input_RL_SELECT_SECTION" text="Select/Deselect Section"/>
+        <text name="rl_ui_openAnimalScreen" text="Állatok kezelése"/>
+        <text name="rl_button_apply" text="Alkalmaz"/>
+        <text name="rl_button_confirm" text="Jóváhagyás"/>
+        <text name="rl_button_recommended" text="Ajánlott"/>
+        <text name="rl_button_cancel" text="Mégse"/>
+        <text name="rl_button_random" text="Véletlenszerű"/>
+        <text name="rl_dialog_title" text="Látható állatok maximális számának beállítása"/>
+
+        <text name="rl_ui_unhealthy" text="Túl beteg"/>
+        <text name="rl_ui_unhealthyBracketed" text="Nem (túl beteg)"/>
+        <text name="rl_ui_noMaleAnimal" text="Nincs megfelelő hím állat"/>
+        <text name="rl_ui_noMaleAnimalBracketed" text="Nem (nincs megfelelő hím állat)"/>
+        <text name="rl_ui_recoveringLastBirth" text="Ellés utáni lábadozás"/>
+        <text name="rl_ui_recoveringLastBirthBracketed" text="Nem (ellés utáni lábadozás)"/>
+        <text name="rl_ui_tooYoung" text="Túl fiatal"/>
+        <text name="rl_ui_tooYoungBracketed" text="Nem (túl fiatal)"/>
+        <text name="rl_ui_pregnant" text="Vemhes"/>
+        <text name="rl_ui_lactating" text="Tejelő / Szoptat"/>
+        <text name="rl_ui_canReproduce" text="Szaporodóképes"/>
+        <text name="rl_ui_impregnatedBy" text="Megtermékenyítette:"/>
+        <text name="rl_ui_unknown" text="Ismeretlen"/>
+        <text name="rl_ui_yes" text="Igen"/>
+        <text name="rl_ui_no" text="Nem"/>
+        <text name="rl_ui_mother" text="Anya"/>
+        <text name="rl_ui_father" text="Apa"/>
+        <text name="rl_ui_uniqueId" text="Egyedi azonosító"/>
+        <text name="rl_ui_farmId" text="Farm azonosító"/>
+        <text name="rl_ui_gender" text="Nem"/>
+        <text name="rl_ui_male" text="Hím"/>
+        <text name="rl_ui_female" text="Nőstény"/>
+        <text name="rl_ui_weight" text="Súly"/>
+        <text name="rl_ui_targetWeight" text="Célsúly"/>
+        <text name="rl_ui_value" text="Érték"/>
+        <text name="rl_ui_valuePerKilo" text="Érték / kg"/>
+        <text name="rl_ui_genetics" text="Genetika"/>
+        <text name="rl_ui_overall" text="Összesített"/>
+        <text name="rl_ui_rename" text="Átnevezés"/>
+        <text name="rl_ui_maleNumImpregnatable" text="Megtermékenyíthető állatok a karámban"/>
+
+        <text name="rl_ui_breederQuality" text="Tenyészminőség"/>
+        <text name="rl_ui_birthday" text="Születési idő"/>
+        <text name="rl_ui_pregnancyExpected" text="Várható"/>
+        <text name="rl_ui_pregnancyExpecting" text="Várható utód:"/>
+        <text name="rl_ui_pregnancyBaby" text="utód"/>
+        <text name="rl_ui_pregnancyBabies" text="utód"/>
+        <text name="rl_ui_animalOrigin" text="Származás"/>
+        <text name="rl_ui_months" text="hónap"/>
+        <text name="rl_ui_month" text="hónap"/>
+        <text name="rl_ui_years" text="év"/>
+        <text name="rl_ui_year" text="év"/>
+
+        <text name="rl_ui_milk" text="Tejtermelés"/>
+        <text name="rl_ui_wool" text="Gyapjútermelés"/>
+        <text name="rl_ui_eggs" text="Tojástermelés"/>
+        <text name="rl_ui_metabolism" text="Anyagcsere"/>
+        <text name="rl_ui_meat" text="Minőség"/>
+        <text name="rl_ui_meat_github" text="Húsminőség"/>
+        <text name="rl_ui_quality" text="Minőség"/>
+        <text name="rl_ui_quality_github" text="Húsminőség"/>
+        <text name="rl_ui_health" text="Egészség"/>
+        <text name="rl_ui_fertility" text="Termékenység"/>
+
+        <text name="rl_ui_genetics_infertile" text="Terméketlen"/>
+        <text name="rl_ui_genetics_extremelyLow" text="Rendkívül alacsony"/>
+        <text name="rl_ui_genetics_veryLow" text="Nagyon alacsony"/>
+        <text name="rl_ui_genetics_low" text="Alacsony"/>
+        <text name="rl_ui_genetics_average" text="Átlagos"/>
+        <text name="rl_ui_genetics_high" text="Magas"/>
+        <text name="rl_ui_genetics_veryHigh" text="Nagyon magas"/>
+        <text name="rl_ui_genetics_extremelyHigh" text="Rendkívül magas"/>
+
+        <text name="rl_ui_genetics_extremelyBad" text="Rendkívül rossz"/>
+        <text name="rl_ui_genetics_veryBad" text="Nagyon rossz"/>
+        <text name="rl_ui_genetics_bad" text="Rossz"/>
+        <text name="rl_ui_genetics_good" text="Jó"/>
+        <text name="rl_ui_genetics_veryGood" text="Nagyon jó"/>
+        <text name="rl_ui_genetics_extremelyGood" text="Rendkívül jó"/>
+
+        <text name="rl_ui_buySelected" text="Kiválasztottak megvásárlása"/>
+        <text name="rl_ui_sellSelected" text="Kiválasztottak eladása"/>
+        <text name="rl_ui_moveSelected" text="Kiválasztottak áthelyezése"/>
+        <text name="rl_ui_buyConfirmation" text="Biztosan meg akarsz vásárolni %s állatot %s összegért?" tag="format"/>
+        <text name="rl_ui_buyPartialConfirmation" text="Megvásárolsz %d állatot a kiválasztott %d közül ennyiért: %s?" tag="format"/>
+        <text name="rl_ui_buySkippedNotSupported" text="%d állatot nem támogat ez az állattartó épület" tag="format"/>
+        <text name="rl_ui_buyAllRejected" text="A kiválasztott állatok egyike sem vásárolható meg ebbe az állattartó épületbe."/>
+        <text name="rl_ui_sellConfirmation" text="Biztosan el akarsz adni %s állatot %s összegért?" tag="format"/>
+        <text name="rl_ui_buyBulkResult" text="%s állat megvásárolva %s összegért" tag="format"/>
+        <text name="rl_ui_sellBulkResult" text="%s állat eladva %s összegért" tag="format"/>
+        <text name="rl_ui_moveBulkResult" text="%s állat áthelyezve" tag="format"/>
+        <text name="rl_ui_moveSingle" text="Áthelyez"/>
+        <text name="rl_ui_moveSelectDestination" text="Célállomás kiválasztása"/>
+        <text name="rl_ui_moveNoDestinations" text="Nincs elérhető célállomás ehhez az állatfajhoz."/>
+        <text name="rl_ui_moveEPPAgeFormat" text="%d-%d hó kor közötti" tag="format"/>
+        <text name="rl_ui_moveValidSummary" text="%d állat lesz áthelyezve" tag="format"/>
+        <text name="rl_ui_moveRejectedAge" text="%d állat kihagyva: nem felel meg az életkori követelménynek (%d-%d hónap)" tag="format"/>
+        <text name="rl_ui_moveRejectedCapacity" text="%d állat kihagyva: nincs elég hely a célállomáson" tag="format"/>
+        <text name="rl_ui_moveAllRejected" text="Egyetlen állat sem helyezhető át erre a célállomásra."/>
+        <text name="rl_ui_moveBulkConfirmTitle" text="Állatok áthelyezése"/>
+        <text name="rl_ui_moveErrorNoPermission" text="Nincs jogosultságod ide állatokat áthelyezni."/>
+        <text name="rl_ui_moveErrorNotSupported" text="Ez a célállomás nem támogatja ezt az állatfajt."/>
+        <text name="rl_ui_moveErrorNoSpace" text="Nincs elég hely a célállomáson."/>
+        <text name="rl_ui_tradeRequestInProgress" text="Egy tranzakció már folyamatban van. Kérlek, várj."/>
+        <text name="rl_ui_tradeRequestTimeout" text="A szerver nem válaszolt. Kérlek, próbáld újra."/>
+
+        <text name="rl_ui_monitor" text="Monitor"/>
+        <text name="rl_ui_monitorSubscriptions" text="Monitor előfizetések"/>
+        <text name="finance_monitorSubscriptions" text="Monitor előfizetések"/>
+        <text name="rl_ui_monitorFee" text="Monitor díja"/>
+        <text name="rl_ui_applyMonitor" text="Monitor felhelyezése"/>
+        <text name="rl_ui_removeMonitor" text="Monitor eltávolítása"/>
+        <text name="rl_ui_removingMonitor" text="Eltávolítás..."/>
+        <text name="rl_ui_input_food" text="Takarmány"/>
+        <text name="rl_ui_input_water" text="Víz"/>
+        <text name="rl_ui_input_straw" text="Szalma"/>
+        <text name="rl_ui_output_milk" text="Tej"/>
+        <text name="rl_ui_output_manure" text="Trágya"/>
+        <text name="rl_ui_output_liquidManure" text="Hígtrágya"/>
+        <text name="rl_ui_output_pallets_eggs" text="Tojás"/>
+        <text name="rl_ui_output_pallets_wool" text="Gyapjú"/>
+        <text name="rl_ui_output_pallets_goatMilk" text="Kecsketej"/>
+        <text name="rl_ui_amountPerDay" text="%.0f l / nap" tag="format"/>
+        <text name="rl_ui_feePerMonth" text="%s / hónap" tag="format"/>
+
+        <text name="rl_ui_animalType" text="Típus"/>
+        <text name="rl_ui_amountMonitored" text="Monitorozott"/>
+        <text name="rl_ui_production" text="Termékek"/>
+        <text name="rl_ui_applyAllMonitor" text="Összes monitor felhelyezése"/>
+        <text name="rl_ui_removeAllMonitor" text="Összes monitor eltávolítása"/>
+        <text name="rl_ui_removingAllMonitor" text="Összes eltávolítása..."/>
+        <text name="rl_ui_fee" text="Díj"/>
+
+        <text name="rl_ui_leftEarTag" text="Bal füljelző"/>
+        <text name="rl_ui_rightEarTag" text="Jobb füljelző"/>
+        <text name="rl_ui_backgroundColour" text="Háttérszín"/>
+        <text name="rl_ui_backgroundHue" text="Háttér színárnyalat"/>
+        <text name="rl_ui_backgroundRgb" text="Háttér RGB"/>
+        <text name="rl_ui_textColour" text="Szövegszín"/>
+        <text name="rl_ui_textHue" text="Szöveg színárnyalat"/>
+        <text name="rl_ui_textRgb" text="Szöveg RGB"/>
+
+        <text name="rl_ui_formatMonths" text="%s hónap"/>
+        <text name="rl_ui_formatMonth" text="%s hónap"/>
+        <text name="rl_ui_notPregnant" text="Nem vemhes"/>
+        <text name="rl_ui_any" text="Bármilyen"/>
+        <text name="rl_ui_pregnancy" text="Vemhesség"/>
+        <text name="rl_ui_productivity" text="Termelékenység"/>
+        <text name="rl_ui_selectAll" text="Összes kijelölése"/>
+        <text name="rl_ui_selectNone" text="Kijelölés törlése"/>
+        <text name="rl_ui_selectSection" text="Select Section"/>
+        <text name="rl_ui_deselectSection" text="Deselect Section"/>
+        <text name="rl_ui_doesntHaveName" text="Nincs neve"/>
+        <text name="rl_ui_doesHaveName" text="Van neve"/>
+
+
+
+        <text name="rl_ui_castrated" text="Kasztrált"/>
+        <text name="rl_ui_castrate" text="Kasztrálás"/>
+
+        <text name="rl_ui_unknownCauses" text="ismeretlen okok"/>
+        <text name="rl_ui_unreadMessages" text="A(z) '%s' istállóban olvasatlan üzeneteid vannak!"/>
+        <text name="rl_ui_herdsman" text="Állatgondozó"/>
+        <text name="rl_ui_budget" text="Költségvetés"/>
+        <text name="rl_ui_budgetType" text="Költségvetés típusa"/>
+        <text name="rl_ui_fixed" text="Fix"/>
+        <text name="rl_ui_percentage" text="Százalékos"/>
+        <text name="rl_ui_maxAnimals" text="Állatok max. száma"/>
+        <text name="rl_ui_herdsmanRecentlyBought" text="Legutóbbi állatgondozói vásárlás"/>
+        <text name="rl_ui_herdsmanWages" text="Állatgondozó bére"/>
+        <text name="finance_herdsmanWages" text="Állatgondozó bére"/>
+        <text name="rl_ui_medicine" text="Gyógyszer"/>
+        <text name="finance_medicine" text="Gyógyszer"/>
+        <text name="rl_ui_semenPurchase" text="Szaporítóanyag vásárlása"/>
+        <text name="rl_ui_semenPurchase_github" text="Sperma vásárlása"/>
+        <text name="finance_semenPurchase" text="Szaporítóanyag vásárlása"/>
+        <text name="finance_semenPurchase_github" text="Sperma vásárlása"/>
+        <text name="rl_ui_alphabetical" text="Betűrendben"/>
+        <text name="rl_ui_breed" text="Fajta"/>
+        <text name="rl_ui_dontMark" text="Ne jelölje meg"/>
+        <text name="rl_ui_mark" text="Megjelölés"/>
+        <text name="rl_ui_unmark" text="Jelölés törlése"/>
+        <text name="rl_ui_favourite" text="Kedvenc"/>
+        <text name="rl_ui_unFavourite" text="Kedvenc törlése"/>
+        <text name="rl_ui_dewar" text="Dewar-edény"/>
+        <text name="rl_ui_semenPurchase_successful" text="Mesterséges szaporítóanyag sikeresen megvásárolva. Átvehető a boltban."/>
+        <text name="rl_ui_semenPurchase_successful_github" text="Sperma sikeresen megvásárolva. Átvehető a boltban."/>
+        <text name="rl_ui_semenPurchase_unsuccessful" text="A mesterséges szaporítóanyag vásárlása sikertelen."/>
+        <text name="rl_ui_semenPurchase_unsuccessful_github" text="A sperma vásárlása sikertelen."/>
+        <text name="rl_ui_earTag" text="Füljelző"/>
+        <text name="rl_ui_species" text="Faj"/>
+        <text name="rl_ui_strawSingle" text="Fiola"/>
+        <text name="rl_ui_strawMultiple" text="Fiolák"/>
+        <text name="rl_ui_artificialInsemination" text="Mesterséges megtermékenyítés"/>
+        <text name="rl_ui_semenPurchaseNoPermission" text="Nincs jogosultságod állatokkal kereskedni vagy szaporítóanyagot vásárolni."/>
+        <text name="rl_ui_semenPurchaseNoPermission_github" text="Nincs jogosultságod állatokkal kereskedni vagy spermát vásárolni."/>
+        <text name="rl_ui_semenPurchaseNoMoney" text="Nincs elég pénzed a szaporítóanyag megvásárlásához."/>
+        <text name="rl_ui_semenPurchaseNoMoney_github" text="Nincs elég pénzed a sperma megvásárlásához."/>
+        <text name="rl_ui_takeStraw" text="Fiola kivétele"/>
+        <text name="rl_ui_inseminateAnimal" text="%s megtermékenyítése"/>
+        <text name="rl_ui_inseminate" text="Megtermékenyítés"/>
+        <text name="rl_ui_strawEmpty" text="Ez a fiola üres"/>
+        <text name="rl_ui_averageSuccess" text="Átlagos sikeresség"/>
+        <text name="rl_ui_success" text="Sikeresség"/>
 
-		<text name="rl_ui_healthy" text="Egészséges"/>
-		<text name="rl_ui_hasDisease" text="Beteg"/>
-		<text name="rl_ui_diseasedAnimals" text="Beteg állatok"/>
+        <text name="rl_ui_healthy" text="Egészséges"/>
+        <text name="rl_ui_hasDisease" text="Beteg"/>
+        <text name="rl_ui_diseasedAnimals" text="Beteg állatok"/>
 
 
-		<text name="rl_insemination_male" text="Csak nőstényeket lehet mesterségesen megtermékenyíteni"/>
-		<text name="rl_insemination_pregnant" text="Ez az állat már vemhes"/>
-		<text name="rl_insemination_animalType" text="Az állatnak az apával megegyező fajtájúnak kell lennie"/>
-		<text name="rl_insemination_inseminated" text="Ezt az állatot már megtermékenyítették mesterségesen"/>
-		<text name="rl_insemination_recovering" text="Ez az állat még lábadozik az előző ellés után"/>
-		<text name="rl_insemination_father" text="A beltenyésztés nem megengedett"/>
-		<text name="rl_insemination_young" text="Ez az állat még túl fiatal a mesterséges megtermékenyítéshez"/>
+        <text name="rl_insemination_male" text="Csak nőstényeket lehet mesterségesen megtermékenyíteni"/>
+        <text name="rl_insemination_pregnant" text="Ez az állat már vemhes"/>
+        <text name="rl_insemination_animalType" text="Az állatnak az apával megegyező fajtájúnak kell lennie"/>
+        <text name="rl_insemination_inseminated" text="Ezt az állatot már megtermékenyítették mesterségesen"/>
+        <text name="rl_insemination_recovering" text="Ez az állat még lábadozik az előző ellés után"/>
+        <text name="rl_insemination_father" text="A beltenyésztés nem megengedett"/>
+        <text name="rl_insemination_young" text="Ez az állat még túl fiatal a mesterséges megtermékenyítéshez"/>
 
 
-		<text name="rl_mark_aiManager_sell" text="Az állatgondozó eladásra jelölte ki"/>
-		<text name="rl_mark_aiManager_castrate" text="Az állatgondozó kasztrálásra jelölte ki"/>
-		<text name="rl_mark_aiManager_disease" text="Az állatgondozó kezelésre jelölte ki"/>
-		<text name="rl_mark_aiManager_ai" text="Az állatgondozó mesterséges megtermékenyítésre jelölte ki"/>
-		<text name="rl_mark_aiManager_move" text="Herdsman marked for moving"/>
-		<text name="rl_mark_player" text="Játékos által megjelölve"/>
+        <text name="rl_mark_aiManager_sell" text="Az állatgondozó eladásra jelölte ki"/>
+        <text name="rl_mark_aiManager_castrate" text="Az állatgondozó kasztrálásra jelölte ki"/>
+        <text name="rl_mark_aiManager_disease" text="Az állatgondozó kezelésre jelölte ki"/>
+        <text name="rl_mark_aiManager_ai" text="Az állatgondozó mesterséges megtermékenyítésre jelölte ki"/>
+        <text name="rl_mark_aiManager_move" text="Herdsman marked for moving"/>
+        <text name="rl_mark_player" text="Játékos által megjelölve"/>
 
 
-		<!-- AI - BUYING -->
+        <!-- AI - BUYING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="Az állatgondozó nem fog állatokat vásárolni"/>
-		<text name="rl_ui_herdsmanTooltip_buy_enabled_2" text="Az állatgondozó állatokat fog vásárolni"/>
+        <text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="Az állatgondozó nem fog állatokat vásárolni"/>
+        <text name="rl_ui_herdsmanTooltip_buy_enabled_2" text="Az állatgondozó állatokat fog vásárolni"/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="A vásárlási keret egy fix összeg"/>
-		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="A vásárlási keret a gazdaság pénzének százalékos aránya"/>
+        <text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="A vásárlási keret egy fix összeg"/>
+        <text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="A vásárlási keret a gazdaság pénzének százalékos aránya"/>
 
 
 
@@ -324,11 +325,11 @@
 
 
 
-		<!-- AI - SELLING -->
+        <!-- AI - SELLING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Az állatgondozó nem fog állatokat eladni"/>
-		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Az állatgondozó állatokat fog eladni"/>
+        <text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Az állatgondozó nem fog állatokat eladni"/>
+        <text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Az állatgondozó állatokat fog eladni"/>
 
 
 
@@ -341,11 +342,11 @@
 
 
 
-		<!-- AI - CASTRATING -->
+        <!-- AI - CASTRATING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Az állatgondozó nem fog állatokat kasztrálni"/>
-		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Az állatgondozó állatokat fog kasztrálni"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Az állatgondozó nem fog állatokat kasztrálni"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Az állatgondozó állatokat fog kasztrálni"/>
 
 
 
@@ -356,29 +357,29 @@
 
 
 
-		<!-- AI - NAMING -->
+        <!-- AI - NAMING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_naming_enabled_1" text="Az állatgondozó nem fog nevet adni az állatoknak"/>
-		<text name="rl_ui_herdsmanTooltip_naming_enabled_2" text="Az állatgondozó nevet fog adni az állatoknak"/>
+        <text name="rl_ui_herdsmanTooltip_naming_enabled_1" text="Az állatgondozó nem fog nevet adni az állatoknak"/>
+        <text name="rl_ui_herdsmanTooltip_naming_enabled_2" text="Az állatgondozó nevet fog adni az állatoknak"/>
 
-		<text name="rl_ui_herdsmanTooltip_naming_convention_1" text="Az állatgondozó véletlenszerűen nevezi el az állatokat"/>
-		<text name="rl_ui_herdsmanTooltip_naming_convention_2" text="Az állatgondozó betűrendben nevezi el az állatokat"/>
+        <text name="rl_ui_herdsmanTooltip_naming_convention_1" text="Az állatgondozó véletlenszerűen nevezi el az állatokat"/>
+        <text name="rl_ui_herdsmanTooltip_naming_convention_2" text="Az állatgondozó betűrendben nevezi el az állatokat"/>
 
 
-		<!-- AI - AI -->
+        <!-- AI - AI -->
 
 
-		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Az állatgondozó nem végez mesterséges megtermékenyítést"/>
-		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Az állatgondozó mesterségesen megtermékenyíti az állatokat"/>
+        <text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Az állatgondozó nem végez mesterséges megtermékenyítést"/>
+        <text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Az állatgondozó mesterségesen megtermékenyíti az állatokat"/>
 
 
 
 
-		<text name="rl_ui_herdsmanTooltip_ai_semen" text="Az állatgondozó %s szaporítóanyagát fogja használni"/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="Az állatgondozó %s spermáját fogja használni"/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="Az állatgondozó bármilyen életképes szaporítóanyagot felhasznál"/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="Az állatgondozó bármilyen életképes spermát felhasznál"/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen" text="Az állatgondozó %s szaporítóanyagát fogja használni"/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_github" text="Az állatgondozó %s spermáját fogja használni"/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_any" text="Az állatgondozó bármilyen életképes szaporítóanyagot felhasznál"/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="Az állatgondozó bármilyen életképes spermát felhasznál"/>
 
 
 
@@ -388,333 +389,333 @@
 
 
 
-		<!--  SETTINGS  -->
+        <!--  SETTINGS  -->
 
 
-		<text name="rl_settings" text="Realistic Livestock"/>
-		<text name="rl_settings_openMenu_button" text="Beállítások megnyitása"/>
-		<text name="rl_settings_openMenu_label" text="Realistic Livestock beállítások megnyitása"/>
+        <text name="rl_settings" text="Realistic Livestock"/>
+        <text name="rl_settings_openMenu_button" text="Beállítások megnyitása"/>
+        <text name="rl_settings_openMenu_label" text="Realistic Livestock beállítások megnyitása"/>
 
-		<text name="rl_settings_off" text="Ki"/>
-		<text name="rl_settings_on" text="Be"/>
+        <text name="rl_settings_off" text="Ki"/>
+        <text name="rl_settings_on" text="Be"/>
 
-		<text name="rl_settings_deathEnabled_label" text="Állatok eltávolítása"/>
-		<text name="rl_settings_deathEnabled_label_github" text="Állatok elhullása"/>
-		<text name="rl_settings_deathEnabled_tooltip_1" text="Az állatok nem kerülnek eltávolításra vemhesség, egészség, kor vagy balesetek miatt"/>
-		<text name="rl_settings_deathEnabled_tooltip_1_github" text="Az állatok nem hullanak el vemhesség, egészség, kor vagy balesetek miatt"/>
-		<text name="rl_settings_deathEnabled_tooltip_2" text="Az állatok eltávolításra kerülnek vemhesség, egészség, kor vagy balesetek miatt"/>
-		<text name="rl_settings_deathEnabled_tooltip_2_github" text="Az állatok elhullanak vemhesség, egészség, kor vagy balesetek miatt"/>
+        <text name="rl_settings_deathEnabled_label" text="Állatok eltávolítása"/>
+        <text name="rl_settings_deathEnabled_label_github" text="Állatok elhullása"/>
+        <text name="rl_settings_deathEnabled_tooltip_1" text="Az állatok nem kerülnek eltávolításra vemhesség, egészség, kor vagy balesetek miatt"/>
+        <text name="rl_settings_deathEnabled_tooltip_1_github" text="Az állatok nem hullanak el vemhesség, egészség, kor vagy balesetek miatt"/>
+        <text name="rl_settings_deathEnabled_tooltip_2" text="Az állatok eltávolításra kerülnek vemhesség, egészség, kor vagy balesetek miatt"/>
+        <text name="rl_settings_deathEnabled_tooltip_2_github" text="Az állatok elhullanak vemhesség, egészség, kor vagy balesetek miatt"/>
 
-		<text name="rl_settings_accidentsChance_label" text="Baleset esélye"/>
-		<text name="rl_settings_accidentsChance_tooltip" text="Véletlenszerű balesetek miatti állateltávolítás valószínűségének módosítása"/>
-		<text name="rl_settings_accidentsChance_tooltip_github" text="Véletlenszerű balesetek miatti elhullás valószínűségének módosítása"/>
+        <text name="rl_settings_accidentsChance_label" text="Baleset esélye"/>
+        <text name="rl_settings_accidentsChance_tooltip" text="Véletlenszerű balesetek miatti állateltávolítás valószínűségének módosítása"/>
+        <text name="rl_settings_accidentsChance_tooltip_github" text="Véletlenszerű balesetek miatti elhullás valószínűségének módosítása"/>
 
-		<text name="rl_settings_foodScale_label" text="Takarmányozási skála"/>
-		<text name="rl_settings_foodScale_tooltip" text="Az állatok által elfogyasztott takarmány mennyiségének módosítása"/>
+        <text name="rl_settings_foodScale_label" text="Takarmányozási skála"/>
+        <text name="rl_settings_foodScale_tooltip" text="Az állatok által elfogyasztott takarmány mennyiségének módosítása"/>
 
-		<text name="rl_settings_maxDealerAnimals_label" text="Kereskedő max. készlete"/>
-		<text name="rl_settings_maxDealerAnimals_tooltip" text="Az állatkereskedőnél típusonként elérhető állatok maximális számának módosítása"/>
-		<text name="rl_settings_dealerQuality_label" text="Dealer Animal Quality"/>
-		<text name="rl_settings_dealerQuality_tooltip" text="Sets how good - and how expensive - the animals the dealer offers are. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing this discards the current dealer stock and restocks with new animals. Does not affect the AI animals used for insemination."/>
-		<text name="rl_settings_dealerQuality_texts_1" text="Budget"/>
-		<text name="rl_settings_dealerQuality_texts_2" text="Standard"/>
-		<text name="rl_settings_dealerQuality_texts_3" text="Premium"/>
+        <text name="rl_settings_maxDealerAnimals_label" text="Kereskedő max. készlete"/>
+        <text name="rl_settings_maxDealerAnimals_tooltip" text="Az állatkereskedőnél típusonként elérhető állatok maximális számának módosítása"/>
+        <text name="rl_settings_dealerQuality_label" text="Dealer Animal Quality"/>
+        <text name="rl_settings_dealerQuality_tooltip" text="Sets how good - and how expensive - the animals the dealer offers are. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing this discards the current dealer stock and restocks with new animals. Does not affect the AI animals used for insemination."/>
+        <text name="rl_settings_dealerQuality_texts_1" text="Budget"/>
+        <text name="rl_settings_dealerQuality_texts_2" text="Standard"/>
+        <text name="rl_settings_dealerQuality_texts_3" text="Premium"/>
 
-		<text name="rl_settings_mapCountry_label" text="Állatok származási országa"/>
-		<text name="rl_settings_mapCountry_tooltip" text="Felülírja az országot, amelyben az új állatok nyilvántartásba kerülnek (fülcímkék, azonosítók). Csak az új állatokra vonatkozik; a meglévő állatok megtartják országukat."/>
-		<text name="rl_settings_mapCountry_texts_1" text="Térkép alapértelmezése"/>
+        <text name="rl_settings_mapCountry_label" text="Állatok származási országa"/>
+        <text name="rl_settings_mapCountry_tooltip" text="Felülírja az országot, amelyben az új állatok nyilvántartásba kerülnek (fülcímkék, azonosítók). Csak az új állatokra vonatkozik; a meglévő állatok megtartják országukat."/>
+        <text name="rl_settings_mapCountry_texts_1" text="Térkép alapértelmezése"/>
 
-		<text name="rl_settings_resetDealer_label" text="Állatkereskedő frissítése"/>
-		<text name="rl_settings_resetDealer_tooltip" text="A kereskedő összes állatának eltávolítása és a készlet feltöltése új állatokkal"/>
-		<text name="rl_settings_resetDealer_text" text="Állatkereskedő frissítése"/>
+        <text name="rl_settings_resetDealer_label" text="Állatkereskedő frissítése"/>
+        <text name="rl_settings_resetDealer_tooltip" text="A kereskedő összes állatának eltávolítása és a készlet feltöltése új állatokkal"/>
+        <text name="rl_settings_resetDealer_text" text="Állatkereskedő frissítése"/>
 
-		<text name="rl_settings_dealerSale_label" text="Choose Animals For Sale"/>
-		<text name="rl_settings_dealerSale_tooltip" text="Choose which animals and age groups the dealer offers for sale. Changing this restocks the dealer."/>
-		<text name="rl_settings_dealerSale_text" text="Choose Animals For Sale"/>
+        <text name="rl_settings_dealerSale_label" text="Choose Animals For Sale"/>
+        <text name="rl_settings_dealerSale_tooltip" text="Choose which animals and age groups the dealer offers for sale. Changing this restocks the dealer."/>
+        <text name="rl_settings_dealerSale_text" text="Choose Animals For Sale"/>
 
-		<text name="rl_settings_resetAIAnimals_label" text="Mesterséges apaállatok frissítése"/>
-		<text name="rl_settings_resetAIAnimals_tooltip" text="A mesterséges megtermékenyítéshez elérhető apaállatok törlése és új, véletlenszerűen generált állatokkal való pótlása"/>
-		<text name="rl_settings_resetAIAnimals_text" text="Mesterséges apaállatok frissítése"/>
+        <text name="rl_settings_resetAIAnimals_label" text="Mesterséges apaállatok frissítése"/>
+        <text name="rl_settings_resetAIAnimals_tooltip" text="A mesterséges megtermékenyítéshez elérhető apaállatok törlése és új, véletlenszerűen generált állatokkal való pótlása"/>
+        <text name="rl_settings_resetAIAnimals_text" text="Mesterséges apaállatok frissítése"/>
 
-		<text name="rl_settings_tagColour_label" text="Füljelző színének módosítása"/>
-		<text name="rl_settings_tagColour_tooltip" text="A füljelzők alapszínének megváltoztatása"/>
-		<text name="rl_settings_tagColour_text" text="Füljelző színének módosítása"/>
-		<text name="rl_settings_maxVisualAnimals_label" text="Set Maximum Visual Animals"/>
-		<text name="rl_settings_maxVisualAnimals_text" text="Set Maximum Visual Animals"/>
-		<text name="rl_settings_maxVisualAnimals_tooltip" text="Set the maximum number of animals rendered per pen. Per-machine display setting; not synced in multiplayer."/>
+        <text name="rl_settings_tagColour_label" text="Füljelző színének módosítása"/>
+        <text name="rl_settings_tagColour_tooltip" text="A füljelzők alapszínének megváltoztatása"/>
+        <text name="rl_settings_tagColour_text" text="Füljelző színének módosítása"/>
+        <text name="rl_settings_maxVisualAnimals_label" text="Set Maximum Visual Animals"/>
+        <text name="rl_settings_maxVisualAnimals_text" text="Set Maximum Visual Animals"/>
+        <text name="rl_settings_maxVisualAnimals_tooltip" text="Set the maximum number of animals rendered per pen. Per-machine display setting; not synced in multiplayer."/>
 
-		<text name="rl_settings_exportCSV_label" text="Exportálás CSV-be"/>
-		<text name="rl_settings_exportCSV_tooltip" text="Statisztikák kimentése CSV fájlba"/>
-		<text name="rl_settings_exportCSV_text" text="Exportálás CSV-be"/>
+        <text name="rl_settings_exportCSV_label" text="Exportálás CSV-be"/>
+        <text name="rl_settings_exportCSV_tooltip" text="Statisztikák kimentése CSV fájlba"/>
+        <text name="rl_settings_exportCSV_text" text="Exportálás CSV-be"/>
 
-		<text name="rl_settings_maxNumMessages_label" text="Üzenetek maximális száma"/>
-		<text name="rl_settings_maxNumMessages_tooltip" text="A magasabb érték nagyobb helyet foglal a mentési mappában. A limit elérése után a legkorábbi üzenetek törlődnek."/>
+        <text name="rl_settings_maxNumMessages_label" text="Üzenetek maximális száma"/>
+        <text name="rl_settings_maxNumMessages_tooltip" text="A magasabb érték nagyobb helyet foglal a mentési mappában. A limit elérése után a legkorábbi üzenetek törlődnek."/>
 
-		<text name="rl_settings_messageSummary_label" text="Üzenetnapló összesítések"/>
-		<text name="rl_settings_messageSummary_tooltip_1" text="Ki: Külön üzenet minden eseményről"/>
-		<text name="rl_settings_messageSummary_tooltip_2" text="Be: Napi összesítés istállónként (csökkenti a napló zaját)"/>
+        <text name="rl_settings_messageSummary_label" text="Üzenetnapló összesítések"/>
+        <text name="rl_settings_messageSummary_tooltip_1" text="Ki: Külön üzenet minden eseményről"/>
+        <text name="rl_settings_messageSummary_tooltip_2" text="Be: Napi összesítés istállónként (csökkenti a napló zaját)"/>
 
-		<text name="rl_settings_diseasesEnabled_label" text="Betegségek engedélyezése"/>
-		<text name="rl_settings_diseasesEnabled_tooltip_1" text="Az állatok nem kaphatnak el és nem örökölhetnek betegségeket"/>
-		<text name="rl_settings_diseasesEnabled_tooltip_2" text="Az állatok elkaphatnak vagy örökölhetnek betegségeket"/>
+        <text name="rl_settings_diseasesEnabled_label" text="Betegségek engedélyezése"/>
+        <text name="rl_settings_diseasesEnabled_tooltip_1" text="Az állatok nem kaphatnak el és nem örökölhetnek betegségeket"/>
+        <text name="rl_settings_diseasesEnabled_tooltip_2" text="Az állatok elkaphatnak vagy örökölhetnek betegségeket"/>
 
-		<text name="rl_settings_diseasesChance_label" text="Betegség esélye"/>
-		<text name="rl_settings_diseasesChance_tooltip" text="A betegségek elkapásának valószínűségének módosítása"/>
+        <text name="rl_settings_diseasesChance_label" text="Betegség esélye"/>
+        <text name="rl_settings_diseasesChance_tooltip" text="A betegségek elkapásának valószínűségének módosítása"/>
 
-		<text name="rl_settings_useCustomAnimals_label" text="Egyedi állatmodellek használata"/>
-		<text name="rl_settings_useCustomAnimals_tooltip_1" text="A RealisticLivestock saját állatmodelljeinek használata (újraindítást igényel)"/>
-		<text name="rl_settings_useCustomAnimals_tooltip_2" text="Egyedi állatmodellek használata (újraindítást igényel, ki kell csomagolni)"/>
+        <text name="rl_settings_useCustomAnimals_label" text="Egyedi állatmodellek használata"/>
+        <text name="rl_settings_useCustomAnimals_tooltip_1" text="A RealisticLivestock saját állatmodelljeinek használata (újraindítást igényel)"/>
+        <text name="rl_settings_useCustomAnimals_tooltip_2" text="Egyedi állatmodellek használata (újraindítást igényel, ki kell csomagolni)"/>
 
-		<text name="rl_settings_animalsXML_label" text="Animals XML elérési útja"/>
-		<text name="rl_settings_animalsXML_tooltip" text="Egyedi animals XML fájl elérési útjának megadása"/>
-		<text name="rl_settings_animalsXML_text" text="Animals XML elérési útja"/>
+        <text name="rl_settings_animalsXML_label" text="Animals XML elérési útja"/>
+        <text name="rl_settings_animalsXML_tooltip" text="Egyedi animals XML fájl elérési útjának megadása"/>
+        <text name="rl_settings_animalsXML_text" text="Animals XML elérési útja"/>
 
-		<text name="rl_settings_geneticsDisplay_label" text="Genetikai adatok megjelenítése"/>
-		<text name="rl_settings_geneticsDisplay_tooltip" text="Numerikus genetikai értékek megjelenítése az állatok nevénél"/>
-		<text name="rl_settings_geneticsDisplay_texts_1" text="Ki"/>
-		<text name="rl_settings_geneticsDisplay_texts_2" text="Rövid"/>
-		<text name="rl_settings_geneticsDisplay_texts_3" text="Hosszú"/>
-		<text name="rl_settings_geneticsPosition_label" text="Genetika pozíciója"/>
-		<text name="rl_settings_geneticsPosition_tooltip" text="Hol jelenjen meg a genetikai adat a névben"/>
-		<text name="rl_settings_geneticsPosition_texts_1" text="Előtag"/>
-		<text name="rl_settings_geneticsPosition_texts_2" text="Utótag"/>
-		<text name="rl_settings_sortByGenetics_label" text="Rendezés genetika szerint"/>
-		<text name="rl_settings_sortByGenetics_tooltip_1" text="Az állatok típus és kor szerint vannak rendezve"/>
-		<text name="rl_settings_sortByGenetics_tooltip_2" text="Az állatok genetika szerint vannak rendezve (legjobb elöl)"/>
+        <text name="rl_settings_geneticsDisplay_label" text="Genetikai adatok megjelenítése"/>
+        <text name="rl_settings_geneticsDisplay_tooltip" text="Numerikus genetikai értékek megjelenítése az állatok nevénél"/>
+        <text name="rl_settings_geneticsDisplay_texts_1" text="Ki"/>
+        <text name="rl_settings_geneticsDisplay_texts_2" text="Rövid"/>
+        <text name="rl_settings_geneticsDisplay_texts_3" text="Hosszú"/>
+        <text name="rl_settings_geneticsPosition_label" text="Genetika pozíciója"/>
+        <text name="rl_settings_geneticsPosition_tooltip" text="Hol jelenjen meg a genetikai adat a névben"/>
+        <text name="rl_settings_geneticsPosition_texts_1" text="Előtag"/>
+        <text name="rl_settings_geneticsPosition_texts_2" text="Utótag"/>
+        <text name="rl_settings_sortByGenetics_label" text="Rendezés genetika szerint"/>
+        <text name="rl_settings_sortByGenetics_tooltip_1" text="Az állatok típus és kor szerint vannak rendezve"/>
+        <text name="rl_settings_sortByGenetics_tooltip_2" text="Az állatok genetika szerint vannak rendezve (legjobb elöl)"/>
 
 
 
-		<!--  HELP  -->
+        <!--  HELP  -->
 
 
-		<text name="rl_help_monitors_title" text="Monitorok"/>
-		<text name="rl_help_monitors_1" text="Ahhoz, hogy lásd az állatok statisztikáinak többségét, megfigyelő jelölőt kell alkalmaznod rajtuk, amit az állatmenüben (ahol az állatokat veszed és eladod) tehetsz meg. A megfigyelő krotáliák vizuálisan is megjelennek az állaton, a bal fülükben az azonosító jelzőjük mellett."/>
-		<text name="rl_help_monitors_2" text="A megfigyelő jelölők segítségével fontos információk válnak láthatóvá, többek között az egészségi állapot, a súly, a laktáció, a termelés, valamint a szalma-, takarmány- és vízigény."/>
-		<text name="rl_help_monitors_3" text="A jelölő felhelyezése egy kis havi előfizetési díjba kerül, amely az állat fajától függ. Ha úgy döntesz, hogy eltávolítod a jelölőt, az a következő hónap elején történik meg."/>
+        <text name="rl_help_monitors_title" text="Monitorok"/>
+        <text name="rl_help_monitors_1" text="Ahhoz, hogy lásd az állatok statisztikáinak többségét, megfigyelő jelölőt kell alkalmaznod rajtuk, amit az állatmenüben (ahol az állatokat veszed és eladod) tehetsz meg. A megfigyelő krotáliák vizuálisan is megjelennek az állaton, a bal fülükben az azonosító jelzőjük mellett."/>
+        <text name="rl_help_monitors_2" text="A megfigyelő jelölők segítségével fontos információk válnak láthatóvá, többek között az egészségi állapot, a súly, a laktáció, a termelés, valamint a szalma-, takarmány- és vízigény."/>
+        <text name="rl_help_monitors_3" text="A jelölő felhelyezése egy kis havi előfizetési díjba kerül, amely az állat fajától függ. Ha úgy döntesz, hogy eltávolítod a jelölőt, az a következő hónap elején történik meg."/>
 
-		<text name="rl_help_pregnancy_title" text="Vemhesség"/>
-		<text name="rl_help_pregnancy_1" text="A nőstény állatoknak legalább 1 hímre van szükségük ahhoz, hogy vemhessé válhassanak. Mindkét állatnak megfelelő korúnak és egészségi állapotúnak kell lennie, és azonos fajba kell tartozniuk. A különböző fajták közötti tenyésztés (pl. Holstein tehén és Angus bika) megengedett."/>
-		<text name="rl_help_pregnancy_2" text="A beltenyésztés nem megengedett. Ha egy hím és egy nőstény közvetlen rokonságban áll, nem fognak szaporodni."/>
-		<text name="rl_help_pregnancy_3" text="A nőstény vemhességének esélye mind az ő, mind a hím termékenységétől függ. A magasabb termékenységű nősténynek jelentősen nagyobb esélye van arra is, hogy egyszerre több utódot hozzon világra."/>
-		<text name="rl_help_pregnancy_4" text="Amint egy nőstény vemhes lesz, hordozni kezdi utódait. A várható ellési időt és az utódok számát megtekintheted az állatot figyelve a karámban, vagy az állatmenüben rá kattintva."/>
-		<text name="rl_help_pregnancy_5" text="Amikor eléri az esedékesség napját, világra hozza utódait. Azonban az újszülötteknél fennáll az elhullás esélye, ahogy az anyánál is, ha a vemhesség rosszul alakul. A túlzsúfolt karámban született újszülöttek automatikusan eladásra kerülnek."/>
+        <text name="rl_help_pregnancy_title" text="Vemhesség"/>
+        <text name="rl_help_pregnancy_1" text="A nőstény állatoknak legalább 1 hímre van szükségük ahhoz, hogy vemhessé válhassanak. Mindkét állatnak megfelelő korúnak és egészségi állapotúnak kell lennie, és azonos fajba kell tartozniuk. A különböző fajták közötti tenyésztés (pl. Holstein tehén és Angus bika) megengedett."/>
+        <text name="rl_help_pregnancy_2" text="A beltenyésztés nem megengedett. Ha egy hím és egy nőstény közvetlen rokonságban áll, nem fognak szaporodni."/>
+        <text name="rl_help_pregnancy_3" text="A nőstény vemhességének esélye mind az ő, mind a hím termékenységétől függ. A magasabb termékenységű nősténynek jelentősen nagyobb esélye van arra is, hogy egyszerre több utódot hozzon világra."/>
+        <text name="rl_help_pregnancy_4" text="Amint egy nőstény vemhes lesz, hordozni kezdi utódait. A várható ellési időt és az utódok számát megtekintheted az állatot figyelve a karámban, vagy az állatmenüben rá kattintva."/>
+        <text name="rl_help_pregnancy_5" text="Amikor eléri az esedékesség napját, világra hozza utódait. Azonban az újszülötteknél fennáll az elhullás esélye, ahogy az anyánál is, ha a vemhesség rosszul alakul. A túlzsúfolt karámban született újszülöttek automatikusan eladásra kerülnek."/>
 
-		<text name="rl_help_production_title" text="Termelés"/>
-		<text name="rl_help_production_1" text="Bármilyen fajtájú tehén csak az ellés után kezd tejet termelni. Az ellést követően a tehén 3 hónapig exponenciálisan termel tejet, majd termelése a következő 6 hónapban lassan csökkenni kezd. 10 hónappal az ellés után a tehén abbahagyja a tejtermelést a következő vemhességig."/>
-		<text name="rl_help_production_2" text="A juhok a meleg hónapokban termelnek gyapjút. A hideg hónapokban, 12°C alatt, nem termelnek gyapjút."/>
-		<text name="rl_help_production_3" text="A tej-, gyapjú- és tojástermelést tovább befolyásolja az állat genetikája. A jó termelési genetikával rendelkező állat többet termel, míg a rossz genetikájú állat alig termel valamit."/>
+        <text name="rl_help_production_title" text="Termelés"/>
+        <text name="rl_help_production_1" text="Bármilyen fajtájú tehén csak az ellés után kezd tejet termelni. Az ellést követően a tehén 3 hónapig exponenciálisan termel tejet, majd termelése a következő 6 hónapban lassan csökkenni kezd. 10 hónappal az ellés után a tehén abbahagyja a tejtermelést a következő vemhességig."/>
+        <text name="rl_help_production_2" text="A juhok a meleg hónapokban termelnek gyapjút. A hideg hónapokban, 12°C alatt, nem termelnek gyapjút."/>
+        <text name="rl_help_production_3" text="A tej-, gyapjú- és tojástermelést tovább befolyásolja az állat genetikája. A jó termelési genetikával rendelkező állat többet termel, míg a rossz genetikájú állat alig termel valamit."/>
 
-		<text name="rl_help_weight_title" text="Súly"/>
-		<text name="rl_help_weight_1" text="Az állatok egy bizonyos súllyal rendelkeznek, amelyet befolyásol, hogy mennyit esznek és isznak. Minden fajnak és fajtának megvan a saját átlagsúlya, amely befolyásolja az egyes állatok tömegét."/>
-		<text name="rl_help_weight_2" text="A súly növeli az állat értékét, az alacsony súly pedig növeli az eltávolítás (elhullás) esélyét minden hónapban."/>
+        <text name="rl_help_weight_title" text="Súly"/>
+        <text name="rl_help_weight_1" text="Az állatok egy bizonyos súllyal rendelkeznek, amelyet befolyásol, hogy mennyit esznek és isznak. Minden fajnak és fajtának megvan a saját átlagsúlya, amely befolyásolja az egyes állatok tömegét."/>
+        <text name="rl_help_weight_2" text="A súly növeli az állat értékét, az alacsony súly pedig növeli az eltávolítás (elhullás) esélyét minden hónapban."/>
 
-		<text name="rl_help_genetics_title" text="Genetika"/>
-		<text name="rl_help_genetics_1" text="Minden állat 4 különböző genetikai értékkel rendelkezik: anyagcsere, termékenység, egészség és minőség. A genetikai tulajdonságok keverednek az anya és az apa között, majd továbböröklődnek az utódaikra."/>
-		<text name="rl_help_genetics_2" text="Az anyagcsere befolyásolja az állat képességét a takarmány súlyra való átváltására, valamint befolyásolja az elfogyasztott mennyiséget."/>
-		<text name="rl_help_genetics_3" text="A termékenység befolyásolja a vemhesség esélyét (nőstényeknél és hímeknél egyaránt), valamint az utódok számát."/>
-		<text name="rl_help_genetics_4" text="Az egészség befolyásolja az állat általános állapotát és a havi elhullási esélyét. A jobb egészségi genetikával rendelkező állatok élettartama is hosszabb."/>
-		<text name="rl_help_genetics_5" text="A minőség befolyásolja magának az állatnak az értékét; a magasabb minőségű állatokat sokkal többért lehet eladni."/>
-		<text name="rl_help_genetics_6" text="A szarvasmarhák, juhok és csirkék termelési genetikával is rendelkeznek, ami befolyásolja, hogy mennyi tejet/tojást/gyapjút termelnek."/>
+        <text name="rl_help_genetics_title" text="Genetika"/>
+        <text name="rl_help_genetics_1" text="Minden állat 4 különböző genetikai értékkel rendelkezik: anyagcsere, termékenység, egészség és minőség. A genetikai tulajdonságok keverednek az anya és az apa között, majd továbböröklődnek az utódaikra."/>
+        <text name="rl_help_genetics_2" text="Az anyagcsere befolyásolja az állat képességét a takarmány súlyra való átváltására, valamint befolyásolja az elfogyasztott mennyiséget."/>
+        <text name="rl_help_genetics_3" text="A termékenység befolyásolja a vemhesség esélyét (nőstényeknél és hímeknél egyaránt), valamint az utódok számát."/>
+        <text name="rl_help_genetics_4" text="Az egészség befolyásolja az állat általános állapotát és a havi elhullási esélyét. A jobb egészségi genetikával rendelkező állatok élettartama is hosszabb."/>
+        <text name="rl_help_genetics_5" text="A minőség befolyásolja magának az állatnak az értékét; a magasabb minőségű állatokat sokkal többért lehet eladni."/>
+        <text name="rl_help_genetics_6" text="A szarvasmarhák, juhok és csirkék termelési genetikával is rendelkeznek, ami befolyásolja, hogy mennyi tejet/tojást/gyapjút termelnek."/>
 
-
-
-		<!--  DISEASES  -->
-
-
-		<text name="rl_ui_immune" text="Immunis"/>
-		<text name="rl_ui_startTreatment" text="Kezelés indítása"/>
-		<text name="rl_ui_resumeTreatment" text="Kezelés folytatása"/>
-		<text name="rl_ui_stopTreatment" text="Kezelés leállítása"/>
-		<text name="rl_ui_duration" text="Időtartam"/>
-		<text name="rl_ui_beingTreated" text="Kezelés alatt"/>
-		<text name="rl_ui_notTreated" text="Nincs kezelve"/>
-		<text name="rl_ui_treatmentPaused" text="Treatment paused"/>
-		<text name="rl_ui_carrier" text="Hordozó"/>
+
+
+        <!--  DISEASES  -->
+
+
+        <text name="rl_ui_immune" text="Immunis"/>
+        <text name="rl_ui_startTreatment" text="Kezelés indítása"/>
+        <text name="rl_ui_resumeTreatment" text="Kezelés folytatása"/>
+        <text name="rl_ui_stopTreatment" text="Kezelés leállítása"/>
+        <text name="rl_ui_duration" text="Időtartam"/>
+        <text name="rl_ui_beingTreated" text="Kezelés alatt"/>
+        <text name="rl_ui_notTreated" text="Nincs kezelve"/>
+        <text name="rl_ui_treatmentPaused" text="Treatment paused"/>
+        <text name="rl_ui_carrier" text="Hordozó"/>
 
-		<text name="rl_diseases" text="Betegségek"/>
-		<text name="rl_disease" text="Betegség"/>
+        <text name="rl_diseases" text="Betegségek"/>
+        <text name="rl_disease" text="Betegség"/>
 
-		<text name="rl_disease_mastitis" text="Tőgygyulladás"/>
+        <text name="rl_disease_mastitis" text="Tőgygyulladás"/>
 
-		<text name="rl_disease_cvm" text="CVM (Örökletes fejlődési hiba)"/>
+        <text name="rl_disease_cvm" text="CVM (Örökletes fejlődési hiba)"/>
 
-		<text name="rl_disease_footAndMouth" text="Száj- és körömfájás"/>
+        <text name="rl_disease_footAndMouth" text="Száj- és körömfájás"/>
 
-		<text name="rl_disease_ped" text="Sertés járványos hasmenése (PED)"/>
+        <text name="rl_disease_ped" text="Sertés járványos hasmenése (PED)"/>
 
-		<text name="rl_disease_avianFlu" text="Madárinfluenza"/>
+        <text name="rl_disease_avianFlu" text="Madárinfluenza"/>
 
 
 
-		<!--  MESSAGES  -->
+        <!--  MESSAGES  -->
 
 
-		<text name="rl_messageTitle_pregnancy" text="Vemhesség"/>
-		<text name="rl_messageTitle_death" text="Eltávolítás"/>
-		<text name="rl_messageTitle_death_github" text="Elhullás"/>
-		<text name="rl_messageTitle_disease" text="Betegség"/>
-		<text name="rl_messageTitle_name" text="Név"/>
-		<text name="rl_messageTitle_movement" text="Mozgatás"/>
-		<text name="rl_messageTitle_aiManager" text="Állatgondozó"/>
-		<text name="rl_messageTitle_insemination" text="Mesterséges megtermékenyítés"/>
+        <text name="rl_messageTitle_pregnancy" text="Vemhesség"/>
+        <text name="rl_messageTitle_death" text="Eltávolítás"/>
+        <text name="rl_messageTitle_death_github" text="Elhullás"/>
+        <text name="rl_messageTitle_disease" text="Betegség"/>
+        <text name="rl_messageTitle_name" text="Név"/>
+        <text name="rl_messageTitle_movement" text="Mozgatás"/>
+        <text name="rl_messageTitle_aiManager" text="Állatgondozó"/>
+        <text name="rl_messageTitle_insemination" text="Mesterséges megtermékenyítés"/>
 
-		<text name="rl_message_pregnancySingle" text="1 utód született"/>
-		<text name="rl_message_pregnancyMultiple" text="%s utód született"/>
-		<text name="rl_message_pregnancySold" text="Túlzsúfoltság miatt %s utód eladva ennyiért: %s"/>
-		<text name="rl_message_pregnancyDied" text="Születéskor %s utód eltávolításra került"/>
-		<text name="rl_message_pregnancyDied_github" text="Születéskor %s utód elpusztult"/>
-		<text name="rl_message_death" text="Eltávolítva a következő okból: %s"/>
-		<text name="rl_message_death_github" text="Elpusztult a következő okból: %s"/>
-		<text name="rl_message_diseaseContracted" text="Megbetegedett: %s"/>
-		<text name="rl_message_diseaseCured" text="Felépült a betegségből: %s"/>
-		<text name="rl_message_diseaseTreatment_start" text="Kezelés megkezdve (%s), költség: %s"/>
-		<text name="rl_message_diseaseTreatment_resume" text="Kezelés folytatva (%s), költség: %s"/>
-		<text name="rl_message_diseaseTreatment_stop" text="Kezelés leállítva: %s"/>
-		<text name="rl_message_nameChange" text="Név megváltoztatva erről: '%s', erre: '%s'"/>
-		<text name="rl_message_nameAdded" text="Név megadva: '%s'"/>
-		<text name="rl_message_nameDeleted" text="A(z) '%s' név törölve lett"/>
-		<text name="rl_message_boughtAnimals_single" text="1 állat vásárolva ennyiért: %s"/>
-		<text name="rl_message_boughtAnimals_multiple" text="%s állat vásárolva ennyiért: %s"/>
-		<text name="rl_message_soldAnimals_single" text="1 állat eladva ennyiért: %s"/>
-		<text name="rl_message_soldAnimals_multiple" text="%s állat eladva ennyiért: %s"/>
-		<text name="rl_message_movedAnimalsTo_single" text="1 állat áthelyezve ide: %s"/>
-		<text name="rl_message_movedAnimalsTo_multiple" text="%s állat áthelyezve ide: %s"/>
-		<text name="rl_message_movedAnimalsFrom_single" text="1 állat áthelyezve innen: %s"/>
-		<text name="rl_message_movedAnimalsFrom_multiple" text="%s állat áthelyezve innen: %s"/>
-		<text name="rl_message_aiManager_boughtAnimals_single" text="Az állatgondozó 1 állatot vásárolt ennyiért: %s"/>
-		<text name="rl_message_aiManager_boughtAnimals_multiple" text="Az állatgondozó %s állatot vásárolt ennyiért: %s"/>
-		<text name="rl_message_aiManager_soldAnimals_single" text="Az állatgondozó 1 állatot adott el ennyiért: %s"/>
-		<text name="rl_message_aiManager_soldAnimals_multiple" text="Az állatgondozó %s állatot adott el ennyiért: %s"/>
-		<text name="rl_message_aiManager_castrated_single" text="Az állatgondozó 1 állatot kasztrált"/>
-		<text name="rl_message_aiManager_castrated_multiple" text="Az állatgondozó %s állatot kasztrált"/>
-		<text name="rl_message_aiManager_named_single" text="Az állatgondozó nevet adott 1 állatnak"/>
-		<text name="rl_message_aiManager_named_multiple" text="Az állatgondozó nevet adott %s állatnak"/>
-		<text name="rl_message_aiManager_mark_sell_single" text="Az állatgondozó 1 állatot eladásra jelölt ki"/>
-		<text name="rl_message_aiManager_mark_sell_multiple" text="Az állatgondozó %s állatot eladásra jelölt ki"/>
-		<text name="rl_message_aiManager_mark_castrate_single" text="Az állatgondozó 1 állatot kasztrálásra jelölt ki"/>
-		<text name="rl_message_aiManager_mark_castrate_multiple" text="Az állatgondozó %s állatot kasztrálásra jelölt ki"/>
-		<text name="rl_message_aiManager_mark_disease_single" text="Az állatgondozó 1 állatot kezelésre jelölt ki"/>
-		<text name="rl_message_aiManager_mark_disease_multiple" text="Az állatgondozó %s állatot kezelésre jelölt ki"/>
-		<text name="rl_message_insemination_success" text="A megtermékenyítés sikeres volt"/>
-		<text name="rl_message_insemination_fail" text="A megtermékenyítés sikertelen volt"/>
-		<text name="rl_message_aiManager_mark_ai_single" text="Az állatgondozó 1 állatot AI-ra jelölt ki"/>
-		<text name="rl_message_aiManager_mark_ai_multiple" text="Az állatgondozó %s állatot AI-ra jelölt ki"/>
-		<text name="rl_message_aiManager_ai_single" text="Az állatgondozó 1 állatot megtermékenyített"/>
-		<text name="rl_message_aiManager_ai_multiple" text="Az állatgondozó %s állatot megtermékenyített"/>
-		<text name="rl_message_aiManager_movedAnimals_single" text="Herdsman moved 1 animal"/>
-		<text name="rl_message_aiManager_movedAnimals_multiple" text="Herdsman moved %s animals"/>
-		<text name="rl_message_aiManager_mark_move_single" text="Herdsman marked 1 animal for moving"/>
-		<text name="rl_message_aiManager_mark_move_multiple" text="Herdsman marked %s animals for moving"/>
-		<text name="rl_message_aiManager_moveSkippedAge_single" text="Herdsman skipped 1 animal (wrong age for the butcher)"/>
-		<text name="rl_message_aiManager_moveSkippedAge_multiple" text="Herdsman skipped %s animals (wrong age for the butcher)"/>
-		<text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
-		<text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
-
-		<!-- Daily summary messages -->
-		<text name="rl_message_dailyBirthsSummary" text="%s állat született itt: %s"/>
-		<text name="rl_message_dailyDeathsSummary" text="%s állat elpusztult itt: %s - %s"/>
-		<text name="rl_message_dailySalesSummary" text="Eladva %s állat itt: %s, összesen: %s"/>
-		<text name="rl_message_dailyOvercrowdingSummary" text="Túlzsúfoltság: eladva %s újszülött itt: %s, összesen: %s"/>
-		<text name="rl_message_dailyPurchasesSummary" text="Vásárolva %s állat itt: %s, összesen: %s"/>
-		<text name="rl_message_dailyCastrationsSummary" text="Castrated %s animals at %s"/>
-		<text name="rl_message_dailyNamingsSummary" text="Named %s animals at %s"/>
-		<text name="rl_message_dailyInseminationsSummary" text="Inseminated %s animals at %s"/>
-		<text name="rl_message_dailyMarkSellSummary" text="Marked %s animals for sale at %s"/>
-		<text name="rl_message_dailyMarkCastrateSummary" text="Marked %s animals for castration at %s"/>
-		<text name="rl_message_dailyMarkInseminateSummary" text="Marked %s animals for insemination at %s"/>
-		<text name="rl_message_dailyMovesSummary" text="Moved %s animals from %s"/>
-		<text name="rl_message_dailyMarkMoveSummary" text="Marked %s animals for moving from %s"/>
-		<text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
-
-
-
-		<!--  DEATHS  -->
-
-
-		<text name="rl_death_pregnancy" text="szövődményes vemhesség"/>
-		<text name="rl_death_health" text="gyenge egészségi állapot"/>
-		<text name="rl_death_age" text="végelgyengülés"/>
-		<text name="rl_death_accident" text="baleset"/>
-
-
-
-		<text name="rl_ui_dependencies_missing" text="A RealisticLivestock használatához a következő kiegészítők szükségesek:"/>
-		<text name="rl_ui_dependency_missing_notInstalled" text="- %s (Nincs telepítve)"/>
-		<text name="rl_ui_dependency_missing_installed" text="- %s (Telepítve: %s, Szükséges minimum: %s)"/>
-
-
-		<!-- MIGRATION -->
-
-		<text name="rm_rl_conflict_title" text="Mod-konfliktus észlelve"/>
-		<text name="rm_rl_mod_conflict_message" text="A következő mod(ok) ütköznek a 'Realistic Livestock - Ritter verzióval', és nem használhatók együtt: %s &#10;&#10;Kérjük, kapcsold ki az ütköző mod(oka)t, és indítsd újra a játékot."/>
-
-		<text name="rl_mod_warn_title" text="Mod Compatibility Warning"/>
-		<text name="rl_mod_warn_message" text="The following mod(s) loaded with Realistic Livestock RM may cause issues:%s&#10;&#10;See %s for details. The game will continue."/>
-		<text name="rl_mod_compat_url" text="https://rittermod.github.io/FS25_RealisticLivestockRM/user-guide/reference-mod-compatibility"/>
-		<text name="rl_mod_warn_FS25_AnimalFoodCalculator" text="FS25_AnimalFoodCalculator: significant performance impact that grows with herd size."/>
-
-		<text name="rm_rl_migration_title" text="Adatmigrációs értesítés"/>
-		<text name="rm_rl_migration_message" text="Korábbi Realistic Livestock adatokat találtunk ebben a mentésben. A beállításaid, állatadataid, Dewar-edényeid és a mesterséges megtermékenyítő eszközeid automatikusan átkerülnek a Realistic Livestock - RitterMod verzióba a játék mentésekor."/>
-		<text name="rm_rl_migration_files_found" text="Talált adatfájlok:"/>
-		<text name="rm_rl_migration_continue" text="Folytatás"/>
-		<text name="rm_rl_migration_quit" text="Kilépés"/>
-
-		<text name="rl_bridge_version_unknown" text="Realistic Livestock: A(z) %s verzió (%s) még nem lett tesztelve a Realistic Livestock %s verziójával. A(z) '%s' konfiguráció használatban. Ha problémát tapasztalsz az egzotikus állatokkal, kérjük, jelentsd itt: %s."/>
-		<!-- TODO: localise -->
-		<text name="rl_bridge_configoverride_conflict_header" text="Realistic Livestock: Conflict detected. Two or more bridges/packs replaced configuration for the same animal type. Last-loaded mod wins. If you continue you will have visual glitches and ghost animals."/>
-		<!-- TODO: localise -->
-		<text name="rl_bridge_configoverride_conflict_line" text="%s: applied by %s"/>
-
-
-		<!-- Missing keys (English fallback) -->
-		<text name="input_RL_MENU" text="Open RL Menu"/>
-		<text name="input_RL_RENAME" text="Rename"/>
-		<text name="input_RL_CYCLE_FILTER" text="Cycle Saved Filter"/>
-		<text name="rl_menu_info_children" text="Children"/>
-		<text name="rl_menu_info_diseases_header" text="Diseases"/>
-		<text name="rl_menu_info_empty_no_animals" text="No animals in this husbandry"/>
-		<text name="rl_menu_info_empty_no_husbandries" text="You need at least one husbandry to view animals"/>
-		<text name="rl_menu_info_filter_button" text="Filter"/>
-		<text name="rl_menu_info_genetics_header" text="Genetics"/>
-		<text name="rl_menu_info_input_header" text="Input (monitored)"/>
-		<text name="rl_menu_info_output_header" text="Output (monitored)"/>
-		<text name="rl_menu_info_pedigree_header" text="Pedigree"/>
-		<text name="rl_menu_info_pen_information" text="Pen Information"/>
-		<text name="rl_menu_info_title" text="Manage"/>
-		<text name="rl_menu_messages_col_animal" text="Animal"/>
-		<text name="rl_menu_messages_col_date" text="Date"/>
-		<text name="rl_menu_messages_col_husbandry" text="Husbandry"/>
-		<text name="rl_menu_messages_col_message" text="Message"/>
-		<text name="rl_menu_messages_col_type" text="Type"/>
-		<text name="rl_menu_messages_confirm_delete_all" text="Delete all %s messages? This cannot be undone."/>
-		<text name="rl_menu_messages_delete_all_button" text="Delete all"/>
-		<text name="rl_menu_messages_delete_button" text="Delete"/>
-		<text name="rl_menu_messages_empty" text="No messages yet"/>
-		<text name="rl_menu_messages_no_farm" text="You need to own a farm to view messages"/>
-		<text name="rl_menu_messages_summary" text="%s messages"/>
-		<text name="rl_menu_messages_title" text="Messages"/>
-		<text name="rl_menu_messages_unknown" text="Unknown: %s"/>
-		<text name="rl_menu_move_summary" text="%d animals" tag="format"/>
-		<text name="rl_menu_move_title" text="Move"/>
-		<!-- Transfer tab -->
-		<text name="rl_menu_transfer_title" text="Transfer"/>
-		<text name="rl_menu_transfer_load" text="Load"/>
-		<text name="rl_menu_transfer_unload" text="Unload"/>
-		<text name="rl_menu_transfer_empty_no_animals" text="No animals on this side"/>
-		<text name="rl_menu_transfer_counterpart" text="Destination"/>
-		<text name="rl_menu_transfer_world" text="Nearby Animals"/>
-		<text name="rl_menu_transfer_deliver" text="Deliver"/>
-		<text name="rl_menu_sell_title" text="Sell"/>
-		<text name="rl_menu_sell_cart_header" text="Sale Summary"/>
-		<text name="rl_menu_sell_cart_selected" text="Selected"/>
-		<text name="rl_menu_sell_cart_empty" text="Select animals to sell"/>
-
-		<!-- Buy tab -->
-		<text name="rl_menu_buy_title" text="Buy"/>
-		<text name="rl_menu_buy_empty_no_types" text="The dealer has no animal types available"/>
-		<text name="rl_menu_buy_empty_no_animals" text="No animals available at the dealer for this type"/>
-		<text name="rl_menu_buy_cart_header" text="Purchase Summary"/>
-		<text name="rl_menu_buy_cart_selected" text="Selected"/>
+        <text name="rl_message_pregnancySingle" text="1 utód született"/>
+        <text name="rl_message_pregnancyMultiple" text="%s utód született"/>
+        <text name="rl_message_pregnancySold" text="Túlzsúfoltság miatt %s utód eladva ennyiért: %s"/>
+        <text name="rl_message_pregnancyDied" text="Születéskor %s utód eltávolításra került"/>
+        <text name="rl_message_pregnancyDied_github" text="Születéskor %s utód elpusztult"/>
+        <text name="rl_message_death" text="Eltávolítva a következő okból: %s"/>
+        <text name="rl_message_death_github" text="Elpusztult a következő okból: %s"/>
+        <text name="rl_message_diseaseContracted" text="Megbetegedett: %s"/>
+        <text name="rl_message_diseaseCured" text="Felépült a betegségből: %s"/>
+        <text name="rl_message_diseaseTreatment_start" text="Kezelés megkezdve (%s), költség: %s"/>
+        <text name="rl_message_diseaseTreatment_resume" text="Kezelés folytatva (%s), költség: %s"/>
+        <text name="rl_message_diseaseTreatment_stop" text="Kezelés leállítva: %s"/>
+        <text name="rl_message_nameChange" text="Név megváltoztatva erről: '%s', erre: '%s'"/>
+        <text name="rl_message_nameAdded" text="Név megadva: '%s'"/>
+        <text name="rl_message_nameDeleted" text="A(z) '%s' név törölve lett"/>
+        <text name="rl_message_boughtAnimals_single" text="1 állat vásárolva ennyiért: %s"/>
+        <text name="rl_message_boughtAnimals_multiple" text="%s állat vásárolva ennyiért: %s"/>
+        <text name="rl_message_soldAnimals_single" text="1 állat eladva ennyiért: %s"/>
+        <text name="rl_message_soldAnimals_multiple" text="%s állat eladva ennyiért: %s"/>
+        <text name="rl_message_movedAnimalsTo_single" text="1 állat áthelyezve ide: %s"/>
+        <text name="rl_message_movedAnimalsTo_multiple" text="%s állat áthelyezve ide: %s"/>
+        <text name="rl_message_movedAnimalsFrom_single" text="1 állat áthelyezve innen: %s"/>
+        <text name="rl_message_movedAnimalsFrom_multiple" text="%s állat áthelyezve innen: %s"/>
+        <text name="rl_message_aiManager_boughtAnimals_single" text="Az állatgondozó 1 állatot vásárolt ennyiért: %s"/>
+        <text name="rl_message_aiManager_boughtAnimals_multiple" text="Az állatgondozó %s állatot vásárolt ennyiért: %s"/>
+        <text name="rl_message_aiManager_soldAnimals_single" text="Az állatgondozó 1 állatot adott el ennyiért: %s"/>
+        <text name="rl_message_aiManager_soldAnimals_multiple" text="Az állatgondozó %s állatot adott el ennyiért: %s"/>
+        <text name="rl_message_aiManager_castrated_single" text="Az állatgondozó 1 állatot kasztrált"/>
+        <text name="rl_message_aiManager_castrated_multiple" text="Az állatgondozó %s állatot kasztrált"/>
+        <text name="rl_message_aiManager_named_single" text="Az állatgondozó nevet adott 1 állatnak"/>
+        <text name="rl_message_aiManager_named_multiple" text="Az állatgondozó nevet adott %s állatnak"/>
+        <text name="rl_message_aiManager_mark_sell_single" text="Az állatgondozó 1 állatot eladásra jelölt ki"/>
+        <text name="rl_message_aiManager_mark_sell_multiple" text="Az állatgondozó %s állatot eladásra jelölt ki"/>
+        <text name="rl_message_aiManager_mark_castrate_single" text="Az állatgondozó 1 állatot kasztrálásra jelölt ki"/>
+        <text name="rl_message_aiManager_mark_castrate_multiple" text="Az állatgondozó %s állatot kasztrálásra jelölt ki"/>
+        <text name="rl_message_aiManager_mark_disease_single" text="Az állatgondozó 1 állatot kezelésre jelölt ki"/>
+        <text name="rl_message_aiManager_mark_disease_multiple" text="Az állatgondozó %s állatot kezelésre jelölt ki"/>
+        <text name="rl_message_insemination_success" text="A megtermékenyítés sikeres volt"/>
+        <text name="rl_message_insemination_fail" text="A megtermékenyítés sikertelen volt"/>
+        <text name="rl_message_aiManager_mark_ai_single" text="Az állatgondozó 1 állatot AI-ra jelölt ki"/>
+        <text name="rl_message_aiManager_mark_ai_multiple" text="Az állatgondozó %s állatot AI-ra jelölt ki"/>
+        <text name="rl_message_aiManager_ai_single" text="Az állatgondozó 1 állatot megtermékenyített"/>
+        <text name="rl_message_aiManager_ai_multiple" text="Az állatgondozó %s állatot megtermékenyített"/>
+        <text name="rl_message_aiManager_movedAnimals_single" text="Herdsman moved 1 animal"/>
+        <text name="rl_message_aiManager_movedAnimals_multiple" text="Herdsman moved %s animals"/>
+        <text name="rl_message_aiManager_mark_move_single" text="Herdsman marked 1 animal for moving"/>
+        <text name="rl_message_aiManager_mark_move_multiple" text="Herdsman marked %s animals for moving"/>
+        <text name="rl_message_aiManager_moveSkippedAge_single" text="Herdsman skipped 1 animal (wrong age for the butcher)"/>
+        <text name="rl_message_aiManager_moveSkippedAge_multiple" text="Herdsman skipped %s animals (wrong age for the butcher)"/>
+        <text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
+        <text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
+
+        <!-- Daily summary messages -->
+        <text name="rl_message_dailyBirthsSummary" text="%s állat született itt: %s"/>
+        <text name="rl_message_dailyDeathsSummary" text="%s állat elpusztult itt: %s - %s"/>
+        <text name="rl_message_dailySalesSummary" text="Eladva %s állat itt: %s, összesen: %s"/>
+        <text name="rl_message_dailyOvercrowdingSummary" text="Túlzsúfoltság: eladva %s újszülött itt: %s, összesen: %s"/>
+        <text name="rl_message_dailyPurchasesSummary" text="Vásárolva %s állat itt: %s, összesen: %s"/>
+        <text name="rl_message_dailyCastrationsSummary" text="Castrated %s animals at %s"/>
+        <text name="rl_message_dailyNamingsSummary" text="Named %s animals at %s"/>
+        <text name="rl_message_dailyInseminationsSummary" text="Inseminated %s animals at %s"/>
+        <text name="rl_message_dailyMarkSellSummary" text="Marked %s animals for sale at %s"/>
+        <text name="rl_message_dailyMarkCastrateSummary" text="Marked %s animals for castration at %s"/>
+        <text name="rl_message_dailyMarkInseminateSummary" text="Marked %s animals for insemination at %s"/>
+        <text name="rl_message_dailyMovesSummary" text="Moved %s animals from %s"/>
+        <text name="rl_message_dailyMarkMoveSummary" text="Marked %s animals for moving from %s"/>
+        <text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
+
+
+
+        <!--  DEATHS  -->
+
+
+        <text name="rl_death_pregnancy" text="szövődményes vemhesség"/>
+        <text name="rl_death_health" text="gyenge egészségi állapot"/>
+        <text name="rl_death_age" text="végelgyengülés"/>
+        <text name="rl_death_accident" text="baleset"/>
+
+
+
+        <text name="rl_ui_dependencies_missing" text="A RealisticLivestock használatához a következő kiegészítők szükségesek:"/>
+        <text name="rl_ui_dependency_missing_notInstalled" text="- %s (Nincs telepítve)"/>
+        <text name="rl_ui_dependency_missing_installed" text="- %s (Telepítve: %s, Szükséges minimum: %s)"/>
+
+
+        <!-- MIGRATION -->
+
+        <text name="rm_rl_conflict_title" text="Mod-konfliktus észlelve"/>
+        <text name="rm_rl_mod_conflict_message" text="A következő mod(ok) ütköznek a 'Realistic Livestock - Ritter verzióval', és nem használhatók együtt: %s &#10;&#10;Kérjük, kapcsold ki az ütköző mod(oka)t, és indítsd újra a játékot."/>
+
+        <text name="rl_mod_warn_title" text="Mod Compatibility Warning"/>
+        <text name="rl_mod_warn_message" text="The following mod(s) loaded with Realistic Livestock RM may cause issues:%s&#10;&#10;See %s for details. The game will continue."/>
+        <text name="rl_mod_compat_url" text="https://rittermod.github.io/FS25_RealisticLivestockRM/user-guide/reference-mod-compatibility"/>
+        <text name="rl_mod_warn_FS25_AnimalFoodCalculator" text="FS25_AnimalFoodCalculator: significant performance impact that grows with herd size."/>
+
+        <text name="rm_rl_migration_title" text="Adatmigrációs értesítés"/>
+        <text name="rm_rl_migration_message" text="Korábbi Realistic Livestock adatokat találtunk ebben a mentésben. A beállításaid, állatadataid, Dewar-edényeid és a mesterséges megtermékenyítő eszközeid automatikusan átkerülnek a Realistic Livestock - RitterMod verzióba a játék mentésekor."/>
+        <text name="rm_rl_migration_files_found" text="Talált adatfájlok:"/>
+        <text name="rm_rl_migration_continue" text="Folytatás"/>
+        <text name="rm_rl_migration_quit" text="Kilépés"/>
+
+        <text name="rl_bridge_version_unknown" text="Realistic Livestock: A(z) %s verzió (%s) még nem lett tesztelve a Realistic Livestock %s verziójával. A(z) '%s' konfiguráció használatban. Ha problémát tapasztalsz az egzotikus állatokkal, kérjük, jelentsd itt: %s."/>
+        <!-- TODO: localise -->
+        <text name="rl_bridge_configoverride_conflict_header" text="Realistic Livestock: Conflict detected. Two or more bridges/packs replaced configuration for the same animal type. Last-loaded mod wins. If you continue you will have visual glitches and ghost animals."/>
+        <!-- TODO: localise -->
+        <text name="rl_bridge_configoverride_conflict_line" text="%s: applied by %s"/>
+
+
+        <!-- Missing keys (English fallback) -->
+        <text name="input_RL_MENU" text="Open RL Menu"/>
+        <text name="input_RL_RENAME" text="Rename"/>
+        <text name="input_RL_CYCLE_FILTER" text="Cycle Saved Filter"/>
+        <text name="rl_menu_info_children" text="Children"/>
+        <text name="rl_menu_info_diseases_header" text="Diseases"/>
+        <text name="rl_menu_info_empty_no_animals" text="No animals in this husbandry"/>
+        <text name="rl_menu_info_empty_no_husbandries" text="You need at least one husbandry to view animals"/>
+        <text name="rl_menu_info_filter_button" text="Filter"/>
+        <text name="rl_menu_info_genetics_header" text="Genetics"/>
+        <text name="rl_menu_info_input_header" text="Input (monitored)"/>
+        <text name="rl_menu_info_output_header" text="Output (monitored)"/>
+        <text name="rl_menu_info_pedigree_header" text="Pedigree"/>
+        <text name="rl_menu_info_pen_information" text="Pen Information"/>
+        <text name="rl_menu_info_title" text="Manage"/>
+        <text name="rl_menu_messages_col_animal" text="Animal"/>
+        <text name="rl_menu_messages_col_date" text="Date"/>
+        <text name="rl_menu_messages_col_husbandry" text="Husbandry"/>
+        <text name="rl_menu_messages_col_message" text="Message"/>
+        <text name="rl_menu_messages_col_type" text="Type"/>
+        <text name="rl_menu_messages_confirm_delete_all" text="Delete all %s messages? This cannot be undone."/>
+        <text name="rl_menu_messages_delete_all_button" text="Delete all"/>
+        <text name="rl_menu_messages_delete_button" text="Delete"/>
+        <text name="rl_menu_messages_empty" text="No messages yet"/>
+        <text name="rl_menu_messages_no_farm" text="You need to own a farm to view messages"/>
+        <text name="rl_menu_messages_summary" text="%s messages"/>
+        <text name="rl_menu_messages_title" text="Messages"/>
+        <text name="rl_menu_messages_unknown" text="Unknown: %s"/>
+        <text name="rl_menu_move_summary" text="%d animals" tag="format"/>
+        <text name="rl_menu_move_title" text="Move"/>
+        <!-- Transfer tab -->
+        <text name="rl_menu_transfer_title" text="Transfer"/>
+        <text name="rl_menu_transfer_load" text="Load"/>
+        <text name="rl_menu_transfer_unload" text="Unload"/>
+        <text name="rl_menu_transfer_empty_no_animals" text="No animals on this side"/>
+        <text name="rl_menu_transfer_counterpart" text="Destination"/>
+        <text name="rl_menu_transfer_world" text="Nearby Animals"/>
+        <text name="rl_menu_transfer_deliver" text="Deliver"/>
+        <text name="rl_menu_sell_title" text="Sell"/>
+        <text name="rl_menu_sell_cart_header" text="Sale Summary"/>
+        <text name="rl_menu_sell_cart_selected" text="Selected"/>
+        <text name="rl_menu_sell_cart_empty" text="Select animals to sell"/>
+
+        <!-- Buy tab -->
+        <text name="rl_menu_buy_title" text="Buy"/>
+        <text name="rl_menu_buy_empty_no_types" text="The dealer has no animal types available"/>
+        <text name="rl_menu_buy_empty_no_animals" text="No animals available at the dealer for this type"/>
+        <text name="rl_menu_buy_cart_header" text="Purchase Summary"/>
+        <text name="rl_menu_buy_cart_selected" text="Selected"/>
         <!-- AI tab (English fallback) -->
         <text name="rl_menu_ai_title" text="Artificial Insemination"/>
         <text name="rl_menu_ai_quantity" text="Quantity"/>
@@ -771,112 +772,112 @@
         <text name="rl_menu_dealerSale_empty" text="No animals available at this dealer."/>
         <text name="rl_menu_herdsman_husbandry_emptyRejected" text="Select at least one husbandry."/>
         <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Current filter unavailable for this task."/>
-			<text name="rl_menu_herdsman_section_move" text="Move"/>
-			<text name="rl_menu_herdsman_detail_destination" text="Destination"/>
-			<text name="rl_menu_herdsman_destination_select" text="Select destination"/>
-			<text name="rl_menu_herdsman_destination_butcher_suffix" text="(butcher)"/>
-			<text name="rl_menu_herdsman_destination_picker_title" text="Select Destination"/>
-			<text name="rl_menu_herdsman_destination_picker_empty" text="No destination husbandry available for this task."/>
-			<text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Current destination unavailable for this task."/>
+        <text name="rl_menu_herdsman_section_move" text="Move"/>
+        <text name="rl_menu_herdsman_detail_destination" text="Destination"/>
+        <text name="rl_menu_herdsman_destination_select" text="Select destination"/>
+        <text name="rl_menu_herdsman_destination_butcher_suffix" text="(butcher)"/>
+        <text name="rl_menu_herdsman_destination_picker_title" text="Select Destination"/>
+        <text name="rl_menu_herdsman_destination_picker_empty" text="No destination husbandry available for this task."/>
+        <text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Current destination unavailable for this task."/>
         <!-- Settings tab shell (English fallback) -->
         <text name="rl_menu_settings_title" text="Settings"/>
         <text name="rl_menu_settings_tab_general" text="General"/>
         <text name="rl_menu_settings_tab_filters" text="Filters"/>
 
-		<!-- Filters tab list -->
-		<text name="rl_menu_filters_quick_filter_title" text="Quick filter"/>
-		<text name="rl_ui_qf_saveFilter" text="Save filter"/>
-		<text name="rl_ui_qf_saveDropsValue" text="Saved filters don't support Value; this condition will not be carried over."/>
-		<text name="rl_menu_filters_empty" text="No saved filters yet"/>
-		<text name="rl_menu_filters_empty_no_farm" text="You need a farm to save filters"/>
-		<text name="rl_menu_filters_new_button" text="New filter"/>
-		<text name="rl_menu_filters_default_name" text="New filter"/>
-		<text name="rl_menu_filters_detail_placeholder" text="To be implemented"/>
-		<!-- Editor + Duplicate/Delete (English fallback) -->
-		<text name="rl_menu_filters_empty_editor" text="Select a filter to edit"/>
-		<text name="rl_menu_filters_editor_title_name" text="Name"/>
-		<text name="rl_menu_filters_editor_title_animal_type" text="Animal type"/>
-		<text name="rl_menu_filters_editor_title_op" text="Conditions"/>
-		<text name="rl_menu_filters_animal_type_any" text="Any"/>
-		<text name="rl_menu_filters_op_and" text="Match ALL"/>
-		<text name="rl_menu_filters_op_or" text="Match ANY"/>
-		<text name="rl_menu_filters_add_group_not_implemented" text="Add group is not yet implemented in this version."/>
-		<text name="rl_menu_filters_duplicate_button" text="Duplicate"/>
-		<text name="rl_menu_filters_delete_button" text="Delete"/>
-		<text name="rl_menu_filters_duplicate_suffix" text=" (copy)"/>
-		<text name="rl_menu_filters_duplicate_suffix_n" text=" (copy %d)"/>
-		<text name="rl_menu_filters_delete_confirm_text" text="Delete filter &quot;%s&quot;? This cannot be undone."/>
-		<!-- Usage scope axis -->
-		<text name="rl_menu_filters_editor_title_usage" text="Show on"/>
-		<text name="rl_menu_filters_usage_any" text="All screens"/>
-		<text name="rl_menu_filters_usage_owned" text="Owned-herd screens"/>
-		<text name="rl_menu_filters_usage_dealer" text="Dealer screens"/>
-		<text name="rl_menu_filters_valueOutOfRange_both" text="Value must be between %d and %d"/>
-		<text name="rl_menu_filters_valueOutOfRange_min" text="Value must be at least %d"/>
-		<text name="rl_menu_filters_valueOutOfRange_max" text="Value must be at most %d"/>
+        <!-- Filters tab list -->
+        <text name="rl_menu_filters_quick_filter_title" text="Quick filter"/>
+        <text name="rl_ui_qf_saveFilter" text="Save filter"/>
+        <text name="rl_ui_qf_saveDropsValue" text="Saved filters don't support Value; this condition will not be carried over."/>
+        <text name="rl_menu_filters_empty" text="No saved filters yet"/>
+        <text name="rl_menu_filters_empty_no_farm" text="You need a farm to save filters"/>
+        <text name="rl_menu_filters_new_button" text="New filter"/>
+        <text name="rl_menu_filters_default_name" text="New filter"/>
+        <text name="rl_menu_filters_detail_placeholder" text="To be implemented"/>
+        <!-- Editor + Duplicate/Delete (English fallback) -->
+        <text name="rl_menu_filters_empty_editor" text="Select a filter to edit"/>
+        <text name="rl_menu_filters_editor_title_name" text="Name"/>
+        <text name="rl_menu_filters_editor_title_animal_type" text="Animal type"/>
+        <text name="rl_menu_filters_editor_title_op" text="Conditions"/>
+        <text name="rl_menu_filters_animal_type_any" text="Any"/>
+        <text name="rl_menu_filters_op_and" text="Match ALL"/>
+        <text name="rl_menu_filters_op_or" text="Match ANY"/>
+        <text name="rl_menu_filters_add_group_not_implemented" text="Add group is not yet implemented in this version."/>
+        <text name="rl_menu_filters_duplicate_button" text="Duplicate"/>
+        <text name="rl_menu_filters_delete_button" text="Delete"/>
+        <text name="rl_menu_filters_duplicate_suffix" text=" (copy)"/>
+        <text name="rl_menu_filters_duplicate_suffix_n" text=" (copy %d)"/>
+        <text name="rl_menu_filters_delete_confirm_text" text="Delete filter &quot;%s&quot;? This cannot be undone."/>
+        <!-- Usage scope axis -->
+        <text name="rl_menu_filters_editor_title_usage" text="Show on"/>
+        <text name="rl_menu_filters_usage_any" text="All screens"/>
+        <text name="rl_menu_filters_usage_owned" text="Owned-herd screens"/>
+        <text name="rl_menu_filters_usage_dealer" text="Dealer screens"/>
+        <text name="rl_menu_filters_valueOutOfRange_both" text="Value must be between %d and %d"/>
+        <text name="rl_menu_filters_valueOutOfRange_min" text="Value must be at least %d"/>
+        <text name="rl_menu_filters_valueOutOfRange_max" text="Value must be at most %d"/>
 
-		<!-- Filter cycle + chip MVP -->
-		<text name="rl_menu_filter_chip_none" text="No filter"/>
-		<text name="rl_menu_filter_chip_active" text="Filter: %s"/>
-		<text name="rl_menu_filter_chip_quick" text="Filter: QF"/>
-		<text name="rl_menu_filter_chip_quick_plus_saved" text="Filter: QF + %s"/>
-		<text name="rl_menu_cycle_filter_button" text="Cycle filter"/>
-		<text name="rl_menu_filter_chip_unnamed" text="(unnamed)"/>
-		<!-- Herdsman rule lifecycle -->
-		<text name="rl_menu_herdsman_new_button" text="New task"/>
-		<text name="rl_menu_herdsman_duplicate_button" text="Duplicate"/>
-		<text name="rl_menu_herdsman_delete_button" text="Delete"/>
-		<text name="rl_menu_herdsman_delete_confirm_text" text="Delete task &quot;%s&quot;? This cannot be undone."/>
-		<text name="rl_menu_herdsman_default_name" text="New task"/>
-		<text name="rl_menu_herdsman_duplicate_suffix" text=" (copy)"/>
-		<text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copy %d)"/>
-		<!-- Filter condition editor (English fallback) -->
-		<text name="rl_menu_filters_add_condition" text="Add condition"/>
-		<text name="rl_menu_filters_add_group_button" text="Add group"/>
-		<text name="rl_menu_filters_edit_condition" text="Edit condition"/>
-		<text name="rl_menu_filters_delete_condition" text="Delete condition"/>
-		<text name="rl_menu_filters_dialog_title" text="Edit condition"/>
-		<text name="rl_menu_filters_field_label" text="Field"/>
-		<text name="rl_menu_filters_cmp_label" text="Compare"/>
-		<text name="rl_menu_filters_cmp_lt" text="is less than"/>
-		<text name="rl_menu_filters_cmp_le" text="is at most"/>
-		<text name="rl_menu_filters_cmp_eq" text="is"/>
-		<text name="rl_menu_filters_cmp_ne" text="is not"/>
-		<text name="rl_menu_filters_cmp_ge" text="is at least"/>
-		<text name="rl_menu_filters_cmp_gt" text="is more than"/>
-		<text name="rl_menu_filters_cmp_in" text="is one of"/>
-		<text name="rl_menu_filters_cmp_notin" text="is none of"/>
-		<text name="rl_menu_filters_cmp_contains" text="contains"/>
-		<text name="rl_menu_filters_cmp_notcontains" text="does not contain"/>
-		<text name="rl_menu_filters_value_label" text="Value"/>
-		<text name="rl_menu_filters_value_invalid_number" text="Invalid number"/>
-		<text name="rl_menu_filters_preserved_banner" text="%d condition(s) hidden - editable in a later phase. Saved on close."/>
-		<text name="rl_menu_filters_field_age" text="Age"/>
-		<text name="rl_menu_filters_field_isCastrated" text="Castrated"/>
-		<text name="rl_menu_filters_field_isPregnant" text="Pregnant"/>
-		<text name="rl_menu_filters_field_isLactating" text="Lactating"/>
-		<text name="rl_menu_filters_field_hasName" text="Has name"/>
-		<text name="rl_menu_filters_field_hasAnyDisease" text="Has any disease"/>
-		<text name="rl_menu_filters_field_hasAnyMark" text="Has any mark"/>
-		<text name="rl_menu_filters_field_weight" text="Weight"/>
-		<text name="rl_menu_filters_field_health" text="Health"/>
-		<text name="rl_menu_filters_field_genetics_metabolism" text="Genetics: metabolism"/>
-		<text name="rl_menu_filters_field_genetics_health" text="Genetics: health"/>
-		<text name="rl_menu_filters_field_genetics_fertility" text="Genetics: fertility"/>
-		<text name="rl_menu_filters_field_genetics_quality" text="Genetics: quality"/>
-		<text name="rl_menu_filters_field_genetics_productivity" text="Genetics: productivity"/>
-		<text name="rl_menu_filters_field_genetics_overall" text="Genetics: overall"/>
-		<text name="rl_menu_filters_field_gender" text="Gender"/>
-		<text name="rl_menu_filters_field_subType" text="Breed"/>
-		<text name="rl_menu_filters_field_name" text="Name"/>
-		<text name="rl_menu_filters_gender_male" text="Male"/>
-		<text name="rl_menu_filters_gender_female" text="Female"/>
-		<text name="rl_menu_filters_emptyValueRejected" text="Value cannot be empty"/>
-		<text name="rl_menu_filters_subtypeRequiresAnimalType" text="Set the filter's animal type first to edit this condition"/>
-		<text name="rl_menu_filters_invalidNumber" text="Enter a valid number"/>
-		<text name="rl_menu_filters_enumValueDrifted" text="Stored value no longer valid - pick a replacement"/>
-		<text name="rl_menu_filters_valueSet_title" text="Select values"/>
-		<text name="rl_menu_filters_valueSet_summary" text="%d selected"/>
-		<text name="rl_menu_filters_valueSet_button" text="Edit values..."/>
-	</texts>
+        <!-- Filter cycle + chip MVP -->
+        <text name="rl_menu_filter_chip_none" text="No filter"/>
+        <text name="rl_menu_filter_chip_active" text="Filter: %s"/>
+        <text name="rl_menu_filter_chip_quick" text="Filter: QF"/>
+        <text name="rl_menu_filter_chip_quick_plus_saved" text="Filter: QF + %s"/>
+        <text name="rl_menu_cycle_filter_button" text="Cycle filter"/>
+        <text name="rl_menu_filter_chip_unnamed" text="(unnamed)"/>
+        <!-- Herdsman rule lifecycle -->
+        <text name="rl_menu_herdsman_new_button" text="New task"/>
+        <text name="rl_menu_herdsman_duplicate_button" text="Duplicate"/>
+        <text name="rl_menu_herdsman_delete_button" text="Delete"/>
+        <text name="rl_menu_herdsman_delete_confirm_text" text="Delete task &quot;%s&quot;? This cannot be undone."/>
+        <text name="rl_menu_herdsman_default_name" text="New task"/>
+        <text name="rl_menu_herdsman_duplicate_suffix" text=" (copy)"/>
+        <text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copy %d)"/>
+        <!-- Filter condition editor (English fallback) -->
+        <text name="rl_menu_filters_add_condition" text="Add condition"/>
+        <text name="rl_menu_filters_add_group_button" text="Add group"/>
+        <text name="rl_menu_filters_edit_condition" text="Edit condition"/>
+        <text name="rl_menu_filters_delete_condition" text="Delete condition"/>
+        <text name="rl_menu_filters_dialog_title" text="Edit condition"/>
+        <text name="rl_menu_filters_field_label" text="Field"/>
+        <text name="rl_menu_filters_cmp_label" text="Compare"/>
+        <text name="rl_menu_filters_cmp_lt" text="is less than"/>
+        <text name="rl_menu_filters_cmp_le" text="is at most"/>
+        <text name="rl_menu_filters_cmp_eq" text="is"/>
+        <text name="rl_menu_filters_cmp_ne" text="is not"/>
+        <text name="rl_menu_filters_cmp_ge" text="is at least"/>
+        <text name="rl_menu_filters_cmp_gt" text="is more than"/>
+        <text name="rl_menu_filters_cmp_in" text="is one of"/>
+        <text name="rl_menu_filters_cmp_notin" text="is none of"/>
+        <text name="rl_menu_filters_cmp_contains" text="contains"/>
+        <text name="rl_menu_filters_cmp_notcontains" text="does not contain"/>
+        <text name="rl_menu_filters_value_label" text="Value"/>
+        <text name="rl_menu_filters_value_invalid_number" text="Invalid number"/>
+        <text name="rl_menu_filters_preserved_banner" text="%d condition(s) hidden - editable in a later phase. Saved on close."/>
+        <text name="rl_menu_filters_field_age" text="Age"/>
+        <text name="rl_menu_filters_field_isCastrated" text="Castrated"/>
+        <text name="rl_menu_filters_field_isPregnant" text="Pregnant"/>
+        <text name="rl_menu_filters_field_isLactating" text="Lactating"/>
+        <text name="rl_menu_filters_field_hasName" text="Has name"/>
+        <text name="rl_menu_filters_field_hasAnyDisease" text="Has any disease"/>
+        <text name="rl_menu_filters_field_hasAnyMark" text="Has any mark"/>
+        <text name="rl_menu_filters_field_weight" text="Weight"/>
+        <text name="rl_menu_filters_field_health" text="Health"/>
+        <text name="rl_menu_filters_field_genetics_metabolism" text="Genetics: metabolism"/>
+        <text name="rl_menu_filters_field_genetics_health" text="Genetics: health"/>
+        <text name="rl_menu_filters_field_genetics_fertility" text="Genetics: fertility"/>
+        <text name="rl_menu_filters_field_genetics_quality" text="Genetics: quality"/>
+        <text name="rl_menu_filters_field_genetics_productivity" text="Genetics: productivity"/>
+        <text name="rl_menu_filters_field_genetics_overall" text="Genetics: overall"/>
+        <text name="rl_menu_filters_field_gender" text="Gender"/>
+        <text name="rl_menu_filters_field_subType" text="Breed"/>
+        <text name="rl_menu_filters_field_name" text="Name"/>
+        <text name="rl_menu_filters_gender_male" text="Male"/>
+        <text name="rl_menu_filters_gender_female" text="Female"/>
+        <text name="rl_menu_filters_emptyValueRejected" text="Value cannot be empty"/>
+        <text name="rl_menu_filters_subtypeRequiresAnimalType" text="Set the filter's animal type first to edit this condition"/>
+        <text name="rl_menu_filters_invalidNumber" text="Enter a valid number"/>
+        <text name="rl_menu_filters_enumValueDrifted" text="Stored value no longer valid - pick a replacement"/>
+        <text name="rl_menu_filters_valueSet_title" text="Select values"/>
+        <text name="rl_menu_filters_valueSet_summary" text="%d selected"/>
+        <text name="rl_menu_filters_valueSet_button" text="Edit values..."/>
+    </texts>
 </l10n>

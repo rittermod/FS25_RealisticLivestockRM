@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <l10n>
     <texts>
         <!-- COWS -->
@@ -738,115 +739,115 @@
         <text name="rl_menu_dealerSale_empty" text="No animals available at this dealer."/>
         <text name="rl_menu_herdsman_husbandry_emptyRejected" text="Seleziona almeno un allevamento."/>
         <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Il filtro corrente non è disponibile per questa operazione."/>
-			<text name="rl_menu_herdsman_section_move" text="Spostamento"/>
-			<text name="rl_menu_herdsman_detail_destination" text="Destinazione"/>
-			<text name="rl_menu_herdsman_destination_select" text="Seleziona destinazione"/>
-			<text name="rl_menu_herdsman_destination_butcher_suffix" text="(butcher)"/>
-			<text name="rl_menu_herdsman_destination_picker_title" text="Seleziona destinazione"/>
-			<text name="rl_menu_herdsman_destination_picker_empty" text="Nessun allevamento di destinazione disponibile per questa regola."/>
-			<text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="La destinazione corrente non è disponibile per questa regola."/>
+        <text name="rl_menu_herdsman_section_move" text="Spostamento"/>
+        <text name="rl_menu_herdsman_detail_destination" text="Destinazione"/>
+        <text name="rl_menu_herdsman_destination_select" text="Seleziona destinazione"/>
+        <text name="rl_menu_herdsman_destination_butcher_suffix" text="(butcher)"/>
+        <text name="rl_menu_herdsman_destination_picker_title" text="Seleziona destinazione"/>
+        <text name="rl_menu_herdsman_destination_picker_empty" text="Nessun allevamento di destinazione disponibile per questa regola."/>
+        <text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="La destinazione corrente non è disponibile per questa regola."/>
         <!-- Settings tab shell (English fallback) -->
         <text name="rl_menu_settings_title" text="Impostazioni"/>
         <text name="rl_menu_settings_tab_general" text="Generale"/>
         <text name="rl_menu_settings_tab_filters" text="Filtri"/>
 
-		<!-- Filters tab list -->
-		<text name="rl_menu_filters_quick_filter_title" text="Filtro rapido"/>
-		<text name="rl_ui_qf_saveFilter" text="Salva filtro"/>
-		<text name="rl_ui_qf_saveDropsValue" text="I filtri salvati non supportano il valore; questa condizione non verrà mantenuta."/>
-		<text name="rl_menu_filters_empty" text="Nessun filtro salvato ancora"/>
-		<text name="rl_menu_filters_empty_no_farm" text="Ti serve una fattoria per salvare i filtri"/>
-		<text name="rl_menu_filters_new_button" text="Nuovo filtro"/>
-		<text name="rl_menu_filters_default_name" text="Nuovo filtro"/>
-		<text name="rl_menu_filters_detail_placeholder" text="Da implementare"/>
-		<!-- Editor + Duplicate/Delete (English fallback) -->
-		<text name="rl_menu_filters_empty_editor" text="Seleziona un filtro da modificare"/>
-		<text name="rl_menu_filters_editor_title_name" text="Nome"/>
-		<text name="rl_menu_filters_editor_title_animal_type" text="Tipo di animale"/>
-		<text name="rl_menu_filters_editor_title_op" text="Condizioni"/>
-		<text name="rl_menu_filters_animal_type_any" text="Qualsiasi"/>
-		<text name="rl_menu_filters_op_and" text="Tutte"/>
-		<text name="rl_menu_filters_op_or" text="Qualsiasi"/>
-		<text name="rl_menu_filters_add_group_not_implemented" text="L'aggiunta di gruppi non è ancora implementata in questa versione."/>
-		<text name="rl_menu_filters_duplicate_button" text="Duplica"/>
-		<text name="rl_menu_filters_delete_button" text="Elimina"/>
-		<text name="rl_menu_filters_duplicate_suffix" text=" (copia)"/>
-		<text name="rl_menu_filters_duplicate_suffix_n" text=" (copia %d)"/>
-		<text name="rl_menu_filters_delete_confirm_text" text="Eliminare il filtro &quot;%s&quot;? L'operazione non può essere annullata."/>
-		<!-- Usage scope axis -->
-		<text name="rl_menu_filters_editor_title_usage" text="Mostra in"/>
-		<text name="rl_menu_filters_usage_any" text="Tutte le schermate"/>
-		<text name="rl_menu_filters_usage_owned" text="Schermate degli allevamenti di proprietà"/>
-		<text name="rl_menu_filters_usage_dealer" text="Schermate del rivenditore"/>
-		<text name="rl_menu_filters_valueOutOfRange_both" text="Il valore deve essere compreso tra %d e %d"/>
-		<text name="rl_menu_filters_valueOutOfRange_min" text="Il valore deve essere almeno %d"/>
-		<text name="rl_menu_filters_valueOutOfRange_max" text="Il valore deve essere al massimo %d"/>
+        <!-- Filters tab list -->
+        <text name="rl_menu_filters_quick_filter_title" text="Filtro rapido"/>
+        <text name="rl_ui_qf_saveFilter" text="Salva filtro"/>
+        <text name="rl_ui_qf_saveDropsValue" text="I filtri salvati non supportano il valore; questa condizione non verrà mantenuta."/>
+        <text name="rl_menu_filters_empty" text="Nessun filtro salvato ancora"/>
+        <text name="rl_menu_filters_empty_no_farm" text="Ti serve una fattoria per salvare i filtri"/>
+        <text name="rl_menu_filters_new_button" text="Nuovo filtro"/>
+        <text name="rl_menu_filters_default_name" text="Nuovo filtro"/>
+        <text name="rl_menu_filters_detail_placeholder" text="Da implementare"/>
+        <!-- Editor + Duplicate/Delete (English fallback) -->
+        <text name="rl_menu_filters_empty_editor" text="Seleziona un filtro da modificare"/>
+        <text name="rl_menu_filters_editor_title_name" text="Nome"/>
+        <text name="rl_menu_filters_editor_title_animal_type" text="Tipo di animale"/>
+        <text name="rl_menu_filters_editor_title_op" text="Condizioni"/>
+        <text name="rl_menu_filters_animal_type_any" text="Qualsiasi"/>
+        <text name="rl_menu_filters_op_and" text="Tutte"/>
+        <text name="rl_menu_filters_op_or" text="Qualsiasi"/>
+        <text name="rl_menu_filters_add_group_not_implemented" text="L'aggiunta di gruppi non è ancora implementata in questa versione."/>
+        <text name="rl_menu_filters_duplicate_button" text="Duplica"/>
+        <text name="rl_menu_filters_delete_button" text="Elimina"/>
+        <text name="rl_menu_filters_duplicate_suffix" text=" (copia)"/>
+        <text name="rl_menu_filters_duplicate_suffix_n" text=" (copia %d)"/>
+        <text name="rl_menu_filters_delete_confirm_text" text="Eliminare il filtro &quot;%s&quot;? L'operazione non può essere annullata."/>
+        <!-- Usage scope axis -->
+        <text name="rl_menu_filters_editor_title_usage" text="Mostra in"/>
+        <text name="rl_menu_filters_usage_any" text="Tutte le schermate"/>
+        <text name="rl_menu_filters_usage_owned" text="Schermate degli allevamenti di proprietà"/>
+        <text name="rl_menu_filters_usage_dealer" text="Schermate del rivenditore"/>
+        <text name="rl_menu_filters_valueOutOfRange_both" text="Il valore deve essere compreso tra %d e %d"/>
+        <text name="rl_menu_filters_valueOutOfRange_min" text="Il valore deve essere almeno %d"/>
+        <text name="rl_menu_filters_valueOutOfRange_max" text="Il valore deve essere al massimo %d"/>
 
-		<!-- Filter cycle + chip MVP -->
-		<text name="rl_menu_filter_chip_none" text="Nessun filtro"/>
-		<text name="rl_menu_filter_chip_active" text="Filtro: %s"/>
-		<text name="rl_menu_filter_chip_quick" text="Filtro: QF"/>
-		<text name="rl_menu_filter_chip_quick_plus_saved" text="Filtro: QF + %s"/>
-		<text name="rl_menu_cycle_filter_button" text="Cambia filtro"/>
-		<text name="rl_menu_filter_chip_unnamed" text="(senza nome)"/>
+        <!-- Filter cycle + chip MVP -->
+        <text name="rl_menu_filter_chip_none" text="Nessun filtro"/>
+        <text name="rl_menu_filter_chip_active" text="Filtro: %s"/>
+        <text name="rl_menu_filter_chip_quick" text="Filtro: QF"/>
+        <text name="rl_menu_filter_chip_quick_plus_saved" text="Filtro: QF + %s"/>
+        <text name="rl_menu_cycle_filter_button" text="Cambia filtro"/>
+        <text name="rl_menu_filter_chip_unnamed" text="(senza nome)"/>
         <text name="rl_ui_buyAllRejected" text="Nessuno degli animali selezionati può essere acquistato in questo allevamento."/>
         <text name="rl_ui_buyPartialConfirmation" text="Acquistare %d dei %d animali selezionati per %s?" tag="format"/>
         <text name="rl_ui_buySkippedNotSupported" text="%d animale/i non supportati da questo allevamento" tag="format"/>
-		<!-- Herdsman rule lifecycle -->
-		<text name="rl_menu_herdsman_new_button" text="Nuova regola"/>
-		<text name="rl_menu_herdsman_duplicate_button" text="Duplica"/>
-		<text name="rl_menu_herdsman_delete_button" text="Elimina"/>
-		<text name="rl_menu_herdsman_delete_confirm_text" text="Eliminare la regola &quot;%s&quot;? L'operazione non può essere annullata."/>
-		<text name="rl_menu_herdsman_default_name" text="Nuova regola"/>
-		<text name="rl_menu_herdsman_duplicate_suffix" text=" (copia)"/>
-		<text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copia %d)"/>
-		<!-- Filter condition editor (English fallback) -->
-		<text name="rl_menu_filters_add_condition" text="Aggiungi condizione"/>
-		<text name="rl_menu_filters_add_group_button" text="Aggiungi gruppo"/>
-		<text name="rl_menu_filters_edit_condition" text="Modifica condizione"/>
-		<text name="rl_menu_filters_delete_condition" text="Elimina condizione"/>
-		<text name="rl_menu_filters_dialog_title" text="Modifica condizione"/>
-		<text name="rl_menu_filters_field_label" text="Campo"/>
-		<text name="rl_menu_filters_cmp_label" text="Confronta"/>
-		<text name="rl_menu_filters_cmp_lt" text="is less than"/>
-		<text name="rl_menu_filters_cmp_le" text="is at most"/>
-		<text name="rl_menu_filters_cmp_eq" text="is"/>
-		<text name="rl_menu_filters_cmp_ne" text="is not"/>
-		<text name="rl_menu_filters_cmp_ge" text="is at least"/>
-		<text name="rl_menu_filters_cmp_gt" text="is more than"/>
-		<text name="rl_menu_filters_cmp_in" text="is one of"/>
-		<text name="rl_menu_filters_cmp_notin" text="is none of"/>
-		<text name="rl_menu_filters_cmp_contains" text="contains"/>
-		<text name="rl_menu_filters_cmp_notcontains" text="does not contain"/>
-		<text name="rl_menu_filters_value_label" text="Valore"/>
-		<text name="rl_menu_filters_value_invalid_number" text="Numero non valido"/>
-		<text name="rl_menu_filters_preserved_banner" text="%d condizione/i nascoste - modificabili in una fase successiva. Salvate alla chiusura."/>
-		<text name="rl_menu_filters_field_age" text="Età"/>
-		<text name="rl_menu_filters_field_isCastrated" text="Castrato"/>
-		<text name="rl_menu_filters_field_isPregnant" text="In gravidanza"/>
-		<text name="rl_menu_filters_field_isLactating" text="In lattazione"/>
-		<text name="rl_menu_filters_field_hasName" text="Ha un nome"/>
-		<text name="rl_menu_filters_field_hasAnyDisease" text="Ha una malattia"/>
-		<text name="rl_menu_filters_field_hasAnyMark" text="Ha un contrassegno"/>
-		<text name="rl_menu_filters_field_weight" text="Peso"/>
-		<text name="rl_menu_filters_field_health" text="Salute"/>
-		<text name="rl_menu_filters_field_genetics_metabolism" text="Genetica: metabolismo"/>
-		<text name="rl_menu_filters_field_genetics_health" text="Genetica: salute"/>
-		<text name="rl_menu_filters_field_genetics_fertility" text="Genetica: fertilità"/>
-		<text name="rl_menu_filters_field_genetics_quality" text="Genetica: qualità"/>
-		<text name="rl_menu_filters_field_genetics_productivity" text="Genetica: produttività"/>
-		<text name="rl_menu_filters_field_genetics_overall" text="Genetica complessiva"/>
-		<text name="rl_menu_filters_field_gender" text="Gender"/>
-		<text name="rl_menu_filters_field_subType" text="Breed"/>
-		<text name="rl_menu_filters_field_name" text="Name"/>
-		<text name="rl_menu_filters_gender_male" text="Maschio"/>
-		<text name="rl_menu_filters_gender_female" text="Femmina"/>
-		<text name="rl_menu_filters_emptyValueRejected" text="Il valore non può essere vuoto"/>
-		<text name="rl_menu_filters_subtypeRequiresAnimalType" text="Imposta prima il tipo di animale del filtro per modificare questa condizione"/>
-		<text name="rl_menu_filters_invalidNumber" text="Inserisci un numero valido"/>
-		<text name="rl_menu_filters_enumValueDrifted" text="Il valore memorizzato non è più valido - seleziona un sostituto"/>
-		<text name="rl_menu_filters_valueSet_title" text="Seleziona valori"/>
-		<text name="rl_menu_filters_valueSet_summary" text="%d selezionati"/>
-		<text name="rl_menu_filters_valueSet_button" text="Modifica valori..."/>
+        <!-- Herdsman rule lifecycle -->
+        <text name="rl_menu_herdsman_new_button" text="Nuova regola"/>
+        <text name="rl_menu_herdsman_duplicate_button" text="Duplica"/>
+        <text name="rl_menu_herdsman_delete_button" text="Elimina"/>
+        <text name="rl_menu_herdsman_delete_confirm_text" text="Eliminare la regola &quot;%s&quot;? L'operazione non può essere annullata."/>
+        <text name="rl_menu_herdsman_default_name" text="Nuova regola"/>
+        <text name="rl_menu_herdsman_duplicate_suffix" text=" (copia)"/>
+        <text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copia %d)"/>
+        <!-- Filter condition editor (English fallback) -->
+        <text name="rl_menu_filters_add_condition" text="Aggiungi condizione"/>
+        <text name="rl_menu_filters_add_group_button" text="Aggiungi gruppo"/>
+        <text name="rl_menu_filters_edit_condition" text="Modifica condizione"/>
+        <text name="rl_menu_filters_delete_condition" text="Elimina condizione"/>
+        <text name="rl_menu_filters_dialog_title" text="Modifica condizione"/>
+        <text name="rl_menu_filters_field_label" text="Campo"/>
+        <text name="rl_menu_filters_cmp_label" text="Confronta"/>
+        <text name="rl_menu_filters_cmp_lt" text="is less than"/>
+        <text name="rl_menu_filters_cmp_le" text="is at most"/>
+        <text name="rl_menu_filters_cmp_eq" text="is"/>
+        <text name="rl_menu_filters_cmp_ne" text="is not"/>
+        <text name="rl_menu_filters_cmp_ge" text="is at least"/>
+        <text name="rl_menu_filters_cmp_gt" text="is more than"/>
+        <text name="rl_menu_filters_cmp_in" text="is one of"/>
+        <text name="rl_menu_filters_cmp_notin" text="is none of"/>
+        <text name="rl_menu_filters_cmp_contains" text="contains"/>
+        <text name="rl_menu_filters_cmp_notcontains" text="does not contain"/>
+        <text name="rl_menu_filters_value_label" text="Valore"/>
+        <text name="rl_menu_filters_value_invalid_number" text="Numero non valido"/>
+        <text name="rl_menu_filters_preserved_banner" text="%d condizione/i nascoste - modificabili in una fase successiva. Salvate alla chiusura."/>
+        <text name="rl_menu_filters_field_age" text="Età"/>
+        <text name="rl_menu_filters_field_isCastrated" text="Castrato"/>
+        <text name="rl_menu_filters_field_isPregnant" text="In gravidanza"/>
+        <text name="rl_menu_filters_field_isLactating" text="In lattazione"/>
+        <text name="rl_menu_filters_field_hasName" text="Ha un nome"/>
+        <text name="rl_menu_filters_field_hasAnyDisease" text="Ha una malattia"/>
+        <text name="rl_menu_filters_field_hasAnyMark" text="Ha un contrassegno"/>
+        <text name="rl_menu_filters_field_weight" text="Peso"/>
+        <text name="rl_menu_filters_field_health" text="Salute"/>
+        <text name="rl_menu_filters_field_genetics_metabolism" text="Genetica: metabolismo"/>
+        <text name="rl_menu_filters_field_genetics_health" text="Genetica: salute"/>
+        <text name="rl_menu_filters_field_genetics_fertility" text="Genetica: fertilità"/>
+        <text name="rl_menu_filters_field_genetics_quality" text="Genetica: qualità"/>
+        <text name="rl_menu_filters_field_genetics_productivity" text="Genetica: produttività"/>
+        <text name="rl_menu_filters_field_genetics_overall" text="Genetica complessiva"/>
+        <text name="rl_menu_filters_field_gender" text="Gender"/>
+        <text name="rl_menu_filters_field_subType" text="Breed"/>
+        <text name="rl_menu_filters_field_name" text="Name"/>
+        <text name="rl_menu_filters_gender_male" text="Maschio"/>
+        <text name="rl_menu_filters_gender_female" text="Femmina"/>
+        <text name="rl_menu_filters_emptyValueRejected" text="Il valore non può essere vuoto"/>
+        <text name="rl_menu_filters_subtypeRequiresAnimalType" text="Imposta prima il tipo di animale del filtro per modificare questa condizione"/>
+        <text name="rl_menu_filters_invalidNumber" text="Inserisci un numero valido"/>
+        <text name="rl_menu_filters_enumValueDrifted" text="Il valore memorizzato non è più valido - seleziona un sostituto"/>
+        <text name="rl_menu_filters_valueSet_title" text="Seleziona valori"/>
+        <text name="rl_menu_filters_valueSet_summary" text="%d selezionati"/>
+        <text name="rl_menu_filters_valueSet_button" text="Modifica valori..."/>
     </texts>
 </l10n>

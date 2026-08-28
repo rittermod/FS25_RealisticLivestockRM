@@ -1,304 +1,304 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <l10n>
-	<texts>
-		<!-- COWS -->
+    <texts>
+        <!-- COWS -->
 
-		<text name="fillType_bull" text="Sonni"/>
-		<text name="fillType_bull_swiss_brown" text="Brown Swiss -sonni"/>
-		<text name="fillType_bull_holstein" text="Holstein-sonni"/>
-		<text name="fillType_bull_angus" text="Angus-sonni"/>
-		<text name="fillType_bull_limousin" text="Limousin-sonni"/>
-		<text name="fillType_cow_hereford" text="Hereford"/>
-		<text name="fillType_bull_hereford" text="Hereford-sonni"/>
-		<text name="fillType_cow_highland_cattle" text="Ylämaankarja"/>
-		<text name="fillType_bull_highland_cattle" text="Ylämaankarja-sonni"/>
-		<text name="animal_descriptionBullFeed" text="Sonnit syövät mielellään ruohoa, heinää ja TMR-rehua."/>
-		<text name="animal_descriptionBullYoung" text="Tämä on urospuolinen vasikka."/>
-		<text name="animal_descriptionBullReproduction" text="Terveet, vähintään 12 kuukauden ikäiset sonnit voivat lisääntyä."/>
-		<text name="rl_descriptionCowReproduction" text="Terveet, vähintään 12 kuukauden ikäiset lehmät voivat lisääntyä."/>
+        <text name="fillType_bull" text="Sonni"/>
+        <text name="fillType_bull_swiss_brown" text="Brown Swiss -sonni"/>
+        <text name="fillType_bull_holstein" text="Holstein-sonni"/>
+        <text name="fillType_bull_angus" text="Angus-sonni"/>
+        <text name="fillType_bull_limousin" text="Limousin-sonni"/>
+        <text name="fillType_cow_hereford" text="Hereford"/>
+        <text name="fillType_bull_hereford" text="Hereford-sonni"/>
+        <text name="fillType_cow_highland_cattle" text="Ylämaankarja"/>
+        <text name="fillType_bull_highland_cattle" text="Ylämaankarja-sonni"/>
+        <text name="animal_descriptionBullFeed" text="Sonnit syövät mielellään ruohoa, heinää ja TMR-rehua."/>
+        <text name="animal_descriptionBullYoung" text="Tämä on urospuolinen vasikka."/>
+        <text name="animal_descriptionBullReproduction" text="Terveet, vähintään 12 kuukauden ikäiset sonnit voivat lisääntyä."/>
+        <text name="rl_descriptionCowReproduction" text="Terveet, vähintään 12 kuukauden ikäiset lehmät voivat lisääntyä."/>
 
-		<!-- WATER BUFFALOS -->
+        <!-- WATER BUFFALOS -->
 
-		<text name="fillType_bull_waterbuffalo" text="Vesipuhvelisonni"/>
+        <text name="fillType_bull_waterbuffalo" text="Vesipuhvelisonni"/>
 
-		<!-- PIGS -->
+        <!-- PIGS -->
 
-		<text name="fillType_boar" text="Karju"/>
-		<text name="fillType_boar_landrace" text="Saksan Maatiassika-karju"/>
-		<text name="fillType_boar_black_pied" text="Bunte Bentheimer Schwein -karju"/>
-		<text name="fillType_boar_berkshire" text="Berkshire-karju"/>
-		<text name="animal_descriptionBoarReproduction" text="Terveet, vähintään 8 kuukauden ikäiset karjut voivat lisääntyä."/>
-		<text name="rl_descriptionPigReproduction" text="Terveet, vähintään 6 kuukauden ikäiset emakot voivat lisääntyä."/>
-		<text name="animal_descriptionBoarFeed" text="Karjut syövät lähes mitä tahansa. Niille voi syöttää maissia, vehnää, ohraa, rypsiä, auringonkukkia, soijapapuja, perunoita, durraa ja sokerijuurikkaita."/>
-		<text name="animal_descriptionBoarYoung" text="Tämä on urospuolinen porsas."/>
+        <text name="fillType_boar" text="Karju"/>
+        <text name="fillType_boar_landrace" text="Saksan Maatiassika-karju"/>
+        <text name="fillType_boar_black_pied" text="Bunte Bentheimer Schwein -karju"/>
+        <text name="fillType_boar_berkshire" text="Berkshire-karju"/>
+        <text name="animal_descriptionBoarReproduction" text="Terveet, vähintään 8 kuukauden ikäiset karjut voivat lisääntyä."/>
+        <text name="rl_descriptionPigReproduction" text="Terveet, vähintään 6 kuukauden ikäiset emakot voivat lisääntyä."/>
+        <text name="animal_descriptionBoarFeed" text="Karjut syövät lähes mitä tahansa. Niille voi syöttää maissia, vehnää, ohraa, rypsiä, auringonkukkia, soijapapuja, perunoita, durraa ja sokerijuurikkaita."/>
+        <text name="animal_descriptionBoarYoung" text="Tämä on urospuolinen porsas."/>
 
-		<!-- SHEEP -->
+        <!-- SHEEP -->
 
-		<text name="fillType_ram" text="Pässi"/>
-		<text name="fillType_ram_landrace" text="Bentheimin Maatiaiskanta-pässi"/>
-		<text name="fillType_ram_steinschaf" text="Steinschaf-pässi"/>
-		<text name="fillType_ram_black_welsh" text="Black Welsh Mountain -pässi"/>
-		<text name="fillType_ram_swiss_mountain" text="Sveitsiläinen Mustaruskea Vuoristopässi"/>
-		<text name="animal_descriptionRamFeed" text="Pässit syövät ruohoa ja heinää."/>
-		<text name="animal_descriptionRamYoung" text="Tämä on urospuolinen karitsa."/>
-		<text name="animal_descriptionRamReproduction" text="Terveet, vähintään 5 kuukauden ikäiset pässit voivat lisääntyä."/>
-		<text name="rl_descriptionSheepReproduction" text="Terveet, vähintään 8 kuukauden ikäiset uuhet voivat lisääntyä."/>
+        <text name="fillType_ram" text="Pässi"/>
+        <text name="fillType_ram_landrace" text="Bentheimin Maatiaiskanta-pässi"/>
+        <text name="fillType_ram_steinschaf" text="Steinschaf-pässi"/>
+        <text name="fillType_ram_black_welsh" text="Black Welsh Mountain -pässi"/>
+        <text name="fillType_ram_swiss_mountain" text="Sveitsiläinen Mustaruskea Vuoristopässi"/>
+        <text name="animal_descriptionRamFeed" text="Pässit syövät ruohoa ja heinää."/>
+        <text name="animal_descriptionRamYoung" text="Tämä on urospuolinen karitsa."/>
+        <text name="animal_descriptionRamReproduction" text="Terveet, vähintään 5 kuukauden ikäiset pässit voivat lisääntyä."/>
+        <text name="rl_descriptionSheepReproduction" text="Terveet, vähintään 8 kuukauden ikäiset uuhet voivat lisääntyä."/>
 
-		<!-- GOATS -->
+        <!-- GOATS -->
 
-		<text name="fillType_ram_goat" text="Pukki"/>
-		<text name="rl_descriptionGoatReproduction" text="Terveet, vähintään 16 kuukauden ikäiset vuohet voivat lisääntyä."/>
+        <text name="fillType_ram_goat" text="Pukki"/>
+        <text name="rl_descriptionGoatReproduction" text="Terveet, vähintään 16 kuukauden ikäiset vuohet voivat lisääntyä."/>
 
-		<!-- HORSES -->
+        <!-- HORSES -->
 
-		<text name="fillType_stallion" text="Ori"/>
-		<text name="fillType_stallion_gray" text="Harmaa ori"/>
-		<text name="fillType_stallion_pinto" text="Pinto ori"/>
-		<text name="fillType_stallion_palomino" text="Palomino ori"/>
-		<text name="fillType_stallion_chestnut" text="Raudikko ori"/>
-		<text name="fillType_stallion_bay" text="Ruunikko ori"/>
-		<text name="fillType_stallion_black" text="Musta ori"/>
-		<text name="fillType_stallion_seal_brown" text="Tummanruskea ori"/>
-		<text name="fillType_stallion_dun" text="Hallakko ori"/>
-		<text name="animal_descriptionStallionFeed" text="Orit pitävät heinästä, kaurasta ja durrasta."/>
-		<text name="animal_descriptionStallionProfit" text="Orit voidaan myydä voitolla."/>
-		<text name="animal_descriptionStallionReproduction" text="Terveet, vähintään 36 kuukauden ikäiset orit voivat lisääntyä."/>
-		<text name="rl_descriptionHorseReproduction" text="Terveet, vähintään 22 kuukauden ikäiset tammat voivat lisääntyä."/>
+        <text name="fillType_stallion" text="Ori"/>
+        <text name="fillType_stallion_gray" text="Harmaa ori"/>
+        <text name="fillType_stallion_pinto" text="Pinto ori"/>
+        <text name="fillType_stallion_palomino" text="Palomino ori"/>
+        <text name="fillType_stallion_chestnut" text="Raudikko ori"/>
+        <text name="fillType_stallion_bay" text="Ruunikko ori"/>
+        <text name="fillType_stallion_black" text="Musta ori"/>
+        <text name="fillType_stallion_seal_brown" text="Tummanruskea ori"/>
+        <text name="fillType_stallion_dun" text="Hallakko ori"/>
+        <text name="animal_descriptionStallionFeed" text="Orit pitävät heinästä, kaurasta ja durrasta."/>
+        <text name="animal_descriptionStallionProfit" text="Orit voidaan myydä voitolla."/>
+        <text name="animal_descriptionStallionReproduction" text="Terveet, vähintään 36 kuukauden ikäiset orit voivat lisääntyä."/>
+        <text name="rl_descriptionHorseReproduction" text="Terveet, vähintään 22 kuukauden ikäiset tammat voivat lisääntyä."/>
 
-		<!-- KANAT -->
+        <!-- KANAT -->
 
-		<text name="rl_descriptionChickenReproduction" text="Terveet, vähintään 6 kuukauden ikäiset kanat voivat lisääntyä."/>
+        <text name="rl_descriptionChickenReproduction" text="Terveet, vähintään 6 kuukauden ikäiset kanat voivat lisääntyä."/>
 
 
         <!-- UI -->
 
 
-		<text name="rl_button_apply" text="Käytä"/>
-		<text name="rl_button_confirm" text="Hyväksy"/>
-		<text name="rl_button_recommended" text="Suositeltu"/>
-		<text name="rl_button_cancel" text="Peruuta"/>
-		<text name="rl_button_random" text="Satunnainen"/>
-		<text name="rl_dialog_title" text="Aseta visuaalisten eläinten maksimimäärä"/>
-
-		<text name="rl_ui_unhealthy" text="Liian huonokuntoinen"/>
-		<text name="rl_ui_unhealthyBracketed" text="Ei (liian huonokuntoinen)"/>
-		<text name="rl_ui_noMaleAnimal" text="Ei soveltuvaa uros eläintä"/>
-		<text name="rl_ui_noMaleAnimalBracketed" text="Ei (ei soveltuvaa uros eläintä)"/>
-		<text name="rl_ui_recoveringLastBirth" text="Toipumassa viimeisimmästä synnytyksestä"/>
-		<text name="rl_ui_recoveringLastBirthBracketed" text="Ei (toipumassa viimeisimmästä synnytyksestä)"/>
-		<text name="rl_ui_tooYoung" text="Liian nuori"/>
-		<text name="rl_ui_tooYoungBracketed" text="Ei (liian nuori)"/>
-		<text name="rl_ui_pregnant" text="Tiineenä"/>
-		<text name="rl_ui_lactating" text="Imettävä"/>
-		<text name="rl_ui_canReproduce" text="Voi lisääntyä"/>
-		<text name="rl_ui_impregnatedBy" text="Siittänyt"/>
-		<text name="rl_ui_unknown" text="Ei tiedossa"/>
-		<text name="rl_ui_yes" text="Kyllä"/>
-		<text name="rl_ui_no" text="Ei"/>
-		<text name="rl_ui_mother" text="Emo"/>
-		<text name="rl_ui_father" text="Isä"/>
-		<text name="rl_ui_uniqueId" text="Yksilöllinen ID"/>
-		<text name="rl_ui_farmId" text="Farmin ID"/>
-		<text name="rl_ui_gender" text="Sukupuoli"/>
-		<text name="rl_ui_male" text="Uros"/>
-		<text name="rl_ui_female" text="Naaras"/>
-		<text name="rl_ui_weight" text="Paino"/>
-		<text name="rl_ui_targetWeight" text="Tavoitepaino"/>
-		<text name="rl_ui_value" text="Arvo"/>
-		<text name="rl_ui_valuePerKilo" text="Arvo kilolta"/>
-		<text name="rl_ui_genetics" text="Genetiikka"/>
-		<text name="rl_ui_overall" text="Kokonais"/>
-		<text name="rl_ui_rename" text="Vaihda nimi"/>
-		<text name="rl_ui_maleNumImpregnatable" text="Siitettäviä eläimiä aitauksessa"/>
-
-		<text name="rl_ui_breederQuality" text="Siittäjän laatu"/>
-		<text name="rl_ui_birthday" text="Syntynyt"/>
-		<text name="rl_ui_pregnancyExpected" text="Laskettu aika"/>
-		<text name="rl_ui_pregnancyExpecting" text="Odottaa"/>
-		<text name="rl_ui_pregnancyBaby" text="poikanen"/>
-		<text name="rl_ui_pregnancyBabies" text="poikaset"/>
-		<text name="rl_ui_animalOrigin" text="Alkuperä"/>
-		<text name="rl_ui_months" text="kuukautta"/>
-		<text name="rl_ui_month" text="kuukausi"/>
-		<text name="rl_ui_years" text="vuotta"/>
-		<text name="rl_ui_year" text="vuosi"/>
-
-		<text name="rl_ui_milk" text="Maidon tuotto"/>
-		<text name="rl_ui_wool" text="Villan tuotto"/>
-		<text name="rl_ui_eggs" text="Munien tuotto"/>
-		<text name="rl_ui_metabolism" text="Aineenvaihdunta"/>
-		<text name="rl_ui_meat" text="Laatu"/>
-		<text name="rl_ui_meat_github" text="Lihan laatu"/>
-		<text name="rl_ui_quality" text="Laatu"/>
-		<text name="rl_ui_quality_github" text="Lihan laatu"/>
-		<text name="rl_ui_health" text="Terveys"/>
-		<text name="rl_ui_fertility" text="Hedelmällisyys"/>
-
-		<text name="rl_ui_genetics_infertile" text="Lisääntymiskyvytön"/>
-		<text name="rl_ui_genetics_extremelyLow" text="Äärimmäisen alhainen"/>
-		<text name="rl_ui_genetics_veryLow" text="Erittäin alhainen"/>
-		<text name="rl_ui_genetics_low" text="Alhainen"/>
-		<text name="rl_ui_genetics_average" text="Keskiverto"/>
-		<text name="rl_ui_genetics_high" text="Korkea"/>
-		<text name="rl_ui_genetics_veryHigh" text="Erittäin korkea"/>
-		<text name="rl_ui_genetics_extremelyHigh" text="Äärimmäisen korkea"/>
-
-		<text name="rl_ui_genetics_extremelyBad" text="Äärimmäisen huono"/>
-		<text name="rl_ui_genetics_veryBad" text="Erittäin huono"/>
-		<text name="rl_ui_genetics_bad" text="Huono"/>
-		<text name="rl_ui_genetics_good" text="Hyvä"/>
-		<text name="rl_ui_genetics_veryGood" text="Erittäin hyvä"/>
-		<text name="rl_ui_genetics_extremelyGood" text="Äärimmäisen hyvä"/>
-
-		<text name="rl_ui_buySelected" text="Osta valitut"/>
-		<text name="rl_ui_sellSelected" text="Myy valitut"/>
-		<text name="rl_ui_moveSelected" text="Siirrä valitut"/>
-		<text name="rl_ui_buyConfirmation" text="Haluatko varmasti ostaa %s eläintä %s:lla?" tag="format"/>
-		<text name="rl_ui_sellConfirmation" text="Haluatko varmasti myydä %s eläintä %s:lla?" tag="format"/>
-		<text name="rl_ui_buyBulkResult" text="%s eläintä ostettiin %s:lla" tag="format"/>
-		<text name="rl_ui_sellBulkResult" text="%s eläintä myytiin %s:lla" tag="format"/>
-		<text name="rl_ui_moveBulkResult" text="%s eläintä siirrettiin" tag="format"/>
-		<text name="rl_ui_moveSingle" text="Move"/>
-		<text name="rl_ui_moveSelectDestination" text="Select Destination"/>
-		<text name="rl_ui_moveNoDestinations" text="No destinations available for this animal type."/>
-		<text name="rl_ui_moveEPPAgeFormat" text="ages %d-%d mo" tag="format"/>
-		<text name="rl_ui_moveValidSummary" text="%d animal(s) will be moved" tag="format"/>
-		<text name="rl_ui_moveRejectedAge" text="%d animal(s) skipped: does not meet age requirement (%d-%d months)" tag="format"/>
-		<text name="rl_ui_moveRejectedCapacity" text="%d animal(s) skipped: not enough space at destination" tag="format"/>
-		<text name="rl_ui_moveAllRejected" text="No animals can be moved to this destination."/>
-		<text name="rl_ui_moveBulkConfirmTitle" text="Move Animals"/>
-		<text name="rl_ui_moveErrorNoPermission" text="You don't have permission to move animals here."/>
-		<text name="rl_ui_moveErrorNotSupported" text="This destination doesn't support this animal type."/>
-		<text name="rl_ui_moveErrorNoSpace" text="Not enough space at the destination."/>
-		<text name="rl_ui_tradeRequestInProgress" text="A trade is already in progress. Please wait."/>
-		<text name="rl_ui_tradeRequestTimeout" text="The server did not respond. Please try again."/>
-
-		<text name="rl_ui_monitor" text="Seurantalaitteet"/>
-		<text name="rl_ui_monitorSubscriptions" text="Seurantalaitetilaukset"/>
-		<text name="finance_monitorSubscriptions" text="Seurantalaitetilaukset"/>
-		<text name="rl_ui_monitorFee" text="Seurantalaitemaksu"/>
-		<text name="rl_ui_applyMonitor" text="Aseta seurantalaite"/>
-		<text name="rl_ui_removeMonitor" text="Poista seurantalaite"/>
-		<text name="rl_ui_input_food" text="Ruoka"/>
-		<text name="rl_ui_input_water" text="Vesi"/>
-		<text name="rl_ui_input_straw" text="Olki"/>
-		<text name="rl_ui_output_milk" text="Maito"/>
-		<text name="rl_ui_output_manure" text="Lanta"/>
-		<text name="rl_ui_output_liquidManure" text="Liete"/>
-		<text name="rl_ui_output_pallets_eggs" text="Munia"/>
-		<text name="rl_ui_output_pallets_wool" text="Villa"/>
-		<text name="rl_ui_output_pallets_goatMilk" text="Vuohenmaito"/>
-		<text name="rl_ui_amountPerDay" text="%.0fl / päivä" tag="format"/>
-		<text name="rl_ui_feePerMonth" text="%s / kk" tag="format"/>
-
-		<text name="rl_ui_animalType" text="Eläintyyppi"/>
-		<text name="rl_ui_amountMonitored" text="Seurannassa"/>
-		<text name="rl_ui_production" text="Tuotanto"/>
-		<text name="rl_ui_applyAllMonitor" text="Aseta kaikille seurantalaite"/>
-		<text name="rl_ui_removeAllMonitor" text="Poista kaikilta seurantalaite"/>
-		<text name="rl_ui_fee" text="Maksu"/>
-
-		<text name="rl_ui_leftEarTag" text="Vasen korvamerkki"/>
-		<text name="rl_ui_rightEarTag" text="Oikea korvamerkki"/>
-		<text name="rl_ui_backgroundColour" text="Taustaväri"/>
-		<text name="rl_ui_backgroundHue" text="Taustan sävy"/>
-		<text name="rl_ui_backgroundRgb" text="Taustan RGB"/>
-		<text name="rl_ui_textColour" text="Tekstin väri"/>
-		<text name="rl_ui_textHue" text="Tekstin sävy"/>
-		<text name="rl_ui_textRgb" text="Tekstin RGB"/>
-
-		<text name="rl_ui_formatMonths" text="%s kuukautta"/>
-		<text name="rl_ui_formatMonth" text="%s kuukausi"/>
-		<text name="rl_ui_notPregnant" text="Ei tiineenä"/>
-		<text name="rl_ui_any" text="Mikä tahansa"/>
-		<text name="rl_ui_pregnancy" text="Tiineys"/>
-		<text name="rl_ui_productivity" text="Tuottavuus"/>
-		<text name="rl_ui_selectAll" text="Valitse kaikki"/>
-		<text name="rl_ui_selectNone" text="Älä valitse mitään"/>
-		<text name="rl_ui_selectSection" text="Select Section"/>
-		<text name="rl_ui_deselectSection" text="Deselect Section"/>
-		<text name="rl_ui_doesntHaveName" text="Ei nimeä"/>
-		<text name="rl_ui_doesHaveName" text="On nimi"/>
-
-
-
-		<text name="rl_ui_castrated" text="Kastroitu"/>
-		<text name="rl_ui_castrate" text="Kastroi"/>
-		<text name="rl_ui_unknownCauses" text="tuntemattomia syitä"/>
-		<text name="rl_ui_unreadMessages" text="Navetalla '%s' on lukemattomia viestejä!"/>
-		<text name="rl_ui_herdsman" text="Lomittaja"/>
-		<text name="rl_ui_budget" text="Budjetti"/>
-		<text name="rl_ui_budgetType" text="Budjetin tyyppi"/>
-		<text name="rl_ui_fixed" text="Kiinteä"/>
-		<text name="rl_ui_percentage" text="Prosenttiosuus"/>
-		<text name="rl_ui_maxAnimals" text="Eläimiä enintään"/>
-		<text name="rl_ui_herdsmanRecentlyBought" text="Lomittajan viimeisimmät ostot"/>
-		<text name="rl_ui_herdsmanWages" text="Lomittajan palkat"/>
-		<text name="finance_herdsmanWages" text="Lomittajan palkat"/>
-		<text name="rl_ui_medicine" text="Lääke"/>
-		<text name="finance_medicine" text="Lääke"/>
-		<text name="rl_ui_semenPurchase" text="Siemennyskapillaari"/>
-		<text name="rl_ui_semenPurchase_github" text="Siemennyskapillaari"/>
-		<text name="finance_semenPurchase" text="Siemennyskapillaari"/>
-		<text name="finance_semenPurchase_github" text="Siemennyskapillaari"/>
-		<text name="rl_ui_alphabetical" text="Aakkosjärjestys"/>
-		<text name="rl_ui_breed" text="Rotu"/>
-		<text name="rl_ui_dontMark" text="Älä merkitse"/>
-		<text name="rl_ui_mark" text="Merkitse"/>
-		<text name="rl_ui_unmark" text="Poista merkintä"/>
-		<text name="rl_ui_favourite" text="Suosikki"/>
-		<text name="rl_ui_unFavourite" text="Poista suosikki"/>
-		<text name="rl_ui_dewar" text="Säiliö"/>
-		<text name="rl_ui_semenPurchase_successful" text="Siemennystuote ostetty onnistuneesti. Voit noutaa sen kaupalta"/>
-		<text name="rl_ui_semenPurchase_successful_github" text="Siemennystuote ostettu onnistuneesti. Voit noutaa sen kaupalta"/>
-		<text name="rl_ui_semenPurchase_unsuccessful" text="Siemennystuotteen ostaminen epäonnistui"/>
-		<text name="rl_ui_semenPurchase_unsuccessful_github" text="Siemennystuotteen ostaminen epäonnistui"/>
-		<text name="rl_ui_earTag" text="Korvamerkki"/>
-		<text name="rl_ui_species" text="Laji"/>
-		<text name="rl_ui_strawSingle" text="Siemennyskapillaari"/>
-		<text name="rl_ui_strawMultiple" text="Siemennyskapillaarit"/>
-		<text name="rl_ui_artificialInsemination" text="Keinosiemennys"/>
-		<text name="rl_ui_semenPurchaseNoPermission" text="Sinulla ei ole oikeuksia käydä kauppaa eläimillä tai ostaa siemennystuotetta."/>
-		<text name="rl_ui_semenPurchaseNoPermission_github" text="Sinulla ei ole oikeuksia käydä kauppaa eläimillä tai ostaa siemennystuotetta."/>
-		<text name="rl_ui_semenPurchaseNoMoney" text="Sinulla ei ole tarpeeksi rahaa siemennystuotteen ostoon."/>
-		<text name="rl_ui_semenPurchaseNoMoney_github" text="Sinulla ei ole tarpeeksi rahaa siemennystuotteen ostoon."/>
-		<text name="rl_ui_takeStraw" text="Ota siemennyskapillaari"/>
-		<text name="rl_ui_inseminateAnimal" text="Siemennä %s"/>
-		<text name="rl_ui_inseminate" text="Siemennä"/>
-		<text name="rl_ui_strawEmpty" text="Tämä siemennyskapillaari on tyhjä"/>
-		<text name="rl_ui_averageSuccess" text="Keskiarvo onnistumisessa"/>
-		<text name="rl_ui_success" text="Onnistui"/>
+        <text name="rl_button_apply" text="Käytä"/>
+        <text name="rl_button_confirm" text="Hyväksy"/>
+        <text name="rl_button_recommended" text="Suositeltu"/>
+        <text name="rl_button_cancel" text="Peruuta"/>
+        <text name="rl_button_random" text="Satunnainen"/>
+        <text name="rl_dialog_title" text="Aseta visuaalisten eläinten maksimimäärä"/>
+
+        <text name="rl_ui_unhealthy" text="Liian huonokuntoinen"/>
+        <text name="rl_ui_unhealthyBracketed" text="Ei (liian huonokuntoinen)"/>
+        <text name="rl_ui_noMaleAnimal" text="Ei soveltuvaa uros eläintä"/>
+        <text name="rl_ui_noMaleAnimalBracketed" text="Ei (ei soveltuvaa uros eläintä)"/>
+        <text name="rl_ui_recoveringLastBirth" text="Toipumassa viimeisimmästä synnytyksestä"/>
+        <text name="rl_ui_recoveringLastBirthBracketed" text="Ei (toipumassa viimeisimmästä synnytyksestä)"/>
+        <text name="rl_ui_tooYoung" text="Liian nuori"/>
+        <text name="rl_ui_tooYoungBracketed" text="Ei (liian nuori)"/>
+        <text name="rl_ui_pregnant" text="Tiineenä"/>
+        <text name="rl_ui_lactating" text="Imettävä"/>
+        <text name="rl_ui_canReproduce" text="Voi lisääntyä"/>
+        <text name="rl_ui_impregnatedBy" text="Siittänyt"/>
+        <text name="rl_ui_unknown" text="Ei tiedossa"/>
+        <text name="rl_ui_yes" text="Kyllä"/>
+        <text name="rl_ui_no" text="Ei"/>
+        <text name="rl_ui_mother" text="Emo"/>
+        <text name="rl_ui_father" text="Isä"/>
+        <text name="rl_ui_uniqueId" text="Yksilöllinen ID"/>
+        <text name="rl_ui_farmId" text="Farmin ID"/>
+        <text name="rl_ui_gender" text="Sukupuoli"/>
+        <text name="rl_ui_male" text="Uros"/>
+        <text name="rl_ui_female" text="Naaras"/>
+        <text name="rl_ui_weight" text="Paino"/>
+        <text name="rl_ui_targetWeight" text="Tavoitepaino"/>
+        <text name="rl_ui_value" text="Arvo"/>
+        <text name="rl_ui_valuePerKilo" text="Arvo kilolta"/>
+        <text name="rl_ui_genetics" text="Genetiikka"/>
+        <text name="rl_ui_overall" text="Kokonais"/>
+        <text name="rl_ui_rename" text="Vaihda nimi"/>
+        <text name="rl_ui_maleNumImpregnatable" text="Siitettäviä eläimiä aitauksessa"/>
+
+        <text name="rl_ui_breederQuality" text="Siittäjän laatu"/>
+        <text name="rl_ui_birthday" text="Syntynyt"/>
+        <text name="rl_ui_pregnancyExpected" text="Laskettu aika"/>
+        <text name="rl_ui_pregnancyExpecting" text="Odottaa"/>
+        <text name="rl_ui_pregnancyBaby" text="poikanen"/>
+        <text name="rl_ui_pregnancyBabies" text="poikaset"/>
+        <text name="rl_ui_animalOrigin" text="Alkuperä"/>
+        <text name="rl_ui_months" text="kuukautta"/>
+        <text name="rl_ui_month" text="kuukausi"/>
+        <text name="rl_ui_years" text="vuotta"/>
+        <text name="rl_ui_year" text="vuosi"/>
+
+        <text name="rl_ui_milk" text="Maidon tuotto"/>
+        <text name="rl_ui_wool" text="Villan tuotto"/>
+        <text name="rl_ui_eggs" text="Munien tuotto"/>
+        <text name="rl_ui_metabolism" text="Aineenvaihdunta"/>
+        <text name="rl_ui_meat" text="Laatu"/>
+        <text name="rl_ui_meat_github" text="Lihan laatu"/>
+        <text name="rl_ui_quality" text="Laatu"/>
+        <text name="rl_ui_quality_github" text="Lihan laatu"/>
+        <text name="rl_ui_health" text="Terveys"/>
+        <text name="rl_ui_fertility" text="Hedelmällisyys"/>
+
+        <text name="rl_ui_genetics_infertile" text="Lisääntymiskyvytön"/>
+        <text name="rl_ui_genetics_extremelyLow" text="Äärimmäisen alhainen"/>
+        <text name="rl_ui_genetics_veryLow" text="Erittäin alhainen"/>
+        <text name="rl_ui_genetics_low" text="Alhainen"/>
+        <text name="rl_ui_genetics_average" text="Keskiverto"/>
+        <text name="rl_ui_genetics_high" text="Korkea"/>
+        <text name="rl_ui_genetics_veryHigh" text="Erittäin korkea"/>
+        <text name="rl_ui_genetics_extremelyHigh" text="Äärimmäisen korkea"/>
+
+        <text name="rl_ui_genetics_extremelyBad" text="Äärimmäisen huono"/>
+        <text name="rl_ui_genetics_veryBad" text="Erittäin huono"/>
+        <text name="rl_ui_genetics_bad" text="Huono"/>
+        <text name="rl_ui_genetics_good" text="Hyvä"/>
+        <text name="rl_ui_genetics_veryGood" text="Erittäin hyvä"/>
+        <text name="rl_ui_genetics_extremelyGood" text="Äärimmäisen hyvä"/>
+
+        <text name="rl_ui_buySelected" text="Osta valitut"/>
+        <text name="rl_ui_sellSelected" text="Myy valitut"/>
+        <text name="rl_ui_moveSelected" text="Siirrä valitut"/>
+        <text name="rl_ui_buyConfirmation" text="Haluatko varmasti ostaa %s eläintä %s:lla?" tag="format"/>
+        <text name="rl_ui_sellConfirmation" text="Haluatko varmasti myydä %s eläintä %s:lla?" tag="format"/>
+        <text name="rl_ui_buyBulkResult" text="%s eläintä ostettiin %s:lla" tag="format"/>
+        <text name="rl_ui_sellBulkResult" text="%s eläintä myytiin %s:lla" tag="format"/>
+        <text name="rl_ui_moveBulkResult" text="%s eläintä siirrettiin" tag="format"/>
+        <text name="rl_ui_moveSingle" text="Move"/>
+        <text name="rl_ui_moveSelectDestination" text="Select Destination"/>
+        <text name="rl_ui_moveNoDestinations" text="No destinations available for this animal type."/>
+        <text name="rl_ui_moveEPPAgeFormat" text="ages %d-%d mo" tag="format"/>
+        <text name="rl_ui_moveValidSummary" text="%d animal(s) will be moved" tag="format"/>
+        <text name="rl_ui_moveRejectedAge" text="%d animal(s) skipped: does not meet age requirement (%d-%d months)" tag="format"/>
+        <text name="rl_ui_moveRejectedCapacity" text="%d animal(s) skipped: not enough space at destination" tag="format"/>
+        <text name="rl_ui_moveAllRejected" text="No animals can be moved to this destination."/>
+        <text name="rl_ui_moveBulkConfirmTitle" text="Move Animals"/>
+        <text name="rl_ui_moveErrorNoPermission" text="You don't have permission to move animals here."/>
+        <text name="rl_ui_moveErrorNotSupported" text="This destination doesn't support this animal type."/>
+        <text name="rl_ui_moveErrorNoSpace" text="Not enough space at the destination."/>
+        <text name="rl_ui_tradeRequestInProgress" text="A trade is already in progress. Please wait."/>
+        <text name="rl_ui_tradeRequestTimeout" text="The server did not respond. Please try again."/>
+
+        <text name="rl_ui_monitor" text="Seurantalaitteet"/>
+        <text name="rl_ui_monitorSubscriptions" text="Seurantalaitetilaukset"/>
+        <text name="finance_monitorSubscriptions" text="Seurantalaitetilaukset"/>
+        <text name="rl_ui_monitorFee" text="Seurantalaitemaksu"/>
+        <text name="rl_ui_applyMonitor" text="Aseta seurantalaite"/>
+        <text name="rl_ui_removeMonitor" text="Poista seurantalaite"/>
+        <text name="rl_ui_input_food" text="Ruoka"/>
+        <text name="rl_ui_input_water" text="Vesi"/>
+        <text name="rl_ui_input_straw" text="Olki"/>
+        <text name="rl_ui_output_milk" text="Maito"/>
+        <text name="rl_ui_output_manure" text="Lanta"/>
+        <text name="rl_ui_output_liquidManure" text="Liete"/>
+        <text name="rl_ui_output_pallets_eggs" text="Munia"/>
+        <text name="rl_ui_output_pallets_wool" text="Villa"/>
+        <text name="rl_ui_output_pallets_goatMilk" text="Vuohenmaito"/>
+        <text name="rl_ui_amountPerDay" text="%.0fl / päivä" tag="format"/>
+        <text name="rl_ui_feePerMonth" text="%s / kk" tag="format"/>
+
+        <text name="rl_ui_animalType" text="Eläintyyppi"/>
+        <text name="rl_ui_amountMonitored" text="Seurannassa"/>
+        <text name="rl_ui_production" text="Tuotanto"/>
+        <text name="rl_ui_applyAllMonitor" text="Aseta kaikille seurantalaite"/>
+        <text name="rl_ui_removeAllMonitor" text="Poista kaikilta seurantalaite"/>
+        <text name="rl_ui_fee" text="Maksu"/>
+
+        <text name="rl_ui_leftEarTag" text="Vasen korvamerkki"/>
+        <text name="rl_ui_rightEarTag" text="Oikea korvamerkki"/>
+        <text name="rl_ui_backgroundColour" text="Taustaväri"/>
+        <text name="rl_ui_backgroundHue" text="Taustan sävy"/>
+        <text name="rl_ui_backgroundRgb" text="Taustan RGB"/>
+        <text name="rl_ui_textColour" text="Tekstin väri"/>
+        <text name="rl_ui_textHue" text="Tekstin sävy"/>
+        <text name="rl_ui_textRgb" text="Tekstin RGB"/>
+
+        <text name="rl_ui_formatMonths" text="%s kuukautta"/>
+        <text name="rl_ui_formatMonth" text="%s kuukausi"/>
+        <text name="rl_ui_notPregnant" text="Ei tiineenä"/>
+        <text name="rl_ui_any" text="Mikä tahansa"/>
+        <text name="rl_ui_pregnancy" text="Tiineys"/>
+        <text name="rl_ui_productivity" text="Tuottavuus"/>
+        <text name="rl_ui_selectAll" text="Valitse kaikki"/>
+        <text name="rl_ui_selectNone" text="Älä valitse mitään"/>
+        <text name="rl_ui_selectSection" text="Select Section"/>
+        <text name="rl_ui_deselectSection" text="Deselect Section"/>
+        <text name="rl_ui_doesntHaveName" text="Ei nimeä"/>
+        <text name="rl_ui_doesHaveName" text="On nimi"/>
+
+
+
+        <text name="rl_ui_castrated" text="Kastroitu"/>
+        <text name="rl_ui_castrate" text="Kastroi"/>
+        <text name="rl_ui_unknownCauses" text="tuntemattomia syitä"/>
+        <text name="rl_ui_unreadMessages" text="Navetalla '%s' on lukemattomia viestejä!"/>
+        <text name="rl_ui_herdsman" text="Lomittaja"/>
+        <text name="rl_ui_budget" text="Budjetti"/>
+        <text name="rl_ui_budgetType" text="Budjetin tyyppi"/>
+        <text name="rl_ui_fixed" text="Kiinteä"/>
+        <text name="rl_ui_percentage" text="Prosenttiosuus"/>
+        <text name="rl_ui_maxAnimals" text="Eläimiä enintään"/>
+        <text name="rl_ui_herdsmanRecentlyBought" text="Lomittajan viimeisimmät ostot"/>
+        <text name="rl_ui_herdsmanWages" text="Lomittajan palkat"/>
+        <text name="finance_herdsmanWages" text="Lomittajan palkat"/>
+        <text name="rl_ui_medicine" text="Lääke"/>
+        <text name="finance_medicine" text="Lääke"/>
+        <text name="rl_ui_semenPurchase" text="Siemennyskapillaari"/>
+        <text name="rl_ui_semenPurchase_github" text="Siemennyskapillaari"/>
+        <text name="finance_semenPurchase" text="Siemennyskapillaari"/>
+        <text name="finance_semenPurchase_github" text="Siemennyskapillaari"/>
+        <text name="rl_ui_alphabetical" text="Aakkosjärjestys"/>
+        <text name="rl_ui_breed" text="Rotu"/>
+        <text name="rl_ui_dontMark" text="Älä merkitse"/>
+        <text name="rl_ui_mark" text="Merkitse"/>
+        <text name="rl_ui_unmark" text="Poista merkintä"/>
+        <text name="rl_ui_favourite" text="Suosikki"/>
+        <text name="rl_ui_unFavourite" text="Poista suosikki"/>
+        <text name="rl_ui_dewar" text="Säiliö"/>
+        <text name="rl_ui_semenPurchase_successful" text="Siemennystuote ostetty onnistuneesti. Voit noutaa sen kaupalta"/>
+        <text name="rl_ui_semenPurchase_successful_github" text="Siemennystuote ostettu onnistuneesti. Voit noutaa sen kaupalta"/>
+        <text name="rl_ui_semenPurchase_unsuccessful" text="Siemennystuotteen ostaminen epäonnistui"/>
+        <text name="rl_ui_semenPurchase_unsuccessful_github" text="Siemennystuotteen ostaminen epäonnistui"/>
+        <text name="rl_ui_earTag" text="Korvamerkki"/>
+        <text name="rl_ui_species" text="Laji"/>
+        <text name="rl_ui_strawSingle" text="Siemennyskapillaari"/>
+        <text name="rl_ui_strawMultiple" text="Siemennyskapillaarit"/>
+        <text name="rl_ui_artificialInsemination" text="Keinosiemennys"/>
+        <text name="rl_ui_semenPurchaseNoPermission" text="Sinulla ei ole oikeuksia käydä kauppaa eläimillä tai ostaa siemennystuotetta."/>
+        <text name="rl_ui_semenPurchaseNoPermission_github" text="Sinulla ei ole oikeuksia käydä kauppaa eläimillä tai ostaa siemennystuotetta."/>
+        <text name="rl_ui_semenPurchaseNoMoney" text="Sinulla ei ole tarpeeksi rahaa siemennystuotteen ostoon."/>
+        <text name="rl_ui_semenPurchaseNoMoney_github" text="Sinulla ei ole tarpeeksi rahaa siemennystuotteen ostoon."/>
+        <text name="rl_ui_takeStraw" text="Ota siemennyskapillaari"/>
+        <text name="rl_ui_inseminateAnimal" text="Siemennä %s"/>
+        <text name="rl_ui_inseminate" text="Siemennä"/>
+        <text name="rl_ui_strawEmpty" text="Tämä siemennyskapillaari on tyhjä"/>
+        <text name="rl_ui_averageSuccess" text="Keskiarvo onnistumisessa"/>
+        <text name="rl_ui_success" text="Onnistui"/>
 
-		<text name="rl_ui_healthy" text="Healthy"/>
-		<text name="rl_ui_hasDisease" text="Has Disease"/>
-		<text name="rl_ui_diseasedAnimals" text="Diseased Animals"/>
+        <text name="rl_ui_healthy" text="Healthy"/>
+        <text name="rl_ui_hasDisease" text="Has Disease"/>
+        <text name="rl_ui_diseasedAnimals" text="Diseased Animals"/>
 
 
-		<text name="rl_insemination_male" text="Vain naaraspuoliset eläimet voidaan keinosiementää"/>
-		<text name="rl_insemination_pregnant" text="Tämä eläin on jo tiineenä"/>
-		<text name="rl_insemination_animalType" text="Eläimen täytyy olla samaa lajia kuin isä"/>
-		<text name="rl_insemination_inseminated" text="Tämä eläin on jo saanut keinosiemennyksen"/>
-		<text name="rl_insemination_recovering" text="Tämä eläin toipuu edellisestä tiineydestä"/>
-		<text name="rl_insemination_father" text="Sukusiitos ei ole sallittua"/>
-		<text name="rl_insemination_young" text="Tämä eläin on liian nuori keinosiemennykseen"/>
+        <text name="rl_insemination_male" text="Vain naaraspuoliset eläimet voidaan keinosiementää"/>
+        <text name="rl_insemination_pregnant" text="Tämä eläin on jo tiineenä"/>
+        <text name="rl_insemination_animalType" text="Eläimen täytyy olla samaa lajia kuin isä"/>
+        <text name="rl_insemination_inseminated" text="Tämä eläin on jo saanut keinosiemennyksen"/>
+        <text name="rl_insemination_recovering" text="Tämä eläin toipuu edellisestä tiineydestä"/>
+        <text name="rl_insemination_father" text="Sukusiitos ei ole sallittua"/>
+        <text name="rl_insemination_young" text="Tämä eläin on liian nuori keinosiemennykseen"/>
 
 
-		<text name="rl_mark_aiManager_sell" text="Lomittaja on merkinnyt myyväksi"/>
-		<text name="rl_mark_aiManager_castrate" text="Lomittaja on merkinnyt kastrointiin"/>
-		<text name="rl_mark_aiManager_disease" text="Lomittaja on merkinnyt hoitoa varten"/>
-		<text name="rl_mark_aiManager_ai" text="Lomittaja on merkinnyt keinosiemennykseen"/>
-		<text name="rl_mark_aiManager_move" text="Herdsman marked for moving"/>
-		<text name="rl_mark_player" text="Pelaajan merkitsemä"/>
+        <text name="rl_mark_aiManager_sell" text="Lomittaja on merkinnyt myyväksi"/>
+        <text name="rl_mark_aiManager_castrate" text="Lomittaja on merkinnyt kastrointiin"/>
+        <text name="rl_mark_aiManager_disease" text="Lomittaja on merkinnyt hoitoa varten"/>
+        <text name="rl_mark_aiManager_ai" text="Lomittaja on merkinnyt keinosiemennykseen"/>
+        <text name="rl_mark_aiManager_move" text="Herdsman marked for moving"/>
+        <text name="rl_mark_player" text="Pelaajan merkitsemä"/>
 
 
-	<!-- AI - BUYING -->
+        <!-- AI - BUYING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="Lomittaja ei osta eläimiä."/>
-		<text name="rl_ui_herdsmanTooltip_buy_enabled_2" text="Lomittaja ostaa eläimiä."/>
+        <text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="Lomittaja ei osta eläimiä."/>
+        <text name="rl_ui_herdsmanTooltip_buy_enabled_2" text="Lomittaja ostaa eläimiä."/>
 
-		<text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Ostobudjetti on kiinteä määrä."/>
-		<text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Ostobudjetti on prosenttiosuus tilan rahoista."/>
+        <text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Ostobudjetti on kiinteä määrä."/>
+        <text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Ostobudjetti on prosenttiosuus tilan rahoista."/>
 
 
 
@@ -312,11 +312,11 @@
 
 
 
-	<!-- AI - SELLING -->
+        <!-- AI - SELLING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Lomittaja ei myy eläimiä."/>
-		<text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Lomittaja myy eläimiä."/>
+        <text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Lomittaja ei myy eläimiä."/>
+        <text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Lomittaja myy eläimiä."/>
 
 
 
@@ -329,11 +329,11 @@
 
 
 
-	<!-- AI - CASTRATING -->
+        <!-- AI - CASTRATING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Lomittaja ei kastroi eläimiä."/>
-		<text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Lomittaja kastroi eläimiä."/>
+        <text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Lomittaja ei kastroi eläimiä."/>
+        <text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Lomittaja kastroi eläimiä."/>
 
 
 
@@ -344,29 +344,29 @@
 
 
 
-	<!-- AI - NAMING -->
+        <!-- AI - NAMING -->
 
 
-		<text name="rl_ui_herdsmanTooltip_naming_enabled_1" text="Lomittaja ei nimeä eläimiä."/>
-		<text name="rl_ui_herdsmanTooltip_naming_enabled_2" text="Lomittaja nimeää eläimiä."/>
+        <text name="rl_ui_herdsmanTooltip_naming_enabled_1" text="Lomittaja ei nimeä eläimiä."/>
+        <text name="rl_ui_herdsmanTooltip_naming_enabled_2" text="Lomittaja nimeää eläimiä."/>
 
-		<text name="rl_ui_herdsmanTooltip_naming_convention_1" text="Lomittaja nimeää eläimet satunnaisesti."/>
-		<text name="rl_ui_herdsmanTooltip_naming_convention_2" text="Lomittaja nimeää eläimet aakkosjärjestyksessä."/>
+        <text name="rl_ui_herdsmanTooltip_naming_convention_1" text="Lomittaja nimeää eläimet satunnaisesti."/>
+        <text name="rl_ui_herdsmanTooltip_naming_convention_2" text="Lomittaja nimeää eläimet aakkosjärjestyksessä."/>
 
 
-	<!-- AI - AI -->
+        <!-- AI - AI -->
 
 
-		<text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Lomittaja ei tee keinohedelmöityksiä."/>
-		<text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Lomittaja tekee keinohedelmöityksiä."/>
+        <text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Lomittaja ei tee keinohedelmöityksiä."/>
+        <text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Lomittaja tekee keinohedelmöityksiä."/>
 
 
 
 
-		<text name="rl_ui_herdsmanTooltip_ai_semen" text="Lomittaja käyttää siementä lähteestä %s."/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_github" text="Lomittaja käyttää siementä lähteestä %s."/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_any" text="Lomittaja käyttää mitä tahansa kelvollista siementä."/>
-		<text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="Lomittaja käyttää mitä tahansa kelvollista siementä."/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen" text="Lomittaja käyttää siementä lähteestä %s."/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_github" text="Lomittaja käyttää siementä lähteestä %s."/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_any" text="Lomittaja käyttää mitä tahansa kelvollista siementä."/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="Lomittaja käyttää mitä tahansa kelvollista siementä."/>
 
 
 
@@ -377,222 +377,222 @@
 
 
 
-		<!--  SETTINGS  -->
+        <!--  SETTINGS  -->
 
 
-		<text name="rl_settings" text="Realistinen Karja"/>
-		<text name="rl_settings_openMenu_button" text="Avaa asetukset"/>
-		<text name="rl_settings_openMenu_label" text="Avaa Realistinen Karja -asetukset"/>
+        <text name="rl_settings" text="Realistinen Karja"/>
+        <text name="rl_settings_openMenu_button" text="Avaa asetukset"/>
+        <text name="rl_settings_openMenu_label" text="Avaa Realistinen Karja -asetukset"/>
 
-		<text name="rl_settings_off" text="Pois"/>
-		<text name="rl_settings_on" text="Päällä"/>
+        <text name="rl_settings_off" text="Pois"/>
+        <text name="rl_settings_on" text="Päällä"/>
 
-		<text name="rl_settings_deathEnabled_label" text="Eläinten poistuminen"/>
-		<text name="rl_settings_deathEnabled_label_github" text="Eläinten kuoleminen"/>
-		<text name="rl_settings_deathEnabled_tooltip_1" text="Eläimiä ei poisteta tiineyden, terveyden, vanhuuden tai onnettomuuden vuoksi"/>
-		<text name="rl_settings_deathEnabled_tooltip_1_github" text="Eläimiä ei kuole tiineyden, terveyden, vanhuuden tai onnettomuuden vuoksi"/>
-		<text name="rl_settings_deathEnabled_tooltip_2" text="Eläimiä poistetaan tiineyden, terveyden, vanhuuden tai onnettomuuden vuoksi"/>
-		<text name="rl_settings_deathEnabled_tooltip_2_github" text="Eläimiä kuolee tiineyden, terveyden, vanhuuden tai onnettomuuden vuoksi"/>
+        <text name="rl_settings_deathEnabled_label" text="Eläinten poistuminen"/>
+        <text name="rl_settings_deathEnabled_label_github" text="Eläinten kuoleminen"/>
+        <text name="rl_settings_deathEnabled_tooltip_1" text="Eläimiä ei poisteta tiineyden, terveyden, vanhuuden tai onnettomuuden vuoksi"/>
+        <text name="rl_settings_deathEnabled_tooltip_1_github" text="Eläimiä ei kuole tiineyden, terveyden, vanhuuden tai onnettomuuden vuoksi"/>
+        <text name="rl_settings_deathEnabled_tooltip_2" text="Eläimiä poistetaan tiineyden, terveyden, vanhuuden tai onnettomuuden vuoksi"/>
+        <text name="rl_settings_deathEnabled_tooltip_2_github" text="Eläimiä kuolee tiineyden, terveyden, vanhuuden tai onnettomuuden vuoksi"/>
 
-		<text name="rl_settings_accidentsChance_label" text="Onnettomuuden todennäköisyys"/>
-		<text name="rl_settings_accidentsChance_tooltip" text="Muuta satunnaisista onnettomuuksista johtuvaa eläinten poistumisen todennäköisyyttä"/>
-		<text name="rl_settings_accidentsChance_tooltip_github" text="Muuta satunnaisista onnettomuuksista johtuvaa eläinten kuolemisen todennäköisyyttä"/>
+        <text name="rl_settings_accidentsChance_label" text="Onnettomuuden todennäköisyys"/>
+        <text name="rl_settings_accidentsChance_tooltip" text="Muuta satunnaisista onnettomuuksista johtuvaa eläinten poistumisen todennäköisyyttä"/>
+        <text name="rl_settings_accidentsChance_tooltip_github" text="Muuta satunnaisista onnettomuuksista johtuvaa eläinten kuolemisen todennäköisyyttä"/>
 
-		<text name="rl_settings_foodScale_label" text="Ruuankulutus"/>
-		<text name="rl_settings_foodScale_tooltip" text="Muuttaa eläinten kuluttamaa ruuan määrää"/>
+        <text name="rl_settings_foodScale_label" text="Ruuankulutus"/>
+        <text name="rl_settings_foodScale_tooltip" text="Muuttaa eläinten kuluttamaa ruuan määrää"/>
 
-		<text name="rl_settings_maxDealerAnimals_label" text="Eläinten enimmäismäärä eläinkauppiaalla"/>
-		<text name="rl_settings_maxDealerAnimals_tooltip" text="Muuta eläinkauppiaalta ostettavien eläinten enimmäismäärää eläinlajia kohden"/>
-		<text name="rl_settings_dealerQuality_label" text="Dealer Animal Quality"/>
-		<text name="rl_settings_dealerQuality_tooltip" text="Sets how good - and how expensive - the animals the dealer offers are. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing this discards the current dealer stock and restocks with new animals. Does not affect the AI animals used for insemination."/>
-		<text name="rl_settings_dealerQuality_texts_1" text="Budget"/>
-		<text name="rl_settings_dealerQuality_texts_2" text="Standard"/>
-		<text name="rl_settings_dealerQuality_texts_3" text="Premium"/>
+        <text name="rl_settings_maxDealerAnimals_label" text="Eläinten enimmäismäärä eläinkauppiaalla"/>
+        <text name="rl_settings_maxDealerAnimals_tooltip" text="Muuta eläinkauppiaalta ostettavien eläinten enimmäismäärää eläinlajia kohden"/>
+        <text name="rl_settings_dealerQuality_label" text="Dealer Animal Quality"/>
+        <text name="rl_settings_dealerQuality_tooltip" text="Sets how good - and how expensive - the animals the dealer offers are. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing this discards the current dealer stock and restocks with new animals. Does not affect the AI animals used for insemination."/>
+        <text name="rl_settings_dealerQuality_texts_1" text="Budget"/>
+        <text name="rl_settings_dealerQuality_texts_2" text="Standard"/>
+        <text name="rl_settings_dealerQuality_texts_3" text="Premium"/>
 
-		<text name="rl_settings_mapCountry_label" text="Eläinten alkuperämaa"/>
-		<text name="rl_settings_mapCountry_tooltip" text="Ohittaa maan, johon uudet eläimet rekisteröidään (korvamerkit, tunnisteet). Koskee vain uusia eläimiä; olemassa olevat eläimet säilyttävät maansa."/>
-		<text name="rl_settings_mapCountry_texts_1" text="Kartan oletus"/>
+        <text name="rl_settings_mapCountry_label" text="Eläinten alkuperämaa"/>
+        <text name="rl_settings_mapCountry_tooltip" text="Ohittaa maan, johon uudet eläimet rekisteröidään (korvamerkit, tunnisteet). Koskee vain uusia eläimiä; olemassa olevat eläimet säilyttävät maansa."/>
+        <text name="rl_settings_mapCountry_texts_1" text="Kartan oletus"/>
 
-		<text name="rl_settings_resetDealer_label" text="Nollaa eläinkauppias"/>
-		<text name="rl_settings_resetDealer_tooltip" text="Poista kaikki eläinkauppiaan eläimet ja täydennä varastot uusilla eläimillä"/>
-		<text name="rl_settings_resetDealer_text" text="Nollaa eläinkauppias"/>
+        <text name="rl_settings_resetDealer_label" text="Nollaa eläinkauppias"/>
+        <text name="rl_settings_resetDealer_tooltip" text="Poista kaikki eläinkauppiaan eläimet ja täydennä varastot uusilla eläimillä"/>
+        <text name="rl_settings_resetDealer_text" text="Nollaa eläinkauppias"/>
 
-		<text name="rl_settings_dealerSale_label" text="Choose Animals For Sale"/>
-		<text name="rl_settings_dealerSale_tooltip" text="Choose which animals and age groups the dealer offers for sale. Changing this restocks the dealer."/>
-		<text name="rl_settings_dealerSale_text" text="Choose Animals For Sale"/>
+        <text name="rl_settings_dealerSale_label" text="Choose Animals For Sale"/>
+        <text name="rl_settings_dealerSale_tooltip" text="Choose which animals and age groups the dealer offers for sale. Changing this restocks the dealer."/>
+        <text name="rl_settings_dealerSale_text" text="Choose Animals For Sale"/>
 
-		<text name="rl_settings_tagColour_label" text="Muuta merkin väriä"/>
-		<text name="rl_settings_tagColour_tooltip" text="Muuta korvamerkin väriä"/>
-		<text name="rl_settings_tagColour_text" text="Muuta merkin väriä"/>
-		<text name="rl_settings_maxVisualAnimals_label" text="Set Maximum Visual Animals"/>
-		<text name="rl_settings_maxVisualAnimals_text" text="Set Maximum Visual Animals"/>
-		<text name="rl_settings_maxVisualAnimals_tooltip" text="Set the maximum number of animals rendered per pen. Per-machine display setting; not synced in multiplayer."/>
+        <text name="rl_settings_tagColour_label" text="Muuta merkin väriä"/>
+        <text name="rl_settings_tagColour_tooltip" text="Muuta korvamerkin väriä"/>
+        <text name="rl_settings_tagColour_text" text="Muuta merkin väriä"/>
+        <text name="rl_settings_maxVisualAnimals_label" text="Set Maximum Visual Animals"/>
+        <text name="rl_settings_maxVisualAnimals_text" text="Set Maximum Visual Animals"/>
+        <text name="rl_settings_maxVisualAnimals_tooltip" text="Set the maximum number of animals rendered per pen. Per-machine display setting; not synced in multiplayer."/>
 
-		<text name="rl_settings_exportCSV_label" text="Vie CSV:ksi"/>
-		<text name="rl_settings_exportCSV_tooltip" text="Vie tilastot CSV:ksi"/>
-		<text name="rl_settings_exportCSV_text" text="Vie CSV:ksi"/>
+        <text name="rl_settings_exportCSV_label" text="Vie CSV:ksi"/>
+        <text name="rl_settings_exportCSV_tooltip" text="Vie tilastot CSV:ksi"/>
+        <text name="rl_settings_exportCSV_text" text="Vie CSV:ksi"/>
 
-		<text name="rl_settings_maxNumMessages_label" text="Enimmäismäärä viestejä"/>
-		<text name="rl_settings_maxNumMessages_tooltip" text="Korkeampi määrä kasvattaa tallennuskansiosi kokoa. Kun tämä raja on saavutettu, vanhimmat viestit poistetaan."/>
+        <text name="rl_settings_maxNumMessages_label" text="Enimmäismäärä viestejä"/>
+        <text name="rl_settings_maxNumMessages_tooltip" text="Korkeampi määrä kasvattaa tallennuskansiosi kokoa. Kun tämä raja on saavutettu, vanhimmat viestit poistetaan."/>
 
-		<text name="rl_settings_diseasesEnabled_label" text="Diseases Enabled"/>
-		<text name="rl_settings_diseasesEnabled_tooltip_1" text="Animals cannot catch or inherit diseases"/>
-		<text name="rl_settings_diseasesEnabled_tooltip_2" text="Animals can catch or inherit diseases"/>
+        <text name="rl_settings_diseasesEnabled_label" text="Diseases Enabled"/>
+        <text name="rl_settings_diseasesEnabled_tooltip_1" text="Animals cannot catch or inherit diseases"/>
+        <text name="rl_settings_diseasesEnabled_tooltip_2" text="Animals can catch or inherit diseases"/>
 
-		<text name="rl_settings_diseasesChance_label" text="Disease Chance"/>
-		<text name="rl_settings_diseasesChance_tooltip" text="Change the likelihood of animals contracting diseases"/>
+        <text name="rl_settings_diseasesChance_label" text="Disease Chance"/>
+        <text name="rl_settings_diseasesChance_tooltip" text="Change the likelihood of animals contracting diseases"/>
 
-		<text name="rl_settings_useCustomAnimals_label" text="Use Custom Animals"/>
-		<text name="rl_settings_useCustomAnimals_tooltip_1" text="Use RealisticLivestock animal models (requires restart)"/>
-		<text name="rl_settings_useCustomAnimals_tooltip_2" text="Use custom animal models (experimental, requires restart, must be unzipped)"/>
+        <text name="rl_settings_useCustomAnimals_label" text="Use Custom Animals"/>
+        <text name="rl_settings_useCustomAnimals_tooltip_1" text="Use RealisticLivestock animal models (requires restart)"/>
+        <text name="rl_settings_useCustomAnimals_tooltip_2" text="Use custom animal models (experimental, requires restart, must be unzipped)"/>
 
-		<text name="rl_settings_animalsXML_label" text="Set Animals XML Path"/>
-		<text name="rl_settings_animalsXML_tooltip" text="Set path to a custom animals XML file"/>
-		<text name="rl_settings_animalsXML_text" text="Set Animals XML Path"/>
+        <text name="rl_settings_animalsXML_label" text="Set Animals XML Path"/>
+        <text name="rl_settings_animalsXML_tooltip" text="Set path to a custom animals XML file"/>
+        <text name="rl_settings_animalsXML_text" text="Set Animals XML Path"/>
 
 
 
-		<!--  HELP  -->
+        <!--  HELP  -->
 
 
-		<text name="rl_help_monitors_title" text="Seurantalaitteet"/>
-		<text name="rl_help_monitors_1" text="Nähdäksesi suurimman osan eläimen tilastoista, sinun on kiinnitettävä siihen seurantalaite, jonka voit tehdä eläinvalikon kautta (jossa ostetaan ja myydään eläimiä). Seurantalaitteet näkyvät myös visuaalisesti eläimen vasemmassa korvassa, tunnistemerkin vieressä."/>
-		<text name="rl_help_monitors_2" text="Seurantalaitteen avulla sinulle näytetään tärkeitä tietoja, mm. terveys, paino, imetys, tuotanto sekä olkien, ruoan ja veden tarve."/>
-		<text name="rl_help_monitors_3" text="Laitteen kiinnittämisestä peritään pieni kuukausimaksun eläimen lajin mukaan. Jos päätät poistaa laitteen, niin se poistetaan seuraavan kuun alussa."/>
+        <text name="rl_help_monitors_title" text="Seurantalaitteet"/>
+        <text name="rl_help_monitors_1" text="Nähdäksesi suurimman osan eläimen tilastoista, sinun on kiinnitettävä siihen seurantalaite, jonka voit tehdä eläinvalikon kautta (jossa ostetaan ja myydään eläimiä). Seurantalaitteet näkyvät myös visuaalisesti eläimen vasemmassa korvassa, tunnistemerkin vieressä."/>
+        <text name="rl_help_monitors_2" text="Seurantalaitteen avulla sinulle näytetään tärkeitä tietoja, mm. terveys, paino, imetys, tuotanto sekä olkien, ruoan ja veden tarve."/>
+        <text name="rl_help_monitors_3" text="Laitteen kiinnittämisestä peritään pieni kuukausimaksun eläimen lajin mukaan. Jos päätät poistaa laitteen, niin se poistetaan seuraavan kuun alussa."/>
 
-		<text name="rl_help_pregnancy_title" text="Tiineys"/>
-		<text name="rl_help_pregnancy_1" text="Kaikki naaraspuoliset eläimet tarvitsevat vähintään yhden uroseläimen tullakseen tiineeksi. Molempien eläinten on oltava oikean ikäisiä, terveitä sekä samaa lajia. Jalostus eri rotujen välillä (esim. holstein-lehmä ja angushärkä) on sallittua."/>
-		<text name="rl_help_pregnancy_2" text="Sukusiitos ei ole sallittua. Jos uros ja naaras ovat suoraan sukua, he eivät lisäänny yhdessä."/>
-		<text name="rl_help_pregnancy_3" text="Naaraan mahdollisuus tulla tiineeksi riippuu kummankin hedelmällisyydestä. Naaralla, jolla on korkeampi hedelmällisyys, on myös huomattavasti suurempi mahdollisuus tuottaa kerralla enemmän jälkeläisiä."/>
-		<text name="rl_help_pregnancy_4" text="Kun naaras tulee tiineeksi, alkaa se kantamaan jälkeläisiä. Näet odotetun tiineyden päivämäärän ja jälkeläisten lukumäärän katsomalla eläintä karsinassa tai klikkaamalla sitä eläinvalikosta."/>
-		<text name="rl_help_pregnancy_5" text="Naaras poikii odottettuna päivänä. Vastasyntyneillä on kuitenkin tietty mahdollisuus poistua, kuten myös emolla, jos raskaus sujuu huonosti. Ahtaaseen karsinaan syntyneet vastasyntyneet myydään automaattisesti."/>
+        <text name="rl_help_pregnancy_title" text="Tiineys"/>
+        <text name="rl_help_pregnancy_1" text="Kaikki naaraspuoliset eläimet tarvitsevat vähintään yhden uroseläimen tullakseen tiineeksi. Molempien eläinten on oltava oikean ikäisiä, terveitä sekä samaa lajia. Jalostus eri rotujen välillä (esim. holstein-lehmä ja angushärkä) on sallittua."/>
+        <text name="rl_help_pregnancy_2" text="Sukusiitos ei ole sallittua. Jos uros ja naaras ovat suoraan sukua, he eivät lisäänny yhdessä."/>
+        <text name="rl_help_pregnancy_3" text="Naaraan mahdollisuus tulla tiineeksi riippuu kummankin hedelmällisyydestä. Naaralla, jolla on korkeampi hedelmällisyys, on myös huomattavasti suurempi mahdollisuus tuottaa kerralla enemmän jälkeläisiä."/>
+        <text name="rl_help_pregnancy_4" text="Kun naaras tulee tiineeksi, alkaa se kantamaan jälkeläisiä. Näet odotetun tiineyden päivämäärän ja jälkeläisten lukumäärän katsomalla eläintä karsinassa tai klikkaamalla sitä eläinvalikosta."/>
+        <text name="rl_help_pregnancy_5" text="Naaras poikii odottettuna päivänä. Vastasyntyneillä on kuitenkin tietty mahdollisuus poistua, kuten myös emolla, jos raskaus sujuu huonosti. Ahtaaseen karsinaan syntyneet vastasyntyneet myydään automaattisesti."/>
 
-		<text name="rl_help_production_title" text="Tuottavuus"/>
-		<text name="rl_help_production_1" text="Kaikkien rotujen lehmät alkavat tuottaa maitoa vasta poikimisen jälkeen. Kun lehmä on poikinut, se tuottaa maitoa eksponentiaalisesti 3 kuukauden ajan, minkä jälkeen tuotanto laskee hitaasti seuraavan 6 kuukauden ajan. 10 kuukautta tiineyden jälkeen lehmä lopettaa maidontuotannon seuraavaan tiineyteen asti."/>
-		<text name="rl_help_production_2" text="Lampaat tuottavat villaa lämpiminä kuukausina. Kylminä kuukausina alle 12 C:ssa ne eivät tuota villaa."/>
-		<text name="rl_help_production_3" text="Maidon, villan ja munien tuotantoon vaikuttaa eläimen genetiikka. Eläin, jolla on hyvä tuotantogenetiikka, tuottaa enemmän, kun taas eläin, jolla on huono genetiikka, ei tuota juuri ollenkaan."/>
+        <text name="rl_help_production_title" text="Tuottavuus"/>
+        <text name="rl_help_production_1" text="Kaikkien rotujen lehmät alkavat tuottaa maitoa vasta poikimisen jälkeen. Kun lehmä on poikinut, se tuottaa maitoa eksponentiaalisesti 3 kuukauden ajan, minkä jälkeen tuotanto laskee hitaasti seuraavan 6 kuukauden ajan. 10 kuukautta tiineyden jälkeen lehmä lopettaa maidontuotannon seuraavaan tiineyteen asti."/>
+        <text name="rl_help_production_2" text="Lampaat tuottavat villaa lämpiminä kuukausina. Kylminä kuukausina alle 12 C:ssa ne eivät tuota villaa."/>
+        <text name="rl_help_production_3" text="Maidon, villan ja munien tuotantoon vaikuttaa eläimen genetiikka. Eläin, jolla on hyvä tuotantogenetiikka, tuottaa enemmän, kun taas eläin, jolla on huono genetiikka, ei tuota juuri ollenkaan."/>
 
-		<text name="rl_help_weight_title" text="Paino"/>
-		<text name="rl_help_weight_1" text="Eläimillä on tietty paino, johon vaikuttaa se, kuinka paljon ne syövät ja juovat. Jokaisella lajilla ja rodulla on oma keskipainonsa, joka vaikuttaa kunkin eläimen painoon."/>
-		<text name="rl_help_weight_2" text="Paino nostaa eläimen arvoa ja alhainen paino vaikuttaa sen mahdollisuuteen poistua joka kuukausi."/>
+        <text name="rl_help_weight_title" text="Paino"/>
+        <text name="rl_help_weight_1" text="Eläimillä on tietty paino, johon vaikuttaa se, kuinka paljon ne syövät ja juovat. Jokaisella lajilla ja rodulla on oma keskipainonsa, joka vaikuttaa kunkin eläimen painoon."/>
+        <text name="rl_help_weight_2" text="Paino nostaa eläimen arvoa ja alhainen paino vaikuttaa sen mahdollisuuteen poistua joka kuukausi."/>
 
-		<text name="rl_help_genetics_title" text="Genetiikka"/>
-		<text name="rl_help_genetics_1" text="Jokaisella eläimellä on 4 erilaista geneettistä arvoa: aineenvaihdunta, hedelmällisyys, terveys ja laatu. Genetiikka sekoitetaan emon ja isän välillä ja välitetään sitten poikasille."/>
-		<text name="rl_help_genetics_2" text="Aineenvaihdunta vaikuttaa eläimen kykyyn muuntaa ruokaa painoksi ja vaikuttaa sen syömään määrään."/>
-		<text name="rl_help_genetics_3" text="Hedelmällisyys vaikuttaa naaraan mahdollisuuteen tulla tiineeksi ja poikasten määrään, sekä uuroksen mahdollisuutta saattaa naaras tiineeksi."/>
-		<text name="rl_help_genetics_4" text="Terveys vaikuttaa eläimen terveyteen ja sen mahdollisuuteen poistua joka kuukausi. Eläimillä, joilla on korkeampi terveysgenetiikka, on myös pidempi elinikä."/>
-		<text name="rl_help_genetics_5" text="Laatu vaikuttaa itse eläimen arvoon, laadukkaammasta eläimestä saa korkeamman hinnan."/>
-		<text name="rl_help_genetics_6" text="Nautaeläimillä, lampailla ja kanoilla on myös tuotantogenetiikkaa, joka vaikuttaa siihen, kuinka paljon maitoa/munia/villaa ne tuottavat."/>
+        <text name="rl_help_genetics_title" text="Genetiikka"/>
+        <text name="rl_help_genetics_1" text="Jokaisella eläimellä on 4 erilaista geneettistä arvoa: aineenvaihdunta, hedelmällisyys, terveys ja laatu. Genetiikka sekoitetaan emon ja isän välillä ja välitetään sitten poikasille."/>
+        <text name="rl_help_genetics_2" text="Aineenvaihdunta vaikuttaa eläimen kykyyn muuntaa ruokaa painoksi ja vaikuttaa sen syömään määrään."/>
+        <text name="rl_help_genetics_3" text="Hedelmällisyys vaikuttaa naaraan mahdollisuuteen tulla tiineeksi ja poikasten määrään, sekä uuroksen mahdollisuutta saattaa naaras tiineeksi."/>
+        <text name="rl_help_genetics_4" text="Terveys vaikuttaa eläimen terveyteen ja sen mahdollisuuteen poistua joka kuukausi. Eläimillä, joilla on korkeampi terveysgenetiikka, on myös pidempi elinikä."/>
+        <text name="rl_help_genetics_5" text="Laatu vaikuttaa itse eläimen arvoon, laadukkaammasta eläimestä saa korkeamman hinnan."/>
+        <text name="rl_help_genetics_6" text="Nautaeläimillä, lampailla ja kanoilla on myös tuotantogenetiikkaa, joka vaikuttaa siihen, kuinka paljon maitoa/munia/villaa ne tuottavat."/>
 
 
 
-		<!--  DISEASES  -->
+        <!--  DISEASES  -->
 
 
-		<text name="rl_ui_immune" text="Immuuni"/>
-		<text name="rl_ui_startTreatment" text="Aloita hoito"/>
-		<text name="rl_ui_resumeTreatment" text="Jatka hoitoa"/>
-		<text name="rl_ui_stopTreatment" text="Lopeta hoito"/>
-		<text name="rl_ui_duration" text="Kesto"/>
-		<text name="rl_ui_beingTreated" text="Hoidettavana"/>
-		<text name="rl_ui_notTreated" text="Ei hoidettavana"/>
-		<text name="rl_ui_treatmentPaused" text="Treatment paused"/>
-		<text name="rl_ui_carrier" text="Kantaja"/>
+        <text name="rl_ui_immune" text="Immuuni"/>
+        <text name="rl_ui_startTreatment" text="Aloita hoito"/>
+        <text name="rl_ui_resumeTreatment" text="Jatka hoitoa"/>
+        <text name="rl_ui_stopTreatment" text="Lopeta hoito"/>
+        <text name="rl_ui_duration" text="Kesto"/>
+        <text name="rl_ui_beingTreated" text="Hoidettavana"/>
+        <text name="rl_ui_notTreated" text="Ei hoidettavana"/>
+        <text name="rl_ui_treatmentPaused" text="Treatment paused"/>
+        <text name="rl_ui_carrier" text="Kantaja"/>
 
-		<text name="rl_diseases" text="Taudit"/>
-		<text name="rl_disease" text="Tauti"/>
+        <text name="rl_diseases" text="Taudit"/>
+        <text name="rl_disease" text="Tauti"/>
 
-		<text name="rl_disease_mastitis" text="Utaretulehdus"/>
+        <text name="rl_disease_mastitis" text="Utaretulehdus"/>
 
-		<text name="rl_disease_cvm" text="CVM (selkärangan epämuodostuma)"/>
+        <text name="rl_disease_cvm" text="CVM (selkärangan epämuodostuma)"/>
 
-		<text name="rl_disease_footAndMouth" text="Suu- ja sorkkatauti"/>
+        <text name="rl_disease_footAndMouth" text="Suu- ja sorkkatauti"/>
 
-		<text name="rl_disease_ped" text="PED (sikojen epidemiaripuli)"/>
+        <text name="rl_disease_ped" text="PED (sikojen epidemiaripuli)"/>
 
-		<text name="rl_disease_avianFlu" text="Lintuinfluenssa"/>
+        <text name="rl_disease_avianFlu" text="Lintuinfluenssa"/>
 
 
 
-		<!--  MESSAGES  -->
+        <!--  MESSAGES  -->
 
 
-		<text name="rl_messageTitle_pregnancy" text="Tiineys"/>
-		<text name="rl_messageTitle_death" text="Poistuma"/>
-		<text name="rl_messageTitle_death_github" text="Kuolema"/>
-		<text name="rl_messageTitle_disease" text="Tauti"/>
-		<text name="rl_messageTitle_name" text="Nimi"/>
-		<text name="rl_messageTitle_movement" text="Siirtymä"/>
-		<text name="rl_messageTitle_aiManager" text="Lomittaja"/>
-		<text name="rl_messageTitle_insemination" text="Keinosiemennys"/>
+        <text name="rl_messageTitle_pregnancy" text="Tiineys"/>
+        <text name="rl_messageTitle_death" text="Poistuma"/>
+        <text name="rl_messageTitle_death_github" text="Kuolema"/>
+        <text name="rl_messageTitle_disease" text="Tauti"/>
+        <text name="rl_messageTitle_name" text="Nimi"/>
+        <text name="rl_messageTitle_movement" text="Siirtymä"/>
+        <text name="rl_messageTitle_aiManager" text="Lomittaja"/>
+        <text name="rl_messageTitle_insemination" text="Keinosiemennys"/>
 
-		<text name="rl_message_pregnancySingle" text="Synnytti poikasen"/>
-		<text name="rl_message_pregnancyMultiple" text="Synnytti %s poikasta"/>
-		<text name="rl_message_pregnancySold" text="%s poikasta myytiin hintaan %s tilanpuutteen vuoksi"/>
-		<text name="rl_message_pregnancyDied" text="%s poikasta poistettiin syntymän yhteydessä"/>
-		<text name="rl_message_pregnancyDied_github" text="%s poikasta kuoli syntymässä"/>
-		<text name="rl_message_death" text="Poistettu syystä: %s"/>
-		<text name="rl_message_death_github" text="Kuoli syystä: %s"/>
-		<text name="rl_message_diseaseContracted" text="Sairastui tautiin: %s"/>
-		<text name="rl_message_diseaseCured" text="Parani taudista: %s"/>
-		<text name="rl_message_diseaseTreatment_start" text="Aloitettiin hoito: %s klo %s"/>
-		<text name="rl_message_diseaseTreatment_resume" text="Hoidon jatkaminen: %s klo %s"/>
-		<text name="rl_message_diseaseTreatment_stop" text="Hoitotoimenpiteet lopetettu: %s"/>
-		<text name="rl_message_nameChange" text="Nimi muutettu: '%s' → '%s'"/>
-		<text name="rl_message_nameAdded" text="Annettiin nimi: '%s'"/>
-		<text name="rl_message_nameDeleted" text="Nimi '%s' poistettiin"/>
-		<text name="rl_message_boughtAnimals_single" text="Ostettiin eläin hintaan %s"/>
-		<text name="rl_message_boughtAnimals_multiple" text="Ostettiin %s eläintä hintaan %s"/>
-		<text name="rl_message_soldAnimals_single" text="Myytiin eläin hintaan %s"/>
-		<text name="rl_message_soldAnimals_multiple" text="Myytiin %s eläintä hintaan %s"/>
-		<text name="rl_message_movedAnimalsTo_single" text="Siirrettiin eläin kohteeseen %s"/>
-		<text name="rl_message_movedAnimalsTo_multiple" text="Siirrettiin %s eläintä kohteeseen %s"/>
-		<text name="rl_message_movedAnimalsFrom_single" text="Siirrettiin eläin paikasta %s"/>
-		<text name="rl_message_movedAnimalsFrom_multiple" text="Siirrettiin %s eläintä paikasta %s"/>
-		<text name="rl_message_aiManager_boughtAnimals_single" text="Lomittaja osti eläimen hintaan %s"/>
-		<text name="rl_message_aiManager_boughtAnimals_multiple" text="Lomittaja osti %s eläintä hintaan %s"/>
-		<text name="rl_message_aiManager_soldAnimals_single" text="Lomittaja myi eläimen hintaan %s"/>
-		<text name="rl_message_aiManager_soldAnimals_multiple" text="Lomittaja myi %s eläintä hintaan %s"/>
-		<text name="rl_message_aiManager_castrated_single" text="Lomittaja kastroi eläimen"/>
-		<text name="rl_message_aiManager_castrated_multiple" text="Lomittaja kastroi %s eläintä"/>
-		<text name="rl_message_aiManager_named_single" text="Lomittaja nimesi eläimen"/>
-		<text name="rl_message_aiManager_named_multiple" text="Lomittaja nimesi %s eläintä"/>
-		<text name="rl_message_aiManager_mark_sell_single" text="Lomittaja merkitsi eläimen myytäväksi"/>
-		<text name="rl_message_aiManager_mark_sell_multiple" text="Lomittaja merkitsi %s eläintä myytäväksi"/>
-		<text name="rl_message_aiManager_mark_castrate_single" text="Lomittaja merkitsi eläimen kastrointiin"/>
-		<text name="rl_message_aiManager_mark_castrate_multiple" text="Lomittaja merkitsi %s eläintä kastroitaviksi"/>
-		<text name="rl_message_aiManager_mark_disease_single" text="Lomittaja merkitsi eläimen hoitoa varten"/>
-		<text name="rl_message_aiManager_mark_disease_multiple" text="Lomittaja merkitsi %s eläintä hoitoa varten"/>
-		<text name="rl_message_insemination_success" text="Keinosiemennys onnistui"/>
-		<text name="rl_message_insemination_fail" text="Keinosiemennys epäonnistui"/>
-		<text name="rl_message_aiManager_mark_ai_single" text="Lomittaja merkitsi eläimen keinosiemennykseen"/>
-		<text name="rl_message_aiManager_mark_ai_multiple" text="Lomittaja merkitsi %s eläintä keinosiemennykseen"/>
-		<text name="rl_message_aiManager_ai_single" text="Lomittaja keinosiemensi eläimen"/>
-		<text name="rl_message_aiManager_ai_multiple" text="Lomittaja keinosiemensi %s eläintä"/>
-		<text name="rl_message_aiManager_movedAnimals_single" text="Herdsman moved 1 animal"/>
-		<text name="rl_message_aiManager_movedAnimals_multiple" text="Herdsman moved %s animals"/>
-		<text name="rl_message_aiManager_mark_move_single" text="Herdsman marked 1 animal for moving"/>
-		<text name="rl_message_aiManager_mark_move_multiple" text="Herdsman marked %s animals for moving"/>
-		<text name="rl_message_aiManager_moveSkippedAge_single" text="Herdsman skipped 1 animal (wrong age for the butcher)"/>
-		<text name="rl_message_aiManager_moveSkippedAge_multiple" text="Herdsman skipped %s animals (wrong age for the butcher)"/>
-		<text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
-		<text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
+        <text name="rl_message_pregnancySingle" text="Synnytti poikasen"/>
+        <text name="rl_message_pregnancyMultiple" text="Synnytti %s poikasta"/>
+        <text name="rl_message_pregnancySold" text="%s poikasta myytiin hintaan %s tilanpuutteen vuoksi"/>
+        <text name="rl_message_pregnancyDied" text="%s poikasta poistettiin syntymän yhteydessä"/>
+        <text name="rl_message_pregnancyDied_github" text="%s poikasta kuoli syntymässä"/>
+        <text name="rl_message_death" text="Poistettu syystä: %s"/>
+        <text name="rl_message_death_github" text="Kuoli syystä: %s"/>
+        <text name="rl_message_diseaseContracted" text="Sairastui tautiin: %s"/>
+        <text name="rl_message_diseaseCured" text="Parani taudista: %s"/>
+        <text name="rl_message_diseaseTreatment_start" text="Aloitettiin hoito: %s klo %s"/>
+        <text name="rl_message_diseaseTreatment_resume" text="Hoidon jatkaminen: %s klo %s"/>
+        <text name="rl_message_diseaseTreatment_stop" text="Hoitotoimenpiteet lopetettu: %s"/>
+        <text name="rl_message_nameChange" text="Nimi muutettu: '%s' → '%s'"/>
+        <text name="rl_message_nameAdded" text="Annettiin nimi: '%s'"/>
+        <text name="rl_message_nameDeleted" text="Nimi '%s' poistettiin"/>
+        <text name="rl_message_boughtAnimals_single" text="Ostettiin eläin hintaan %s"/>
+        <text name="rl_message_boughtAnimals_multiple" text="Ostettiin %s eläintä hintaan %s"/>
+        <text name="rl_message_soldAnimals_single" text="Myytiin eläin hintaan %s"/>
+        <text name="rl_message_soldAnimals_multiple" text="Myytiin %s eläintä hintaan %s"/>
+        <text name="rl_message_movedAnimalsTo_single" text="Siirrettiin eläin kohteeseen %s"/>
+        <text name="rl_message_movedAnimalsTo_multiple" text="Siirrettiin %s eläintä kohteeseen %s"/>
+        <text name="rl_message_movedAnimalsFrom_single" text="Siirrettiin eläin paikasta %s"/>
+        <text name="rl_message_movedAnimalsFrom_multiple" text="Siirrettiin %s eläintä paikasta %s"/>
+        <text name="rl_message_aiManager_boughtAnimals_single" text="Lomittaja osti eläimen hintaan %s"/>
+        <text name="rl_message_aiManager_boughtAnimals_multiple" text="Lomittaja osti %s eläintä hintaan %s"/>
+        <text name="rl_message_aiManager_soldAnimals_single" text="Lomittaja myi eläimen hintaan %s"/>
+        <text name="rl_message_aiManager_soldAnimals_multiple" text="Lomittaja myi %s eläintä hintaan %s"/>
+        <text name="rl_message_aiManager_castrated_single" text="Lomittaja kastroi eläimen"/>
+        <text name="rl_message_aiManager_castrated_multiple" text="Lomittaja kastroi %s eläintä"/>
+        <text name="rl_message_aiManager_named_single" text="Lomittaja nimesi eläimen"/>
+        <text name="rl_message_aiManager_named_multiple" text="Lomittaja nimesi %s eläintä"/>
+        <text name="rl_message_aiManager_mark_sell_single" text="Lomittaja merkitsi eläimen myytäväksi"/>
+        <text name="rl_message_aiManager_mark_sell_multiple" text="Lomittaja merkitsi %s eläintä myytäväksi"/>
+        <text name="rl_message_aiManager_mark_castrate_single" text="Lomittaja merkitsi eläimen kastrointiin"/>
+        <text name="rl_message_aiManager_mark_castrate_multiple" text="Lomittaja merkitsi %s eläintä kastroitaviksi"/>
+        <text name="rl_message_aiManager_mark_disease_single" text="Lomittaja merkitsi eläimen hoitoa varten"/>
+        <text name="rl_message_aiManager_mark_disease_multiple" text="Lomittaja merkitsi %s eläintä hoitoa varten"/>
+        <text name="rl_message_insemination_success" text="Keinosiemennys onnistui"/>
+        <text name="rl_message_insemination_fail" text="Keinosiemennys epäonnistui"/>
+        <text name="rl_message_aiManager_mark_ai_single" text="Lomittaja merkitsi eläimen keinosiemennykseen"/>
+        <text name="rl_message_aiManager_mark_ai_multiple" text="Lomittaja merkitsi %s eläintä keinosiemennykseen"/>
+        <text name="rl_message_aiManager_ai_single" text="Lomittaja keinosiemensi eläimen"/>
+        <text name="rl_message_aiManager_ai_multiple" text="Lomittaja keinosiemensi %s eläintä"/>
+        <text name="rl_message_aiManager_movedAnimals_single" text="Herdsman moved 1 animal"/>
+        <text name="rl_message_aiManager_movedAnimals_multiple" text="Herdsman moved %s animals"/>
+        <text name="rl_message_aiManager_mark_move_single" text="Herdsman marked 1 animal for moving"/>
+        <text name="rl_message_aiManager_mark_move_multiple" text="Herdsman marked %s animals for moving"/>
+        <text name="rl_message_aiManager_moveSkippedAge_single" text="Herdsman skipped 1 animal (wrong age for the butcher)"/>
+        <text name="rl_message_aiManager_moveSkippedAge_multiple" text="Herdsman skipped %s animals (wrong age for the butcher)"/>
+        <text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
+        <text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
 
 
 
-		<!--  DEATHS  -->
+        <!--  DEATHS  -->
 
 
-		<text name="rl_death_pregnancy" text="ongelmallinen tiineys"/>
-		<text name="rl_death_health" text="heikko terveys"/>
-		<text name="rl_death_age" text="vanhuus"/>
-		<text name="rl_death_accident" text="onnettomuus"/>
+        <text name="rl_death_pregnancy" text="ongelmallinen tiineys"/>
+        <text name="rl_death_health" text="heikko terveys"/>
+        <text name="rl_death_age" text="vanhuus"/>
+        <text name="rl_death_accident" text="onnettomuus"/>
 
 
 
-		<text name="rl_ui_dependencies_missing" text="RealisticLivestock requires the following dependencies:"/>
-		<text name="rl_ui_dependency_missing_notInstalled" text="- %s (Not Installed)"/>
-		<text name="rl_ui_dependency_missing_installed" text="- %s (Installed: %s, Minimum Required: %s)"/>
+        <text name="rl_ui_dependencies_missing" text="RealisticLivestock requires the following dependencies:"/>
+        <text name="rl_ui_dependency_missing_notInstalled" text="- %s (Not Installed)"/>
+        <text name="rl_ui_dependency_missing_installed" text="- %s (Installed: %s, Minimum Required: %s)"/>
         <!-- Added missing translations -->
         <text name="input_RL_AI" text="Keinosiemennys"/>
         <text name="input_RL_DISEASES" text="Eläintaudit"/>
@@ -748,57 +748,57 @@
         <text name="rl_menu_dealerSale_empty" text="No animals available at this dealer."/>
         <text name="rl_menu_herdsman_husbandry_emptyRejected" text="Select at least one husbandry."/>
         <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Current filter unavailable for this task."/>
-			<text name="rl_menu_herdsman_section_move" text="Move"/>
-			<text name="rl_menu_herdsman_detail_destination" text="Destination"/>
-			<text name="rl_menu_herdsman_destination_select" text="Select destination"/>
-			<text name="rl_menu_herdsman_destination_butcher_suffix" text="(butcher)"/>
-			<text name="rl_menu_herdsman_destination_picker_title" text="Select Destination"/>
-			<text name="rl_menu_herdsman_destination_picker_empty" text="No destination husbandry available for this task."/>
-			<text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Current destination unavailable for this task."/>
+        <text name="rl_menu_herdsman_section_move" text="Move"/>
+        <text name="rl_menu_herdsman_detail_destination" text="Destination"/>
+        <text name="rl_menu_herdsman_destination_select" text="Select destination"/>
+        <text name="rl_menu_herdsman_destination_butcher_suffix" text="(butcher)"/>
+        <text name="rl_menu_herdsman_destination_picker_title" text="Select Destination"/>
+        <text name="rl_menu_herdsman_destination_picker_empty" text="No destination husbandry available for this task."/>
+        <text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Current destination unavailable for this task."/>
         <!-- Settings tab shell (English fallback) -->
         <text name="rl_menu_settings_title" text="Settings"/>
         <text name="rl_menu_settings_tab_general" text="General"/>
         <text name="rl_menu_settings_tab_filters" text="Filters"/>
 
-		<!-- Filters tab list -->
-		<text name="rl_menu_filters_quick_filter_title" text="Quick filter"/>
-		<text name="rl_ui_qf_saveFilter" text="Save filter"/>
-		<text name="rl_ui_qf_saveDropsValue" text="Saved filters don't support Value; this condition will not be carried over."/>
-		<text name="rl_menu_filters_empty" text="No saved filters yet"/>
-		<text name="rl_menu_filters_empty_no_farm" text="You need a farm to save filters"/>
-		<text name="rl_menu_filters_new_button" text="New filter"/>
-		<text name="rl_menu_filters_default_name" text="New filter"/>
-		<text name="rl_menu_filters_detail_placeholder" text="To be implemented"/>
-		<!-- Editor + Duplicate/Delete (English fallback) -->
-		<text name="rl_menu_filters_empty_editor" text="Select a filter to edit"/>
-		<text name="rl_menu_filters_editor_title_name" text="Name"/>
-		<text name="rl_menu_filters_editor_title_animal_type" text="Animal type"/>
-		<text name="rl_menu_filters_editor_title_op" text="Conditions"/>
-		<text name="rl_menu_filters_animal_type_any" text="Any"/>
-		<text name="rl_menu_filters_op_and" text="Match ALL"/>
-		<text name="rl_menu_filters_op_or" text="Match ANY"/>
-		<text name="rl_menu_filters_add_group_not_implemented" text="Add group is not yet implemented in this version."/>
-		<text name="rl_menu_filters_duplicate_button" text="Duplicate"/>
-		<text name="rl_menu_filters_delete_button" text="Delete"/>
-		<text name="rl_menu_filters_duplicate_suffix" text=" (copy)"/>
-		<text name="rl_menu_filters_duplicate_suffix_n" text=" (copy %d)"/>
-		<text name="rl_menu_filters_delete_confirm_text" text="Delete filter &quot;%s&quot;? This cannot be undone."/>
-		<!-- Usage scope axis -->
-		<text name="rl_menu_filters_editor_title_usage" text="Show on"/>
-		<text name="rl_menu_filters_usage_any" text="All screens"/>
-		<text name="rl_menu_filters_usage_owned" text="Owned-herd screens"/>
-		<text name="rl_menu_filters_usage_dealer" text="Dealer screens"/>
-		<text name="rl_menu_filters_valueOutOfRange_both" text="Value must be between %d and %d"/>
-		<text name="rl_menu_filters_valueOutOfRange_min" text="Value must be at least %d"/>
-		<text name="rl_menu_filters_valueOutOfRange_max" text="Value must be at most %d"/>
+        <!-- Filters tab list -->
+        <text name="rl_menu_filters_quick_filter_title" text="Quick filter"/>
+        <text name="rl_ui_qf_saveFilter" text="Save filter"/>
+        <text name="rl_ui_qf_saveDropsValue" text="Saved filters don't support Value; this condition will not be carried over."/>
+        <text name="rl_menu_filters_empty" text="No saved filters yet"/>
+        <text name="rl_menu_filters_empty_no_farm" text="You need a farm to save filters"/>
+        <text name="rl_menu_filters_new_button" text="New filter"/>
+        <text name="rl_menu_filters_default_name" text="New filter"/>
+        <text name="rl_menu_filters_detail_placeholder" text="To be implemented"/>
+        <!-- Editor + Duplicate/Delete (English fallback) -->
+        <text name="rl_menu_filters_empty_editor" text="Select a filter to edit"/>
+        <text name="rl_menu_filters_editor_title_name" text="Name"/>
+        <text name="rl_menu_filters_editor_title_animal_type" text="Animal type"/>
+        <text name="rl_menu_filters_editor_title_op" text="Conditions"/>
+        <text name="rl_menu_filters_animal_type_any" text="Any"/>
+        <text name="rl_menu_filters_op_and" text="Match ALL"/>
+        <text name="rl_menu_filters_op_or" text="Match ANY"/>
+        <text name="rl_menu_filters_add_group_not_implemented" text="Add group is not yet implemented in this version."/>
+        <text name="rl_menu_filters_duplicate_button" text="Duplicate"/>
+        <text name="rl_menu_filters_delete_button" text="Delete"/>
+        <text name="rl_menu_filters_duplicate_suffix" text=" (copy)"/>
+        <text name="rl_menu_filters_duplicate_suffix_n" text=" (copy %d)"/>
+        <text name="rl_menu_filters_delete_confirm_text" text="Delete filter &quot;%s&quot;? This cannot be undone."/>
+        <!-- Usage scope axis -->
+        <text name="rl_menu_filters_editor_title_usage" text="Show on"/>
+        <text name="rl_menu_filters_usage_any" text="All screens"/>
+        <text name="rl_menu_filters_usage_owned" text="Owned-herd screens"/>
+        <text name="rl_menu_filters_usage_dealer" text="Dealer screens"/>
+        <text name="rl_menu_filters_valueOutOfRange_both" text="Value must be between %d and %d"/>
+        <text name="rl_menu_filters_valueOutOfRange_min" text="Value must be at least %d"/>
+        <text name="rl_menu_filters_valueOutOfRange_max" text="Value must be at most %d"/>
 
-		<!-- Filter cycle + chip MVP -->
-		<text name="rl_menu_filter_chip_none" text="No filter"/>
-		<text name="rl_menu_filter_chip_active" text="Filter: %s"/>
-		<text name="rl_menu_filter_chip_quick" text="Filter: QF"/>
-		<text name="rl_menu_filter_chip_quick_plus_saved" text="Filter: QF + %s"/>
-		<text name="rl_menu_cycle_filter_button" text="Cycle filter"/>
-		<text name="rl_menu_filter_chip_unnamed" text="(unnamed)"/>
+        <!-- Filter cycle + chip MVP -->
+        <text name="rl_menu_filter_chip_none" text="No filter"/>
+        <text name="rl_menu_filter_chip_active" text="Filter: %s"/>
+        <text name="rl_menu_filter_chip_quick" text="Filter: QF"/>
+        <text name="rl_menu_filter_chip_quick_plus_saved" text="Filter: QF + %s"/>
+        <text name="rl_menu_cycle_filter_button" text="Cycle filter"/>
+        <text name="rl_menu_filter_chip_unnamed" text="(unnamed)"/>
         <text name="rl_settings_geneticsDisplay_label" text="Genetics Display"/>
         <text name="rl_settings_geneticsDisplay_texts_1" text="Off"/>
         <text name="rl_settings_geneticsDisplay_texts_2" text="Short"/>
@@ -814,61 +814,61 @@
         <text name="rl_ui_buyAllRejected" text="None of the selected animals can be purchased in this husbandry."/>
         <text name="rl_ui_buyPartialConfirmation" text="Buy %d of %d selected animals for %s?" tag="format"/>
         <text name="rl_ui_buySkippedNotSupported" text="%d animal(s) not supported by this husbandry" tag="format"/>
-		<!-- Herdsman rule lifecycle -->
-		<text name="rl_menu_herdsman_new_button" text="New task"/>
-		<text name="rl_menu_herdsman_duplicate_button" text="Duplicate"/>
-		<text name="rl_menu_herdsman_delete_button" text="Delete"/>
-		<text name="rl_menu_herdsman_delete_confirm_text" text="Delete task &quot;%s&quot;? This cannot be undone."/>
-		<text name="rl_menu_herdsman_default_name" text="New task"/>
-		<text name="rl_menu_herdsman_duplicate_suffix" text=" (copy)"/>
-		<text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copy %d)"/>
-		<!-- Filter condition editor (English fallback) -->
-		<text name="rl_menu_filters_add_condition" text="Add condition"/>
-		<text name="rl_menu_filters_add_group_button" text="Add group"/>
-		<text name="rl_menu_filters_edit_condition" text="Edit condition"/>
-		<text name="rl_menu_filters_delete_condition" text="Delete condition"/>
-		<text name="rl_menu_filters_dialog_title" text="Edit condition"/>
-		<text name="rl_menu_filters_field_label" text="Field"/>
-		<text name="rl_menu_filters_cmp_label" text="Compare"/>
-		<text name="rl_menu_filters_cmp_lt" text="is less than"/>
-		<text name="rl_menu_filters_cmp_le" text="is at most"/>
-		<text name="rl_menu_filters_cmp_eq" text="is"/>
-		<text name="rl_menu_filters_cmp_ne" text="is not"/>
-		<text name="rl_menu_filters_cmp_ge" text="is at least"/>
-		<text name="rl_menu_filters_cmp_gt" text="is more than"/>
-		<text name="rl_menu_filters_cmp_in" text="is one of"/>
-		<text name="rl_menu_filters_cmp_notin" text="is none of"/>
-		<text name="rl_menu_filters_cmp_contains" text="contains"/>
-		<text name="rl_menu_filters_cmp_notcontains" text="does not contain"/>
-		<text name="rl_menu_filters_value_label" text="Value"/>
-		<text name="rl_menu_filters_value_invalid_number" text="Invalid number"/>
-		<text name="rl_menu_filters_preserved_banner" text="%d condition(s) hidden - editable in a later phase. Saved on close."/>
-		<text name="rl_menu_filters_field_age" text="Age"/>
-		<text name="rl_menu_filters_field_isCastrated" text="Castrated"/>
-		<text name="rl_menu_filters_field_isPregnant" text="Pregnant"/>
-		<text name="rl_menu_filters_field_isLactating" text="Lactating"/>
-		<text name="rl_menu_filters_field_hasName" text="Has name"/>
-		<text name="rl_menu_filters_field_hasAnyDisease" text="Has any disease"/>
-		<text name="rl_menu_filters_field_hasAnyMark" text="Has any mark"/>
-		<text name="rl_menu_filters_field_weight" text="Weight"/>
-		<text name="rl_menu_filters_field_health" text="Health"/>
-		<text name="rl_menu_filters_field_genetics_metabolism" text="Genetics: metabolism"/>
-		<text name="rl_menu_filters_field_genetics_health" text="Genetics: health"/>
-		<text name="rl_menu_filters_field_genetics_fertility" text="Genetics: fertility"/>
-		<text name="rl_menu_filters_field_genetics_quality" text="Genetics: quality"/>
-		<text name="rl_menu_filters_field_genetics_productivity" text="Genetics: productivity"/>
-		<text name="rl_menu_filters_field_genetics_overall" text="Genetics: overall"/>
-		<text name="rl_menu_filters_field_gender" text="Gender"/>
-		<text name="rl_menu_filters_field_subType" text="Breed"/>
-		<text name="rl_menu_filters_field_name" text="Name"/>
-		<text name="rl_menu_filters_gender_male" text="Male"/>
-		<text name="rl_menu_filters_gender_female" text="Female"/>
-		<text name="rl_menu_filters_emptyValueRejected" text="Value cannot be empty"/>
-		<text name="rl_menu_filters_subtypeRequiresAnimalType" text="Set the filter's animal type first to edit this condition"/>
-		<text name="rl_menu_filters_invalidNumber" text="Enter a valid number"/>
-		<text name="rl_menu_filters_enumValueDrifted" text="Stored value no longer valid - pick a replacement"/>
-		<text name="rl_menu_filters_valueSet_title" text="Select values"/>
-		<text name="rl_menu_filters_valueSet_summary" text="%d selected"/>
-		<text name="rl_menu_filters_valueSet_button" text="Edit values..."/>
-	</texts>
+        <!-- Herdsman rule lifecycle -->
+        <text name="rl_menu_herdsman_new_button" text="New task"/>
+        <text name="rl_menu_herdsman_duplicate_button" text="Duplicate"/>
+        <text name="rl_menu_herdsman_delete_button" text="Delete"/>
+        <text name="rl_menu_herdsman_delete_confirm_text" text="Delete task &quot;%s&quot;? This cannot be undone."/>
+        <text name="rl_menu_herdsman_default_name" text="New task"/>
+        <text name="rl_menu_herdsman_duplicate_suffix" text=" (copy)"/>
+        <text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copy %d)"/>
+        <!-- Filter condition editor (English fallback) -->
+        <text name="rl_menu_filters_add_condition" text="Add condition"/>
+        <text name="rl_menu_filters_add_group_button" text="Add group"/>
+        <text name="rl_menu_filters_edit_condition" text="Edit condition"/>
+        <text name="rl_menu_filters_delete_condition" text="Delete condition"/>
+        <text name="rl_menu_filters_dialog_title" text="Edit condition"/>
+        <text name="rl_menu_filters_field_label" text="Field"/>
+        <text name="rl_menu_filters_cmp_label" text="Compare"/>
+        <text name="rl_menu_filters_cmp_lt" text="is less than"/>
+        <text name="rl_menu_filters_cmp_le" text="is at most"/>
+        <text name="rl_menu_filters_cmp_eq" text="is"/>
+        <text name="rl_menu_filters_cmp_ne" text="is not"/>
+        <text name="rl_menu_filters_cmp_ge" text="is at least"/>
+        <text name="rl_menu_filters_cmp_gt" text="is more than"/>
+        <text name="rl_menu_filters_cmp_in" text="is one of"/>
+        <text name="rl_menu_filters_cmp_notin" text="is none of"/>
+        <text name="rl_menu_filters_cmp_contains" text="contains"/>
+        <text name="rl_menu_filters_cmp_notcontains" text="does not contain"/>
+        <text name="rl_menu_filters_value_label" text="Value"/>
+        <text name="rl_menu_filters_value_invalid_number" text="Invalid number"/>
+        <text name="rl_menu_filters_preserved_banner" text="%d condition(s) hidden - editable in a later phase. Saved on close."/>
+        <text name="rl_menu_filters_field_age" text="Age"/>
+        <text name="rl_menu_filters_field_isCastrated" text="Castrated"/>
+        <text name="rl_menu_filters_field_isPregnant" text="Pregnant"/>
+        <text name="rl_menu_filters_field_isLactating" text="Lactating"/>
+        <text name="rl_menu_filters_field_hasName" text="Has name"/>
+        <text name="rl_menu_filters_field_hasAnyDisease" text="Has any disease"/>
+        <text name="rl_menu_filters_field_hasAnyMark" text="Has any mark"/>
+        <text name="rl_menu_filters_field_weight" text="Weight"/>
+        <text name="rl_menu_filters_field_health" text="Health"/>
+        <text name="rl_menu_filters_field_genetics_metabolism" text="Genetics: metabolism"/>
+        <text name="rl_menu_filters_field_genetics_health" text="Genetics: health"/>
+        <text name="rl_menu_filters_field_genetics_fertility" text="Genetics: fertility"/>
+        <text name="rl_menu_filters_field_genetics_quality" text="Genetics: quality"/>
+        <text name="rl_menu_filters_field_genetics_productivity" text="Genetics: productivity"/>
+        <text name="rl_menu_filters_field_genetics_overall" text="Genetics: overall"/>
+        <text name="rl_menu_filters_field_gender" text="Gender"/>
+        <text name="rl_menu_filters_field_subType" text="Breed"/>
+        <text name="rl_menu_filters_field_name" text="Name"/>
+        <text name="rl_menu_filters_gender_male" text="Male"/>
+        <text name="rl_menu_filters_gender_female" text="Female"/>
+        <text name="rl_menu_filters_emptyValueRejected" text="Value cannot be empty"/>
+        <text name="rl_menu_filters_subtypeRequiresAnimalType" text="Set the filter's animal type first to edit this condition"/>
+        <text name="rl_menu_filters_invalidNumber" text="Enter a valid number"/>
+        <text name="rl_menu_filters_enumValueDrifted" text="Stored value no longer valid - pick a replacement"/>
+        <text name="rl_menu_filters_valueSet_title" text="Select values"/>
+        <text name="rl_menu_filters_valueSet_summary" text="%d selected"/>
+        <text name="rl_menu_filters_valueSet_button" text="Edit values..."/>
+    </texts>
 </l10n>

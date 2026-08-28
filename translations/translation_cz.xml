@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <l10n>
-	<texts>
+    <texts>
         <!-- COWS -->
 
         <text name="fillType_bull" text="Býk"/>
@@ -303,7 +304,7 @@
         <text name="rl_mark_player" text="Označeno hráčem"/>
 
 
-		<!-- AI - BUYING -->
+        <!-- AI - BUYING -->
 
 
         <text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="Pastýř nebude nakupovat zvířata"/>
@@ -388,7 +389,7 @@
 
 
 
-		<!--  SETTINGS  -->
+        <!--  SETTINGS  -->
 
 
         <text name="rl_settings" text="Realistický chov zvířat"/>
@@ -627,43 +628,43 @@
 
 
 
-		<!--  DEATHS  -->
+        <!--  DEATHS  -->
 
 
-		<text name="rl_death_pregnancy" text="komplikace při březosti"/>
-		<text name="rl_death_health" text="nízké zdraví"/>
-		<text name="rl_death_age" text="stáří"/>
-		<text name="rl_death_accident" text="nehoda"/>
+        <text name="rl_death_pregnancy" text="komplikace při březosti"/>
+        <text name="rl_death_health" text="nízké zdraví"/>
+        <text name="rl_death_age" text="stáří"/>
+        <text name="rl_death_accident" text="nehoda"/>
 
-		<text name="rl_ui_dependencies_missing" text="Realistic Livestock vyžaduje následující závislosti:"/>
-		<text name="rl_ui_dependency_missing_notInstalled" text="- %s (není nainstalováno)"/>
-		<text name="rl_ui_dependency_missing_installed" text="- %s (nainstalováno: %s, minimálně požadováno: %s)"/>
+        <text name="rl_ui_dependencies_missing" text="Realistic Livestock vyžaduje následující závislosti:"/>
+        <text name="rl_ui_dependency_missing_notInstalled" text="- %s (není nainstalováno)"/>
+        <text name="rl_ui_dependency_missing_installed" text="- %s (nainstalováno: %s, minimálně požadováno: %s)"/>
 
-		<!-- MIGRATION -->
+        <!-- MIGRATION -->
 
-		<text name="rm_rl_conflict_title" text="Zjištěn konflikt modů"/>
-		<text name="rm_rl_mod_conflict_message" text="Následující mod(y) jsou v konfliktu s 'Realistic Livestock - Ritter version' a nelze je používat současně: %s &#10;&#10;Vypněte konfliktní mod(y) a restartujte hru."/>
+        <text name="rm_rl_conflict_title" text="Zjištěn konflikt modů"/>
+        <text name="rm_rl_mod_conflict_message" text="Následující mod(y) jsou v konfliktu s 'Realistic Livestock - Ritter version' a nelze je používat současně: %s &#10;&#10;Vypněte konfliktní mod(y) a restartujte hru."/>
 
-		<text name="rl_mod_warn_title" text="Varování ohledně kompatibility módů"/>
+        <text name="rl_mod_warn_title" text="Varování ohledně kompatibility módů"/>
         <text name="rl_mod_warn_message" text="Následující mód(y) načtené společně s Realistic Livestock RM mohou způsobovat problémy:%s&#10;&#10;Podrobnosti naleznete na %s. Hra bude pokračovat."/>
         <text name="rl_mod_compat_url" text="https://rittermod.github.io/FS25_RealisticLivestockRM/user-guide/reference-mod-compatibility"/>
         <text name="rl_mod_warn_FS25_AnimalFoodCalculator" text="FS25_AnimalFoodCalculator: výrazný dopad na výkon, který se zvyšuje s velikostí stáda."/>
 
-		<text name="rm_rl_migration_title" text="Upozornění na migraci dat"/>
-		<text name="rm_rl_migration_message" text="V této uložené hře byla nalezena předchozí data Realistic Livestock. Vaše nastavení, data zvířat, Dewary a ruční nástroje AI Straw budou automaticky převedeny do verze Realistic Livestock - RitterMod při uložení hry."/>
-		<text name="rm_rl_migration_files_found" text="Nalezené datové soubory:"/>
-		<text name="rm_rl_migration_continue" text="Pokračovat"/>
-		<text name="rm_rl_migration_quit" text="Ukončit"/>
+        <text name="rm_rl_migration_title" text="Upozornění na migraci dat"/>
+        <text name="rm_rl_migration_message" text="V této uložené hře byla nalezena předchozí data Realistic Livestock. Vaše nastavení, data zvířat, Dewary a ruční nástroje AI Straw budou automaticky převedeny do verze Realistic Livestock - RitterMod při uložení hry."/>
+        <text name="rm_rl_migration_files_found" text="Nalezené datové soubory:"/>
+        <text name="rm_rl_migration_continue" text="Pokračovat"/>
+        <text name="rm_rl_migration_quit" text="Ukončit"/>
 
-		<text name="rl_bridge_version_unknown" text="Realistic Livestock: %s verze %s nebyla testována s verzí %s modifikace Realistic Livestock. Používá se konfigurace '%s'. Pokud narazíte na problémy s exotickými zvířaty, nahlaste je na %s."/>
-		<!-- TODO: localise -->
-		<text name="rl_bridge_configoverride_conflict_header" text="Realistic Livestock: Zjištěn konflikt. Dva nebo více můstků/balíčků nahradily konfiguraci pro stejný druh zvířete. Platí naposledy načtený mód. Pokud budete pokračovat, vyskytnou se vizuální chyby a nezobrazující se zvířata."/>
-		<!-- TODO: localise -->
-		<text name="rl_bridge_configoverride_conflict_line" text="%s: použito módem %s"/>
+        <text name="rl_bridge_version_unknown" text="Realistic Livestock: %s verze %s nebyla testována s verzí %s modifikace Realistic Livestock. Používá se konfigurace '%s'. Pokud narazíte na problémy s exotickými zvířaty, nahlaste je na %s."/>
+        <!-- TODO: localise -->
+        <text name="rl_bridge_configoverride_conflict_header" text="Realistic Livestock: Zjištěn konflikt. Dva nebo více můstků/balíčků nahradily konfiguraci pro stejný druh zvířete. Platí naposledy načtený mód. Pokud budete pokračovat, vyskytnou se vizuální chyby a nezobrazující se zvířata."/>
+        <!-- TODO: localise -->
+        <text name="rl_bridge_configoverride_conflict_line" text="%s: použito módem %s"/>
 
 
-		<!-- Missing keys (English fallback) -->
-		<text name="input_RL_MENU" text="Otevřít nabídku RL"/>
+        <!-- Missing keys (English fallback) -->
+        <text name="input_RL_MENU" text="Otevřít nabídku RL"/>
         <text name="input_RL_RENAME" text="Přejmenovat"/>
         <text name="input_RL_CYCLE_FILTER" text="Přepnout uložený filtr"/>
         <text name="rl_menu_info_children" text="Potomci"/>
@@ -692,8 +693,8 @@
         <text name="rl_menu_messages_unknown" text="Neznámé: %s"/>
         <text name="rl_menu_move_summary" text="%d zvířat" tag="format"/>
         <text name="rl_menu_move_title" text="Přesunout"/>
-		<!-- Transfer tab -->
-		<text name="rl_menu_transfer_title" text="Převoz"/>
+        <!-- Transfer tab -->
+        <text name="rl_menu_transfer_title" text="Převoz"/>
         <text name="rl_menu_transfer_load" text="Naložit"/>
         <text name="rl_menu_transfer_unload" text="Vyložit"/>
         <text name="rl_menu_transfer_empty_no_animals" text="Na této straně nejsou žádná zvířata"/>
@@ -705,8 +706,8 @@
         <text name="rl_menu_sell_cart_selected" text="Vybráno"/>
         <text name="rl_menu_sell_cart_empty" text="Vyberte zvířata k prodeji"/>
 
-		<!-- Buy tab -->
-		<text name="rl_menu_buy_title" text="Koupit"/>
+        <!-- Buy tab -->
+        <text name="rl_menu_buy_title" text="Koupit"/>
         <text name="rl_menu_buy_empty_no_types" text="Obchodník nemá k dispozici žádné druhy zvířat"/>
         <text name="rl_menu_buy_empty_no_animals" text="Pro tento druh nemá obchodník k dispozici žádná zvířata"/>
         <text name="rl_menu_buy_cart_header" text="Přehled nákupu"/>
@@ -779,8 +780,8 @@
         <text name="rl_menu_settings_tab_general" text="Obecné"/>
         <text name="rl_menu_settings_tab_filters" text="Filtry"/>
 
-		<!-- Filters tab list -->
-		<text name="rl_menu_filters_quick_filter_title" text="Rychlý filtr"/>
+        <!-- Filters tab list -->
+        <text name="rl_menu_filters_quick_filter_title" text="Rychlý filtr"/>
         <text name="rl_ui_qf_saveFilter" text="Uložit filtr"/>
         <text name="rl_ui_qf_saveDropsValue" text="Uložené filtry nepodporují Hodnotu; tato podmínka nebude přenesena."/>
         <text name="rl_menu_filters_empty" text="Zatím žádné uložené filtry"/>
@@ -788,8 +789,8 @@
         <text name="rl_menu_filters_new_button" text="Nový filtr"/>
         <text name="rl_menu_filters_default_name" text="Nový filtr"/>
         <text name="rl_menu_filters_detail_placeholder" text="Bude implementováno"/>
-		<!-- Editor + Duplicate/Delete (English fallback) -->
-		<text name="rl_menu_filters_empty_editor" text="Vyberte filtr k úpravě"/>
+        <!-- Editor + Duplicate/Delete (English fallback) -->
+        <text name="rl_menu_filters_empty_editor" text="Vyberte filtr k úpravě"/>
         <text name="rl_menu_filters_editor_title_name" text="Název"/>
         <text name="rl_menu_filters_editor_title_animal_type" text="Druh zvířete"/>
         <text name="rl_menu_filters_editor_title_op" text="Podmínky"/>
@@ -802,8 +803,8 @@
         <text name="rl_menu_filters_duplicate_suffix" text=" (kopie)"/>
         <text name="rl_menu_filters_duplicate_suffix_n" text=" (kopie %d)"/>
         <text name="rl_menu_filters_delete_confirm_text" text="Smazat filtr &quot;%s&quot;? Tuto akci nelze vrátit zpět."/>
-		<!-- Usage scope axis -->
-		<text name="rl_menu_filters_editor_title_usage" text="Zobrazit na"/>
+        <!-- Usage scope axis -->
+        <text name="rl_menu_filters_editor_title_usage" text="Zobrazit na"/>
         <text name="rl_menu_filters_usage_any" text="Všechny obrazovky"/>
         <text name="rl_menu_filters_usage_owned" text="Obrazovky vlastněného stáda"/>
         <text name="rl_menu_filters_usage_dealer" text="Obrazovky obchodníka"/>
@@ -811,23 +812,23 @@
         <text name="rl_menu_filters_valueOutOfRange_min" text="Hodnota musí být minimálně %d"/>
         <text name="rl_menu_filters_valueOutOfRange_max" text="Hodnota musí být maximálně %d"/>
 
-		<!-- Filter cycle + chip MVP -->
-		<text name="rl_menu_filter_chip_none" text="Bez filtru"/>
+        <!-- Filter cycle + chip MVP -->
+        <text name="rl_menu_filter_chip_none" text="Bez filtru"/>
         <text name="rl_menu_filter_chip_active" text="Filtr: %s"/>
         <text name="rl_menu_filter_chip_quick" text="Filtr: QF"/>
         <text name="rl_menu_filter_chip_quick_plus_saved" text="Filtr: QF + %s"/>
         <text name="rl_menu_cycle_filter_button" text="Přepnout filtr"/>
         <text name="rl_menu_filter_chip_unnamed" text="(bez názvu)"/>
-		<!-- Herdsman rule lifecycle -->
-		<text name="rl_menu_herdsman_new_button" text="Nový úkol" />
+        <!-- Herdsman rule lifecycle -->
+        <text name="rl_menu_herdsman_new_button" text="Nový úkol" />
         <text name="rl_menu_herdsman_duplicate_button" text="Duplikovat" />
         <text name="rl_menu_herdsman_delete_button" text="Smazat" />
         <text name="rl_menu_herdsman_delete_confirm_text" text="Smazat úkol &quot;%s&quot;? Tuto akci nelze vrátit zpět." />
         <text name="rl_menu_herdsman_default_name" text="Nový úkol" />
         <text name="rl_menu_herdsman_duplicate_suffix" text=" (kopie)" />
         <text name="rl_menu_herdsman_duplicate_suffix_n" text=" (kopie %d)" />
-		<!-- Filter condition editor (English fallback) -->
-		<text name="rl_menu_filters_add_condition" text="Přidat podmínku" />
+        <!-- Filter condition editor (English fallback) -->
+        <text name="rl_menu_filters_add_condition" text="Přidat podmínku" />
         <text name="rl_menu_filters_add_group_button" text="Přidat skupinu" />
         <text name="rl_menu_filters_edit_condition" text="Upravit podmínku" />
         <text name="rl_menu_filters_delete_condition" text="Smazat podmínku" />
@@ -874,5 +875,5 @@
         <text name="rl_menu_filters_valueSet_title" text="Vybrat hodnoty" />
         <text name="rl_menu_filters_valueSet_summary" text="Vybráno: %d" />
         <text name="rl_menu_filters_valueSet_button" text="Upravit hodnoty..." />
-	</texts>
+    </texts>
 </l10n>

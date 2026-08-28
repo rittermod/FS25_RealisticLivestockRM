@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
 <l10n>
     <texts>
         <!-- COWS -->
@@ -57,7 +58,7 @@
         <text name="fillType_stallion_chestnut" text="Chestnut Aygır"/>
         <text name="fillType_stallion_bay" text="Bay Aygır"/>
         <text name="fillType_stallion_black" text="Siyah Aygır"/>
-        <text name="fillType_stallion_seal_brown" text="Seal Brown Aygır"/> 
+        <text name="fillType_stallion_seal_brown" text="Seal Brown Aygır"/>
         <text name="fillType_stallion_dun" text="Dun Aygır"/>
         <text name="animal_descriptionStallionFeed" text="Aygırlar kuru ot, yulaf ve sorgum severler."/>
         <text name="animal_descriptionStallionProfit" text="Aygırlar kar amacıyla satılabilir."/>
@@ -66,7 +67,7 @@
 
         <!-- CHICKENS -->
 
-		<text name="rl_descriptionChickenReproduction" text="Sağlıklı ve 6 aydan büyük tavuklar üreyebilir."/>
+        <text name="rl_descriptionChickenReproduction" text="Sağlıklı ve 6 aydan büyük tavuklar üreyebilir."/>
 
 
         <!-- UI -->
@@ -109,12 +110,12 @@
         <text name="rl_ui_male" text="Erkek"/>
         <text name="rl_ui_female" text="Dişi"/>
         <text name="rl_ui_weight" text="Ağırlık"/>
-		<text name="rl_ui_targetWeight" text="Hedef Ağırlık"/>
+        <text name="rl_ui_targetWeight" text="Hedef Ağırlık"/>
         <text name="rl_ui_value" text="Değer"/>
         <text name="rl_ui_valuePerKilo" text="Kg. Başına Değer"/>
         <text name="rl_ui_genetics" text="Genetik"/>
-		<text name="rl_ui_overall" text="Toplam"/>
-		<text name="rl_ui_rename" text="İsim Değiştir"/>
+        <text name="rl_ui_overall" text="Toplam"/>
+        <text name="rl_ui_rename" text="İsim Değiştir"/>
         <text name="rl_ui_maleNumImpregnatable" text="Ağıldaki döllenebilir hayvanlar"/>
 
         <text name="rl_ui_breederQuality" text="Damızlık Kalitesi"/>
@@ -126,7 +127,7 @@
         <text name="rl_ui_animalOrigin" text="Köken"/>
         <text name="rl_ui_months" text="ay"/>
         <text name="rl_ui_month" text="ay"/>
-		<text name="rl_ui_years" text="yaşında"/>
+        <text name="rl_ui_years" text="yaşında"/>
         <text name="rl_ui_year" text="yıl"/>
 
         <text name="rl_ui_milk" text="Süt üretimi"/>
@@ -188,7 +189,7 @@
         <text name="rl_ui_monitorFee" text="İzleme ücreti"/>
         <text name="rl_ui_applyMonitor" text="İzle"/>
         <text name="rl_ui_removeMonitor" text="İzlemeyi Kaldır"/>
-		<text name="rl_ui_removingMonitor" text="Kaldırılıyor..."/>
+        <text name="rl_ui_removingMonitor" text="Kaldırılıyor..."/>
         <text name="rl_ui_input_food" text="Yem"/>
         <text name="rl_ui_input_water" text="Su"/>
         <text name="rl_ui_input_straw" text="Saman"/>
@@ -197,16 +198,16 @@
         <text name="rl_ui_output_liquidManure" text="Sıvı Gübre"/>
         <text name="rl_ui_output_pallets_eggs" text="Yumurta"/>
         <text name="rl_ui_output_pallets_wool" text="Yün"/>
-		<text name="rl_ui_output_pallets_goatMilk" text="Keçi Sütü"/>
+        <text name="rl_ui_output_pallets_goatMilk" text="Keçi Sütü"/>
         <text name="rl_ui_amountPerDay" text="%.0fL / gün" tag="format"/>
         <text name="rl_ui_feePerMonth" text="%s / ay" tag="format"/>
 
         <text name="rl_ui_animalType" text="Tür"/>
-		<text name="rl_ui_amountMonitored" text="İzlendi"/>
+        <text name="rl_ui_amountMonitored" text="İzlendi"/>
         <text name="rl_ui_production" text="Ürünler"/>
         <text name="rl_ui_applyAllMonitor" text="Tüm İzlenenlere Uygula"/>
         <text name="rl_ui_removeAllMonitor" text="Tüm İzlenenleri Kaldır"/>
-		<text name="rl_ui_removingAllMonitor" text="Hepsini Kaldırıyor..."/>
+        <text name="rl_ui_removingAllMonitor" text="Hepsini Kaldırıyor..."/>
         <text name="rl_ui_fee" text="Ücret"/>
 
         <text name="rl_ui_leftEarTag" text="Sol Kulak Küpesi"/>
@@ -391,9 +392,9 @@
         <!--  SETTINGS  -->
 
 
-		<text name="rl_settings" text="Gerçekçi Hayvancılık"/>
-		<text name="rl_settings_openMenu_button" text="Ayarları Aç"/>
-		<text name="rl_settings_openMenu_label" text="Gerçekçi Hayvancılık Ayarlarını Aç"/>
+        <text name="rl_settings" text="Gerçekçi Hayvancılık"/>
+        <text name="rl_settings_openMenu_button" text="Ayarları Aç"/>
+        <text name="rl_settings_openMenu_label" text="Gerçekçi Hayvancılık Ayarlarını Aç"/>
 
         <text name="rl_settings_off" text="Kapalı"/>
         <text name="rl_settings_on" text="Açık"/>
@@ -412,25 +413,25 @@
         <text name="rl_settings_foodScale_label" text="Yem Ölçeği"/>
         <text name="rl_settings_foodScale_tooltip" text="Hayvanlar tarafından yenilen yem miktarını değiştirin"/>
 
-		<text name="rl_settings_maxDealerAnimals_label" text="Maksimum Bayi Hayvanları"/>
-		<text name="rl_settings_maxDealerAnimals_tooltip" text="Hayvan satıcısının hayvan türü başına stokta bulunduracağı maksimum hayvan sayısını değiştirin"/>
-		<text name="rl_settings_dealerQuality_label" text="Dealer Animal Quality"/>
-		<text name="rl_settings_dealerQuality_tooltip" text="Sets how good - and how expensive - the animals the dealer offers are. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing this discards the current dealer stock and restocks with new animals. Does not affect the AI animals used for insemination."/>
-		<text name="rl_settings_dealerQuality_texts_1" text="Budget"/>
-		<text name="rl_settings_dealerQuality_texts_2" text="Standard"/>
-		<text name="rl_settings_dealerQuality_texts_3" text="Premium"/>
+        <text name="rl_settings_maxDealerAnimals_label" text="Maksimum Bayi Hayvanları"/>
+        <text name="rl_settings_maxDealerAnimals_tooltip" text="Hayvan satıcısının hayvan türü başına stokta bulunduracağı maksimum hayvan sayısını değiştirin"/>
+        <text name="rl_settings_dealerQuality_label" text="Dealer Animal Quality"/>
+        <text name="rl_settings_dealerQuality_tooltip" text="Sets how good - and how expensive - the animals the dealer offers are. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing this discards the current dealer stock and restocks with new animals. Does not affect the AI animals used for insemination."/>
+        <text name="rl_settings_dealerQuality_texts_1" text="Budget"/>
+        <text name="rl_settings_dealerQuality_texts_2" text="Standard"/>
+        <text name="rl_settings_dealerQuality_texts_3" text="Premium"/>
 
-		<text name="rl_settings_mapCountry_label" text="Hayvanların Menşe Ülkesi"/>
-		<text name="rl_settings_mapCountry_tooltip" text="Yeni hayvanların kaydedildiği ülkeyi geçersiz kılar (kulak küpeleri, kimlikler). Yalnızca yeni hayvanlar için geçerlidir; mevcut hayvanlar ülkelerini korur."/>
-		<text name="rl_settings_mapCountry_texts_1" text="Harita varsayılanı"/>
+        <text name="rl_settings_mapCountry_label" text="Hayvanların Menşe Ülkesi"/>
+        <text name="rl_settings_mapCountry_tooltip" text="Yeni hayvanların kaydedildiği ülkeyi geçersiz kılar (kulak küpeleri, kimlikler). Yalnızca yeni hayvanlar için geçerlidir; mevcut hayvanlar ülkelerini korur."/>
+        <text name="rl_settings_mapCountry_texts_1" text="Harita varsayılanı"/>
 
-		<text name="rl_settings_resetDealer_label" text="Hayvan bayisini sıfırla"/>
-		<text name="rl_settings_resetDealer_tooltip" text="Satıcının tüm hayvanlarını çıkarın ve stoğu yeni hayvanlarla doldurun"/>
-		<text name="rl_settings_resetDealer_text" text="Hayvan Bayisini Sıfırla"/>
+        <text name="rl_settings_resetDealer_label" text="Hayvan bayisini sıfırla"/>
+        <text name="rl_settings_resetDealer_tooltip" text="Satıcının tüm hayvanlarını çıkarın ve stoğu yeni hayvanlarla doldurun"/>
+        <text name="rl_settings_resetDealer_text" text="Hayvan Bayisini Sıfırla"/>
 
-		<text name="rl_settings_dealerSale_label" text="Choose Animals For Sale"/>
-		<text name="rl_settings_dealerSale_tooltip" text="Choose which animals and age groups the dealer offers for sale. Changing this restocks the dealer."/>
-		<text name="rl_settings_dealerSale_text" text="Choose Animals For Sale"/>
+        <text name="rl_settings_dealerSale_label" text="Choose Animals For Sale"/>
+        <text name="rl_settings_dealerSale_tooltip" text="Choose which animals and age groups the dealer offers for sale. Changing this restocks the dealer."/>
+        <text name="rl_settings_dealerSale_text" text="Choose Animals For Sale"/>
 
         <text name="rl_settings_resetAIAnimals_label" text="Yapay Zeka Hayvanlarını Sıfırla"/>
         <text name="rl_settings_resetAIAnimals_tooltip" text="Suni tohumlama için mevcut tüm AI (yapay zeka) hayvanlarını kaldırın ve rastgele oluşturulmuş yeni hayvanlarla yenileyin"/>
@@ -781,13 +782,13 @@
         <text name="rl_menu_herdsman_filter_picker_title" text="Select Filter"/>
         <text name="rl_menu_herdsman_filter_picker_empty" text="No filters available for this task."/>
         <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Current filter unavailable for this task."/>
-			<text name="rl_menu_herdsman_section_move" text="Move"/>
-			<text name="rl_menu_herdsman_detail_destination" text="Destination"/>
-			<text name="rl_menu_herdsman_destination_select" text="Select destination"/>
-			<text name="rl_menu_herdsman_destination_butcher_suffix" text="(butcher)"/>
-			<text name="rl_menu_herdsman_destination_picker_title" text="Select Destination"/>
-			<text name="rl_menu_herdsman_destination_picker_empty" text="No destination husbandry available for this task."/>
-			<text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Current destination unavailable for this task."/>
+        <text name="rl_menu_herdsman_section_move" text="Move"/>
+        <text name="rl_menu_herdsman_detail_destination" text="Destination"/>
+        <text name="rl_menu_herdsman_destination_select" text="Select destination"/>
+        <text name="rl_menu_herdsman_destination_butcher_suffix" text="(butcher)"/>
+        <text name="rl_menu_herdsman_destination_picker_title" text="Select Destination"/>
+        <text name="rl_menu_herdsman_destination_picker_empty" text="No destination husbandry available for this task."/>
+        <text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Current destination unavailable for this task."/>
         <text name="rl_menu_herdsman_husbandry_select" text="Select husbandries"/>
         <text name="rl_menu_herdsman_husbandry_count" text="%d selected"/>
         <text name="rl_menu_herdsman_husbandry_picker_title" text="Select Husbandries"/>
@@ -840,53 +841,53 @@
         <text name="rl_message_dailyMovesSummary" text="Moved %s animals from %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="Marked %s animals for moving from %s"/>
         <text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
-		<!-- Filter condition editor (English fallback) -->
-		<text name="rl_menu_filters_add_condition" text="Add condition"/>
-		<text name="rl_menu_filters_add_group_button" text="Add group"/>
-		<text name="rl_menu_filters_edit_condition" text="Edit condition"/>
-		<text name="rl_menu_filters_delete_condition" text="Delete condition"/>
-		<text name="rl_menu_filters_dialog_title" text="Edit condition"/>
-		<text name="rl_menu_filters_field_label" text="Field"/>
-		<text name="rl_menu_filters_cmp_label" text="Compare"/>
-		<text name="rl_menu_filters_cmp_lt" text="is less than"/>
-		<text name="rl_menu_filters_cmp_le" text="is at most"/>
-		<text name="rl_menu_filters_cmp_eq" text="is"/>
-		<text name="rl_menu_filters_cmp_ne" text="is not"/>
-		<text name="rl_menu_filters_cmp_ge" text="is at least"/>
-		<text name="rl_menu_filters_cmp_gt" text="is more than"/>
-		<text name="rl_menu_filters_cmp_in" text="is one of"/>
-		<text name="rl_menu_filters_cmp_notin" text="is none of"/>
-		<text name="rl_menu_filters_cmp_contains" text="contains"/>
-		<text name="rl_menu_filters_cmp_notcontains" text="does not contain"/>
-		<text name="rl_menu_filters_value_label" text="Value"/>
-		<text name="rl_menu_filters_value_invalid_number" text="Invalid number"/>
-		<text name="rl_menu_filters_preserved_banner" text="%d condition(s) hidden - editable in a later phase. Saved on close."/>
-		<text name="rl_menu_filters_field_age" text="Age"/>
-		<text name="rl_menu_filters_field_isCastrated" text="Castrated"/>
-		<text name="rl_menu_filters_field_isPregnant" text="Pregnant"/>
-		<text name="rl_menu_filters_field_isLactating" text="Lactating"/>
-		<text name="rl_menu_filters_field_hasName" text="Has name"/>
-		<text name="rl_menu_filters_field_hasAnyDisease" text="Has any disease"/>
-		<text name="rl_menu_filters_field_hasAnyMark" text="Has any mark"/>
-		<text name="rl_menu_filters_field_weight" text="Weight"/>
-		<text name="rl_menu_filters_field_health" text="Health"/>
-		<text name="rl_menu_filters_field_genetics_metabolism" text="Genetics: metabolism"/>
-		<text name="rl_menu_filters_field_genetics_health" text="Genetics: health"/>
-		<text name="rl_menu_filters_field_genetics_fertility" text="Genetics: fertility"/>
-		<text name="rl_menu_filters_field_genetics_quality" text="Genetics: quality"/>
-		<text name="rl_menu_filters_field_genetics_productivity" text="Genetics: productivity"/>
-		<text name="rl_menu_filters_field_genetics_overall" text="Genetics: overall"/>
-		<text name="rl_menu_filters_field_gender" text="Gender"/>
-		<text name="rl_menu_filters_field_subType" text="Breed"/>
-		<text name="rl_menu_filters_field_name" text="Name"/>
-		<text name="rl_menu_filters_gender_male" text="Male"/>
-		<text name="rl_menu_filters_gender_female" text="Female"/>
-		<text name="rl_menu_filters_emptyValueRejected" text="Value cannot be empty"/>
-		<text name="rl_menu_filters_subtypeRequiresAnimalType" text="Set the filter's animal type first to edit this condition"/>
-		<text name="rl_menu_filters_invalidNumber" text="Enter a valid number"/>
-		<text name="rl_menu_filters_enumValueDrifted" text="Stored value no longer valid - pick a replacement"/>
-		<text name="rl_menu_filters_valueSet_title" text="Select values"/>
-		<text name="rl_menu_filters_valueSet_summary" text="%d selected"/>
-		<text name="rl_menu_filters_valueSet_button" text="Edit values..."/>
+        <!-- Filter condition editor (English fallback) -->
+        <text name="rl_menu_filters_add_condition" text="Add condition"/>
+        <text name="rl_menu_filters_add_group_button" text="Add group"/>
+        <text name="rl_menu_filters_edit_condition" text="Edit condition"/>
+        <text name="rl_menu_filters_delete_condition" text="Delete condition"/>
+        <text name="rl_menu_filters_dialog_title" text="Edit condition"/>
+        <text name="rl_menu_filters_field_label" text="Field"/>
+        <text name="rl_menu_filters_cmp_label" text="Compare"/>
+        <text name="rl_menu_filters_cmp_lt" text="is less than"/>
+        <text name="rl_menu_filters_cmp_le" text="is at most"/>
+        <text name="rl_menu_filters_cmp_eq" text="is"/>
+        <text name="rl_menu_filters_cmp_ne" text="is not"/>
+        <text name="rl_menu_filters_cmp_ge" text="is at least"/>
+        <text name="rl_menu_filters_cmp_gt" text="is more than"/>
+        <text name="rl_menu_filters_cmp_in" text="is one of"/>
+        <text name="rl_menu_filters_cmp_notin" text="is none of"/>
+        <text name="rl_menu_filters_cmp_contains" text="contains"/>
+        <text name="rl_menu_filters_cmp_notcontains" text="does not contain"/>
+        <text name="rl_menu_filters_value_label" text="Value"/>
+        <text name="rl_menu_filters_value_invalid_number" text="Invalid number"/>
+        <text name="rl_menu_filters_preserved_banner" text="%d condition(s) hidden - editable in a later phase. Saved on close."/>
+        <text name="rl_menu_filters_field_age" text="Age"/>
+        <text name="rl_menu_filters_field_isCastrated" text="Castrated"/>
+        <text name="rl_menu_filters_field_isPregnant" text="Pregnant"/>
+        <text name="rl_menu_filters_field_isLactating" text="Lactating"/>
+        <text name="rl_menu_filters_field_hasName" text="Has name"/>
+        <text name="rl_menu_filters_field_hasAnyDisease" text="Has any disease"/>
+        <text name="rl_menu_filters_field_hasAnyMark" text="Has any mark"/>
+        <text name="rl_menu_filters_field_weight" text="Weight"/>
+        <text name="rl_menu_filters_field_health" text="Health"/>
+        <text name="rl_menu_filters_field_genetics_metabolism" text="Genetics: metabolism"/>
+        <text name="rl_menu_filters_field_genetics_health" text="Genetics: health"/>
+        <text name="rl_menu_filters_field_genetics_fertility" text="Genetics: fertility"/>
+        <text name="rl_menu_filters_field_genetics_quality" text="Genetics: quality"/>
+        <text name="rl_menu_filters_field_genetics_productivity" text="Genetics: productivity"/>
+        <text name="rl_menu_filters_field_genetics_overall" text="Genetics: overall"/>
+        <text name="rl_menu_filters_field_gender" text="Gender"/>
+        <text name="rl_menu_filters_field_subType" text="Breed"/>
+        <text name="rl_menu_filters_field_name" text="Name"/>
+        <text name="rl_menu_filters_gender_male" text="Male"/>
+        <text name="rl_menu_filters_gender_female" text="Female"/>
+        <text name="rl_menu_filters_emptyValueRejected" text="Value cannot be empty"/>
+        <text name="rl_menu_filters_subtypeRequiresAnimalType" text="Set the filter's animal type first to edit this condition"/>
+        <text name="rl_menu_filters_invalidNumber" text="Enter a valid number"/>
+        <text name="rl_menu_filters_enumValueDrifted" text="Stored value no longer valid - pick a replacement"/>
+        <text name="rl_menu_filters_valueSet_title" text="Select values"/>
+        <text name="rl_menu_filters_valueSet_summary" text="%d selected"/>
+        <text name="rl_menu_filters_valueSet_button" text="Edit values..."/>
     </texts>
 </l10n>
