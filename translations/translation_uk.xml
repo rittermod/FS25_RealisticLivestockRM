@@ -408,7 +408,7 @@
 
 		<text name="rl_settings_useCustomAnimals_label" text="Використовувати власні моделі тварин"/>
 		<text name="rl_settings_useCustomAnimals_tooltip_1" text="Використовувати моделі тварин RealisticLivestock (потрібен перезапуск)"/>
-		<text name="rl_settings_useCustomAnimals_tooltip_2" text="Використовувати користувальницькі моделі тварин (експериментально, потрібен перезапуск, архів має бути розпакований)"/>
+		<text name="rl_settings_useCustomAnimals_tooltip_2" text="Використовувати користувальницькі моделі тварин (потрібен перезапуск, архів має бути розпакований)"/>
 
 		<text name="rl_settings_animalsXML_label" text="Задати шлях до XML тварин"/>
 		<text name="rl_settings_animalsXML_tooltip" text="Задати шлях до користувальницького файла XML тварин"/>
@@ -434,7 +434,7 @@
 		<text name="rl_help_production_title" text="Виробництво"/>
 		<text name="rl_help_production_1" text="Корови будь-якої породи починають виробляти молоко тільки після пологів. Після пологів корова буде виробляти молоко в геометричній прогресії протягом 3 місяців, потім її продуктивність буде повільно знижуватися протягом наступних 6 місяців. Через 10 місяців після вагітності корова перестане виробляти молоко до наступної вагітності."/>
 		<text name="rl_help_production_2" text="Вівці будуть виробляти вовну в теплі місяці. У холодні місяці, при температурі нижче 12°C, вони не будуть виробляти вовну."/>
-		<text name="rl_help_production_3" text="На виробництво молока, вовни та яєць також впливає генетика тварини. Тварина з хорошую генетикою вироблятиме більше, тоді як тварина з поганою генетикою не вироблятиме багато взагалі."/>
+		<text name="rl_help_production_3" text="На виробництво молока, вовни та яєць також впливає генетика тварини. Тварина з хорошою генетикою вироблятиме більше, тоді як тварина з поганою генетикою не вироблятиме багато взагалі."/>
 
 		<text name="rl_help_weight_title" text="Вага"/>
 		<text name="rl_help_weight_1" text="Тварини мають певну вагу, яка залежить від того, скільки вони їдять і п'ють. Кожен вид і порода має свою середню вагу, яка впливає на вагу кожної тварини."/>
@@ -694,19 +694,19 @@
         <text name="rl_menu_herdsman_destination_tooltip" text="Загін, до якого пастух переміщує відповідних тварин."/>
         <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Чи виконуватиме пастух це завдання з догляду за конями щодня."/>
         <text name="rl_menu_herdsman_enabled_move_tooltip" text="Чи виконуватиме пастух це завдання з переміщення щодня."/>
-        <text name="rl_menu_herdsman_empty" text="Правила для пастуха ще не створені"/>
-        <text name="rl_menu_herdsman_empty_editor" text="Оберіть правило для редагування"/>
+        <text name="rl_menu_herdsman_empty" text="Завдання для пастуха ще не створені"/>
+        <text name="rl_menu_herdsman_empty_editor" text="Оберіть завдання для редагування"/>
         <text name="rl_menu_herdsman_section_sell" text="Продаж"/>
         <text name="rl_menu_herdsman_section_buy" text="Купівля"/>
         <text name="rl_menu_herdsman_section_castrate" text="Кастрація"/>
         <text name="rl_menu_herdsman_section_naming" text="Найменування"/>
         <text name="rl_menu_herdsman_section_ai" text="Штучне запліднення"/>
         <text name="rl_menu_herdsman_section_horsecare" text="Догляд за конями"/>
-        <text name="rl_menu_herdsman_detail_operation" text="Операція"/>
+        <text name="rl_menu_herdsman_detail_operation" text="Завдання"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Увімкнено"/>
         <text name="rl_menu_herdsman_detail_convention" text="Принцип найменування"/>
         <text name="rl_menu_herdsman_detail_budgetfixed" text="Фіксована сума"/>
-        <text name="rl_menu_herdsman_detail_budgetpercentage" text="% від вартості стада"/>
+        <text name="rl_menu_herdsman_detail_budgetpercentage" text="% від коштів ферми"/>
         <text name="rl_menu_herdsman_detail_semen" text="Сперма"/>
         <text name="rl_menu_herdsman_detail_husbandries" text="Загони"/>
         <text name="rl_menu_herdsman_detail_none" text="(немає)"/>
@@ -716,22 +716,22 @@
         <text name="rl_menu_herdsman_detail_wholeNumberMin" text="Значення має бути цілим числом не менше %d"/>
         <text name="rl_menu_herdsman_filter_select" text="Обрати фільтр"/>
         <text name="rl_menu_herdsman_filter_picker_title" text="Обрати фільтр"/>
-        <text name="rl_menu_herdsman_filter_picker_empty" text="Немає доступних фільтрів для цієї операції."/>
+        <text name="rl_menu_herdsman_filter_picker_empty" text="Немає доступних фільтрів для цього завдання."/>
         <text name="rl_menu_herdsman_husbandry_select" text="Обрати загони"/>
         <text name="rl_menu_herdsman_husbandry_count" text="Вибрано: %d"/>
         <text name="rl_menu_herdsman_husbandry_picker_title" text="Обрати загони"/>
-        <text name="rl_menu_herdsman_husbandry_picker_empty" text="Немає доступних загонів для цього правила."/>
+        <text name="rl_menu_herdsman_husbandry_picker_empty" text="Немає доступних загонів для цього завдання."/>
         <text name="rl_menu_dealerSale_title" text="Тварини на продаж"/>
         <text name="rl_menu_dealerSale_empty" text="У цього торговця немає доступних тварин."/>
         <text name="rl_menu_herdsman_husbandry_emptyRejected" text="Оберіть принаймні один загін."/>
-        <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Поточний фільтр недоступний для цієї операції."/>
+        <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Поточний фільтр недоступний для цього завдання."/>
 			<text name="rl_menu_herdsman_section_move" text="Переміщення"/>
 			<text name="rl_menu_herdsman_detail_destination" text="Місце призначення"/>
 			<text name="rl_menu_herdsman_destination_select" text="Обрати місце призначення"/>
 			<text name="rl_menu_herdsman_destination_butcher_suffix" text="(бійня)"/>
 			<text name="rl_menu_herdsman_destination_picker_title" text="Обрати місце призначення"/>
-			<text name="rl_menu_herdsman_destination_picker_empty" text="Немає доступного загону для цього правила."/>
-			<text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Поточне місце призначення недоступне для цього правила."/>
+			<text name="rl_menu_herdsman_destination_picker_empty" text="Немає доступного загону для цього завдання."/>
+			<text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Поточне місце призначення недоступне для цього завдання."/>
         <!-- Settings tab shell (English fallback) -->
         <text name="rl_menu_settings_title" text="Налаштування"/>
         <text name="rl_menu_settings_tab_general" text="Загальні"/>
@@ -792,11 +792,11 @@
         <text name="rl_ui_buyPartialConfirmation" text="Купити %d з %d вибраних тварин за %s?" tag="format"/>
         <text name="rl_ui_buySkippedNotSupported" text="Пропущено %d тварин, які не підтримуються цим загоном" tag="format"/>
 		<!-- Herdsman rule lifecycle -->
-		<text name="rl_menu_herdsman_new_button" text="Нове правило"/>
+		<text name="rl_menu_herdsman_new_button" text="Нове завдання"/>
 		<text name="rl_menu_herdsman_duplicate_button" text="Дублювати"/>
 		<text name="rl_menu_herdsman_delete_button" text="Видалити"/>
-		<text name="rl_menu_herdsman_delete_confirm_text" text="Видалити правило &quot;%s&quot;? Цю дію неможливо скасувати."/>
-		<text name="rl_menu_herdsman_default_name" text="Нове правило"/>
+		<text name="rl_menu_herdsman_delete_confirm_text" text="Видалити завдання &quot;%s&quot;? Цю дію неможливо скасувати."/>
+		<text name="rl_menu_herdsman_default_name" text="Нове завдання"/>
 		<text name="rl_menu_herdsman_duplicate_suffix" text=" (копія)"/>
 		<text name="rl_menu_herdsman_duplicate_suffix_n" text=" (копія %d)"/>
 		<!-- Filter condition editor (English fallback) -->
