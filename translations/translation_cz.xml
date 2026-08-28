@@ -736,19 +736,19 @@
         <text name="rl_menu_herdsman_destination_tooltip" text="Chovný objekt, do kterého pastýř přesune odpovídající zvířata."/>
         <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Zda pastýř tento úkol péče o koně provádí každý den."/>
         <text name="rl_menu_herdsman_enabled_move_tooltip" text="Zda pastýř tento úkol přesunu provádí každý den."/>
-        <text name="rl_menu_herdsman_empty" text="Zatím žádná pravidla pro pastýře"/>
-        <text name="rl_menu_herdsman_empty_editor" text="Vyberte pravidlo k úpravě"/>
+        <text name="rl_menu_herdsman_empty" text="Zatím žádné úkoly pro pastýře"/>
+        <text name="rl_menu_herdsman_empty_editor" text="Vyberte úkol k úpravě"/>
         <text name="rl_menu_herdsman_section_sell" text="Prodej"/>
         <text name="rl_menu_herdsman_section_buy" text="Nákup"/>
         <text name="rl_menu_herdsman_section_castrate" text="Kastrace"/>
         <text name="rl_menu_herdsman_section_naming" text="Pojmenování"/>
         <text name="rl_menu_herdsman_section_ai" text="Inseminace"/>
         <text name="rl_menu_herdsman_section_horsecare" text="Péče o koně"/>
-        <text name="rl_menu_herdsman_detail_operation" text="Operace"/>
+        <text name="rl_menu_herdsman_detail_operation" text="Úkol"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Povoleno"/>
         <text name="rl_menu_herdsman_detail_convention" text="Formát jména"/>
         <text name="rl_menu_herdsman_detail_budgetfixed" text="Pevná částka"/>
-        <text name="rl_menu_herdsman_detail_budgetpercentage" text="Hodnota stáda %"/>
+        <text name="rl_menu_herdsman_detail_budgetpercentage" text="Peníze farmy %"/>
         <text name="rl_menu_herdsman_detail_semen" text="Sperma"/>
         <text name="rl_menu_herdsman_detail_husbandries" text="Chovné objekty"/>
         <text name="rl_menu_herdsman_detail_none" text="(žádné)"/>
@@ -758,22 +758,22 @@
         <text name="rl_menu_herdsman_detail_wholeNumberMin" text="Hodnota musí být celé číslo, minimálně %d"/>
         <text name="rl_menu_herdsman_filter_select" text="Vybrat filtr"/>
         <text name="rl_menu_herdsman_filter_picker_title" text="Vyberte filtr"/>
-        <text name="rl_menu_herdsman_filter_picker_empty" text="Pro tuto operaci nejsou k dispozici žádné filtry."/>
+        <text name="rl_menu_herdsman_filter_picker_empty" text="Pro tento úkol nejsou k dispozici žádné filtry."/>
         <text name="rl_menu_herdsman_husbandry_select" text="Vybrat chovné objekty"/>
         <text name="rl_menu_herdsman_husbandry_count" text="Vybráno: %d"/>
         <text name="rl_menu_herdsman_husbandry_picker_title" text="Vyberte chovné objekty"/>
-        <text name="rl_menu_herdsman_husbandry_picker_empty" text="Pro toto pravidlo nejsou k dispozici žádné chovné objekty."/>
+        <text name="rl_menu_herdsman_husbandry_picker_empty" text="Pro tento úkol nejsou k dispozici žádné chovné objekty."/>
         <text name="rl_menu_dealerSale_title" text="Zvířata k prodeji"/>
         <text name="rl_menu_dealerSale_empty" text="U tohoto obchodníka nejsou k dispozici žádná zvířata."/>
         <text name="rl_menu_herdsman_husbandry_emptyRejected" text="Vyberte alespoň jeden chovný objekt."/>
-        <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Aktuální filtr není pro tuto operaci k dispozici."/>
+        <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Aktuální filtr není pro tento úkol k dispozici."/>
         <text name="rl_menu_herdsman_section_move" text="Přesun"/>
         <text name="rl_menu_herdsman_detail_destination" text="Cíl"/>
         <text name="rl_menu_herdsman_destination_select" text="Vybrat cíl"/>
         <text name="rl_menu_herdsman_destination_butcher_suffix" text="(řezník)"/>
         <text name="rl_menu_herdsman_destination_picker_title" text="Vyberte cíl"/>
-        <text name="rl_menu_herdsman_destination_picker_empty" text="Pro toto pravidlo není k dispozici žádný cílový objekt."/>
-        <text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Aktuální cíl není pro toto pravidlo k dispozici."/>
+        <text name="rl_menu_herdsman_destination_picker_empty" text="Pro tento úkol není k dispozici žádný cílový objekt."/>
+        <text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Aktuální cíl není pro tento úkol k dispozici."/>
         <!-- Settings tab shell (English fallback) -->
         <text name="rl_menu_settings_title" text="Nastavení"/>
         <text name="rl_menu_settings_tab_general" text="Obecné"/>
@@ -819,11 +819,11 @@
         <text name="rl_menu_cycle_filter_button" text="Přepnout filtr"/>
         <text name="rl_menu_filter_chip_unnamed" text="(bez názvu)"/>
 		<!-- Herdsman rule lifecycle -->
-		<text name="rl_menu_herdsman_new_button" text="Nové pravidlo" />
+		<text name="rl_menu_herdsman_new_button" text="Nový úkol" />
         <text name="rl_menu_herdsman_duplicate_button" text="Duplikovat" />
         <text name="rl_menu_herdsman_delete_button" text="Smazat" />
-        <text name="rl_menu_herdsman_delete_confirm_text" text="Smazat pravidlo &quot;%s&quot;? Tuto akci nelze vrátit zpět." />
-        <text name="rl_menu_herdsman_default_name" text="Nové pravidlo" />
+        <text name="rl_menu_herdsman_delete_confirm_text" text="Smazat úkol &quot;%s&quot;? Tuto akci nelze vrátit zpět." />
+        <text name="rl_menu_herdsman_default_name" text="Nový úkol" />
         <text name="rl_menu_herdsman_duplicate_suffix" text=" (kopie)" />
         <text name="rl_menu_herdsman_duplicate_suffix_n" text=" (kopie %d)" />
 		<!-- Filter condition editor (English fallback) -->
