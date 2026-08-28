@@ -720,7 +720,7 @@
         <text name="rl_menu_herdsman_detail_enabled" text="Attivato"/>
         <text name="rl_menu_herdsman_detail_convention" text="Convenzione di denominazione"/>
         <text name="rl_menu_herdsman_detail_budgetfixed" text="Importo fisso"/>
-        <text name="rl_menu_herdsman_detail_budgetpercentage" text="Valore del branco %"/>
+        <text name="rl_menu_herdsman_detail_budgetpercentage" text="% del denaro della fattoria"/>
         <text name="rl_menu_herdsman_detail_semen" text="Seme"/>
         <text name="rl_menu_herdsman_detail_husbandries" text="Allevamenti"/>
         <text name="rl_menu_herdsman_detail_none" text="(nessuno)"/>

@@ -755,7 +755,7 @@
         <text name="rl_menu_herdsman_detail_enabled" text="Activé"/>
         <text name="rl_menu_herdsman_detail_convention" text="Convention de nommage"/>
         <text name="rl_menu_herdsman_detail_budgetfixed" text="Montant fixe"/>
-        <text name="rl_menu_herdsman_detail_budgetpercentage" text="% de la valeur du troupeau"/>
+        <text name="rl_menu_herdsman_detail_budgetpercentage" text="% de l'argent de la ferme"/>
         <text name="rl_menu_herdsman_detail_semen" text="Semence"/>
         <text name="rl_menu_herdsman_detail_husbandries" text="Élevages"/>
         <text name="rl_menu_herdsman_detail_none" text="(aucun)"/>

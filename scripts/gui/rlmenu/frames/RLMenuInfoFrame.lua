@@ -637,7 +637,7 @@ function RLMenuInfoFrame:updateButtonVisibility()
         end
     end
 
-    -- DEBUG: log button count and each action for keybinding diagnosis
+    -- Button-bar contents for keybinding diagnosis: the count, then each action.
     Log:debug("RLMenuInfoFrame:updateButtonVisibility: %d buttons in menuButtonInfo", #self.menuButtonInfo)
     for i, info in ipairs(self.menuButtonInfo) do
         Log:trace("  button[%d]: action=%s text=%s disabled=%s",

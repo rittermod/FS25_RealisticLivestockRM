@@ -1,44 +1,16 @@
 # Changelog
 
-## 1.3.2.0-dev.2:
-
-### Heads up before you update
-
-- The old per-pen herdsman's leftover settings are cleared out of your save the first time you save after updating. It has not run since v1.3.0.0 and the Herdsman tab in RL Menu replaces it.
-- The custom Mark Animal and Castrate Animal keybindings are gone, and any custom keys you had set for them are ignored.
-- For mod authors: getAIManager on a Realistic Livestock animal pen is removed with no replacement.
-
-### Changed
-
-- Changed every route into the animal screen to open the RL Menu, including ones other mods trigger - some previously opened the old screen and others did nothing at all.
-- Stopped replacing the base game's hand-tool sorting on the statistics screen - Realistic Livestock had been overriding it with code that behaved like the base game's, so nothing changes on that screen, but the mod no longer overwrites other mods that adjust it.
-
-### Removed
-
-- Removed the old animal management screen for good. Browsing and managing animals is unchanged - the RL Menu already handled all of it. In the rare case another mod opens the animal screen in a way the RL Menu cannot take over, you now see the standard Farming Simulator screen instead of the old Realistic Livestock one.
-- Removed the leftover Mark Animal and Castrate Animal keybindings - they had stopped doing anything, and any custom keys you had set for them are simply ignored now.
-- Removed the old per-pen herdsman, the automation you used to set up on a single animal pen - it has not run since v1.3.0.0, the Herdsman tab in RL Menu replaces it, and its leftover settings are cleared out of your save the first time you save after updating.
-- Removed the getAIManager function that other mods could call on a Realistic Livestock animal pen, with no replacement, because the per-pen herdsman it handed back no longer exists.
-
-### Fixed
-
-- Fixed the R shortcut being listed as "Open Animal Screen" in the Controls settings, naming a screen that no longer exists - it now reads "Manage Animals" in every language, matching the button it triggers.
-- Fixed being stranded on the old animal screen with no way out - not even Escape - when another mod opened the animal screen in a way Realistic Livestock could not take over. The RL Menu now opens as intended in that case.
-- Fixed the Diseases button being usable by farm members without the Trade Animals permission - starting a treatment commits the farm to a recurring per-animal fee, so it now follows the same permission as the other animal actions.
-- Fixed diseases never reaching other players in multiplayer - a client saw whatever the herd looked like when they joined, so an animal falling ill, being cured, or coming out of immunity went unnoticed until something unrelated happened in that pen. Health and treatment now update as they happen.
-- Fixed a newly infected animal reporting its infection age as "-1 years, 11 months" in the info box until the next month began. It now reads 0 months.
-- Fixed a sick animal not passing its disease on during the month it recovered or died - the month an infection ended counted as if the animal had never been contagious.
-
-### Translations
-
-- Added Dutch translations for the many menu, filter, herdsman, settings, and message strings that were still showing in English (contributed by Nozem1982).
-- Added Spanish as a new language, covering the menus, filters, herdsman, settings, messages and in-game help - it arrives as one of the most complete translations the mod ships (contributed by zarvaoo_16).
-
-## 1.3.2.0-dev.1:
+## 1.3.2.0:
 
 ### Heads up before you update
 
 - Treating a disease now costs money. Any animal already part-way through a course starts charging on the next month - Foot & Mouth bills $250 a month across its three months, mastitis $200 and PED $150.
+- The old per-pen herdsman's leftover settings are cleared out of your save the first time you save after updating. It has not run since v1.3.0.0 and the Herdsman tab in RL Menu replaces it.
+- The custom Mark Animal and Castrate Animal keybindings are gone, and any custom keys you had set for them are ignored.
+- An animal already stuck showing "Being treated" after being cured keeps that label until its immunity expires; there is no repair pass.
+- For mod authors: getAIManager on a Realistic Livestock animal pen is removed with no replacement.
+
+### Diseases
 
 - Changed the disease signal on animal cards from a red row to status icons, so you can tell an untreated animal from one under treatment and spot a CVM carrier at a glance.
 - Fixed animals dying from a disease they had just beaten - curing an animal, by treatment or by natural recovery, now reliably saves it.
@@ -46,10 +18,37 @@
 - Fixed every treatment curing after a single month regardless of the disease - Foot & Mouth now runs the full three-month course its treatment is meant to take.
 - Fixed animals that had recovered from a disease, and CVM carriers, still being listed as diseased - they now group, sort and filter as healthy, so the Diseased Animals list only shows animals that are actually sick.
 - Fixed recovered animals still spreading the disease they beat, so outbreaks now burn out instead of running for the whole immunity window.
+- Fixed a sick animal not passing its disease on during the month it recovered or died - the month an infection ended counted as if the animal had never been contagious.
 - Fixed the Immune label counting up from when the animal caught the disease instead of counting down the protection it has left.
 - Fixed the cured notification arriving a year or two late - it now appears on the month the animal actually recovers, instead of when its immunity runs out.
 - Fixed a treatment you stopped part-way reading as Not treated, so the status now agrees with the months left and the Resume button.
 - Fixed disease treatment being free - the fee is now taken from your farm balance and shown as a cost, where it used to appear as income and never leave your account.
+- Fixed a newly infected animal reporting its infection age as "-1 years, 11 months" in the info box until the next month began. It now reads 0 months.
+- Fixed the Diseases button being usable by farm members without the Trade Animals permission - starting a treatment commits the farm to a recurring per-animal fee, so it now follows the same permission as the other animal actions.
+- Fixed diseases never reaching other players in multiplayer - a client saw whatever the herd looked like when they joined, so an animal falling ill, being cured, or coming out of immunity went unnoticed until something unrelated happened in that pen. Health and treatment now update as they happen.
+- Fixed an animal the server had just cured reading as "Being treated" on other players' screens when treatment was toggled.
+
+### The animal screen and the per-pen herdsman
+
+- Changed every route into the animal screen to open the RL Menu, including ones other mods trigger - some previously opened the old screen and others did nothing at all.
+- Stopped replacing the base game's hand-tool sorting on the statistics screen - Realistic Livestock had been overriding it with code that behaved like the base game's, so nothing changes on that screen, but the mod no longer overwrites other mods that adjust it.
+- Removed the old animal management screen for good. Browsing and managing animals is unchanged - the RL Menu already handled all of it. In the rare case another mod opens the animal screen in a way the RL Menu cannot take over, you now see the standard Farming Simulator screen instead of the old Realistic Livestock one.
+- Removed the old per-pen herdsman, the automation you used to set up on a single animal pen - it has not run since v1.3.0.0, the Herdsman tab in RL Menu replaces it, and its leftover settings are cleared out of your save the first time you save after updating.
+- Removed the leftover Mark Animal and Castrate Animal keybindings - they had stopped doing anything, and any custom keys you had set for them are simply ignored now.
+- Removed the getAIManager function that other mods could call on a Realistic Livestock animal pen, with no replacement, because the per-pen herdsman it handed back no longer exists.
+- Fixed being stranded on the old animal screen with no way out - not even Escape - when another mod opened the animal screen in a way Realistic Livestock could not take over. The RL Menu now opens as intended in that case.
+- Fixed the R shortcut being listed as "Open Animal Screen" in the Controls settings, naming a screen that no longer exists - it now reads "Manage Animals" in every language, matching the button it triggers.
+
+### Translations
+
+- Added Spanish as a new language, covering the menus, filters, herdsman, settings, messages and in-game help - it arrives as one of the most complete translations the mod ships (contributed by zarvaoo_16).
+- Completed the Dutch translation - the many menu, filter, herdsman, settings and message strings that were still showing in English are now translated (contributed by Nozem1982).
+- Completed the Ukrainian translation - the menus, filters, herdsman, settings, messages and in-game help were still largely in English (contributed by Kalderone Daniil_ua).
+- Completed the Czech translation - the menus, filters, herdsman, settings, messages and in-game help were still largely in English, and the insemination straw is now named as such rather than as bedding straw (contributed by Mapolap).
+- Fixed the herdsman labels in thirteen languages still carrying wording retired two releases ago - among them a budget field that read as a share of herd value when it actually sets a share of your farm money.
+
+### Documentation
+
 - Updated the disease guide's survival tables to match the new post-recovery rules - a cured animal faces no further risk from the disease it beat until its immunity lapses.
 
 ## 1.3.1.0:

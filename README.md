@@ -23,7 +23,7 @@ This is a maintained version of the original mod by Arrow-kb, who has discontinu
 - Genetics display in animal names with configurable detail level (average score or full trait breakdown)
 - Breeding and reproduction with pregnancy mechanics and genetic inheritance
 - AI insemination system with semen dewars
-- Disease simulation with infection, treatment, and immunity
+- Disease simulation with infection, immunity, and treatment charged as a monthly fee
 - Animal monitoring to track individual animals over time
 - Weight system tied to genetics and feeding
 - Animal marking and castration
