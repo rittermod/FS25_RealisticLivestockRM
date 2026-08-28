@@ -716,19 +716,19 @@
         <text name="rl_menu_herdsman_destination_tooltip" text="The husbandry the herdsman moves matching animals into."/>
         <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Whether the herdsman runs this horse care task each day."/>
         <text name="rl_menu_herdsman_enabled_move_tooltip" text="Whether the herdsman runs this move task each day."/>
-        <text name="rl_menu_herdsman_empty" text="No herdsman rules yet"/>
-        <text name="rl_menu_herdsman_empty_editor" text="Select a rule to edit"/>
+        <text name="rl_menu_herdsman_empty" text="No herdsman tasks yet"/>
+        <text name="rl_menu_herdsman_empty_editor" text="Select a task to edit"/>
         <text name="rl_menu_herdsman_section_sell" text="Sell"/>
         <text name="rl_menu_herdsman_section_buy" text="Buy"/>
         <text name="rl_menu_herdsman_section_castrate" text="Castrate"/>
         <text name="rl_menu_herdsman_section_naming" text="Naming"/>
         <text name="rl_menu_herdsman_section_ai" text="Artificial Insemination"/>
         <text name="rl_menu_herdsman_section_horsecare" text="Horse Care"/>
-        <text name="rl_menu_herdsman_detail_operation" text="Operation"/>
+        <text name="rl_menu_herdsman_detail_operation" text="Task"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Enabled"/>
         <text name="rl_menu_herdsman_detail_convention" text="Naming Convention"/>
         <text name="rl_menu_herdsman_detail_budgetfixed" text="Fixed Amount"/>
-        <text name="rl_menu_herdsman_detail_budgetpercentage" text="Herd Value %"/>
+        <text name="rl_menu_herdsman_detail_budgetpercentage" text="Farm Money %"/>
         <text name="rl_menu_herdsman_detail_semen" text="Semen"/>
         <text name="rl_menu_herdsman_detail_husbandries" text="Husbandries"/>
         <text name="rl_menu_herdsman_detail_none" text="(none)"/>
@@ -738,22 +738,22 @@
         <text name="rl_menu_herdsman_detail_wholeNumberMin" text="Value must be a whole number, %d or more"/>
         <text name="rl_menu_herdsman_filter_select" text="Select filter"/>
         <text name="rl_menu_herdsman_filter_picker_title" text="Select Filter"/>
-        <text name="rl_menu_herdsman_filter_picker_empty" text="No filters available for this operation."/>
+        <text name="rl_menu_herdsman_filter_picker_empty" text="No filters available for this task."/>
         <text name="rl_menu_herdsman_husbandry_select" text="Select husbandries"/>
         <text name="rl_menu_herdsman_husbandry_count" text="%d selected"/>
         <text name="rl_menu_herdsman_husbandry_picker_title" text="Select Husbandries"/>
-        <text name="rl_menu_herdsman_husbandry_picker_empty" text="No husbandries available for this rule."/>
+        <text name="rl_menu_herdsman_husbandry_picker_empty" text="No husbandries available for this task."/>
         <text name="rl_menu_dealerSale_title" text="Animals for Sale"/>
         <text name="rl_menu_dealerSale_empty" text="No animals available at this dealer."/>
         <text name="rl_menu_herdsman_husbandry_emptyRejected" text="Select at least one husbandry."/>
-        <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Current filter unavailable for this operation."/>
+        <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Current filter unavailable for this task."/>
 			<text name="rl_menu_herdsman_section_move" text="Move"/>
 			<text name="rl_menu_herdsman_detail_destination" text="Destination"/>
 			<text name="rl_menu_herdsman_destination_select" text="Select destination"/>
 			<text name="rl_menu_herdsman_destination_butcher_suffix" text="(butcher)"/>
 			<text name="rl_menu_herdsman_destination_picker_title" text="Select Destination"/>
-			<text name="rl_menu_herdsman_destination_picker_empty" text="No destination husbandry available for this rule."/>
-			<text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Current destination unavailable for this rule."/>
+			<text name="rl_menu_herdsman_destination_picker_empty" text="No destination husbandry available for this task."/>
+			<text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Current destination unavailable for this task."/>
         <!-- Settings tab shell (English fallback) -->
         <text name="rl_menu_settings_title" text="Settings"/>
         <text name="rl_menu_settings_tab_general" text="General"/>
@@ -814,11 +814,11 @@
         <text name="rl_ui_buyPartialConfirmation" text="Buy %d of %d selected animals for %s?" tag="format"/>
         <text name="rl_ui_buySkippedNotSupported" text="%d animal(s) not supported by this husbandry" tag="format"/>
 		<!-- Herdsman rule lifecycle -->
-		<text name="rl_menu_herdsman_new_button" text="New rule"/>
+		<text name="rl_menu_herdsman_new_button" text="New task"/>
 		<text name="rl_menu_herdsman_duplicate_button" text="Duplicate"/>
 		<text name="rl_menu_herdsman_delete_button" text="Delete"/>
-		<text name="rl_menu_herdsman_delete_confirm_text" text="Delete rule &quot;%s&quot;? This cannot be undone."/>
-		<text name="rl_menu_herdsman_default_name" text="New rule"/>
+		<text name="rl_menu_herdsman_delete_confirm_text" text="Delete task &quot;%s&quot;? This cannot be undone."/>
+		<text name="rl_menu_herdsman_default_name" text="New task"/>
 		<text name="rl_menu_herdsman_duplicate_suffix" text=" (copy)"/>
 		<text name="rl_menu_herdsman_duplicate_suffix_n" text=" (copy %d)"/>
 		<!-- Filter condition editor (English fallback) -->
