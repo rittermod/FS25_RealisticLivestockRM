@@ -12,9 +12,9 @@ Realistic Livestock RM includes five diseases that can infect, spread between, a
 |---------|---------|--------|-------|-----------|-------------------|
 | **Mastitis** | Cow, Goat | Slow | No | Yes ($200) | Small reduction |
 | **CVM** | Cow only | Genetic | Almost always (calves) | No | Moderate reduction |
-| **Foot & Mouth** | Cow, Sheep, Goat, Pig | Moderate | Yes | Yes ($250/mo) | Major reduction |
-| **PED** | Pig only | Moderate | Devastating to newborns | Yes ($150) | Significant reduction |
-| **Avian Influenza** | Chicken only | Fast | Yes, high fatality | No | Severe reduction |
+| **Foot & Mouth** | Cow, Sheep, Goat, Pig | High | Yes | Yes ($250/mo) | Major reduction |
+| **PED** | Pig only | Low | Devastating to newborns | Yes ($150) | Significant reduction |
+| **Avian Influenza** | Chicken only | Limited | Yes, high fatality | No | Severe reduction |
 
 ---
 
@@ -148,11 +148,11 @@ CVM carriers appear healthy and suffer no ill effects. In fact, **CVM carrier co
 
 **Affects:** Cows, Sheep, Goats, Pigs
 
-Foot & Mouth is the most widespread disease, affecting three species. It's moderately contagious and can be fatal, especially in recently infected animals.
+Foot & Mouth is the most widespread disease, affecting three species, and the only one that reliably spreads through a herd. An infected animal never recovers on its own, so it keeps infecting pen mates for as long as it stays sick - treat it or sell it. Fatality is highest in the first months after infection.
 
 | Parameter | Value |
 |-----------|-------|
-| Spread | Moderate - noticeable risk to nearby animals |
+| Spread | High - the only disease that sustains an outbreak on its own |
 | Fatality | Moderate initially, decreasing as the animal builds resistance |
 | Treatment | $250/month ($750 over 3 months) |
 | Natural recovery | None - requires treatment |
@@ -201,7 +201,7 @@ PED is devastating to young piglets - almost always fatal in newborns. Older pig
 
 | Parameter | Value |
 |-----------|-------|
-| Spread | Moderate - spreads to nearby pigs |
+| Spread | Low - a sick pig usually recovers before it infects another |
 | Fatality | Almost always fatal in the first month after infection |
 | Treatment | $150, cured in 1 month |
 | Natural recovery | 3 months without treatment |
@@ -243,11 +243,11 @@ With pig litters of 11-16 piglets, a PED outbreak in a maternity pen can kill mo
 
 **Affects:** Chickens only
 
-Avian Flu is the fastest-spreading disease and has **no treatment**. Infected chickens stop producing eggs entirely and have a high fatality rate.
+Avian Flu has **no treatment**. Infected chickens stop producing eggs entirely and have a high fatality rate. It is less contagious than its reputation suggests: a bird recovers after about a month, so an outbreak normally burns out instead of sweeping the coop. The danger is the fatality, not the spread.
 
 | Parameter | Value |
 |-----------|-------|
-| Spread | **Fast** - can infect multiple birds quickly |
+| Spread | Limited - birds recover in about a month, so outbreaks burn out |
 | Fatality | High initially, then much lower while the bird stays infected; none once it recovers, until that immunity lapses |
 | Treatment | **None available** |
 | Natural recovery | 1 month |
@@ -273,7 +273,7 @@ Avian Flu is the fastest-spreading disease and has **no treatment**. Infected ch
 ### Why Avian Flu Is Dangerous
 
 - **No treatment** - you can only wait for natural recovery (1 month)
-- **Fast spread** - in a large pen, multiple birds get infected each month
+- **Cases keep appearing** - birds mostly catch it on their own rather than from each other, so a large flock sees new cases over time rather than one contained outbreak
 - **High initial fatality** - many infected chickens die before recovering
 - **Complete egg loss** - surviving infected chickens produce zero eggs
 - Even survivors lose a month of egg production while sick
