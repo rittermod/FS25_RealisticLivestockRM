@@ -10,6 +10,11 @@ function DiseaseManager.new()
     local self = setmetatable({}, diseaseManager_mt)
 
 	self.diseases = {}
+	-- Initialised ABOVE the loader call. loadDiseases assigns it unconditionally,
+	-- so this is a guard against a future edit that stops doing so rather than a
+	-- value anything reads today - but an init placed BELOW the call would clobber
+	-- the parsed table with an empty one, and no test would see it.
+	self.diseaseModels = {}
 	self.diseasesEnabled = true
 	self.diseasesChance = 1
 
@@ -20,132 +25,94 @@ function DiseaseManager.new()
 end
 
 
+--- Load the disease definition file into the legacy registry and the model map.
+---
+--- Runs from `new()`, which the mod re-runs on every map load, so both tables are
+--- rebuilt from the archive each time and neither can carry a previous save's
+--- contents.
+---
+--- The single emission point for the parser's authoring warnings: the parse
+--- RETURNS them rather than logging them, so each rule stays assertable without a
+--- logger spy, and every line a malformed definition file produces comes from
+--- here.
+---@return nil
 function DiseaseManager:loadDiseases()
 
-	local xmlFile = XMLFile.loadIfExists("diseases", modDirectory .. "xml/diseases.xml")
+    -- Thin wrapper: open, parse, assign, log, delete. The parse itself lives in
+    -- RLDiseaseDefinition so both halves of the registry are built in one place
+    -- and a later teardown deletes a branch rather than untangling one.
+    --
+    -- Deliberately NO pcall around parse. Its contract is that it does not raise
+    -- for any input, so a raise here is a wiring bug that must crash loudly
+    -- rather than be swallowed into a silently empty registry.
+    --
+    -- A nil xmlFile is handed straight to parse rather than short-circuited here:
+    -- the absent-file case is one of parse's own warning rules, which keeps this
+    -- function the SINGLE emission point for the whole vocabulary.
+    local xmlFile = XMLFile.loadIfExists("diseases", modDirectory .. "xml/diseases.xml")
 
-	if xmlFile == nil then return end
+    local legacy, models, warnings = RLDiseaseDefinition.parse(xmlFile, {
+        ["animalTypes"] = AnimalType,
+        ["i18n"] = g_i18n
+    })
 
-	xmlFile:iterate("diseases.disease", function(_, key)
-	
-		local title = xmlFile:getString(key .. "#title")
-		local translationKey = "rl_disease_" .. title
-		local name = g_i18n:getText(translationKey)
+    self.diseases = legacy
+    self.diseaseModels = models
 
-		local animals = {}
-		local animalTitles = string.split(xmlFile:getString(key .. "#animals"), " ")
+    -- Every value goes through %s + tostring(): the headless harness formats with
+    -- a bare string.format and RAISES where the in-game logger degrades, so a
+    -- typed specifier here would turn a malformed-input warning into a suite
+    -- crash on one runner only.
+    for _, authoringWarning in ipairs(warnings) do
+        Log:warning("loadDiseases: %s (disease=%s) - %s",
+            tostring(authoringWarning.rule),
+            tostring(authoringWarning.title),
+            tostring(authoringWarning.detail))
+    end
 
-		for _, animalTitle in pairs(animalTitles) do animals[AnimalType[animalTitle]] = true end
+    local modelCount = 0
+    local titles = {}
 
-		local valueModifier = xmlFile:getFloat(key .. "#value", 1.0)
-		local transmission = xmlFile:getFloat(key .. "#transmission", 0)
-		local immunity = xmlFile:getInt(key .. "#immunity", 12)
+    for title in pairs(models) do
+        modelCount = modelCount + 1
+        table.insert(titles, title)
+    end
 
-		local prerequisites = {}
+    -- Sorted at BOTH levels, and for the same reason: pairs order is undefined, so
+    -- an unsorted walk names the same diseases and the same channels in a
+    -- different order on every load, which defeats a grep across two logs and
+    -- would make any ordered log pin flaky the moment a second carrier exists.
+    table.sort(titles)
 
-		xmlFile:iterate(key .. ".prerequisites.prerequisite", function(_, prerequisiteKey)
+    for _, title in ipairs(titles) do
 
-			local valueType = xmlFile:getString(prerequisiteKey .. "#valueType", "Int")
-		
-			table.insert(prerequisites, {
-				["path"] = string.split(xmlFile:getString(prerequisiteKey .. "#path"), "."),
-				["value"] = XMLFile["get" .. valueType](xmlFile, prerequisiteKey .. "#value")
-			})
-		
-		end)
+        local model = models[title]
 
-		local probability = {}
+        if model.carrier ~= nil and next(model.carrier.output) ~= nil then
 
-		xmlFile:iterate(key .. ".probability.key", function(_, probabilityKey)
+            local channels = {}
 
-			table.insert(probability, {
-				["age"] = xmlFile:getInt(probabilityKey .. "#age"),
-				["value"] = xmlFile:getFloat(probabilityKey .. "#value")
-			})
-		
-		end)
+            -- %.6g, not tostring: the engine reads these as 32-bit floats, so
+            -- tostring renders 0.35 as 0.3499999940395355 in-game and 0.35
+            -- headless. Six significant digits round that away and still carry
+            -- every authored value.
+            for channel, modifier in pairs(model.carrier.output) do
+                table.insert(channels, string.format("%s=%.6g", tostring(channel), modifier))
+            end
 
-		local fatality = {}
+            table.sort(channels)
 
-		xmlFile:iterate(key .. ".fatality.key", function(_, fatalityKey)
+            Log:debug("loadDiseases: %s carrier output modifiers loaded (%s)",
+                tostring(title), table.concat(channels, " "))
 
-			table.insert(fatality, {
-				["time"] = xmlFile:getInt(fatalityKey .. "#time"),
-				["value"] = xmlFile:getFloat(fatalityKey .. "#value")
-			})
-		
-		end)
+        end
 
-		local output = {}
+    end
 
-		xmlFile:iterate(key .. ".output.fillType", function(_, outputKey)
+    Log:info("loadDiseases: %s disease(s) defined, %s with a model block, %s authoring warning(s)",
+        tostring(#legacy), tostring(modelCount), tostring(#warnings))
 
-			output[xmlFile:getString(outputKey .. "#type")] = xmlFile:getFloat(outputKey .. "#modifier")
-		
-		end)
-
-		local treatment = {
-			["cost"] = xmlFile:getFloat(key .. ".treatment#cost"),
-			["duration"] = xmlFile:getInt(key .. ".treatment#duration")
-		}
-
-		if treatment.cost == nil or treatment.duration == nil then treatment = nil end
-
-		local recovery = xmlFile:getFloat(key .. "#recovery")
-
-		local disease = {
-			["title"] = title,
-			["key"] = translationKey,
-			["name"] = name,
-			["animals"] = animals,
-			["value"] = valueModifier,
-			["transmission"] = transmission,
-			["immunity"] = immunity,
-			["prerequisites"] = prerequisites,
-			["probability"] = probability,
-			["fatality"] = fatality,
-			["output"] = output,
-			["treatment"] = treatment,
-			["recovery"] = recovery
-		}
-
-		if xmlFile:hasProperty(key .. ".carrier") then
-
-			local carrier = {}
-
-			if xmlFile:hasProperty(key .. ".carrier.output") then
-
-				local carrierOutput = {}
-
-				xmlFile:iterate(key .. ".output.fillType", function(_, outputKey)
-
-					carrierOutput[xmlFile:getString(outputKey .. "#type")] = xmlFile:getFloat(outputKey .. "#modifier")
-		
-				end)
-
-				carrier.output = carrierOutput
-
-			end
-
-			disease.carrier = carrier
-
-		end
-
-		if xmlFile:hasProperty(key .. ".genetic") then
-
-			disease.genetic = {
-				["recessive"] = xmlFile:getBool(key .. ".genetic#recessive", false),
-				["dominant"] = xmlFile:getBool(key .. ".genetic#dominant", false),
-				["saleChance"] = xmlFile:getFloat(key .. ".genetic#saleChance", 0)
-			}
-
-		end
-
-		table.insert(self.diseases, disease)
-	
-	end)
-
-	xmlFile:delete()
+    if xmlFile ~= nil then xmlFile:delete() end
 
 end
 
