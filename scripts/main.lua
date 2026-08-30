@@ -408,6 +408,10 @@ source(modDirectory .. "scripts/insemination/DewarManager.lua")
 -- The rate primitive first: it is pure arithmetic with no dependency of its own,
 -- and it precedes the entities that will consume it.
 source(modDirectory .. "scripts/disease/RLDiseaseRates.lua")
+-- The definition parser next: DiseaseManager reaches it at CALL time from
+-- loadDiseases, which runs inside DiseaseManager.new(), so it only has to precede
+-- the construction below rather than the manager's own source line.
+source(modDirectory .. "scripts/disease/RLDiseaseDefinition.lua")
 source(modDirectory .. "scripts/disease/Disease.lua")
 source(modDirectory .. "scripts/disease/DiseaseManager.lua")
 
