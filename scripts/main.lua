@@ -405,6 +405,9 @@ source(modDirectory .. "scripts/events/RL_ResetDealerEvent.lua")
 source(modDirectory .. "scripts/insemination/DewarManager.lua")
 
 -- SECTION 20e: Disease
+-- The rate primitive first: it is pure arithmetic with no dependency of its own,
+-- and it precedes the entities that will consume it.
+source(modDirectory .. "scripts/disease/RLDiseaseRates.lua")
 source(modDirectory .. "scripts/disease/Disease.lua")
 source(modDirectory .. "scripts/disease/DiseaseManager.lua")
 
