@@ -95,6 +95,82 @@
     re-read through a model reference. Re-reading would couple this module to the
     model registry's lifetime, and a record outlives a definition-file reload.
 
+    THE INCUBATION COUNTER COUNTS DOWN, AND THE FLOOR IS A PROPERTY OF THE SEED.
+    `seedIncubation` is the single place `incubationTicksRemaining` is written at
+    infection, and it floors through `incubationTicksFor`, so no difficulty scale
+    can drive a hidden window to zero - every disease hides for at least one tick.
+    A seed of N yields exactly N advances in EXPOSED, because `advanceIncubation`
+    decrements FIRST and then tests. The counter is clamped at 0 and never runs
+    negative: a later codec serializes this field, and a negative sentinel in an
+    unsigned slot is the defect this record exists to replace.
+
+    THE FLOOR BOUNDS A SCALE, NEVER AN AUTHOR. A disease authored at zero
+    incubation means "visible at once", and the infection slice honours that by
+    constructing the record straight at INFECTIOUS and never seeding it - so a `0`
+    reaching `incubationTicksFor` comes from a difficulty scale applied to a
+    NONZERO authored value, which is exactly the case the floor exists to stop. Do
+    not add an authored-zero branch here, and do not read the model's authored
+    tick count from this module at all.
+
+    THE FOLD PUTS THE VALUE FIRST, AND THAT ORDER IS THE PORTABLE ONE. Every
+    comparison against NaN is false in both directions, so `math.max` keeps
+    whichever operand its implementation holds by default - measured, a NaN in the
+    FIRST slot returns the other operand under both runtimes this module runs on,
+    while a NaN in the SECOND slot is kept by one and discarded by the other.
+    Value-first is therefore the direction that behaves identically in both. The
+    sibling vulnerability module uses the opposite order deliberately, because it
+    WANTS a NaN to propagate into a factor that can never fire a roll; this one
+    does not, because the result is written into a field a codec serializes. Do
+    not "align" the two - they differ on purpose.
+
+    `0` IN THE COUNTER IS AMBIGUOUS, DELIBERATELY, AND THE AMBIGUITY IS BOUNDED. A
+    fresh record and a surfaced record both hold `0`, so the counter alone cannot
+    say which; `state` is what separates them, and it sits on the same record. An
+    unseeded record therefore advances once and surfaces - the same behaviour a
+    floor-seeded record has - so a forgotten seed fails SOFT, costing the player
+    one tick of visibility rather than producing an instantly-visible animal.
+
+    MORE SHARP EDGES, on the incubation surface specifically. There is no
+    validation of the tick VALUE and no NaN guard: every caller is mod code inside
+    this subsystem, and the definition parser already refuses a negative authored
+    value. What a degenerate input DOES is specified rather than guarded:
+
+      nil ticks   `incubationTicksFor` RAISES (nil + 0.5), deliberately - it is a
+                  pure primitive, and a missing argument is a wiring bug that
+                  should be loud. `seedIncubation` guards it instead, because that
+                  is the applier the infection slice calls. That guard tests for
+                  nil ONLY, so a `false` reaching it - the ordinary
+                  `local ticks = enabled and authored * scale` idiom - still
+                  raises on the arithmetic, where the record guard beside it uses
+                  a TYPE test because `false` is its reachable non-table.
+      NaN ticks   returns MIN_INCUBATION_TICKS, by the value-first fold above.
+      negative    returns MIN_INCUBATION_TICKS. No producer: the parser drops the
+                  whole model half on a negative authored value.
+      math.huge   returns math.huge - NOT an integer, and `inf - 1 == inf`, so
+                  such a record would stay EXPOSED forever. No producer: it needs
+                  a non-finite scale. Any finite counter at or above 2^54 behaves
+                  the same way, because `n - 1 == n` there.
+
+    TWO RESIDUALS ON THE COUNTER ITSELF, recorded rather than guarded because no
+    producer exists yet - a codec and a migration are later slices' work.
+
+    A record whose counter is absent or non-numeric is a PERMANENT zombie: the
+    advance refuses it at the type guard and the seed refuses it at the `~= 0`
+    guard, so nothing can move it and it stays hidden, contagious and un-surfacing
+    for the life of the save. That is a harder failure than the soft one above, and
+    the asymmetry is deliberate only in the sense that failing closed beats writing
+    over a value a codec produced. Whoever builds that codec owns making it loud.
+
+    An out-of-enum `state` is refused by both appliers at their own state check, so
+    neither reaches `transition` - which means the one DEBUG line in this module,
+    written precisely so a record frozen at a stale state is not invisible at every
+    level, cannot fire on the incubation path. A frozen record is therefore still
+    invisible here.
+
+    ROUNDING IS ROUND-HALF-UP (`math.floor(x + 0.5)`), so 2.5 rounds to 3. That is
+    observable only under a FRACTIONAL scale, which the advanced percentage
+    overrides make reachable; the preset ladder scales by whole numbers.
+
     Nothing calls this module yet. The incubation, treatment and fatality slices
     each adopt it in their own change, and each goes through `transition` rather
     than assigning `record.state`.
@@ -133,6 +209,16 @@ RLDiseaseRecord.STATE = {
 RLDiseaseRecord.APPLIED = "APPLIED"
 RLDiseaseRecord.REFUSED = "REFUSED"
 RLDiseaseRecord.REMOVE = "REMOVE"
+
+
+--- The hidden window's floor, in ticks. Every disease hides for at least one tick
+--- and no setting can remove it - see the header for the measurement that makes
+--- that load-bearing rather than tidy.
+---
+--- Public and read at CALL time through the module table, so a suite can pin it and
+--- a deliberate break can move it. It is a code constant on every peer, never
+--- persisted and never sent over the wire.
+RLDiseaseRecord.MIN_INCUBATION_TICKS = 1
 
 
 --- The legal transitions, as a closed table rather than a chain of conditionals.
@@ -284,10 +370,138 @@ function RLDiseaseRecord.new(model, title)
 end
 
 
+--- Floor a tick count into the hidden window's smallest legal length.
+---
+--- Takes a count the caller has ALREADY scaled - the difficulty multiply belongs to
+--- the settings slice that owns the preset, not here - and returns a positive
+--- integer for any finite input. That split is what lets "incubation can never
+--- reach zero at any scale value" hold without this module knowing what a scale is.
+---
+--- The fold puts the VALUE first and the constant second; the header says why that
+--- order is the portable one and must not be swapped.
+--- @param ticks number Tick count, already scaled by the caller. TRUSTED INTERNAL
+---        input - not validated; see the header's sharp-edge enumeration, including
+---        what a nil, NaN, negative or infinite value does.
+--- @return number ticks A positive integer for any finite input, never below
+---         MIN_INCUBATION_TICKS
+function RLDiseaseRecord.incubationTicksFor(ticks)
+    return math.max(math.floor(ticks + 0.5), RLDiseaseRecord.MIN_INCUBATION_TICKS)
+end
+
+
+--- Seed a fresh record's hidden window. The ONLY place `incubationTicksRemaining`
+--- is written at infection.
+---
+--- Refuses a record that has left EXPOSED or is already mid-window, because either
+--- way re-seeding restarts something: a record past EXPOSED has served its hidden
+--- window, and one still in EXPOSED with a running counter is inside it. The
+--- transition table forbids the same move in the other direction, so the refusal
+--- keeps the two consistent.
+--- @param record table|nil A record from `new`. TRUSTED INTERNAL input; a nil - or
+---        any non-table, `false` being the reachable one - returns REFUSED rather
+---        than raising.
+--- @param ticks number|nil Tick count, already scaled. Floored by
+---        `incubationTicksFor`. A nil returns REFUSED, because arithmetic on it
+---        would otherwise raise inside a wiring bug's caller.
+--- @return string outcome APPLIED | REFUSED
+function RLDiseaseRecord.seedIncubation(record, ticks)
+    -- Same membership-first shape as `transition`, and a TYPE test for the same
+    -- reason it is one there: reading `record.state` off a non-table raises, and
+    -- `false` is the reachable case.
+    if type(record) ~= "table" then return RLDiseaseRecord.REFUSED end
+
+    -- A wiring guard against a MISSING argument, not value validation - the
+    -- distinction the header draws.
+    if ticks == nil then return RLDiseaseRecord.REFUSED end
+
+    if record.state ~= RLDiseaseRecord.STATE.EXPOSED then
+        return RLDiseaseRecord.REFUSED
+    end
+
+    -- Tested against 0 rather than for a positive value, and the difference is not
+    -- style: `> 0` RAISES on a nil counter, where `~= 0` refuses it. So this shape
+    -- also declines a record whose counter is absent or non-numeric instead of
+    -- writing over it or crashing on it.
+    --
+    -- `new` starts every counter at 0, so TODAY a fresh record is the only thing
+    -- this admits. That stops being true the moment the transition table grows a
+    -- condition: a record that spent its last tick and had its surfacing REFUSED
+    -- sits at EXPOSED with the counter at 0, which is indistinguishable from fresh
+    -- here and would be re-seeded. `advanceIncubation` below anticipates exactly
+    -- that refusal, so the two are only consistent while the pair remains
+    -- unconditional - the chronic exit rule is where this gets settled.
+    if record.incubationTicksRemaining ~= 0 then
+        return RLDiseaseRecord.REFUSED
+    end
+
+    record.incubationTicksRemaining = RLDiseaseRecord.incubationTicksFor(ticks)
+
+    return RLDiseaseRecord.APPLIED
+end
+
+
+--- Advance a record's hidden window by one tick, surfacing it when the window ends.
+---
+--- Decrements FIRST and then tests, so a seed of N yields exactly N advances in
+--- EXPOSED. The decrement is clamped at 0: an unseeded record advances once and
+--- surfaces rather than running the counter negative into a field a codec
+--- serializes.
+---
+--- Returns two values rather than a fourth outcome constant. The outcome set is
+--- locked, and the caller genuinely needs to tell "decremented" from "decremented
+--- and surfaced" - the tick order puts symptoms ahead of the player's turn, so a
+--- consumer acts on the SAME tick a case becomes visible rather than snapshotting
+--- the state around this call. `APPLIED` therefore also covers a bare decrement.
+--- @param record table|nil A record from `new`. TRUSTED INTERNAL input; a nil or
+---        non-table returns REFUSED rather than raising, as does a record whose
+---        counter is absent or non-numeric, since `nil - 1` raises.
+--- @return string outcome APPLIED for a bare decrement; on the surfacing call,
+---         whatever `transition` returned - APPLIED while the pair stays
+---         unconditional. REFUSED means the call was DECLINED at a guard and
+---         nothing moved, EXCEPT on a refused surfacing, where the tick is already
+---         spent and deliberately not restored. `transition` returns REMOVE only
+---         for a SUSCEPTIBLE destination, so REMOVE is unreachable from here.
+--- @return boolean surfaced true ONLY on the call that moved the record to
+---         INFECTIOUS - a strict boolean, never a truthy value
+function RLDiseaseRecord.advanceIncubation(record)
+    if type(record) ~= "table" then return RLDiseaseRecord.REFUSED, false end
+
+    if record.state ~= RLDiseaseRecord.STATE.EXPOSED then
+        return RLDiseaseRecord.REFUSED, false
+    end
+
+    local remaining = record.incubationTicksRemaining
+
+    if type(remaining) ~= "number" then
+        return RLDiseaseRecord.REFUSED, false
+    end
+
+    -- The clamp is the whole reason this is not a bare `remaining - 1`: an unseeded
+    -- record sits at 0, and 0 is exactly the value a later codec's unsigned slot
+    -- cannot carry one below.
+    record.incubationTicksRemaining = math.max(remaining - 1, 0)
+
+    if record.incubationTicksRemaining > 0 then
+        return RLDiseaseRecord.APPLIED, false
+    end
+
+    -- The spent tick is NOT restored on a refusal. The counter is decremented above,
+    -- so a transition table that later grows a condition surfaces the refusal with
+    -- the tick already consumed, rather than as a silent inconsistency between the
+    -- counter and the state.
+    local outcome = RLDiseaseRecord.transition(record, RLDiseaseRecord.STATE.INFECTIOUS)
+
+    return outcome, outcome == RLDiseaseRecord.APPLIED
+end
+
+
 -- The load line is the whole of this module's logging, deliberately. `canTransition`
--- is a table lookup and a boolean, `transition` is that plus one assignment, and
--- `new` is a table literal - so there is no branch whose decision a TRACE line would
--- explain that the caller does not already hold. The callers are the incubation,
--- treatment, fatality and switch-over slices, each of which can name the animal,
--- which this module cannot. Read the absence as that, not as under-logging.
+-- is a table lookup and a boolean, `transition` is that plus one assignment, `new`
+-- is a table literal, and the three incubation functions are straight-line
+-- arithmetic plus one guarded write - so there is no branch whose decision a TRACE
+-- line would explain that the caller does not already hold. `advanceIncubation`
+-- does branch, but on the record's own state and counter, both of which the caller
+-- holds and can state itself, naming the animal as this module cannot. The callers
+-- are the incubation, treatment, fatality and switch-over slices. Read the absence
+-- as that, not as under-logging.
 Log:info("RLDiseaseRecord loaded")
