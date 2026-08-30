@@ -214,4 +214,31 @@ RLConstants.GENETICS_MAX = 1.75
 RLConstants.GENETICS_SPAN = RLConstants.GENETICS_MAX - RLConstants.GENETICS_MIN
 
 
+-- Maximum lifespan in months per animal type, keyed by the UPPERCASE type NAME.
+-- The index is registration order and shifts with load order, so a name is the
+-- only stable key; the caller resolves the name and passes it.
+--
+-- The same numbers already appear in the old-age death mechanic, in two places:
+-- AnimalHealth.calculateOldAgeMonthlyAnimalDeaths and
+-- RealisticLivestock.calculateOldAgeMonthlyAnimalDeaths. This table is a THIRD
+-- copy and nothing compares the three - both of those hold their numbers inline
+-- in an if/elseif chain, which no test can read - so a change here has to be
+-- made in all three by hand.
+--
+-- A type absent from this table has no entry rather than a default, matching
+-- what the two authorities do with an unrecognised type: they leave it at a
+-- minAge of 20000 and it never dies of old age.
+--
+-- READ-ONLY by contract. Consumers share this object rather than a copy, so a
+-- mutation reaches all of them; there is deliberately no defensive copy and no
+-- metatable freeze.
+RLConstants.MAX_LIFESPAN_MONTHS_BY_TYPE = {
+    COW = 240,
+    PIG = 240,
+    SHEEP = 144,
+    HORSE = 360,
+    CHICKEN = 96
+}
+
+
 Log:info("RLConstants loaded")
