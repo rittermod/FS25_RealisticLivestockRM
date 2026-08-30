@@ -416,6 +416,10 @@ source(modDirectory .. "scripts/disease/RLDiseaseDefinition.lua")
 -- at file scope, so it has to follow SECTION 2c. Like the rate primitive it
 -- precedes the entities that will consume it.
 source(modDirectory .. "scripts/disease/RLDiseaseVulnerability.lua")
+-- The SEIR record is the third pure primitive. It reads no constant of its own -
+-- RmLogging from SECTION 0 is its only dependency - so it needs only to precede the
+-- entities that will consume it.
+source(modDirectory .. "scripts/disease/RLDiseaseRecord.lua")
 source(modDirectory .. "scripts/disease/Disease.lua")
 source(modDirectory .. "scripts/disease/DiseaseManager.lua")
 
