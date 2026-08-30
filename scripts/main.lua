@@ -412,6 +412,10 @@ source(modDirectory .. "scripts/disease/RLDiseaseRates.lua")
 -- loadDiseases, which runs inside DiseaseManager.new(), so it only has to precede
 -- the construction below rather than the manager's own source line.
 source(modDirectory .. "scripts/disease/RLDiseaseDefinition.lua")
+-- The vulnerability factor is the second pure primitive, and it reads RLConstants
+-- at file scope, so it has to follow SECTION 2c. Like the rate primitive it
+-- precedes the entities that will consume it.
+source(modDirectory .. "scripts/disease/RLDiseaseVulnerability.lua")
 source(modDirectory .. "scripts/disease/Disease.lua")
 source(modDirectory .. "scripts/disease/DiseaseManager.lua")
 
