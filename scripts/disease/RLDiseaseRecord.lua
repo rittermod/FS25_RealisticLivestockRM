@@ -33,11 +33,14 @@
     record exists to remove. A record is therefore never stranded at a live state,
     because it is deleted with its animal rather than outliving it.
 
-    THE CHRONIC EXIT RULE IS NOT HERE. `INFECTIOUS -> RECOVERED` is unconditionally
-    legal, the record still CARRIES `chronic` as data, and whether a
-    chronic-but-treatable disease may reach RECOVERED through a completed cure is
-    settled separately. So `canTransition` takes TWO arguments and the domain is
-    5 x 5, not 5 x 5 x 2 - do NOT add a third argument here.
+    THE EXIT RULE IS NOT HERE, AND IT IS NOW A THREE-WAY QUESTION rather than the
+    two-way one the flag posed. `INFECTIOUS -> RECOVERED` is unconditionally legal
+    and the record still CARRIES `endpoint` as data, but what that endpoint implies
+    is settled separately, per value: a `lifelong` infection never reaches
+    RECOVERED at all, a `cureOnly` one reaches it only through a completed curative
+    course, and `terminal` is the one still open. `recovers` is the only value whose
+    exit is already decided. So `canTransition` takes TWO arguments and the domain
+    is 5 x 5, not 5 x 5 x 4 - do NOT add a third argument here.
 
     THE DECISION IS A PURE PREDICATE, and that shape is deliberate. `canTransition`
     answers the whole question over plain data, so the entire domain is swept by a
@@ -79,7 +82,7 @@
     the value set the same object for the allowlist check above.
 
     `TRANSITIONS` IS EXPOSED FOR A TRIPWIRE ONLY. `canTransition` is the sole
-    supported read: the deferred chronic rule will not live in a plain `[from][to]`
+    supported read: the deferred exit rule will not live in a plain `[from][to]`
     cell, so a consumer reading the table directly is reading something that is
     about to stop being the whole answer. It is public the way a test seam is
     public, not the way `STATE` is.
@@ -91,9 +94,21 @@
     naturally and neither needs a special case, which is exactly why a maintainer
     might add one.
 
-    A record carries `chronic` as its own field, copied at construction rather than
+    A record carries `endpoint` as its own field, copied at construction rather than
     re-read through a model reference. Re-reading would couple this module to the
-    model registry's lifetime, and a record outlives a definition-file reload.
+    model registry's lifetime, and a record outlives a definition-file reload. It is
+    carried VERBATIM and never gated here, because the parser already owns that
+    decision - a second gate would split one vocabulary across two files.
+
+    THE TWO CARRIED VOCABULARIES ARE NOT UNGATED FOR THE SAME REASON, and reading
+    them as one pair gets the next question wrong. `endpoint` is CLOSED: the parser
+    refuses an unrecognised value outright and the model half never reaches this
+    module, so every record's endpoint is one of the four by construction.
+    `archetype` is OPEN: the parser only WARNS and carries an unrecognised value
+    through, so a record genuinely can hold an archetype nothing validated - which
+    is deliberate, and is why the constructor's own comment speaks of a warning
+    rather than a refusal. Neither is gated here; only one of them could ever
+    arrive unrecognised.
 
     THE INCUBATION COUNTER COUNTS DOWN, AND THE FLOOR IS A PROPERTY OF THE SEED.
     `seedIncubation` is the single place `incubationTicksRemaining` is written at
@@ -234,7 +249,7 @@ RLDiseaseRecord.TRANSITIONS = {
     -- Incubation elapses and the animal becomes symptomatic.
     ["EXPOSED"] = { ["INFECTIOUS"] = true },
     -- Recovery or a completed cure, and disease fatality. Both unconditional here;
-    -- the chronic constraint on the first is deferred (see the header).
+    -- the endpoint constraint on the first is deferred (see the header).
     ["INFECTIOUS"] = { ["RECOVERED"] = true, ["DEAD"] = true },
     -- Immunity expires. Returns REMOVE and writes nothing - a record never holds
     -- SUSCEPTIBLE.
@@ -247,9 +262,9 @@ RLDiseaseRecord.TRANSITIONS = {
 --- Is this ordered pair of states a legal transition?
 ---
 --- Takes exactly two arguments, and that is a contract rather than an accident: the
---- chronic exit rule is deferred, so no arm of this module reads `chronic` and a
---- third parameter would be an unused public surface the deferred work would have
---- to renegotiate.
+--- exit rule is deferred, so no arm of this module reads `endpoint` and a third
+--- parameter would be an unused public surface the deferred work would have to
+--- renegotiate.
 --- @param from string|nil A STATE value. TRUSTED INTERNAL input - not validated; an
 ---        unrecognised value, nil or NaN is refused rather than raising.
 --- @param to string|nil A STATE value. TRUSTED INTERNAL input - same handling.
@@ -330,16 +345,17 @@ end
 --- codec to serialize and keeps one authority for every authored number; the cost,
 --- accepted, is that those slices hold a model reference when they roll.
 ---
---- `chronic` is the one model-derived flag that IS copied, because the state
+--- `endpoint` is the one model-derived value that IS copied, because the state
 --- machine and the later delegation both branch on it without a model in hand.
 ---
---- THE KEY SET IS IDENTICAL FOR A CHRONIC AND A NON-CHRONIC RECORD. The parser
---- writes exactly one of the duration pair, so copying either would give the two
---- shapes different key sets. Not copying either removes the problem. Counters with
---- nothing to count are `0`, never nil - a nil would drop the key and reintroduce
---- the same split - and `0` on the treatment counter does NOT distinguish "never
---- treatable" from "course finished"; the model's own treatment block answers that.
---- @param model table A parsed `<model>` entry. `archetype` and `chronic` are
+--- THE KEY SET IS IDENTICAL FOR EVERY ENDPOINT. The parser writes at most one of
+--- the duration pair - and for `lifelong` and `cureOnly` neither - so copying
+--- either would give the shapes different key sets. Not copying either removes the
+--- problem. Counters with nothing to count are `0`, never nil - a nil would drop
+--- the key and reintroduce the same split - and `0` on the treatment counter does
+--- NOT distinguish "never treatable" from "course finished"; the model's own
+--- treatment block answers that.
+--- @param model table A parsed `<model>` entry. `archetype` and `endpoint` are
 ---        guaranteed present by the definition parser. TRUSTED INTERNAL input - a
 ---        shipped file read back by the mod that ships it is an internal caller, so
 ---        nothing here is validated.
@@ -355,7 +371,7 @@ function RLDiseaseRecord.new(model, title)
         -- accepted, splitting the vocabulary across two files.
         ["title"] = title,
         ["archetype"] = model.archetype,
-        ["chronic"] = model.chronic,
+        ["endpoint"] = model.endpoint,
 
         ["state"] = RLDiseaseRecord.STATE.EXPOSED,
 
@@ -429,7 +445,7 @@ function RLDiseaseRecord.seedIncubation(record, ticks)
     -- sits at EXPOSED with the counter at 0, which is indistinguishable from fresh
     -- here and would be re-seeded. `advanceIncubation` below anticipates exactly
     -- that refusal, so the two are only consistent while the pair remains
-    -- unconditional - the chronic exit rule is where this gets settled.
+    -- unconditional - the endpoint exit rule is where this gets settled.
     if record.incubationTicksRemaining ~= 0 then
         return RLDiseaseRecord.REFUSED
     end
