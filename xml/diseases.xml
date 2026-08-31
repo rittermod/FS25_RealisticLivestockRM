@@ -16,14 +16,14 @@
 			<fillType type="pallets" modifier="0"/>
 		</output>
 		<treatment cost="200" duration="1"/>
-		<model archetype="infectious" chronic="false" cullRequired="false"
+		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="1.2" durationMonths="2"
 			caseFatality="0.01" immunityMonths="12" salePrice="0.85">
 			<infection>
 				<key ageMonths="0" perMonth="0"/>
 				<key ageMonths="12" perMonth="0.012"/>
 			</infection>
-			<treatment months="1" cost="200" efficacy="1"/>
+			<treatment months="1" cost="200" efficacy="1" outcome="cure"/>
 			<effects weightGain="0.85" fertility="0.7">
 				<output type="milk" modifier="0"/>
 				<output type="pallets" modifier="0"/>
@@ -48,7 +48,7 @@
 			</output>
 		</carrier>
 		<genetic recessive="true" saleChance="0.005"/>
-		<model archetype="genetic" chronic="true" cullRequired="true"
+		<model archetype="genetic" endpoint="terminal" cullRequired="true"
 			incubationTicks="0" r0="0" chronicMonthsToDeath="2"
 			caseFatality="1" immunityMonths="0" salePrice="0.75">
 			<infection>
@@ -78,14 +78,14 @@
 			<fillType type="pallets" modifier="0.9"/>
 		</output>
 		<treatment cost="250" duration="3"/>
-		<model archetype="infectious" chronic="false" cullRequired="false"
+		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="6.0" durationMonths="2"
 			caseFatality="0.06" immunityMonths="24" salePrice="0.5">
 			<infection>
 				<key ageMonths="0" perMonth="0"/>
 				<key ageMonths="6" perMonth="0.0015"/>
 			</infection>
-			<treatment months="1" cost="250" efficacy="1"/>
+			<treatment months="1" cost="250" efficacy="1" outcome="cure"/>
 			<effects weightGain="0.7" fertility="0.5">
 				<output type="milk" modifier="0.35"/>
 				<output type="pallets" modifier="0.9"/>
@@ -110,7 +110,7 @@
 			<fillType type="manure" modifier="0.25"/>
 		</output>
 		<treatment cost="150" duration="1"/>
-		<model archetype="infectious" chronic="false" cullRequired="false"
+		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="2.5" durationMonths="2"
 			caseFatality="0.22" immunityMonths="12" salePrice="0.65">
 			<infection>
@@ -118,7 +118,7 @@
 				<key ageMonths="6" perMonth="0.02"/>
 				<key ageMonths="18" perMonth="0.004"/>
 			</infection>
-			<treatment months="1" cost="150" efficacy="1"/>
+			<treatment months="1" cost="150" efficacy="1" outcome="cure"/>
 			<effects weightGain="0.5" fertility="1">
 				<output type="liquidManure" modifier="4"/>
 				<output type="manure" modifier="0.25"/>
@@ -137,13 +137,13 @@
 		<output>
 			<fillType type="pallets" modifier="0"/>
 		</output>
-		<model archetype="infectious" chronic="false" cullRequired="false"
+		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="2.5" durationMonths="2"
 			caseFatality="0.06" immunityMonths="12" salePrice="0.25">
 			<infection>
 				<key ageMonths="0" perMonth="0.013"/>
 			</infection>
-			<treatment months="1" cost="40" efficacy="1"/>
+			<treatment months="1" cost="40" efficacy="1" outcome="cure"/>
 			<effects weightGain="0.9" fertility="1">
 				<output type="pallets" modifier="0.4"/>
 			</effects>

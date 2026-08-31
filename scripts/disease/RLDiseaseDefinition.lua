@@ -82,9 +82,88 @@ local OUTPUT_CHANNELS = {
 --- Archetype is an OPEN vocabulary: an unknown value warns and is carried through
 --- verbatim rather than rejected, so a future kind needs no schema churn. The
 --- warning is what stops a typo becoming a silent third archetype.
+---
+--- `management` covers the non-transmissible, non-inherited conditions - wear,
+--- diet, parasites. The archive's vaccination taxonomy names a degenerative kind
+--- beside it, but mechanically the two are one class (neither transmits, neither
+--- is inherited), so this is one value rather than two.
 local ARCHETYPES = {
     ["infectious"] = true,
-    ["genetic"] = true
+    ["genetic"] = true,
+    ["management"] = true
+}
+
+
+--- The endpoint names what ends the INFECTIOUS phase, and the value it maps to is
+--- the duration attribute that phase is clocked by - `false` where nothing clocks
+--- it. One table therefore answers both authoring questions, "is this value legal"
+--- and "which duration does it require", so the vocabulary cannot land in two
+--- places and drift.
+---
+--- CLOSED, unlike `ARCHETYPES`: an endpoint decides which OTHER attributes are
+--- required and forbidden, so an unrecognised one has no defined parse at all.
+--- Membership is tested with `~= nil`, never for truthiness - `false` is a legal
+--- entry and the clockless pair would otherwise read as unknown.
+---
+--- The two durations are NOT interchangeable and must never be merged into one
+--- attribute. `durationMonths` is a fractional SPAN - how long the infectious
+--- phase runs before natural recovery. `chronicMonthsToDeath` is a MEDIAN,
+--- converted `1 - 0.5 ^ (1/m)` into a per-month hazard by its consumer. Merging
+--- them turns a geometric tail into a deterministic death at the clock boundary,
+--- with no error and plausible numbers on either side.
+local ENDPOINTS = {
+    -- the span elapses and the animal recovers naturally
+    ["recovers"] = "durationMonths",
+    -- the hazard kills; the animal never recovers
+    ["terminal"] = "chronicMonthsToDeath",
+    -- nothing ends it; the animal sheds for life
+    ["lifelong"] = false,
+    -- only a completed curative course ends it
+    ["cureOnly"] = false
+}
+
+
+--- The duration attributes the pairing rule walks: exactly one is required per
+--- endpoint and every other one is FORBIDDEN, so the walk needs the whole set
+--- rather than just the required member.
+---
+--- DERIVED from `ENDPOINTS` rather than hand-written beside it, which is what makes
+--- the "one home" claim above true instead of aspirational. A second hand-kept list
+--- drifts in one direction silently: an endpoint mapped to an attribute missing
+--- from the walk matches no iteration, so its required check never runs, its value
+--- is never assigned, and the model half loads with no duration AND no warning -
+--- the exact silent-default class this module exists to prevent.
+---
+--- Sorted for a stable walk order. Order does not change any verdict - the required
+--- attribute is matched by name and every other declared one is refused - but it
+--- decides WHICH detail string an author sees first, and a `pairs` order would make
+--- that differ per process and between the two runners.
+local DURATION_ATTRIBUTES = {}
+
+do
+    local seen = {}
+
+    for _, attribute in pairs(ENDPOINTS) do
+        -- `false` is a legal value: the clockless endpoints require no attribute.
+        if attribute ~= false and not seen[attribute] then
+            seen[attribute] = true
+            table.insert(DURATION_ATTRIBUTES, attribute)
+        end
+    end
+
+    table.sort(DURATION_ATTRIBUTES)
+end
+
+
+--- What a completed treatment achieves. CLOSED for the same reason `ENDPOINTS` is:
+--- the value decides which endpoints the block is legal against.
+---
+--- `cure` clears the record; `relief` eases the symptoms and leaves it in place,
+--- which is the axis an incurable-but-manageable condition needs and the only
+--- reason this attribute exists.
+local OUTCOMES = {
+    ["cure"] = true,
+    ["relief"] = true
 }
 
 --- Prerequisite value types, as an ALLOWLIST rather than a `type(fn) == "function"`
@@ -100,11 +179,11 @@ local PREREQUISITE_VALUE_TYPES = {
 
 --- The `<model>` scalars that are ALWAYS required. There are no defaults: a silent
 --- default in a contract the later slices read is worse than a warning, and the
---- design archive names `chronic` specifically as a field that must be declared
---- rather than inferred from absence. The duration pair is required separately,
---- selected by `chronic`.
+--- design archive names the endpoint specifically as a field that must be declared
+--- rather than inferred from absence - an absent attribute is indistinguishable
+--- from a typo. The duration pair is required separately, selected by `endpoint`.
 local MODEL_REQUIRED_SCALARS = {
-    "archetype", "chronic", "cullRequired", "incubationTicks",
+    "archetype", "endpoint", "cullRequired", "incubationTicks",
     "r0", "caseFatality", "immunityMonths", "salePrice"
 }
 
@@ -509,17 +588,64 @@ end
 
 --- Read the `<model><treatment>` child onto `model`, or refuse it.
 ---
---- All three fields are required together. A partially-populated record is worse
+--- All four fields are required together. A partially-populated record is worse
 --- than none: the module's contract is that there are no silent defaults, and a
 --- consumer doing arithmetic on a nil cost raises far from here.
+---
+--- `efficacy` is the probability that a COMPLETED course achieves its `outcome`,
+--- rolled once at completion - not per tick, and not a partial-effect multiplier.
+--- Its consumer owns the failure path; this function only pins the domain.
+---
+--- ONE ARM OF THE COMPATIBILITY TABLE IS DELIBERATELY SILENT, and that is the
+--- single trap in this function. A `cureOnly` model whose block declares `relief`
+--- is refused by returning without assigning `model.treatment` and WITHOUT a
+--- warning, because the caller's endpoint gate emits the one warning that case
+--- earns - see `buildModelEntry`. Warning here as well would report the same
+--- authoring mistake twice under two different rules.
 ---@param xmlFile table open XMLFile document
 ---@param modelKey string the `<model>` element key
----@param model table the model entry being built
+---@param model table the model entry being built, carrying a validated `endpoint`
 ---@param title string the owning disease
 ---@param warnings table the accumulator
 local function readModelTreatment(xmlFile, modelKey, model, title, warnings)
 
     if not xmlFile:hasProperty(modelKey .. ".treatment") then return end
+
+    local outcome = xmlFile:getString(modelKey .. ".treatment#outcome")
+
+    -- Checked BEFORE the allowlist so "you forgot it" and "you mistyped it" stay
+    -- distinguishable; they need different corrections, and one rule covering both
+    -- sends an author looking for an attribute that is not in the file.
+    if outcome == nil then
+        warn(warnings, title, "treatment-missing-outcome",
+            "<treatment> declares no #outcome; it must be cure or relief; treatment skipped")
+        return
+    end
+
+    if not OUTCOMES[outcome] then
+        warn(warnings, title, "treatment-unknown-outcome",
+            string.format("treatment #outcome %s is not one of cure/relief; treatment skipped",
+                tostring(outcome)))
+        return
+    end
+
+    -- FIELD-local: the treatment is dropped and the model survives as an
+    -- untreatable `lifelong`. Clearing a lifelong infection is a contradiction in
+    -- the endpoint's own terms, where relieving one is exactly the case the
+    -- outcome axis exists for.
+    if model.endpoint == "lifelong" and outcome == "cure" then
+        warn(warnings, title, "treatment-outcome-contradicts-endpoint",
+            "a lifelong disease cannot be cured; declare outcome=relief or change the "
+                .. "endpoint; treatment skipped")
+        return
+    end
+
+    -- The silent arm. See the header: `buildModelEntry` refuses the whole model
+    -- half for a `cureOnly` that ends up with no treatment, and this is one of the
+    -- three shapes that reaches it.
+    if model.endpoint == "cureOnly" and outcome == "relief" then
+        return
+    end
 
     -- Read as a FLOAT so the whole-number check below can actually fire: the
     -- engine's native int read truncates a fractional lexical first, so on an
@@ -547,10 +673,15 @@ local function readModelTreatment(xmlFile, modelKey, model, title, warnings)
         return
     end
 
-    -- The archive's real rule: a course no shorter than the illness means the
-    -- animal recovers naturally before it completes, so treating is pointless. A
-    -- chronic disease has no duration to compare against.
-    if not model.chronic and months >= model.durationMonths then
+    -- The archive's real rule, and it holds for exactly ONE cell of the endpoint x
+    -- outcome table. Its reason - the animal recovers naturally before the course
+    -- completes, so treating is pointless - is true only where recovery is what
+    -- ends the illness AND the course is trying to beat it there. Against a
+    -- `terminal` model the course races a median rather than a deadline, and a
+    -- `relief` course is not trying to clear anything, so neither is pointless at
+    -- any length. Both fields are DECLARED, so this gate reads no absence.
+    if model.endpoint == "recovers" and outcome == "cure"
+        and months >= model.durationMonths then
         warn(warnings, title, "treatment-not-shorter-than-illness",
             string.format("treatment runs %s month(s) against a %s-month illness; the "
                 .. "course must be strictly shorter; treatment skipped",
@@ -558,7 +689,12 @@ local function readModelTreatment(xmlFile, modelKey, model, title, warnings)
         return
     end
 
-    model.treatment = { ["months"] = months, ["cost"] = cost, ["efficacy"] = efficacy }
+    model.treatment = {
+        ["months"] = months,
+        ["cost"] = cost,
+        ["efficacy"] = efficacy,
+        ["outcome"] = outcome
+    }
 
 end
 
@@ -585,7 +721,7 @@ local function buildModelEntry(xmlFile, key, title, warnings)
 
     local model = {
         ["archetype"] = xmlFile:getString(modelKey .. "#archetype"),
-        ["chronic"] = xmlFile:getBool(modelKey .. "#chronic"),
+        ["endpoint"] = xmlFile:getString(modelKey .. "#endpoint"),
         ["cullRequired"] = xmlFile:getBool(modelKey .. "#cullRequired"),
         ["incubationTicks"] = readNonNegative(xmlFile, modelKey .. "#incubationTicks",
             "incubationTicks", title, warnings, true),
@@ -612,52 +748,75 @@ local function buildModelEntry(xmlFile, key, title, warnings)
 
     if not ARCHETYPES[model.archetype] then
         warn(warnings, title, "model-unknown-archetype",
-            string.format("archetype %s is not one of infectious/genetic; carried "
-                .. "through verbatim", tostring(model.archetype)))
+            string.format("archetype %s is not one of infectious/genetic/management; "
+                .. "carried through verbatim", tostring(model.archetype)))
     end
 
-    -- Exactly one of the duration pair, selected by `chronic`. Overloading one
-    -- attribute to mean both under a flag was rejected: a consumer that forgot to
-    -- branch would read a median as a duration and get plausible wrong numbers.
+    -- The endpoint gates the pairing rule below, so an unrecognised one is refused
+    -- HERE and the pairing never runs: it has no required attribute to select, and
+    -- letting it run would report a spurious mismatch beside the real defect.
+    -- Membership by `== nil`, never by truthiness - `lifelong` and `cureOnly` map
+    -- to `false` and would otherwise read as unknown.
+    if ENDPOINTS[model.endpoint] == nil then
+        warn(warnings, title, "model-unknown-endpoint",
+            string.format("endpoint %s is not one of recovers/terminal/lifelong/"
+                .. "cureOnly; model half skipped", tostring(model.endpoint)))
+        return nil
+    end
+
+    -- Exactly one duration attribute, selected by `endpoint`, and every other one
+    -- FORBIDDEN. The pair stays two attributes rather than one overloaded field
+    -- because they are different quantities - a span and a median - and a consumer
+    -- that forgot to branch would read one as the other and get plausible wrong
+    -- numbers with no error.
     --
     -- The FORBIDDEN half is tested by PRESENCE, not by the parsed value. A refused
     -- value (a negative one) also reads as nil, so a value test would let a
     -- declared-but-negative forbidden attribute through while refusing a merely
     -- wrong positive one - a more corrupt file passing where a less corrupt one
     -- fails.
-    local declaresDuration = xmlFile:hasProperty(modelKey .. "#durationMonths")
-    local declaresChronicMonths = xmlFile:hasProperty(modelKey .. "#chronicMonthsToDeath")
+    --
+    -- Both are read unconditionally, so a negative one still reports itself; the
+    -- walk then returns on the FIRST offence, so a model earns exactly one mismatch
+    -- warning however many attributes it got wrong.
+    local requiredDuration = ENDPOINTS[model.endpoint]
 
-    local durationMonths = readNonNegative(xmlFile, modelKey .. "#durationMonths",
-        "durationMonths", title, warnings)
-    local chronicMonthsToDeath = readNonNegative(xmlFile, modelKey .. "#chronicMonthsToDeath",
-        "chronicMonthsToDeath", title, warnings)
+    local durationDeclared = {}
+    local durationValues = {}
 
-    if model.chronic then
+    for _, attribute in ipairs(DURATION_ATTRIBUTES) do
+        durationDeclared[attribute] = xmlFile:hasProperty(modelKey .. "#" .. attribute)
+        durationValues[attribute] = readNonNegative(xmlFile, modelKey .. "#" .. attribute,
+            attribute, title, warnings)
+    end
 
-        if chronicMonthsToDeath == nil or declaresDuration then
-            warn(warnings, title, "model-duration-mismatch",
-                string.format("chronic=true requires a usable #chronicMonthsToDeath and "
-                    .. "forbids #durationMonths (got %s / declares durationMonths=%s); "
-                    .. "model half skipped",
-                    tostring(chronicMonthsToDeath), tostring(declaresDuration)))
+    for _, attribute in ipairs(DURATION_ATTRIBUTES) do
+
+        if attribute == requiredDuration then
+
+            if durationValues[attribute] == nil then
+                -- "missing OR REFUSED", the same wording MODEL_REQUIRED_SCALARS uses
+                -- and for the same reason: a present-but-negative attribute reaches
+                -- here as nil too, and rendering that as "(got nil)" sends the
+                -- author looking for an attribute that is in the file. Where it was
+                -- refused, `readNonNegative` has already said why.
+                warn(warnings, title, "model-endpoint-duration-mismatch",
+                    string.format("endpoint %s requires a usable #%s, which is "
+                        .. "missing or refused; model half skipped",
+                        tostring(model.endpoint), attribute))
+                return nil
+            end
+
+            model[attribute] = durationValues[attribute]
+
+        elseif durationDeclared[attribute] then
+
+            warn(warnings, title, "model-endpoint-duration-mismatch",
+                string.format("endpoint %s forbids #%s, which is declared; "
+                    .. "model half skipped", tostring(model.endpoint), attribute))
             return nil
+
         end
-
-        model.chronicMonthsToDeath = chronicMonthsToDeath
-
-    else
-
-        if durationMonths == nil or declaresChronicMonths then
-            warn(warnings, title, "model-duration-mismatch",
-                string.format("chronic=false requires a usable #durationMonths and "
-                    .. "forbids #chronicMonthsToDeath (got %s / declares "
-                    .. "chronicMonthsToDeath=%s); model half skipped",
-                    tostring(durationMonths), tostring(declaresChronicMonths)))
-            return nil
-        end
-
-        model.durationMonths = durationMonths
 
     end
 
@@ -698,6 +857,33 @@ local function buildModelEntry(xmlFile, key, title, warnings)
     model.infection = infection
 
     readModelTreatment(xmlFile, modelKey, model, title, warnings)
+
+    -- MODEL-local, and it cannot live inside `readModelTreatment`: that function
+    -- early-returns when `<treatment>` is absent, so a `cureOnly` model carrying no
+    -- block at all never reaches a single line of it. Testing the ASSIGNED field
+    -- here instead catches all three failing shapes with one predicate, because
+    -- `model.treatment` is written only on that function's success path: no block,
+    -- a block refused for its months / cost / efficacy, and a block declaring
+    -- `relief` (which returns silently for exactly this reason).
+    --
+    -- Refusing the whole model half is the right severity: the endpoint says the
+    -- infection ends only through a completed cure, so without one it never ends
+    -- at all and the model describes an animal nothing can ever help.
+    -- Tests the assigned RESULT, not the outcome attribute, and that is the spec's
+    -- prescribed shape rather than an accident. A second clause reading
+    -- `model.treatment.outcome ~= "cure"` was written here at code review and
+    -- REVERTED: it is unreachable, because the relief arm above returns before
+    -- assigning, so nothing can construct a `model.treatment` whose outcome is not
+    -- `cure`. An unreachable defensive clause cannot be tested or break-proved, and
+    -- it made this line contradict the Design Note that explains why one predicate
+    -- covers all three shapes. The coupling to the relief arm is real and is
+    -- documented at BOTH sites instead.
+    if model.endpoint == "cureOnly" and model.treatment == nil then
+        warn(warnings, title, "endpoint-requires-curative-treatment",
+            "endpoint cureOnly requires a <treatment outcome=\"cure\">, and none was "
+                .. "usable; model half skipped")
+        return nil
+    end
 
     model.effects = {
         ["weightGain"] = readNonNegative(xmlFile, modelKey .. ".effects#weightGain",
