@@ -33,14 +33,19 @@
     record exists to remove. A record is therefore never stranded at a live state,
     because it is deleted with its animal rather than outliving it.
 
-    THE EXIT RULE IS NOT HERE, AND IT IS NOW A THREE-WAY QUESTION rather than the
-    two-way one the flag posed. `INFECTIOUS -> RECOVERED` is unconditionally legal
-    and the record still CARRIES `endpoint` as data, but what that endpoint implies
-    is settled separately, per value: a `lifelong` infection never reaches
-    RECOVERED at all, a `cureOnly` one reaches it only through a completed curative
-    course, and `terminal` is the one still open. `recovers` is the only value whose
-    exit is already decided. So `canTransition` takes TWO arguments and the domain
-    is 5 x 5, not 5 x 5 x 4 - do NOT add a third argument here.
+    THE EXIT RULE LIVES BESIDE `canTransition`, NEVER INSIDE IT. `canRecover`
+    answers "may an INFECTIOUS record reach RECOVERED for this reason" over two
+    DECLARED values - the model's `endpoint` and the reason the record is leaving
+    INFECTIOUS - while `TRANSITIONS` stays unconditional and `transition` stays
+    ENDPOINT-BLIND. So `canTransition` still takes TWO arguments and its domain is
+    5 x 5, not 5 x 5 x 4: do NOT add a third argument here, and do NOT make
+    `INFECTIOUS -> RECOVERED` conditional in the table.
+
+    COMPOSING THE TWO IS THE CALLER'S JOB - ask `canRecover`, then `transition` -
+    and nothing here enforces that order. That is a stated residual rather than an
+    oversight: `canRecover` receives neither a record nor a source state, the first
+    production caller is the treatment course, and building enforcement for a caller
+    that does not exist yet buys nothing.
 
     THE DECISION IS A PURE PREDICATE, and that shape is deliberate. `canTransition`
     answers the whole question over plain data, so the entire domain is swept by a
@@ -99,6 +104,13 @@
     model registry's lifetime, and a record outlives a definition-file reload. It is
     carried VERBATIM and never gated here, because the parser already owns that
     decision - a second gate would split one vocabulary across two files.
+
+    THAT HAZARD IS NOW CLOSED FOR THE ENDPOINT NAMES SPECIFICALLY. `ENDPOINT` below
+    is their one home and the parser READS them from it rather than repeating the
+    four literals, so there is one spelling rather than two copies that can drift.
+    The warning above still governs `archetype`, whose vocabulary remains the
+    parser's alone - the two are not symmetrical, and the paragraph headed THE TWO
+    CARRIED VOCABULARIES ARE NOT UNGATED FOR THE SAME REASON says why.
 
     THE TWO CARRIED VOCABULARIES ARE NOT UNGATED FOR THE SAME REASON, and reading
     them as one pair gets the next question wrong. `endpoint` is CLOSED: the parser
@@ -217,6 +229,60 @@ RLDiseaseRecord.STATE = {
 }
 
 
+--- The four endpoint names - what ends a disease's INFECTIOUS phase.
+---
+--- THIS IS THE ONE HOME FOR THESE NAMES. `RLDiseaseDefinition` reads them from here
+--- rather than repeating the four literals, which is what keeps the vocabulary from
+--- landing in two files and drifting apart. The dependency runs one way only, and
+--- that direction is the load-bearing part of the choice: this module depends on
+--- nothing but RmLogging, so it can own a vocabulary the XML-reading parser reads,
+--- where the reverse would give the pure, dual-running module a dependency on the
+--- parser.
+---
+--- THE PARSER READS THIS AT FILE SCOPE, so `RLDiseaseRecord.lua` MUST be sourced
+--- BEFORE `RLDiseaseDefinition.lua` - in `main.lua` and in the headless env alike.
+--- Get that order wrong and the parser's file-scope read raises on a nil global,
+--- which is loud in-game and INVISIBLE to the headless harness, because the harness
+--- sources the record from its own env regardless of what `main.lua` says.
+---
+--- Values are identical to their keys, for two of the three reasons `STATE`'s are: a
+--- log line readable with no reverse map, and one object serving as both the key set
+--- and the value set. The third does not transfer - no endpoint is persisted by this
+--- module - so "greppable stale persisted value" is deliberately not among them.
+---
+--- READ-ONLY by contract, exactly like `STATE`: consumers share this object and
+--- there is deliberately no defensive copy.
+RLDiseaseRecord.ENDPOINT = {
+    ["recovers"] = "recovers",
+    ["terminal"] = "terminal",
+    ["lifelong"] = "lifelong",
+    ["cureOnly"] = "cureOnly"
+}
+
+
+--- Why an INFECTIOUS record is leaving that state.
+---
+--- NOT the parser's `<treatment outcome>` vocabulary, and the two must never be fed
+--- to each other. That one is authored lowercase (`cure` / `relief`) and answers
+--- what a completed course ACHIEVES; these are uppercase and answer why a record is
+--- EXITING INFECTIOUS. Passing a raw `"cure"` to `canRecover` returns false, and any
+--- mapping between the two belongs to the treatment slice that holds both.
+---
+--- `CURE` means a course that COMPLETED **and** whose efficacy roll SUCCEEDED, never
+--- merely one that completed: efficacy is the probability a completed course
+--- achieves its outcome, rolled once at completion, with the record staying where it
+--- is on failure. This predicate is asked only after that roll succeeds.
+---
+--- `NATURAL` ships ahead of its consumer deliberately. Nothing calls it today; the
+--- progression and fatality slices acquire it when they advance `monthsElapsed`
+--- against the authored span. Declaring both reasons now is what makes the table
+--- below a complete statement of the rule rather than a CURE-shaped fragment.
+RLDiseaseRecord.EXIT_REASON = {
+    ["NATURAL"] = "NATURAL",
+    ["CURE"] = "CURE"
+}
+
+
 --- The three outcomes of an attempted transition. Three rather than a boolean,
 --- because the immunity-expiry pair is legal AND must not be written: collapsing
 --- REMOVE into a truthy APPLIED would leave the record alive at a state it may not
@@ -248,8 +314,10 @@ RLDiseaseRecord.TRANSITIONS = {
     [SUSCEPTIBLE] = { ["EXPOSED"] = true },
     -- Incubation elapses and the animal becomes symptomatic.
     ["EXPOSED"] = { ["INFECTIOUS"] = true },
-    -- Recovery or a completed cure, and disease fatality. Both unconditional here;
-    -- the endpoint constraint on the first is deferred (see the header).
+    -- Recovery or a completed cure, and disease fatality. Both stay UNCONDITIONAL
+    -- here: the endpoint constraint on the first lives in `canRecover`, beside this
+    -- table rather than inside it, and `testEveryEndpointMayRecover` pins that by
+    -- asserting all four endpoints still reach RECOVERED through `transition`.
     ["INFECTIOUS"] = { ["RECOVERED"] = true, ["DEAD"] = true },
     -- Immunity expires. Returns REMOVE and writes nothing - a record never holds
     -- SUSCEPTIBLE.
@@ -259,12 +327,51 @@ RLDiseaseRecord.TRANSITIONS = {
 }
 
 
+--- May an INFECTIOUS record reach RECOVERED, per endpoint and per exit reason?
+---
+--- A closed `[endpoint][reason]` table with ONE ROW PER ENDPOINT, the all-false row
+--- included. That row is not padding: a missing row and an empty row both make
+--- `canRecover` return false, so without it the "declared, never inferred" claim is
+--- untestable and deleting the `lifelong` row outright would leave every assert
+--- green. The suite pins this key set against `ENDPOINT` in BOTH directions for
+--- exactly that reason.
+---
+--- Named for its DESTINATION rather than `INFECTIOUS_EXITS`, which would invite a
+--- maintainer to add the `DEAD` row the fatality slice owns. Leaving INFECTIOUS for
+--- DEAD is `canTransition("INFECTIOUS", "DEAD")` and is not this table's question.
+---
+--- EVERY `false` IS DECLARED, including the cells the parser already refuses to
+--- produce. Inference from an absent attribute is the shape the endpoint vocabulary
+--- exists to remove, and the refusals that would justify inferring live in another
+--- module: a reader here would have to take them on trust from a file they are not
+--- reading, and a future endpoint that forbids a span AND recovers naturally would
+--- silently inherit the wrong answer.
+---
+--- READ-ONLY by contract, like `STATE` and `TRANSITIONS`.
+RLDiseaseRecord.RECOVERY_EXITS = {
+    -- The authored span ends it naturally, and a completed cure ends it early -
+    -- independently of whether any model declares a treatment, which is the model's
+    -- business rather than this table's.
+    ["recovers"] = { ["NATURAL"] = true, ["CURE"] = true },
+    -- No span is authorable, so the hazard is the only NATURAL end - but a completed,
+    -- successful course beats the death clock.
+    ["terminal"] = { ["NATURAL"] = false, ["CURE"] = true },
+    -- Nothing ends it; the animal sheds for life. The parser refuses a curative
+    -- treatment on this endpoint, so the CURE cell has no producer - declared here
+    -- anyway rather than inferred from a refusal in another file.
+    ["lifelong"] = { ["NATURAL"] = false, ["CURE"] = false },
+    -- The defining shape: no span, and a completed cure is the only exit.
+    ["cureOnly"] = { ["NATURAL"] = false, ["CURE"] = true }
+}
+
+
 --- Is this ordered pair of states a legal transition?
 ---
---- Takes exactly two arguments, and that is a contract rather than an accident: the
---- exit rule is deferred, so no arm of this module reads `endpoint` and a third
---- parameter would be an unused public surface the deferred work would have to
---- renegotiate.
+--- Takes exactly two arguments, and that is a contract rather than an accident. The
+--- exit rule landed BESIDE this predicate rather than inside it, so no arm here
+--- reads `endpoint`: a third parameter could not express the exit REASON anyway, and
+--- it would grow this sweep from 25 pairs to 100 for a question `canRecover` already
+--- answers over 8.
 --- @param from string|nil A STATE value. TRUSTED INTERNAL input - not validated; an
 ---        unrecognised value, nil or NaN is refused rather than raising.
 --- @param to string|nil A STATE value. TRUSTED INTERNAL input - same handling.
@@ -283,6 +390,71 @@ function RLDiseaseRecord.canTransition(from, to)
     -- `== true` rather than the raw cell, so the return is a strict boolean and a
     -- caller cannot come to depend on a truthy table value.
     return row[to] == true
+end
+
+
+--- May an INFECTIOUS record reach RECOVERED for this reason?
+---
+--- The second pure predicate BESIDE `canTransition`, deliberately not a third
+--- argument to it - see that function's doc block for why - and deliberately not a
+--- rule left to fall out of the data, which would infer the answer from an ABSENT
+--- duration attribute and leave it invisible to a reader and to every test.
+---
+--- ANSWERS AN ENDPOINT QUESTION, NOT A TREATABILITY ONE. `canRecover("recovers",
+--- "CURE")` is true for a model that declares no `<treatment>` at all, and that is
+--- correct: whether a curative course EXISTS is the model's business and the
+--- parser's, while whether one can END the infectious phase is this predicate's. A
+--- caller that never completes a course never asks. Stated because the name invites
+--- the other reading.
+---
+--- Takes neither a record nor a source state, so it cannot check WHERE the record
+--- is - the reason is a property of the CALL, not of the record, and the record
+--- gains no ninth key for it. The header says who owns composing this with
+--- `transition`.
+--- @param endpoint string|nil An `ENDPOINT` value. TRUSTED INTERNAL input - not
+---        validated; an unrecognised value, nil, `false` or NaN is REFUSED rather
+---        than raised on.
+--- @param reason string|nil An `EXIT_REASON` value. TRUSTED INTERNAL input - same
+---        handling. NOT the parser's lowercase treatment `outcome`.
+--- @return boolean mayRecover True only for the four legal (endpoint, reason) cells
+function RLDiseaseRecord.canRecover(endpoint, reason)
+    -- Membership-first, the same shape as `canTransition` and for the same reason:
+    -- the lookup indexes TWICE, an unrecognised endpoint yields nil at the first
+    -- level, and indexing THAT with `reason` is what would raise. The TYPE test
+    -- rather than `row == nil` covers a malformed row that is neither nil nor a
+    -- table, so the never-raise property is total. Short-circuiting `and` keeps the
+    -- second index unreachable when the first level did not resolve, and `== true`
+    -- makes every answer a strict boolean - so a declared `false` cell and an
+    -- unrecognised reason are indistinguishable to a caller, which is intended.
+    local row = RLDiseaseRecord.RECOVERY_EXITS[endpoint]
+    local mayRecover = type(row) == "table" and row[reason] == true
+
+    if not mayRecover then
+        -- TWO MESSAGES, NOT ONE, and the split is the diagnostic. A refusal here has
+        -- two very different causes that the RETURN deliberately cannot separate: a
+        -- declared `false` cell - the rule working - and a value that is in no
+        -- vocabulary, which is a wiring bug or a record carrying a name a later mod
+        -- version retired. With one shared message a stale endpoint reads exactly
+        -- like `lifelong` behaving correctly, and the animal is permanently
+        -- infectious with nothing in the log to say so.
+        --
+        -- Both lines stay: the first PLAYER-VISIBLE refusal is a treated `lifelong`
+        -- animal that never recovers, and that is a DECLARED false, so silencing the
+        -- declared case would remove the line from the one case it was asked for.
+        -- DEBUG keeps both out of the production INFO budget.
+        if RLDiseaseRecord.ENDPOINT[endpoint] == nil
+            or RLDiseaseRecord.EXIT_REASON[reason] == nil then
+            Log:debug("RLDiseaseRecord.canRecover: refused an UNRECOGNISED value - "
+                .. "endpoint=%s reason=%s (the reason vocabulary is EXIT_REASON, "
+                .. "never the parser's lowercase treatment outcome)",
+                tostring(endpoint), tostring(reason))
+        else
+            Log:debug("RLDiseaseRecord.canRecover: refused endpoint=%s reason=%s (declared)",
+                tostring(endpoint), tostring(reason))
+        end
+    end
+
+    return mayRecover
 end
 
 
@@ -439,13 +611,19 @@ function RLDiseaseRecord.seedIncubation(record, ticks)
     -- also declines a record whose counter is absent or non-numeric instead of
     -- writing over it or crashing on it.
     --
-    -- `new` starts every counter at 0, so TODAY a fresh record is the only thing
-    -- this admits. That stops being true the moment the transition table grows a
+    -- `new` starts every counter at 0, so a fresh record is the only thing this
+    -- admits. That would stop being true the moment the transition table grew a
     -- condition: a record that spent its last tick and had its surfacing REFUSED
-    -- sits at EXPOSED with the counter at 0, which is indistinguishable from fresh
-    -- here and would be re-seeded. `advanceIncubation` below anticipates exactly
-    -- that refusal, so the two are only consistent while the pair remains
-    -- unconditional - the endpoint exit rule is where this gets settled.
+    -- would sit at EXPOSED with the counter at 0, indistinguishable from fresh here,
+    -- and would be re-seeded. `advanceIncubation` below anticipates exactly that
+    -- refusal, so the two are consistent only while `EXPOSED -> INFECTIOUS` stays
+    -- unconditional.
+    --
+    -- IT DOES, AND THE EXIT RULE DID NOT CHANGE THAT. `canRecover` sits OUTSIDE the
+    -- transition table and constrains only the RECOVERED exit, so `TRANSITIONS`
+    -- gained no condition and this pair keeps its guarantee. A rule placed INSIDE
+    -- the table - the shape that was weighed and rejected - is what would have
+    -- reintroduced the inconsistency named above.
     if record.incubationTicksRemaining ~= 0 then
         return RLDiseaseRecord.REFUSED
     end
@@ -511,7 +689,21 @@ function RLDiseaseRecord.advanceIncubation(record)
 end
 
 
--- The load line is the whole of this module's logging, deliberately. `canTransition`
+-- THREE SITES LOG HERE, deliberately: the load line, `transition`'s refusal, and
+-- `canRecover`'s. Everything else is silent, and the enumeration below says why.
+--
+-- `canRecover` earns its pair of lines the way `transition` earns its one: it REFUSES
+-- over a closed table, so a caller that never gets its recovery has nothing else to
+-- read. Note the asymmetry with `canTransition`, which is silent on refusal - that
+-- predicate's refusals are swept exhaustively by a truth table and have no player
+-- consequence, where `canRecover`'s first player-visible refusal is a treated
+-- `lifelong` animal that never recovers. Consequence worth knowing before the
+-- progression slice lands: four of the eight cells are declared falses, so once a
+-- caller asks `NATURAL` per tick these lines arrive per refused record per tick. That
+-- is a volume question for the slice that acquires the call, and it is measurable
+-- only then; no consumer exists to measure it now.
+--
+-- `canTransition`
 -- is a table lookup and a boolean, `transition` is that plus one assignment, `new`
 -- is a table literal, and the three incubation functions are straight-line
 -- arithmetic plus one guarded write - so there is no branch whose decision a TRACE
