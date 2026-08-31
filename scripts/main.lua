@@ -408,18 +408,23 @@ source(modDirectory .. "scripts/insemination/DewarManager.lua")
 -- The rate primitive first: it is pure arithmetic with no dependency of its own,
 -- and it precedes the entities that will consume it.
 source(modDirectory .. "scripts/disease/RLDiseaseRates.lua")
--- The definition parser next: DiseaseManager reaches it at CALL time from
+-- The SEIR record next, and its position AHEAD of the parser is REQUIRED, not
+-- stylistic: it owns the endpoint vocabulary and RLDiseaseDefinition reads
+-- RLDiseaseRecord.ENDPOINT at FILE SCOPE, so sourcing the parser first raises on a
+-- nil global and takes RLDiseaseDefinition.parse down with it. Nothing in the
+-- headless tier can catch a mistake here - that env sources the record itself - so
+-- this line's position is in-game-only coverage. RmLogging from SECTION 0 stays its
+-- only dependency.
+source(modDirectory .. "scripts/disease/RLDiseaseRecord.lua")
+-- The definition parser then: DiseaseManager reaches it at CALL time from
 -- loadDiseases, which runs inside DiseaseManager.new(), so it only has to precede
--- the construction below rather than the manager's own source line.
+-- the construction below rather than the manager's own source line - but it must
+-- follow the record above.
 source(modDirectory .. "scripts/disease/RLDiseaseDefinition.lua")
--- The vulnerability factor is the second pure primitive, and it reads RLConstants
+-- The vulnerability factor is the third pure primitive, and it reads RLConstants
 -- at file scope, so it has to follow SECTION 2c. Like the rate primitive it
 -- precedes the entities that will consume it.
 source(modDirectory .. "scripts/disease/RLDiseaseVulnerability.lua")
--- The SEIR record is the third pure primitive. It reads no constant of its own -
--- RmLogging from SECTION 0 is its only dependency - so it needs only to precede the
--- entities that will consume it.
-source(modDirectory .. "scripts/disease/RLDiseaseRecord.lua")
 source(modDirectory .. "scripts/disease/Disease.lua")
 source(modDirectory .. "scripts/disease/DiseaseManager.lua")
 

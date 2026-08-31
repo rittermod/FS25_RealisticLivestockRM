@@ -34,9 +34,19 @@
     disease still loads. A malformed `<model>` never costs the disease its
     LEGACY entry - a new-half authoring error must not regress shipped gameplay.
 
-    `deps` arrives as a PARAMETER with no default: `{ animalTypes, i18n }`. This
-    module never reads a root global and never caches one at module load - that
-    is the load-order trap that reads populated headless and empty in-game.
+    `deps` arrives as a PARAMETER with no default: `{ animalTypes, i18n }`. No
+    RUNTIME global is read here and none is cached at module load - that is the
+    load-order trap that reads populated headless and empty in-game.
+
+    THE ONE MODULE-LOAD GLOBAL READ IS `RLDiseaseRecord.ENDPOINT`, and it is the
+    exception that proves the rule above rather than a breach of it: a sibling
+    module's CONSTANT is populated the moment that file is sourced and never moves
+    afterwards, where the trap is about runtime state that fills later. The cost is
+    a hard ordering requirement - `RLDiseaseRecord.lua` MUST be sourced before this
+    file, in `main.lua` and in `tests/headless/animal_env.lua` alike. Get it wrong
+    and the read below raises on a nil global, which takes `parse` with it and is
+    loud in-game; the headless tier cannot see the mistake at all, because its env
+    sources the record itself whatever `main.lua` says.
 
     Pure data-in / data-out apart from that: no GUI, no engine natives beyond the
     XMLFile the caller hands over, so the module dual-runs headless.
@@ -94,11 +104,21 @@ local ARCHETYPES = {
 }
 
 
---- The endpoint names what ends the INFECTIOUS phase, and the value it maps to is
---- the duration attribute that phase is clocked by - `false` where nothing clocks
---- it. One table therefore answers both authoring questions, "is this value legal"
---- and "which duration does it require", so the vocabulary cannot land in two
---- places and drift.
+--- The endpoint NAMES, read from their one home on `RLDiseaseRecord` rather than
+--- re-declared here. That module depends on nothing but RmLogging, so it can own a
+--- vocabulary this XML-reading one reads; the reverse would give the pure,
+--- dual-running module a dependency on the parser. See the header for the load-order
+--- requirement this file-scope read imposes.
+---
+--- Named `RECORD_ENDPOINT` rather than `ENDPOINT` deliberately: `ENDPOINTS` below is
+--- a DIFFERENT table with an almost identical name, and both index legally for any
+--- key, so a typo between the two would return a silent nil rather than raise.
+local RECORD_ENDPOINT = RLDiseaseRecord.ENDPOINT
+
+
+--- Which duration attribute each endpoint's INFECTIOUS phase is clocked by - `false`
+--- where nothing clocks it. Keyed off `RECORD_ENDPOINT` so the NAMES live in one
+--- place while the endpoint-to-duration MAPPING, a parsing concern, lives here.
 ---
 --- CLOSED, unlike `ARCHETYPES`: an endpoint decides which OTHER attributes are
 --- required and forbidden, so an unrecognised one has no defined parse at all.
@@ -113,13 +133,14 @@ local ARCHETYPES = {
 --- with no error and plausible numbers on either side.
 local ENDPOINTS = {
     -- the span elapses and the animal recovers naturally
-    ["recovers"] = "durationMonths",
-    -- the hazard kills; the animal never recovers
-    ["terminal"] = "chronicMonthsToDeath",
+    [RECORD_ENDPOINT.recovers] = "durationMonths",
+    -- the hazard kills on its own clock; only a completed, successful curative
+    -- course ends it any other way (see `RLDiseaseRecord.RECOVERY_EXITS`)
+    [RECORD_ENDPOINT.terminal] = "chronicMonthsToDeath",
     -- nothing ends it; the animal sheds for life
-    ["lifelong"] = false,
+    [RECORD_ENDPOINT.lifelong] = false,
     -- only a completed curative course ends it
-    ["cureOnly"] = false
+    [RECORD_ENDPOINT.cureOnly] = false
 }
 
 
@@ -633,7 +654,7 @@ local function readModelTreatment(xmlFile, modelKey, model, title, warnings)
     -- untreatable `lifelong`. Clearing a lifelong infection is a contradiction in
     -- the endpoint's own terms, where relieving one is exactly the case the
     -- outcome axis exists for.
-    if model.endpoint == "lifelong" and outcome == "cure" then
+    if model.endpoint == RECORD_ENDPOINT.lifelong and outcome == "cure" then
         warn(warnings, title, "treatment-outcome-contradicts-endpoint",
             "a lifelong disease cannot be cured; declare outcome=relief or change the "
                 .. "endpoint; treatment skipped")
@@ -643,7 +664,7 @@ local function readModelTreatment(xmlFile, modelKey, model, title, warnings)
     -- The silent arm. See the header: `buildModelEntry` refuses the whole model
     -- half for a `cureOnly` that ends up with no treatment, and this is one of the
     -- three shapes that reaches it.
-    if model.endpoint == "cureOnly" and outcome == "relief" then
+    if model.endpoint == RECORD_ENDPOINT.cureOnly and outcome == "relief" then
         return
     end
 
@@ -680,7 +701,7 @@ local function readModelTreatment(xmlFile, modelKey, model, title, warnings)
     -- `terminal` model the course races a median rather than a deadline, and a
     -- `relief` course is not trying to clear anything, so neither is pointless at
     -- any length. Both fields are DECLARED, so this gate reads no absence.
-    if model.endpoint == "recovers" and outcome == "cure"
+    if model.endpoint == RECORD_ENDPOINT.recovers and outcome == "cure"
         and months >= model.durationMonths then
         warn(warnings, title, "treatment-not-shorter-than-illness",
             string.format("treatment runs %s month(s) against a %s-month illness; the "
@@ -878,7 +899,7 @@ local function buildModelEntry(xmlFile, key, title, warnings)
     -- it made this line contradict the Design Note that explains why one predicate
     -- covers all three shapes. The coupling to the relief arm is real and is
     -- documented at BOTH sites instead.
-    if model.endpoint == "cureOnly" and model.treatment == nil then
+    if model.endpoint == RECORD_ENDPOINT.cureOnly and model.treatment == nil then
         warn(warnings, title, "endpoint-requires-curative-treatment",
             "endpoint cureOnly requires a <treatment outcome=\"cure\">, and none was "
                 .. "usable; model half skipped")
