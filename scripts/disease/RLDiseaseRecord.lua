@@ -42,10 +42,17 @@
     `INFECTIOUS -> RECOVERED` conditional in the table.
 
     COMPOSING THE TWO IS THE CALLER'S JOB - ask `canRecover`, then `transition` -
-    and nothing here enforces that order. That is a stated residual rather than an
-    oversight: `canRecover` receives neither a record nor a source state, the first
-    production caller is the treatment course, and building enforcement for a caller
-    that does not exist yet buys nothing.
+    and `advanceTreatment` below is the one place in this module that performs it,
+    on the call where a course completes and its efficacy roll succeeds. It is also
+    the one place the two vocabularies meet: the parser's lowercase `outcome` is
+    mapped to `EXIT_REASON.CURE` there and nowhere else.
+
+    NOTHING ENFORCES THAT ORDER FOR ANY OTHER CALLER, and that is a stated residual
+    rather than an oversight. `canRecover` receives neither a record nor a source
+    state, so it cannot check where the record is or whether it was asked first; a
+    future slice that drives a NATURAL exit inherits the same obligation and the same
+    absence of enforcement. Building a gate for callers that do not exist yet buys
+    nothing, and the third argument that would express it was weighed and refused.
 
     THE DECISION IS A PURE PREDICATE, and that shape is deliberate. `canTransition`
     answers the whole question over plain data, so the entire domain is swept by a
@@ -198,9 +205,23 @@
     observable only under a FRACTIONAL scale, which the advanced percentage
     overrides make reachable; the preset ladder scales by whole numbers.
 
-    Nothing calls this module yet. The incubation, treatment and fatality slices
-    each adopt it in their own change, and each goes through `transition` rather
-    than assigning `record.state`.
+    THE TREATMENT COURSE RUNS ON THE DAILY TICK, IN WHOLE MONTHS. `enrolTreatment`
+    seeds `treatmentMonthsRemaining` from the model's `<treatment>` block and
+    `advanceTreatment` is its only decrement, serving `1 / daysPerPeriod` months per
+    call so a course of N months completes on exactly the `N * daysPerPeriod`-th
+    advance at every setting. That is what the whole-month authoring rule buys, and
+    it is why completion compares against an absolute epsilon rather than zero.
+
+    THE ENROL'S REFUSAL OF A NON-ZERO COUNTER IS THE PAUSE CONTRACT, not a defensive
+    check. The record carries no running flag, so pausing is the caller withholding
+    the advance and the served months survive because nothing else writes the counter
+    down; what the refusal prevents is a resume RE-SEEDING the course. Do not "fix"
+    it into a re-seed.
+
+    Nothing calls this module yet, and that is still true after the treatment pair:
+    it adds two functions and no call site. The infection, progression and fatality
+    slices each adopt the module in their own change, and each goes through
+    `transition` rather than assigning `record.state`.
 ]]
 
 RLDiseaseRecord = {}
@@ -265,8 +286,14 @@ RLDiseaseRecord.ENDPOINT = {
 --- NOT the parser's `<treatment outcome>` vocabulary, and the two must never be fed
 --- to each other. That one is authored lowercase (`cure` / `relief`) and answers
 --- what a completed course ACHIEVES; these are uppercase and answer why a record is
---- EXITING INFECTIOUS. Passing a raw `"cure"` to `canRecover` returns false, and any
---- mapping between the two belongs to the treatment slice that holds both.
+--- EXITING INFECTIOUS. Passing a raw `"cure"` to `canRecover` returns false.
+---
+--- THE MAPPING BETWEEN THE TWO HAS ONE HOME, and it is `advanceTreatment` - the only
+--- function here that holds both a record and a `<treatment>` block. It compares
+--- `outcome` against the lowercase literals and passes `CURE` from this table, never
+--- the authored word. A second mapping anywhere else is the drift this note exists to
+--- prevent; a `relief` course never reaches `canRecover` at all, because relief is
+--- not an exit.
 ---
 --- `CURE` means a course that COMPLETED **and** whose efficacy roll SUCCEEDED, never
 --- merely one that completed: efficacy is the probability a completed course
@@ -300,6 +327,53 @@ RLDiseaseRecord.REMOVE = "REMOVE"
 --- a deliberate break can move it. It is a code constant on every peer, never
 --- persisted and never sent over the wire.
 RLDiseaseRecord.MIN_INCUBATION_TICKS = 1
+
+
+--- What a treatment advance did to the course, in the second return slot.
+---
+--- A FIFTH closed vocabulary beside `STATE`, `ENDPOINT`, `EXIT_REASON` and the three
+--- outcome constants, and it exists because two completions are indistinguishable by
+--- the record alone: a failed cure and a completed relief both leave the record
+--- INFECTIOUS with the counter at 0. The caller cannot tell them apart from the
+--- record, so the advance says which it was.
+---
+--- `NONE` on every refusal, so the second slot is never nil - a caller comparing
+--- against a constant would otherwise read `nil == nil` and treat a refusal as
+--- whichever result it asked about.
+---
+--- `ADVANCED` is the bare decrement: a tick was served and the course is still
+--- running. The other three are terminal for the course, and all three leave the
+--- counter at 0.
+---
+--- Values are identical to their keys, for the same two reasons `ENDPOINT`'s are: a
+--- log line readable with no reverse map, and one object serving as both the key set
+--- and the value set. Nothing here is persisted or sent, so the third does not apply.
+---
+--- READ-ONLY by contract, exactly like `STATE` and `ENDPOINT`.
+RLDiseaseRecord.TREATMENT_RESULT = {
+    ["NONE"] = "NONE",
+    ["ADVANCED"] = "ADVANCED",
+    ["CURED"] = "CURED",
+    ["RELIEVED"] = "RELIEVED",
+    ["FAILED"] = "FAILED"
+}
+
+
+--- How close to zero the treatment counter must land to count as completed.
+---
+--- ABSOLUTE, never relative, and never a bare `<= 0`. The counter accumulates
+--- `1 / daysPerPeriod` subtractions, so the residue at completion is float noise
+--- either side of zero: measured across every course of 1 to 4 months at every
+--- `daysPerPeriod` in 1..28, the worst residue is 7.5e-15, while a bare `<= 0`
+--- over-serves 50 of those 112 courses by a whole extra tick. The epsilon therefore
+--- sits about five orders above the worst drift an authored course reaches and seven
+--- below the smallest tick, so it can neither miss a completion nor swallow a real
+--- one.
+---
+--- Public and read at CALL time through the module table, so a suite can pin it and a
+--- deliberate break can move it. A code constant on every peer, never persisted and
+--- never sent over the wire.
+RLDiseaseRecord.TREATMENT_COMPLETION_EPSILON = 1e-9
 
 
 --- The legal transitions, as a closed table rather than a chain of conditionals.
@@ -547,9 +621,12 @@ function RLDiseaseRecord.new(model, title)
 
         ["state"] = RLDiseaseRecord.STATE.EXPOSED,
 
-        -- All four counters start at 0 and NONE is advanced here. The incubation,
-        -- treatment and fatality slices each own their own decrement; this slice
-        -- declares them and nothing more.
+        -- All four counters start at 0. TWO of them are advanced in this file -
+        -- `incubationTicksRemaining` by `advanceIncubation` and
+        -- `treatmentMonthsRemaining` by `advanceTreatment`, each the sole decrement
+        -- of its own field. `monthsElapsed` and `immunityMonthsRemaining` are
+        -- declared here and advanced nowhere yet; the progression and fatality
+        -- slices own those.
         ["incubationTicksRemaining"] = 0,
         ["monthsElapsed"] = 0,
         ["treatmentMonthsRemaining"] = 0,
@@ -689,8 +766,253 @@ function RLDiseaseRecord.advanceIncubation(record)
 end
 
 
--- THREE SITES LOG HERE, deliberately: the load line, `transition`'s refusal, and
--- `canRecover`'s. Everything else is silent, and the enumeration below says why.
+--- Enrol a symptomatic record on a treatment course. The ONLY place
+--- `treatmentMonthsRemaining` is written at enrolment.
+---
+--- REFUSING A RECORD MID-COURSE IS THE PAUSE CONTRACT AT THIS LEVEL, not a
+--- defensive check, and it is the half of the pair a maintainer would "fix". The
+--- record carries no running flag - the key set is locked at eight and a ninth was
+--- already refused for the exit reason - so pausing is the CALLER withholding
+--- `advanceTreatment`, and the served months survive by construction because nothing
+--- else writes the counter down. What must never happen is a resume RE-SEEDING the
+--- course, and this refusal is what stops it. Do not turn it into a re-seed.
+---
+--- Tested `~= 0` rather than `> 0`, exactly as `seedIncubation` tests its own
+--- counter and for the same reason: `> 0` RAISES on a nil counter where `~= 0`
+--- refuses it, so a record whose counter a codec left absent or non-numeric is
+--- declined rather than written over.
+---
+--- `0` does NOT mean "never treatable" - the model's own `<treatment>` block answers
+--- that, which is why this takes the block rather than reading a flag off the record.
+--- @param record table|nil A record from `new`. TRUSTED INTERNAL input; a nil - or
+---        any non-table, `false` being the reachable one - returns REFUSED rather
+---        than raising, and returns BEFORE any log line, because there is no title
+---        to name.
+--- @param treatment table|nil The model's `<treatment>` block, as the definition
+---        parser emits it: `months` whole and >= 1, `cost`, `efficacy` in [0, 1],
+---        `outcome` in the parser's closed set. A nil or `false` block - the
+---        untreatable model, reached through the ordinary `hasIt and x` idiom -
+---        returns REFUSED.
+--- @return string outcome APPLIED | REFUSED
+function RLDiseaseRecord.enrolTreatment(record, treatment)
+    if type(record) ~= "table" then return RLDiseaseRecord.REFUSED end
+    if type(treatment) ~= "table" then return RLDiseaseRecord.REFUSED end
+
+    if record.state ~= RLDiseaseRecord.STATE.INFECTIOUS then
+        Log:trace("RLDiseaseRecord.enrolTreatment: refused title=%s - state is %s, not INFECTIOUS",
+            tostring(record.title), tostring(record.state))
+
+        return RLDiseaseRecord.REFUSED
+    end
+
+    if record.treatmentMonthsRemaining ~= 0 then
+        Log:trace("RLDiseaseRecord.enrolTreatment: refused title=%s - a course is already "
+            .. "running with %s month(s) left (this refusal IS the resume guard)",
+            tostring(record.title), tostring(record.treatmentMonthsRemaining))
+
+        return RLDiseaseRecord.REFUSED
+    end
+
+    -- THE ONE THING VALIDATED HERE, and it guards a STRUCTURAL invariant rather than a
+    -- value. Assigning a nil in Lua REMOVES the key, so a block with no `months` would
+    -- take the record from eight keys to seven while this function returned APPLIED -
+    -- and the eight-key set is locked "on every path", with a codec still to be built
+    -- against it. The record would also be bricked: the counter guard above refuses a
+    -- non-numeric counter forever, and `advanceTreatment` refuses it too, so nothing
+    -- could ever move it again.
+    --
+    -- `< 1` rides along because 0 is the value this module reserves for "no course":
+    -- seeding it would return APPLIED for a course the advance then refuses as absent.
+    --
+    -- This is the sibling's shape, not a new one - `seedIncubation` guards its own nil
+    -- tick count for the same reason. The parser refuses both cases, so no shipped
+    -- model reaches here; what the guard protects is the invariant, not the input.
+    if type(treatment.months) ~= "number" or treatment.months < 1 then
+        Log:trace("RLDiseaseRecord.enrolTreatment: refused title=%s - the block's months is %s, "
+            .. "which cannot seed a course", tostring(record.title), tostring(treatment.months))
+
+        return RLDiseaseRecord.REFUSED
+    end
+
+    record.treatmentMonthsRemaining = treatment.months
+
+    Log:debug("RLDiseaseRecord.enrolTreatment: enrolled title=%s for %s month(s)",
+        tostring(record.title), tostring(treatment.months))
+
+    return RLDiseaseRecord.APPLIED
+end
+
+
+--- Serve one daily tick of a treatment course, resolving it when the course
+--- completes. The ONLY decrement of `treatmentMonthsRemaining`.
+---
+--- THE COURSE RUNS ON THE DAILY TICK, in months. Each call serves
+--- `1 / daysPerPeriod` months, so a course of N months completes on exactly the
+--- `N * daysPerPeriod`-th call at every setting - which is the whole reason the
+--- authoring rule makes a course a WHOLE number of months. A whole-month decrement on
+--- the period boundary was weighed and rejected: it makes the served animal-time
+--- depend on which day of the period the player enrolled.
+---
+--- COMPLETION COMPARES AGAINST AN ABSOLUTE EPSILON, never `== 0` and never a bare
+--- `<= 0`. See `TREATMENT_COMPLETION_EPSILON` for the measurement; the short version
+--- is that a bare `<= 0` over-serves about half of all authored courses by one tick.
+---
+--- THE ROLL FIRES EXACTLY ONCE PER COURSE, on the completing call, and never on a
+--- bare decrement or a refusal. `efficacy` is the probability that a COMPLETED course
+--- achieves its outcome - not a per-tick chance and not a partial-effect multiplier -
+--- so rolling per tick would be a different mechanic wearing the same field's name.
+--- Achieved is `roll < efficacy`, never `<=`, which is what makes `efficacy = 0` never
+--- achieve and `efficacy = 1` always achieve against a `[0, 1)` generator.
+---
+--- THIS IS THE ONE PLACE THE TWO VOCABULARIES MEET. `treatment.outcome` is the
+--- parser's lowercase authoring word and `EXIT_REASON` is the record's uppercase exit
+--- word; they are compared and mapped here and nowhere else. The lowercase literals
+--- stay inline rather than being promoted to a public table on this module, because
+--- the parser owns that vocabulary and moving it would widen a public surface for a
+--- single reader.
+---
+--- THE COMPOSITION IS `canRecover` THEN `transition`, in that order, and this is the
+--- first and only caller that performs it. A cure that the endpoint refuses resolves
+--- FAILED and the record stays where it is - never `transition` without asking first.
+---
+--- `APPLIED` on every completion, FAILED and RELIEVED included, because a counter
+--- write WAS applied - the same reading `advanceIncubation` locked when it returns
+--- APPLIED for a bare decrement. The second slot is what separates the three
+--- completions, and it is never nil.
+--- @param record table|nil A record from `new`. TRUSTED INTERNAL input; a nil or
+---        non-table returns REFUSED rather than raising, as does a record whose
+---        counter is absent or non-numeric.
+--- @param treatment table|nil The model's `<treatment>` block. A nil or `false`
+---        block returns REFUSED.
+--- @param daysPerPeriod number The engine's configured days per period, clamped by
+---        the environment to 1..28. TRUSTED INTERNAL input - not validated. A NIL
+---        raises on the subtraction, deliberately: that is a wiring bug and should be
+---        loud, and the subtraction precedes every write, so the counter and the roll
+---        are untouched when it does.
+--- @param rng function|nil A zero-argument generator returning `[0, 1)`, defaulting
+---        to `math.random`. A TRUSTED INTERNAL TEST SEAM, the same shape the dealer
+---        quality model and the genetics draw already use, so a suite can drive the
+---        roll deterministically without touching the shared stream. Production
+---        passes nothing.
+--- @return string outcome APPLIED | REFUSED
+--- @return string result A TREATMENT_RESULT value - NONE on every refusal, ADVANCED
+---         on a bare decrement, and CURED | RELIEVED | FAILED on the completing call
+function RLDiseaseRecord.advanceTreatment(record, treatment, daysPerPeriod, rng)
+    local RESULT = RLDiseaseRecord.TREATMENT_RESULT
+
+    if type(record) ~= "table" then return RLDiseaseRecord.REFUSED, RESULT.NONE end
+    if type(treatment) ~= "table" then return RLDiseaseRecord.REFUSED, RESULT.NONE end
+
+    if record.state ~= RLDiseaseRecord.STATE.INFECTIOUS then
+        -- A record that left INFECTIOUS with a course running keeps its counter, and
+        -- this refusal is what makes that stale value inert rather than harmful.
+        -- Clearing it belongs to whichever slice drives the exit.
+        Log:trace("RLDiseaseRecord.advanceTreatment: refused title=%s - state is %s, "
+            .. "not INFECTIOUS", tostring(record.title), tostring(record.state))
+
+        return RLDiseaseRecord.REFUSED, RESULT.NONE
+    end
+
+    local remaining = record.treatmentMonthsRemaining
+
+    if type(remaining) ~= "number" then
+        Log:trace("RLDiseaseRecord.advanceTreatment: refused title=%s - the counter is a %s, "
+            .. "not a number", tostring(record.title), type(remaining))
+
+        return RLDiseaseRecord.REFUSED, RESULT.NONE
+    end
+
+    if remaining == 0 then
+        -- `0` is "no course", never "complete now". A course that is not running is
+        -- not something to resolve.
+        Log:trace("RLDiseaseRecord.advanceTreatment: refused title=%s - no course is running",
+            tostring(record.title))
+
+        return RLDiseaseRecord.REFUSED, RESULT.NONE
+    end
+
+    rng = rng or math.random
+
+    -- The subtraction sits AHEAD of every write and ahead of the roll, so a nil
+    -- `daysPerPeriod` raises with the record and the generator untouched.
+    local served = remaining - 1 / daysPerPeriod
+
+    if served > RLDiseaseRecord.TREATMENT_COMPLETION_EPSILON then
+        record.treatmentMonthsRemaining = served
+
+        Log:trace("RLDiseaseRecord.advanceTreatment: served a tick of title=%s, %s month(s) left",
+            tostring(record.title), tostring(served))
+
+        return RLDiseaseRecord.APPLIED, RESULT.ADVANCED
+    end
+
+    -- THE DISPATCH RESOLVES FIRST AND THE COUNTER IS WRITTEN AFTER IT, which is the same
+    -- ordering discipline the subtraction above follows for `daysPerPeriod`. The comparison
+    -- below RAISES on a block with no `efficacy`, and resolving before writing means such a
+    -- raise leaves the counter exactly where the caller left it rather than destroying a
+    -- part-served course that nothing could then reconstruct.
+    --
+    -- Every path that RETURNS still passes through the write, so the invariant a reader
+    -- cares about is unchanged: the course is over however it resolves, and a FAILED roll
+    -- is re-enrollable with no separate reset path because `enrolTreatment` accepts a zero
+    -- counter. Only the raising path differs, and only in leaving less wreckage.
+    --
+    -- The roll is spent before the comparison either way - `rng()` has to run to be compared
+    -- against. That is not recoverable here and does not need to be: a raise aborts the tick,
+    -- and one consumed draw from a generator with no other observer costs nothing.
+    local roll = rng()
+    local result, cause
+
+    if roll >= treatment.efficacy then
+        result, cause = RESULT.FAILED, "roll"
+    elseif treatment.outcome == "relief" then
+        -- Relief eases the symptoms and clears nothing, so the record stays
+        -- INFECTIOUS and `canRecover` is never asked - relief is not an exit.
+        result, cause = RESULT.RELIEVED, "relief"
+    elseif treatment.outcome == "cure" then
+        if RLDiseaseRecord.canRecover(record.endpoint, RLDiseaseRecord.EXIT_REASON.CURE) then
+            if RLDiseaseRecord.transition(record, RLDiseaseRecord.STATE.RECOVERED)
+                == RLDiseaseRecord.APPLIED then
+                result, cause = RESULT.CURED, "cure"
+            else
+                -- UNREACHABLE BY CONSTRUCTION - the pair is unconditional and the
+                -- state guard at entry already proved the record is INFECTIOUS - and
+                -- kept so the dispatch cannot fall off its end with a nil result.
+                result, cause = RESULT.FAILED, "transition"
+            end
+        else
+            -- The endpoint refuses this exit. `canRecover` logs its own refusal, so
+            -- this cause is named on the completion line below and nowhere else.
+            result, cause = RESULT.FAILED, "endpoint"
+        end
+    else
+        -- The else arm of a CLOSED dispatch rather than a guard: the parser refuses
+        -- an outcome outside its own set, so this is reachable only from a hand-built
+        -- block. It exists so the second slot is never nil.
+        result, cause = RESULT.FAILED, "outcome"
+    end
+
+    -- The course is over however it resolved, and this is the one write that ends it.
+    record.treatmentMonthsRemaining = 0
+
+    -- ONE line per completion, and it is the line a player's "my treatment failed"
+    -- report needs: the module's standing stance is that straight-line arithmetic
+    -- needs no line because the caller holds every value one could name, and that is
+    -- true of the incubation pair, whose branches turn on the record's own state and
+    -- counter. It is NOT true here, because the completion turns on a roll the caller
+    -- never sees.
+    Log:debug("RLDiseaseRecord.advanceTreatment: course complete title=%s roll=%s "
+        .. "efficacy=%s outcome=%s result=%s cause=%s",
+        tostring(record.title), tostring(roll), tostring(treatment.efficacy),
+        tostring(treatment.outcome), tostring(result), cause)
+
+    return RLDiseaseRecord.APPLIED, result
+end
+
+
+-- FIVE SITES LOG HERE, deliberately: the load line, `transition`'s refusal,
+-- `canRecover`'s pair, and the treatment pair's own refusals and completions.
+-- Everything else is silent, and the enumeration below says why.
 --
 -- `canRecover` earns its pair of lines the way `transition` earns its one: it REFUSES
 -- over a closed table, so a caller that never gets its recovery has nothing else to
@@ -703,13 +1025,30 @@ end
 -- is a volume question for the slice that acquires the call, and it is measurable
 -- only then; no consumer exists to measure it now.
 --
--- `canTransition`
--- is a table lookup and a boolean, `transition` is that plus one assignment, `new`
--- is a table literal, and the three incubation functions are straight-line
--- arithmetic plus one guarded write - so there is no branch whose decision a TRACE
--- line would explain that the caller does not already hold. `advanceIncubation`
--- does branch, but on the record's own state and counter, both of which the caller
--- holds and can state itself, naming the animal as this module cannot. The callers
--- are the incubation, treatment, fatality and switch-over slices. Read the absence
--- as that, not as under-logging.
+-- THE TREATMENT PAIR LOGS WHERE ITS INCUBATION SIBLING DOES NOT, and the difference
+-- is not inconsistency. Every branch in the incubation pair turns on the record's own
+-- state and counter - both of which the caller holds and can state itself, naming the
+-- animal as this module cannot - so a line here would only repeat what the caller
+-- already knows. The treatment COMPLETION turns on a roll the caller never sees, and
+-- an outcome and an endpoint it would have to re-resolve, so the completion line is
+-- the only place those four values ever appear together. Its refusals are TRACE for
+-- the same reason the enrol's are: a caller whose course never starts, or never
+-- advances, has nothing else to read, and TRACE keeps the volume out of the default
+-- view. The bare decrement is TRACE too - per-tick volume is a TRACE property rather
+-- than a reason to drop the line.
+--
+-- `canTransition` is a table lookup and a boolean, `transition` is that plus one
+-- assignment, `new` is a table literal, and the three incubation functions are
+-- straight-line arithmetic plus one guarded write - so there is no branch whose
+-- decision a TRACE line would explain that the caller does not already hold.
+-- `advanceIncubation` does branch, but only on state and counter, which is the
+-- distinction the paragraph above draws. Read the absence as that, not as
+-- under-logging. The callers this module is waiting on are the infection,
+-- progression, fatality and switch-over slices.
+--
+-- THE FOUR TYPE GUARDS ARE SILENT ON PURPOSE, and both appliers do it for the same
+-- reason: a non-table record has no title to name and a non-table treatment block
+-- has nothing to report, so a line there could say only that something was nil.
+-- That is the one early-return class in this file with no TRACE, and it is a
+-- deliberate exception to the standing rule that every early return carries one.
 Log:info("RLDiseaseRecord loaded")
