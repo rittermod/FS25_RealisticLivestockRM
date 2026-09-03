@@ -425,12 +425,18 @@ source(modDirectory .. "scripts/disease/RLDiseaseDefinition.lua")
 -- at file scope, so it has to follow SECTION 2c. Like the rate primitive it
 -- precedes the entities that will consume it.
 source(modDirectory .. "scripts/disease/RLDiseaseVulnerability.lua")
--- The fatality hazard last of the pure primitives. It reads RLDiseaseRates and
+-- The fatality hazard next. It reads RLDiseaseRates and
 -- RLDiseaseRecord at CALL time only - no file-scope capture of either - which is
 -- precisely WHY this position is ordinary rather than required: the file-scope read
 -- that forces the record ahead of the parser above has no counterpart here. It still
 -- precedes the entities that will consume it, like its three siblings.
 source(modDirectory .. "scripts/disease/RLDiseaseFatality.lua")
+-- The transmission rate closes the pure tier. Like the fatality hazard above it
+-- reads its FOUR siblings - RLDiseaseRates, RLDiseaseRecord, RLDiseaseVulnerability
+-- and RLDiseaseFatality - at CALL time only, with no file-scope capture of any of
+-- them, which is why this position is ordinary rather than required. It still
+-- precedes the entities that will consume it, like the four before it.
+source(modDirectory .. "scripts/disease/RLDiseaseTransmission.lua")
 source(modDirectory .. "scripts/disease/Disease.lua")
 source(modDirectory .. "scripts/disease/DiseaseManager.lua")
 

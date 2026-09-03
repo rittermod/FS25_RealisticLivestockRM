@@ -457,6 +457,9 @@ end
 ---@param deps table `{ animalTypes, i18n }`
 ---@param warnings table the accumulator
 ---@return table|nil the legacy entry, or nil when the row must be dropped
+---@return table|nil the type NAMES that resolved, in document order, for the MODEL
+--- half to carry. Nil exactly when the entry is nil, so a caller that checks the
+--- first return never has to check this one.
 local function buildLegacyEntry(xmlFile, key, title, deps, warnings)
 
     local translationKey = "rl_disease_" .. title
@@ -470,9 +473,21 @@ local function buildLegacyEntry(xmlFile, key, title, deps, warnings)
     end
 
     local animals = {}
-    local resolvedAny = false
 
-    for _, animalName in pairs(string.split(animalNames, " ")) do
+    -- The same resolve, collected a second way for the MODEL half. The legacy set
+    -- is keyed by type INDEX because that is what its consumers walk; the model
+    -- half needs NAMES, and the two shapes coexist until the legacy half is torn
+    -- down. Collected HERE rather than re-read inside `buildModelEntry`: a second
+    -- read of the attribute would emit every unknown-name warning a second time
+    -- under a second rule, and resolving once at load keeps the name-to-index hop
+    -- off every later path.
+    local resolvedNames = {}
+
+    -- `ipairs`, not `pairs`, and that is load-bearing rather than tidy: the array
+    -- built below is stored as `model.animals`, whose contract is DOCUMENT ORDER,
+    -- while `pairs` traversal order is undefined. Both runners' splits return a
+    -- contiguous sequence, so the two walk the same tokens.
+    for _, animalName in ipairs(string.split(animalNames, " ")) do
 
         -- An empty token is skipped rather than resolved. The engine's split
         -- yields one for a leading, trailing or doubled space while the headless
@@ -489,7 +504,7 @@ local function buildLegacyEntry(xmlFile, key, title, deps, warnings)
                         tostring(animalName)))
             else
                 animals[typeIndex] = true
-                resolvedAny = true
+                table.insert(resolvedNames, animalName)
             end
 
         end
@@ -498,7 +513,7 @@ local function buildLegacyEntry(xmlFile, key, title, deps, warnings)
 
     -- Row-fatal: a disease bound to no animal type is unreachable, so keeping it
     -- would put an entry in the registry that nothing can ever match.
-    if not resolvedAny then
+    if #resolvedNames == 0 then
         warn(warnings, title, "no-animal-types",
             string.format("no name in '%s' resolves to an animal type; disease dropped",
                 tostring(animalNames)))
@@ -602,7 +617,7 @@ local function buildLegacyEntry(xmlFile, key, title, deps, warnings)
 
     end
 
-    return disease
+    return disease, resolvedNames
 
 end
 
@@ -727,9 +742,13 @@ end
 ---@param xmlFile table open XMLFile document
 ---@param key string this disease's element key
 ---@param title string resolved, non-empty title
+---@param animalTypeNames table the type NAMES that resolved for this disease, from
+--- `buildLegacyEntry`. Stored verbatim as `model.animals` - never re-read from the
+--- attribute here, and never uppercased, since the resolve that produced it already
+--- required the authored casing.
 ---@param warnings table the accumulator
 ---@return table|nil the model entry, or nil where absent or refused
-local function buildModelEntry(xmlFile, key, title, warnings)
+local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
 
     local modelKey = key .. ".model"
 
@@ -741,6 +760,13 @@ local function buildModelEntry(xmlFile, key, title, warnings)
     end
 
     local model = {
+        -- The affected type NAMES, threaded from the legacy resolve rather than
+        -- re-read here. The shedding bound a chronic disease needs is the
+        -- shortest-lived affected species, and its consumer is a pure module that
+        -- may not reach the animal-type registry - so the resolve stays where it
+        -- already happens, at LOAD, and the model carries the result. The legacy
+        -- half's own set stays INDEX-keyed; the two shapes coexist until it goes.
+        ["animals"] = animalTypeNames,
         ["archetype"] = xmlFile:getString(modelKey .. "#archetype"),
         ["endpoint"] = xmlFile:getString(modelKey .. "#endpoint"),
         ["cullRequired"] = xmlFile:getBool(modelKey .. "#cullRequired"),
@@ -1006,14 +1032,14 @@ function RLDiseaseDefinition.parse(xmlFile, deps)
             return
         end
 
-        local entry = buildLegacyEntry(xmlFile, key, title, deps, warnings)
+        local entry, animalTypeNames = buildLegacyEntry(xmlFile, key, title, deps, warnings)
 
         if entry == nil then return end
 
         seenTitles[title] = true
         table.insert(legacy, entry)
 
-        local model = buildModelEntry(xmlFile, key, title, warnings)
+        local model = buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
 
         if model ~= nil then models[title] = model end
 
