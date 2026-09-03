@@ -443,6 +443,12 @@ source(modDirectory .. "scripts/disease/RLDiseaseTransmission.lua")
 -- why this position is ordinary rather than required. Nothing calls it yet, so its
 -- only observable effect at load is its own line.
 source(modDirectory .. "scripts/disease/RLDiseaseSpread.lua")
+-- The sub-lethal multiplier resolver is the last of the pure tier. It reads ONE
+-- sibling - RLDiseaseRecord, for the state vocabulary - at CALL time only, with no
+-- file-scope capture of it, which is why this position is ordinary rather than
+-- required. Nothing calls it yet, so its only observable effect at load is its own
+-- line.
+source(modDirectory .. "scripts/disease/RLDiseaseEffects.lua")
 source(modDirectory .. "scripts/disease/Disease.lua")
 source(modDirectory .. "scripts/disease/DiseaseManager.lua")
 
