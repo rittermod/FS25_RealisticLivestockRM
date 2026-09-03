@@ -437,6 +437,12 @@ source(modDirectory .. "scripts/disease/RLDiseaseFatality.lua")
 -- them, which is why this position is ordinary rather than required. It still
 -- precedes the entities that will consume it, like the four before it.
 source(modDirectory .. "scripts/disease/RLDiseaseTransmission.lua")
+-- The spread pass sits on top of the pure tier and is the last of it. It reads its
+-- TWO siblings - RLDiseaseRecord for the state vocabulary and RLDiseaseTransmission
+-- for the rate - at CALL time only, with no file-scope capture of either, which is
+-- why this position is ordinary rather than required. Nothing calls it yet, so its
+-- only observable effect at load is its own line.
+source(modDirectory .. "scripts/disease/RLDiseaseSpread.lua")
 source(modDirectory .. "scripts/disease/Disease.lua")
 source(modDirectory .. "scripts/disease/DiseaseManager.lua")
 
