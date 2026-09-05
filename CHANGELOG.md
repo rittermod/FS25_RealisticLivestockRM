@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.4.0.0-dev.1:
+
+- Turned the disease system off while it is rebuilt - animals no longer catch, spread or recover from diseases, and an existing illness stays frozen exactly where it is.
+- Stopped every disease surface showing a frozen illness - the animal's detail pane, the card status icons and the disease HUD box all go quiet, so a sick animal reads as healthy until the new system lands.
+- Greyed out the Diseases setting for everyone, admins included, and disabled the Diseases button on an animal so the treatment dialog cannot be opened.
+- Stopped treatment charging the farm - a course that was part-way through stays exactly where it stopped and bills nothing further.
+- Fixed one bad entry in the disease definition file silently dropping every disease defined after it - five authoring mistakes now warn and skip just the offending entry.
+- Corrected the disease guide's spread claims - foot and mouth is the only disease that sustains an outbreak, and PED and avian flu were both overstated.
+
 ## 1.3.2.0:
 
 ### Heads up before you update
