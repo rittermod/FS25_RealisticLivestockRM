@@ -231,130 +231,39 @@ function DiseaseManager:resolveRecordType(title, identity)
 end
 
 
+--- Refuse the daily spontaneous-infection roll: the legacy engine is switched off for the
+--- switchover, so no animal contracts a new disease from this path until the SEIR driver
+--- lands. The per-disease eligibility walk and its `math.random` draw are gone with it.
+---
+--- Unconditional rather than keyed on `diseasesEnabled`, so it keeps holding once something
+--- turns the setting back on.
+---@param animal table The animal that would have rolled. Read for log identity only.
 function DiseaseManager:onDayChanged(animal)
 
-	if not self.diseasesEnabled then return end
-
-	for _, disease in pairs(self.diseases) do
-
-		if not disease.animals[animal.animalTypeIndex] then continue end
-
-		local eligible = true
-
-		for _, existingDisease in pairs(animal.diseases) do
-
-			if existingDisease.type.title == disease.title then
-				eligible = false
-				break
-			end
-
-		end
-
-		if not eligible then continue end
-
-		for _, prerequisite in pairs(disease.prerequisites) do
-
-			local currentValue = animal
-
-			for _, path in pairs(prerequisite.path) do
-
-				currentValue = currentValue[path]
-
-				if currentValue == nil then eligible = false break end
-
-			end
-
-			if currentValue ~= prerequisite.value then
-				eligible = false
-				break
-			end
-
-		end
-
-		if not eligible then continue end
-
-		local probability = 0
-
-		for i = 1, #disease.probability do
-
-			if animal.age <= disease.probability[i].age or i == #disease.probability then
-				probability = disease.probability[i].value
-				break
-			end
-
-		end
-
-		if math.random() >= probability * self.diseasesChance then continue end
-
-		animal:addDisease(disease)
-
-	end
+	Log:trace("DiseaseManager:onDayChanged: refused, reason=legacy engine off (farmId=%s uniqueId=%s)",
+		tostring(animal and animal.farmId or nil), tostring(animal and animal.uniqueId or nil))
 
 end
 
 
+--- Refuse to seed a genetic record onto a freshly generated sale animal: the legacy engine
+--- is switched off for the switchover, so dealer stock carries no carrier and no `genes`.
+---
+--- This is the only one of the five refusals whose body had no `diseasesEnabled` guard, so it
+--- is the only one whose `math.random` draws ran even with the setting OFF - one per eligible
+--- genetic disease, plus a second on a hit. Removing them re-rolls every later draw in the
+--- caller's sale-animal generation, so dealer stock differs from a pre-slice save at the same
+--- seed. That is expected, not a defect.
+---
+--- Be precise about the scope of that claim, because the obvious stronger version is false:
+--- with the setting ON - which is the shipped DEFAULT - four other stubbed sites were drawing
+--- too, so a normal save's progression, inheritance and transmission streams all moved as
+--- well. "The only stream that moved" is true only of a save with diseases already off.
+---@param animal table The sale animal that would have been seeded. Read for log identity only.
 function DiseaseManager:setGeneticDiseasesForSaleAnimal(animal)
 
-	for _, disease in pairs(self.diseases) do
-
-		if not disease.animals[animal.animalTypeIndex] or disease.genetic == nil or disease.probability[1].value ~= 0 or #disease.probability > 1 then continue end
-
-		local eligible = true
-
-		for _, existingDisease in pairs(animal.diseases) do
-
-			if existingDisease.type.title == disease.title then
-				eligible = false
-				break
-			end
-
-		end
-
-		if not eligible then continue end
-
-		if math.random() < disease.genetic.saleChance then
-
-			local numGenes = 1
-
-			if math.random() <= 0.25 then numGenes = 2 end
-
-			animal:addDisease(disease, disease.genetic.recessive and numGenes == 1, numGenes)
-
-		end
-
-	end
-
-end
-
-
---- Render the collected sources as a stable "title=amount" list for the per-pen
---- summary. The sort is load-bearing rather than cosmetic: pairs order is undefined,
---- and the summary lines are compared across successive months.
----@param sources table|nil the collector's source set
----@return string a sorted "title=amount ..." list, or "none" when there are no sources
-local function formatSources(sources)
-
-	-- Unreachable from the single call site, whose input is contract-guaranteed to be
-	-- a table. Kept because a raise here would land OUTSIDE the logger's own pcall and
-	-- abandon the pen's period tick, which is a worse trade than one dead branch.
-	if sources == nil then return "none" end
-
-	local titles = {}
-
-	for title in pairs(sources) do table.insert(titles, title) end
-
-	if #titles == 0 then return "none" end
-
-	table.sort(titles)
-
-	local parts = {}
-
-	for _, title in ipairs(titles) do
-		local entry = sources[title]
-		table.insert(parts, string.format("%s=%s", title, tostring(entry ~= nil and entry.amount or "?")))
-	end
-
-	return table.concat(parts, " ")
+	Log:trace("DiseaseManager:setGeneticDiseasesForSaleAnimal: refused, reason=legacy engine off (uniqueId=%s)",
+		tostring(animal and animal.uniqueId or nil))
 
 end
 
@@ -511,114 +420,27 @@ function DiseaseManager:snapshotTransmission(animals, penName)
 end
 
 
---- Run one pen's transmission pass: collect the shedding sources, then roll each
---- susceptible animal against them.
+--- Refuse one pen's transmission pass: the legacy engine is switched off for the switchover,
+--- so no animal catches anything from a pen mate until the SEIR spread pass lands.
 ---
---- `penName` is DISPLAY-ONLY, and exists because the summary line below is the manual
---- walkthrough's oracle: without it a multi-pen save emits a stream of indistinguishable
---- lines and "this pen reached zero sources" cannot be attributed to the pen under test.
---- Nil-tolerant on purpose - a missing name degrades the line, never the pass.
+--- Only the APPLY half is stubbed. `snapshotTransmission` is left alone because it is the
+--- collector the SEIR spread pass reuses, NOT because it keeps producing evidence: it carries
+--- its own `diseasesEnabled` guard and returns nil before reaching the collector, so under the
+--- lock nothing is gathered and the pen tick logs only that it skipped. The `title=amount`
+--- source summary went with this function's body. There is therefore no per-pen transmission
+--- observability during the switchover window, at any log level - state that plainly rather
+--- than implying the collector still reports, because the next reader will look for a line
+--- that is not there.
 ---
---- `snapshot` is how the pen tick rolls against the state the pen was in BEFORE its own
---- progression loop ran. Every other caller omits it and gets today's behaviour unchanged:
---- the sources are collected here, from the pen as it stands now.
----@param animals table the pen's animals
+--- `penName` stays DISPLAY-ONLY and stays nil-tolerant: it is what attributes the line to a
+--- pen on a multi-pen save, and a missing name must degrade the line rather than the pass.
+---@param animals table the pen's animals. Unread while the engine is off.
 ---@param penName string|nil the husbandry's display name, for log attribution only
----@param snapshot table|nil a record from `DiseaseManager:snapshotTransmission` taken earlier
---- in this tick; nil collects the sources now
+---@param snapshot table|nil a record from `DiseaseManager:snapshotTransmission`. Unread while
+---        the engine is off; the parameter stays so the pen tick's call site is unchanged.
 function DiseaseManager:calculateTransmission(animals, penName, snapshot)
 
-	if not self.diseasesEnabled then
-
-		Log:trace("calculateTransmission [%s]: nothing to roll, reason=diseases disabled", tostring(penName))
-
-		return
-
-	end
-
-	if snapshot == nil then
-
-		-- The guard above has already returned when diseases are off, so the nil arm of
-		-- snapshotTransmission is unreachable from here and needs no second guard.
-		snapshot = self:snapshotTransmission(animals, penName)
-
-		Log:trace("calculateTransmission [%s]: no snapshot supplied, collected the sources now",
-			tostring(penName))
-
-	else
-
-		Log:trace("calculateTransmission [%s]: rolling against the caller's pre-progression snapshot",
-			tostring(penName))
-
-	end
-
-	local diseases, hasDiseases, stats = snapshot.sources, snapshot.hasSources, snapshot.stats
-
-	-- Emitted BEFORE the early return below: the walkthrough's terminal condition is
-	-- the source count reaching zero, which a summary placed after it could never
-	-- report. The rendered list is built into a local first, so no argument
-	-- expression here can raise inside the caller's safeCall wrapper.
-	local sourceSummary = formatSources(diseases)
-
-	Log:debug("calculateTransmission [%s]: %d animal(s), sources: %s (skipped %d cured record(s), %d dead animal(s))",
-		tostring(penName), stats.animals, sourceSummary, stats.curedSkipped, stats.deadSkipped)
-
-	if not hasDiseases then
-
-		Log:trace("calculateTransmission [%s]: nothing to roll, reason=no shedding source in the snapshot",
-			tostring(penName))
-
-		return
-
-	end
-
-
-	for _, animal in pairs(animals) do
-
-		for title, disease in pairs(diseases) do
-
-			local eligible = true
-
-			for _, existingDisease in pairs(animal.diseases) do
-
-				if existingDisease.type.title == title then
-					eligible = false
-					break
-				end
-
-			end
-
-			if not eligible then continue end
-
-			for _, prerequisite in pairs(disease.type.prerequisites) do
-
-				local currentValue = animal
-
-				for _, path in pairs(prerequisite.path) do
-
-					currentValue = currentValue[path]
-
-					if currentValue == nil then eligible = false break end
-
-				end
-
-				if currentValue ~= prerequisite.value then
-					eligible = false
-					break
-				end
-
-			end
-
-			if not eligible then continue end
-
-			if math.random() <= disease.type.transmission * (disease.amount / #animals) then
-				animal:addDisease(disease.type)
-			end
-
-		end
-
-	end
-
+	Log:trace("calculateTransmission [%s]: refused, reason=legacy engine off", tostring(penName))
 
 end
 

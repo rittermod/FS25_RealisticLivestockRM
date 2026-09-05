@@ -614,7 +614,10 @@ function RLMenuInfoFrame:updateButtonVisibility()
         -- disable only on per-animal state (already castrated, monitor removed).
         -- Written unconditionally within this block: the buttonInfo table is reused
         -- across calls, so a stale `true` would survive a permission grant.
-        self.diseasesButtonInfo.disabled = not RLPermissionHelper.hasLocalPermission("tradeAnimals")
+        -- Also disabled while the disease engine is off: there is nothing to treat, and
+        -- the dialog's own refusal would otherwise be the player's first feedback.
+        local diseasesOff = g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled
+        self.diseasesButtonInfo.disabled = diseasesOff or not RLPermissionHelper.hasLocalPermission("tradeAnimals")
         table.insert(self.menuButtonInfo, self.diseasesButtonInfo)
 
         -- Castrate - males only, not chickens
@@ -946,8 +949,14 @@ function RLMenuInfoFrame:onClickDiseases()
         Log:trace("RLMenuInfoFrame:onClickDiseases: no animal selected, early return")
         return
     end
-    -- Click-time recheck: the footer flag is computed when the button list is built,
-    -- so it goes stale if the permission is revoked while the menu is open.
+    -- Click-time rechecks: the footer flag is computed when the button list is built, so
+    -- it goes stale if the permission is revoked - or the disease engine switched off -
+    -- while the menu is open.
+    if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled then
+        Log:trace("RLMenuInfoFrame:onClickDiseases: refused, reason=diseases disabled (farmId=%s uniqueId=%s)",
+            tostring(animal.farmId), tostring(animal.uniqueId))
+        return
+    end
     if not RLPermissionHelper.hasLocalPermission("tradeAnimals") then
         Log:trace("RLMenuInfoFrame:onClickDiseases: no tradeAnimals permission, early return")
         return

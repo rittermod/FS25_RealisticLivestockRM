@@ -1030,7 +1030,7 @@ function RLMenuSettingsFrame:updateButtonVisibility()
     -- were still accepting input. The server-side RLFilterUpdateEvent guard
     -- already drops the forged mutation, but the local commit-then-revert
     -- cycle is misleading and dispatches WARN-spammy wire churn. Mirror the
-    -- adminOnly pattern used by updateReadonlyState (line ~3167) and push
+    -- adminOnly pattern used by updateReadonlyState and push
     -- the editable bit to each widget. setDisabled is idempotent, so this
     -- is safe to call on every focus-driven re-entry.
     local editable = hasFarm and hasPerm
@@ -3372,7 +3372,15 @@ function RLMenuSettingsFrame:updateReadonlyState()
         if widget ~= nil then
             local disabled = false
 
-            if setting.adminOnly and not isAdmin then
+            -- The lock arm leads: a locked row is disabled for EVERYONE, admin included,
+            -- which is the only visible difference a master user sees. It is what stops a
+            -- player toggling a setting whose engine is stubbed out underneath.
+            -- Note the arms are exclusive, so a locked row never evaluates its dependency
+            -- cascade. Harmless for diseasesEnabled, which declares none; a live constraint
+            -- for any future locked row that does.
+            if setting.lock then
+                disabled = true
+            elseif setting.adminOnly and not isAdmin then
                 disabled = true
             elseif setting.dependancy ~= nil then
                 local parent = RLSettings.SETTINGS[setting.dependancy.name]

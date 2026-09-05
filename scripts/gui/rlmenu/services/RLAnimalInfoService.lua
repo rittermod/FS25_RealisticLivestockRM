@@ -69,13 +69,23 @@ end
 --- is already localized by DiseaseManager. Empty list when the animal has
 --- no diseases.
 ---
---- NOT gated on `g_diseaseManager.diseasesEnabled`, unlike the card icons and the HUD box.
---- With diseases off, a record frozen mid-course still renders here while those two show
---- nothing. Tracked separately; do not add the gate as a drive-by.
+--- Gated on `diseasesEnabled` like the card icons and the HUD box: with diseases off a
+--- frozen record must not render here either, or the pane claims an animal is sick while
+--- every other surface says otherwise.
+---
+--- The nil-manager arm is this gate's own, not shared: `Disease:modifyOutput` and the HUD box
+--- both dereference `g_diseaseManager.diseasesEnabled` bare, so the parity above is about the
+--- SETTING and not about a nil manager. That state has one producer - a parse raise leaving the
+--- global nil for the session - and it already takes the mission down, so this is cheap
+--- symmetry with the other gates in this slice rather than a claim the tree is nil-safe.
 --- @param animal table
 --- @return table rows
 local function buildDiseaseRows(animal)
     local rows = {}
+    if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled then
+        Log:trace("RLAnimalInfoService.buildDiseaseRows: no rows, reason=diseases disabled")
+        return rows
+    end
     if animal == nil or type(animal.diseases) ~= "table" then return rows end
     for _, disease in ipairs(animal.diseases) do
         if disease ~= nil and disease.type ~= nil then
