@@ -83,202 +83,68 @@ function Disease:readStream(streamId, connection)
 end
 
 
---- Advance this record by one month and report what it did to its host.
+--- Refuse to advance this record: the legacy progression engine is switched off for the
+--- SEIR switchover, so a record freezes exactly as it stands - a part-served treatment
+--- included - and nothing cures it, expires its immunity, kills its host, or bills the farm.
 ---
---- The player-facing cured notification is emitted HERE, by whichever of the two
---- transitions actually cures the record - a completed treatment or the natural-recovery
---- roll. That is the contract: the notification marks the CURE, so the two sites below own
---- it and record removal is silent. Immunity expiry is deliberately silent too - it ends
---- protection rather than granting it, so a notification there would tell the player they
---- are safe at the exact moment they stop being safe.
+--- The refusal is unconditional rather than keyed on `diseasesEnabled`, and that is the
+--- point: the setting is forced off beside it but stays writable, so the two mechanisms fail
+--- in OPPOSITE directions. The setting fails open, this fails closed, and only this one still
+--- holds once something turns the setting back on.
 ---
---- The two restore paths must never emit. `loadFromXMLFile` and `readStream` both assign
---- `cured`, and neither is a transition: one rebuilds a saved record, the other applies
---- server state on a client. Emitting there would re-announce every cured animal on every
---- load and on every client join.
----
---- Placement WITHIN this function is load-bearing. The treatment emission belongs in the
---- NESTED `treatmentDuration <= 0` block, never at the end of the enclosing `beingTreated`
---- branch - at the branch end it would fire once per treated month.
----@param animal table Host animal. Must carry the notification entry point and the identity
----       fields behind it: both cure sites notify through it, so a table lacking it raises here.
----@param deathEnabled boolean Whether the fatality roll may run at all.
----@return boolean died True when this record killed its host on this tick.
----@return number treatmentCost This month's configured treatment cost; 0 when not treating.
----       The caller accumulates it per pen - what it does with the total is the caller's
----       concern, so do not read this as money already taken from the farm.
+--- Both return values are the contract and must stay two: the caller destructures them and
+--- adds the second to a running per-pen total, so a bare `return` makes that `number + nil`.
+---@param animal table Host animal. Read for log identity only while the engine is off.
+---@param deathEnabled boolean Whether the fatality roll may run. Unread while the engine is off.
+---@return boolean died Always false - a frozen record kills nobody.
+---@return number treatmentCost Always 0 - a frozen record bills nothing.
 function Disease:onPeriodChanged(animal, deathEnabled)
 
-	if not g_diseaseManager.diseasesEnabled then return false, 0 end
+	Log:trace("Disease:onPeriodChanged: refused, reason=legacy engine off (disease=%s farmId=%s uniqueId=%s)",
+		tostring(self.type and self.type.title or nil),
+		tostring(animal and animal.farmId or nil),
+		tostring(animal and animal.uniqueId or nil))
 
-	self.time = self.time + 1
-	local treatmentCost = 0
-
-	if self.cured then
-
-		self.immunity = self.immunity - 1
-
-		if self.immunity <= 0 then
-			-- Name the transition HERE: removeDisease is generic and cannot know which caller
-			-- reached it, and this branch is its only production caller. Its own trace records
-			-- the removal; this one records why.
-			Log:trace("Disease:onPeriodChanged: immunity EXPIRED, removing record (disease=%s farmId=%s uniqueId=%s)",
-				tostring(self.type.title), tostring(animal.farmId), tostring(animal.uniqueId))
-
-			animal:removeDisease(self.type.title)
-			return false, 0
-		end
-
-	elseif self.beingTreated and self.type.treatment ~= nil then
-
-		-- A course that has made no progress is a fresh enrolment, so seed it with the
-		-- configured length; without this the counter never leaves 0 and every treatment
-		-- cures on its first tick. Guarding on no-progress rather than seeding every tick
-		-- is what lets a player stop and restart a course without losing the months
-		-- already served.
-		if self.treatmentDuration <= 0 then
-
-			self.treatmentDuration = self.type.treatment.duration
-
-			Log:trace("Disease:onPeriodChanged: seeded treatment duration (disease=%s duration=%s uniqueId=%s)",
-				tostring(self.type.title), tostring(self.treatmentDuration), tostring(animal.uniqueId))
-
-		end
-
-		self.treatmentDuration = math.max(self.treatmentDuration - 1, 0)
-
-		treatmentCost = self.type.treatment.cost
-
-		if self.treatmentDuration <= 0 then
-			-- Flag BEFORE the three writes: the flag is the only thing that schedules the pen
-			-- flush, so behind them it would be the first thing lost to a raise, leaving the
-			-- server cured and every client still showing the animal sick indefinitely.
-			animal:setDirty()
-
-			self.cured = true
-			self.beingTreated = false
-			self.immunity = self.type.immunity - 0
-
-			animal:addMessage("DISEASE_CURED", { self.type.name })
-
-			Log:trace("Disease:onPeriodChanged: cured by TREATMENT, animal flagged dirty (disease=%s farmId=%s uniqueId=%s)",
-				tostring(self.type.title), tostring(animal.farmId), tostring(animal.uniqueId))
-		end
-
-	end
-
-	if not self.cured and self.type.recovery ~= nil then
-
-		self.recovery = self.recovery + 1
-
-		if self.recovery >= self.type.recovery and math.random() >= 0.25 then
-
-			-- Flag first, same contract as the treatment cure above.
-			animal:setDirty()
-
-			self.cured = true
-			self.immunity = self.type.immunity - 0
-			self.beingTreated = false
-
-			animal:addMessage("DISEASE_CURED", { self.type.name })
-
-			Log:trace("Disease:onPeriodChanged: cured by RECOVERY, animal flagged dirty (disease=%s farmId=%s uniqueId=%s)",
-				tostring(self.type.title), tostring(animal.farmId), tostring(animal.uniqueId))
-
-		end
-
-	end
-
-	if not self.isCarrier and deathEnabled then
-
-		-- A cured record never rolls fatality, on the cure tick or anywhere inside
-		-- the immunity window: the animal has already beaten this disease. The skip
-		-- is a branch rather than an extra term on the guard above so that it can be
-		-- observed in a log - a silent skip is undiagnosable.
-		if self.cured then
-
-			Log:trace("Disease:onPeriodChanged: cured record skips the fatality roll (disease=%s uniqueId=%s)",
-				tostring(self.type.title), tostring(animal.uniqueId))
-
-		else
-
-			local fatality = self.type.fatality
-			local fatalityChance = 0
-
-			for i = 1, #fatality do
-
-				if self.time <= fatality[i].time or i == #fatality then
-					fatalityChance = fatality[i].value
-					break
-				end
-
-			end
-
-			if math.random() < fatalityChance then
-
-				animal:die(self.type.key)
-				return true, treatmentCost
-
-			end
-
-		end
-
-	end
-
-	return false, treatmentCost
+	return false, 0
 
 end
 
 
+--- Refuse to pass this record's genetics to a newborn: the legacy inheritance path is
+--- switched off for the switchover, so a child is born carrying no record and no `genes`.
+---
+--- The Mendelian fold's `math.random` draws go with it - between zero and two per call, one
+--- per parent holding a single affected gene, and none at all for a type declaring no
+--- `genetic` block. State the range rather than a count: the switchover's RNG-stream
+--- accounting is only useful if the numbers in it are exact.
+---
+--- Unconditional for the same reason as `onPeriodChanged`: this half must keep holding once
+--- something turns `diseasesEnabled` back on.
+---@param child table The newborn. Never mutated while the engine is off.
+---@param otherParent table|nil The second parent. Unread while the engine is off.
 function Disease:affectReproduction(child, otherParent)
 
-	if not g_diseaseManager.diseasesEnabled then return end
-
-	local genetic = self.type.genetic
-
-	if genetic == nil or (not genetic.recessive and not genetic.dominant) then return end
-
-	local pDisease = otherParent ~= nil and otherParent:getDisease(self.type.title) or nil
-	
-	local parents = {
-		self.genes,
-		pDisease ~= nil and pDisease.genes or 0
-	}
-
-	local numAffectedGenes = 0
-
-	for _, genes in pairs(parents) do
-
-		if genes == 2 then
-			numAffectedGenes = numAffectedGenes + 1
-		elseif genes == 1 then
-			if math.random() <= 0.5 then numAffectedGenes = numAffectedGenes + 1 end
-		end
-
-	end
-
-	if numAffectedGenes == 2 then
-
-		child:addDisease(self.type, false, 2)
-
-	elseif numAffectedGenes == 1 then
-
-		if genetic.recessive then
-
-			child:addDisease(self.type, true, 1)
-
-		elseif genetic.dominant then
-
-			child:addDisease(self.type, false, 1)
-
-		end
-
-	end
+	Log:trace("Disease:affectReproduction: refused, reason=legacy engine off (disease=%s)",
+		tostring(self.type and self.type.title or nil))
 
 end
 
 
+--- Scale a sale price by this record's configured multiplier.
+---
+--- Gated on `diseasesEnabled` ALONE, deliberately. The sibling `modifyOutput` also tests
+--- `cured`, and matching it here would be a latent sell-price change that outlives the
+--- switchover for no benefit now - under the lock nothing reaches this arm anyway. The
+--- symptomatic shaping of both functions belongs to the record slice.
+---
+--- No TRACE here, and that is not an oversight: Lua evaluates a log call's arguments before
+--- the logger tests the level, and this runs per record per `getSellPrice`.
+---@param value number The undiseased price.
+---@return number The price after this record's multiplier, or `value` unchanged while the
+---        engine is off.
 function Disease:modifyValue(value)
+
+	if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled then return value end
 
 	return value * self.type.value
 

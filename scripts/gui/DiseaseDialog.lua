@@ -29,7 +29,31 @@ function DiseaseDialog.createFromExistingGui(gui)
 end
 
 
+--- Open the treatment dialog for one animal.
+---
+--- Refuses while the disease engine is off. Both callers funnel through here - the RL Menu Info
+--- frame's button and `createFromExistingGui` - so while the lock holds, no open reaches
+--- `onClickOk`, its `beingTreated` write, the treatment toggle event or the three treatment
+--- messages.
+---
+--- "While the lock holds" is the honest scope, not "every future open". `createFromExistingGui`
+--- passes no animal at all, so with the setting back ON it still raises on the clone below -
+--- a pre-existing defect this gate MASKS rather than fixes. The record slice rewrites the
+--- dialog and owns it; do not read the refusal as having closed it.
+---
+--- It does NOT close an already-open dialog: `onClickOk` carries no recheck. Under the lock
+--- the dialog can never have opened in the first place, so that residual has no
+--- player-reachable path and no recheck is added for it.
+---@param animal table|nil The animal whose records to show.
+---@param onCloseCallback function|nil Invoked on close so the parent can refresh.
+---@param onCloseTarget table|nil `self` for the close callback.
 function DiseaseDialog.show(animal, onCloseCallback, onCloseTarget)
+
+    if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled then
+        Log:trace("DiseaseDialog.show: refused, reason=diseases disabled (uniqueId=%s)",
+            tostring(animal ~= nil and animal.uniqueId))
+        return
+    end
 
     if DiseaseDialog.INSTANCE == nil then DiseaseDialog.register() end
 
@@ -86,8 +110,9 @@ function DiseaseDialog:onClickOk()
     -- per-month decrement is deliberately not synced. A course STARTED since that flush is the
     -- widest gap: seeding this counter is itself an unflagged tick, so a client reads 0 for the
     -- whole course.
-    -- uniqueId is what lets this line be correlated with the seed trace in
-    -- Disease:onPeriodChanged, which is the other half of the same diagnostic.
+    -- uniqueId names the animal so the line stands on its own. It used to be the half that
+    -- correlated it with the course-seeding trace in Disease:onPeriodChanged; that trace went
+    -- with the progression stub, so there is nothing to correlate against while the lock holds.
     Log:trace("DiseaseDialog:onClickOk sending event disease=%s treatment=%s treatmentDuration=%s uniqueId=%s",
         disease.type.title, tostring(newState), tostring(disease.treatmentDuration),
         tostring(self.animal.uniqueId))
