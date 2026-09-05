@@ -31,7 +31,26 @@ local Log = RmLogging.getLogger("RLRM")
 --- @param key string XML path key
 --- @param clusterSystem table|nil Cluster system (nil for pregnancy children)
 --- @param isLegacy boolean Whether this is a legacy-format save
+---
+--- THE DISEASE ARRAY IS REBUILT IN DOCUMENT ORDER, and that is a contract rather than an
+--- incidental property of `iterate`. The save half writes each record at an INDEXED key taken
+--- from its position in the array, so document order IS array order, and every peer folds the
+--- same records in the same sequence. Rebuilding it from a title-keyed map, a set, per-state
+--- buckets or a re-sorted query loses that with no raise, no red assert and no log line.
+---
 --- @return table|nil animal New Animal instance, or nil if subType not found
+--- @return number droppedLegacyDiseaseRecords How many disease records THIS animal lost to the
+---         shape discriminator. Zero on every save this build wrote. Exposed because a suite
+---         has no other way to assert it - the emission is a WARNING, and neither a logger spy
+---         nor the error-line pin can see one.
+---
+---         SCOPED TO THIS ANIMAL'S OWN RECORDS. An unborn child is loaded by a recursive call
+---         and is a different animal: it counts, warns and reports for itself, and its total is
+---         deliberately NOT folded in here, because a number documented as one animal's loss
+---         must not silently include another's. The consequence to know when reading a log: a
+---         pregnant mother's returned figure does not cover her children, and a child's own
+---         warning renders `farmId=nil uniqueId=nil`, because the pregnancy key it loads from
+---         carries neither - a pre-existing property of that path, inherited rather than added.
 function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy)
 
     local subTypeIndex
@@ -53,7 +72,11 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
             local rawName = xmlFile:getString(key .. "#subType", "?")
             Log:warning("loadAnimal: subType '%s' not found in registry - animal will be dropped (key=%s)", rawName, key)
         end
-        return nil
+        -- Both values, so the second return is a number on EVERY path the doc block declares it
+        -- on. A bare `return nil` here hands the caller nil in that slot, and the first caller
+        -- to write `total = total + dropped` would get `number + nil` on exactly the drop path -
+        -- the one that is hardest to reach in a test and easiest to miss in review.
+        return nil, 0
     end
 
     local age = xmlFile:getInt(key .. "#age")
@@ -198,6 +221,13 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
 
     local diseases = {}
 
+    -- Counts ONE drop reason: a record written in the pre-switchover shape. The other two
+    -- skips below keep their own per-record warnings and are not counted here, because this
+    -- number is an ORACLE - a suite asserts it, a logger spy is banned portfolio-wide, and a
+    -- WARNING moves neither the error pin nor a sequence pin - so folding three reasons into
+    -- one figure would make it unassertable for any of them.
+    local droppedLegacyDiseaseRecords = 0
+
     -- Every skip below is a BARE return, never `return false`. Returning exactly false from an
     -- iterate callback ends the walk, so it would drop every REMAINING disease on this animal
     -- rather than just the one that could not be resolved. Returning nothing continues it.
@@ -219,6 +249,23 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
 
         if diseaseType == nil then return end
 
+        -- THE SHAPE DISCRIMINATOR, and it must sit exactly here - after the title resolves and
+        -- before anything is constructed. Both shapes carry a title, and every attribute read
+        -- in the codec supplies a default, so without this an old record is accepted with
+        -- default values for fields it never had: a record at EXPOSED with zeroed counters
+        -- that no guard refuses and nothing can ever advance. Silent, permanent, and
+        -- indistinguishable from a fresh infection.
+        --
+        -- Absent reads as 1 - the legacy shape wrote no version - so the default is what
+        -- actually does the work here, not the comparison.
+        if xmlFile:getInt(diseaseKey .. "#version", 1) < Disease.RECORD_VERSION then
+
+            droppedLegacyDiseaseRecords = droppedLegacyDiseaseRecords + 1
+
+            return
+
+        end
+
         local disease = Disease.new(diseaseType)
 
         disease:loadFromXMLFile(xmlFile, diseaseKey)
@@ -226,6 +273,14 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
         table.insert(diseases, disease)
 
     end)
+
+    -- ONE line per animal, never one per record: a herd carrying the old shape is the normal
+    -- case on the first load of this build, so per-record lines would bury the load log in
+    -- exactly the situation a reader most needs to follow it.
+    if droppedLegacyDiseaseRecords > 0 then
+        Log:warning("loadAnimal: dropped %s pre-switchover disease record(s), reason=record shape predates the current one and carries no state to migrate (farmId=%s uniqueId=%s)",
+            tostring(droppedLegacyDiseaseRecords), tostring(farmId), tostring(id))
+    end
 
 
     local insemination
@@ -300,7 +355,7 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
 
     end
 
-    return animal
+    return animal, droppedLegacyDiseaseRecords
 
 end
 
@@ -446,9 +501,15 @@ function AnimalPersistence.saveToXMLFile(animal, xmlFile, key)
     if animal.isCastrated then xmlFile:setBool(key .. "#isCastrated", true) end
     if animal.canBeSold == false then xmlFile:setBool(key .. "#canBeSold", false) end
 
-    for i, disease in pairs(animal.diseases) do
+    -- INDEXED walk, never `pairs`, and this is the site that MATERIALISES the positional
+    -- contract the loader and both stream halves are written against. The element index is
+    -- derived from the loop variable, so with `pairs` the document's order was whatever the
+    -- iterator happened to hand back - order-preserving for a dense array under this VM, and
+    -- not a guarantee. Writing the index from a counted loop makes the contract true by
+    -- construction instead of by luck, and matches the two stream write halves exactly.
+    for i = 1, #animal.diseases do
 
-        disease:saveToXMLFile(xmlFile, key .. ".diseases.disease(" .. (i - 1) .. ")")
+        animal.diseases[i]:saveToXMLFile(xmlFile, key .. ".diseases.disease(" .. (i - 1) .. ")")
 
     end
 

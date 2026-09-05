@@ -431,7 +431,7 @@ function AnimalReproduction.createPregnancy(animal, childNum, month, year, fathe
         local hasDisease = false
 
         for _, mDisease in pairs(mDiseases) do
-            if mDisease.type.title == disease.type.title then
+            if mDisease.title == disease.title then
                 hasDisease = true
                 break
             end

@@ -1574,7 +1574,9 @@ end
 ---@param title string Disease type title to remove.
 function Animal:removeDisease(title)
     for i, disease in pairs(self.diseases) do
-        if disease.type.title == title then
+        -- The record carries its own title, so this no longer reaches through to the registry
+        -- entry to ask what it is called.
+        if disease.title == title then
             Log:trace("removeDisease: removing record (disease=%s farmId=%s uniqueId=%s remaining=%d)",
                 tostring(title), tostring(self.farmId), tostring(self.uniqueId), #self.diseases - 1)
 
@@ -1601,23 +1603,23 @@ end
 --- Sale, dealer and AI animals reach this too and carry no cluster system. `setDirty` nil-guards
 --- that delegate, so the flag is set locally and goes nowhere; those pools replicate through
 --- their own state event instead. Harmless, and not a claim that this path syncs them.
----@param type table Disease type table from the disease manager.
+---@param model table Disease model entry from the disease manager's registry.
 ---@param isCarrier boolean|nil True for an asymptomatic carrier record.
 ---@param genes number|nil Count of affected genes inherited, 0 when not genetic.
-function Animal:addDisease(type, isCarrier, genes)
+function Animal:addDisease(model, isCarrier, genes)
     self:setDirty()
 
     Log:trace("addDisease: contracted, animal flagged dirty (disease=%s farmId=%s uniqueId=%s)",
-        tostring(type.title), tostring(self.farmId), tostring(self.uniqueId))
+        tostring(model.title), tostring(self.farmId), tostring(self.uniqueId))
 
-    table.insert(self.diseases, Disease.new(type, isCarrier, genes))
+    table.insert(self.diseases, Disease.new(model, isCarrier, genes))
 
-    self:addMessage("DISEASE_CONTRACTED", { type.name })
+    self:addMessage("DISEASE_CONTRACTED", { model.name })
 end
 
 function Animal:getDisease(title)
     for _, disease in pairs(self.diseases) do
-        if disease.type.title == title then return disease end
+        if disease.title == title then return disease end
     end
 
     return nil
@@ -1694,25 +1696,32 @@ function Animal:getCanBeInseminatedByAnimal(animal) return AnimalReproduction.ge
 
 function Animal:setInsemination(animal) AnimalReproduction.setInsemination(self, animal) end
 
---- Whether this animal currently carries an ACTIVE disease record. A record is
---- active iff it is neither cured (immunity countdown running) nor a genetic
---- carrier - both read as healthy on every list surface and in the
---- hasAnyDisease filter field, while the record itself stays attached (a cured
---- record blocks re-infection; a carrier record marks the carried gene).
+--- Whether this animal currently carries a SYMPTOMATIC disease record - one at INFECTIOUS.
+---
+--- A GAMEPLAY predicate, not a display helper, and that is why the rule is a decision rather
+--- than a default. It backs the saved-filter field the herdsman planner evaluates to decide
+--- what it autonomously sells, so what counts as "diseased" here decides what a rule the
+--- player wrote about sick animals actually acts on.
+---
+--- INFECTIOUS ONLY. An incubating animal is deliberately invisible - the design withholds that
+--- early warning, and letting it through here would hand it back through the filter. A
+--- recovered animal is immune rather than sick, and its record is what blocks re-infection, so
+--- it must stay attached while reading healthy. Both would otherwise be auto-sold.
+---
 --- Strict boolean contract: never nil (the filter evaluator type-gates and
 --- would silently match nothing) and never raises on a nil diseases table.
 --- Deliberately unlogged: the three list sort comparators call this per
 --- comparison, so a per-call trace would dominate the log at TRACE.
 ---@return boolean hasActiveDisease true iff diseases are enabled AND at least one attached
----        record is neither cured nor a carrier; false whenever the manager is absent,
----        diseases are disabled, or the animal carries no diseases table
+---        record is INFECTIOUS; false whenever the manager is absent, diseases are disabled,
+---        or the animal carries no diseases table
 function Animal:getHasAnyDisease()
     if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled or self.diseases == nil then
         return false
     end
 
     for _, disease in ipairs(self.diseases) do
-        if not disease.cured and not disease.isCarrier then
+        if disease.state == RLDiseaseRecord.STATE.INFECTIOUS then
             return true
         end
     end
@@ -1725,22 +1734,24 @@ end
 --- or an absent diseases table all yield three falses, so turning diseases off
 --- clears the icons the same way it clears every other disease surface.
 ---
---- "Untreated" and "treated" describe ACTIVE records only (neither cured nor a
---- carrier), so a cured record contributes nothing whatever its beingTreated
---- flag says. Carrier is keyed on isCarrier alone, cured or not, because it
---- marks a lifelong carried gene rather than a record state.
+--- "Untreated" and "treated" describe SYMPTOMATIC records only - those at INFECTIOUS - so an
+--- incubating or a recovered record contributes nothing whatever its treatment flag says.
+--- Carrier is keyed on isCarrier alone, whatever the state, because it marks a lifelong
+--- carried gene rather than a point in the disease's course.
 ---
 --- WITHIN one record the three are exclusive - a carrier record can never also
 --- report untreated or treated. ACROSS records they are independent, which is
 --- how an animal carrying a gene and running an active infection lights two
---- icons. A degenerate record (no fields set) reports untreated, matching what
---- getHasAnyDisease already does with the same input.
+--- icons. A degenerate record (no fields set) lights NOTHING, matching what
+--- getHasAnyDisease does with the same input - the rule demands a state the record
+--- does not carry, so it fails closed, which is the safe direction for a predicate
+--- the herdsman auto-sells on.
 ---
 --- Iterates with ipairs to match the list predicate: a sparse diseases table has
 --- to be read the same way by both, or the icons and the section grouping would
 --- disagree about the same animal.
----@return boolean untreated true iff at least one active record is not being treated
----@return boolean treated true iff at least one active record is being treated
+---@return boolean untreated true iff at least one SYMPTOMATIC record has no course running
+---@return boolean treated true iff at least one SYMPTOMATIC record has a course running
 ---@return boolean carrier true iff at least one record carries the gene
 function Animal:getDiseaseStatusFlags()
     if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled or self.diseases == nil then
@@ -1752,8 +1763,8 @@ function Animal:getDiseaseStatusFlags()
     for _, disease in ipairs(self.diseases) do
         if disease.isCarrier then
             carrier = true
-        elseif not disease.cured then
-            if disease.beingTreated then
+        elseif disease.state == RLDiseaseRecord.STATE.INFECTIOUS then
+            if disease.treatmentRunning then
                 treated = true
             else
                 untreated = true

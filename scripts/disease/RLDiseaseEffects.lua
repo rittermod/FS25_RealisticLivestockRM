@@ -43,14 +43,25 @@
     separate them; this count is the only thing that can. It is also a number the
     fold already computed, so a caller logging the outcome recomputes nothing.
 
-    RECORD ORDER IS THE CALLER'S OBLIGATION, and the determinism claim is scoped to a
-    fixed array. Float multiplication is not associative, so three or more
-    contributing records can produce products differing in the last ulp between two
-    orderings; two factors are commutative and cannot. This module walks `ipairs` and
-    does NOT sort - sorting per call in a per-animal loop buys nothing the caller
-    cannot do once - so the canonical order belongs to whoever builds the array. Until
-    that lands the claim is "identical for the same array", never "identical across
-    peers".
+    RECORD ORDER IS THE CALLER'S OBLIGATION, AND THE RESULT IS NOW IDENTICAL ACROSS
+    PEERS. Float multiplication is not associative, so three or more contributing
+    records can produce products differing in the last ulp between two orderings; two
+    factors are commutative and cannot. This module walks `ipairs` and does NOT sort -
+    sorting per call in a per-animal loop buys nothing the caller cannot do once - so
+    the order belongs to whoever builds the array.
+
+    What makes the cross-peer claim true is not a sort but the CODECS: both round-trip
+    the record array POSITIONALLY, the savegame by indexed key and the stream by an
+    indexed write against a `table.insert` read, so a client's array is a positional
+    copy of the server's and both fold the same records in the same sequence. There is
+    no difference to tolerate rather than a small one that is tolerated - which matters,
+    because this fold runs on EVERY peer: the server guard beside its two call sites
+    wraps only the pen-level aggregation, one line below.
+
+    That makes the claim a CODEC obligation rather than a property of this module, and
+    it dies silently in any rewrite that rebuilds the array from a map, a set, a sort,
+    per-state buckets, or an XML gather by element name rather than document order.
+    Both codecs carry the obligation at their own read and write sites.
 
     NOTE WHAT THE ORDERED CHANNEL LISTS ARE AND ARE NOT FOR. They exist for SEED
     COMPLETENESS and a stable log line, never for float determinism: each channel is
@@ -174,8 +185,12 @@
     channels are wired by their own slices, each of which owns its own gating and its
     own hoisting - the shipped `updateOutput` folds diseases INSIDE a per-fillType
     loop, so a naive port would call `resolve` once per fill type per animal per tick.
-    Nothing in the tree yet produces the record shape this module reads either; the
-    switchover that changes it also owns the canonical order of the record array.
+
+    THE RECORD SHAPE THIS MODULE READS IS NOW THE SHIPPED ONE. `Disease` carries the
+    record keys flat, both codecs round-trip them, and the array order is settled above -
+    so what is still missing is a CONSUMER, not the data. Read the absence of callers as
+    exactly that and nothing more: every animal's `diseases` array is empty in this
+    build, because nothing constructs a record until infection is wired.
 ]]
 
 RLDiseaseEffects = {}

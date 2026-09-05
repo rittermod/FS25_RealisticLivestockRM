@@ -65,8 +65,8 @@ local function buildChildrenRow(animal)
     }
 end
 
---- Build disease rows for read-only display. Uses disease.type.name which
---- is already localized by DiseaseManager. Empty list when the animal has
+--- Build disease rows for read-only display. Reads the display name off the record's model
+--- entry, which the definition parser has already localized. Empty list when the animal has
 --- no diseases.
 ---
 --- Gated on `diseasesEnabled` like the card icons and the HUD box: with diseases off a
@@ -87,15 +87,23 @@ local function buildDiseaseRows(animal)
         return rows
     end
     if animal == nil or type(animal.diseases) ~= "table" then return rows end
+    -- EVERY record, unfiltered, exactly as before. Repointing the field this reads is this
+    -- slice's whole job here: hiding a state is the display slice's contract, and no record of
+    -- any state exists in this build for a filter to act on anyway.
+    --
+    -- The presence guard moves with the field it guards. Note what it and the `getStatus` guard
+    -- below it actually cover: a hand-built test fixture. Against production records both are
+    -- always true, so an assert added here against the neutral "" is measuring the fallback
+    -- rather than the row - bind the real function onto the fixture instead.
     for _, disease in ipairs(animal.diseases) do
-        if disease ~= nil and disease.type ~= nil then
+        if disease ~= nil and disease.model ~= nil then
             local status = ""
             if disease.getStatus ~= nil then
                 local ok, statusText = pcall(function() return disease:getStatus() end)
                 if ok and statusText ~= nil then status = statusText end
             end
             table.insert(rows, {
-                name   = disease.type.name or "",
+                name   = disease.model.name or "",
                 status = status,
             })
         end

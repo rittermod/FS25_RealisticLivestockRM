@@ -175,14 +175,19 @@ RLFilterFieldCatalog.FIELDS = {
         type        = "bool",
         cmps        = BOOL_CMPS,
         animalTypes = "all",
-        -- Both branches implement the SAME active-record rule as
-        -- Animal:getHasAnyDisease: a record that is cured or a genetic carrier
-        -- does not count as disease. The fallback is a second implementation of
-        -- that predicate for plain-table animals - keep the two in lockstep,
-        -- including the diseasesEnabled gate. Both branches return a strict
-        -- boolean by construction (the evaluator type-gates, so a nil return
+        -- Both branches implement the SAME symptomatic-record rule as
+        -- Animal:getHasAnyDisease: only a record at INFECTIOUS counts as disease,
+        -- so an incubating or a recovered-and-immune animal reads healthy here
+        -- exactly as it does through the accessor. The fallback is a second
+        -- implementation of that predicate for plain-table animals - keep the two
+        -- in lockstep, including the diseasesEnabled gate. Both branches return a
+        -- strict boolean by construction (the evaluator type-gates, so a nil return
         -- silently matches nothing): the accessor's answer is coerced here so a
         -- foreign animal shape cannot leak nil through this field.
+        --
+        -- RLDiseaseRecord is read INSIDE the closure, and that is what keeps this
+        -- file's loader position free: the catalog is sourced hundreds of lines
+        -- before the record module, so a file-scope alias would capture a nil.
         getter      = function(animal)
             if animal.getHasAnyDisease ~= nil then return animal:getHasAnyDisease() == true end
             if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled
@@ -190,7 +195,7 @@ RLFilterFieldCatalog.FIELDS = {
                 return false
             end
             for _, disease in ipairs(animal.diseases) do
-                if not disease.cured and not disease.isCarrier then return true end
+                if disease.state == RLDiseaseRecord.STATE.INFECTIOUS then return true end
             end
             return false
         end,

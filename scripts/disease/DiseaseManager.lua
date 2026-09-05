@@ -124,11 +124,11 @@ end
 --- A direct lookup: the registry is keyed by title, so the linear scan this
 --- replaced is gone along with the array it walked.
 ---
---- Returns the registry's own entry table, or nil - NEVER `false`. Both stream
---- call sites fold the result through an `and`/`or` chain that would turn a false
---- into nil, so the two outcomes must stay distinguishable by nilness alone. A nil
---- or empty title is a legal read that returns nil, which is what lets
---- `resolveRecordType`'s guard above it keep working unchanged.
+--- Returns the registry's own entry table, or nil - never `false`. A nil or empty
+--- title is a legal read that returns nil, which is what lets `resolveRecordType`'s
+--- guard above it keep working unchanged. (The `and`/`or` folds at the two stream
+--- call sites that made the nil-versus-false distinction load-bearing are gone: the
+--- stream now resolves unconditionally and raises on an unresolvable title.)
 ---@param title string|nil the title as persisted, transmitted or authored
 ---@return table|nil the registry entry, or nil when the title is not defined
 function DiseaseManager:getDiseaseByTitle(title)
@@ -352,29 +352,30 @@ function DiseaseManager.collectTransmissionSources(animals)
 
 		for _, disease in pairs(animal.diseases) do
 
-			local type = disease.type
+			local model = disease.model
 
-			if type.transmission == nil or type.transmission <= 0 then continue end
+			-- THIS GATE NOW SHORT-CIRCUITS EVERY RECORD, and the honest description of the
+			-- change below it is "a dead read deleted", not "transmission repointed". The
+			-- registry entry is a model entry, which carries an authored spread figure under a
+			-- different name and no `transmission` key at all - so the walk reaches this
+			-- `continue` for every record of every animal and the collector returns empty.
+			--
+			-- Left standing rather than removed because the pen tick still calls this, and a
+			-- body that returns an empty source set is the correct inert behaviour while the
+			-- SEIR pipeline has no caller. The slice that wires spread replaces the whole
+			-- function with a delegation to the spread module, which already owns the shedding
+			-- question and answers it from the record's STATE.
+			if model.transmission == nil or model.transmission <= 0 then continue end
 
-			local isSource = (not disease.cured) or disease.isCarrier
-
-			if not isSource then
-
-				stats.curedSkipped = stats.curedSkipped + 1
-
-				Log:trace("collectTransmissionSources: skipped record, reason=cured (disease=%s uniqueId=%s)",
-					tostring(type.title), tostring(animal.uniqueId))
-
-				continue
-
-			end
-
-			if sources[type.title] == nil then
-				sources[type.title] = { ["type"] = type, ["amount"] = 0 }
+			-- Reads NO record field beyond the title, deliberately. Deciding what sheds is the
+			-- spread module's contract, and answering it a second time here would make this the
+			-- sixth predicate over the same records - the repair this codebase refuses.
+			if sources[disease.title] == nil then
+				sources[disease.title] = { ["type"] = model, ["amount"] = 0 }
 				hasSources = true
 			end
 
-			sources[type.title].amount = sources[type.title].amount + 1
+			sources[disease.title].amount = sources[disease.title].amount + 1
 
 		end
 
@@ -389,7 +390,7 @@ end
 --- LATER in the same tick.
 ---
 --- The pen's period tick advances every disease record before it rolls transmission, and
---- the collector skips cured records and dead animals whole - so a snapshot taken after
+--- the collector skips resolved records and dead animals whole - so a snapshot taken after
 --- progression has already dropped every infection that resolved during it. The animal was
 --- contagious for the whole month and shed to nobody. Snapshotting ahead of the progression
 --- loop and handing the result to `calculateTransmission` restores that month.

@@ -7,12 +7,12 @@ function DiseaseTreatmentToggleEvent.emptyNew()
     return self
 end
 
-function DiseaseTreatmentToggleEvent.new(object, animal, diseaseTitle, beingTreated)
+function DiseaseTreatmentToggleEvent.new(object, animal, diseaseTitle, treatmentRunning)
     local self = DiseaseTreatmentToggleEvent.emptyNew()
     self.object = object
     self.animal = animal
     self.diseaseTitle = diseaseTitle
-    self.beingTreated = beingTreated
+    self.treatmentRunning = treatmentRunning
     return self
 end
 
@@ -20,7 +20,7 @@ function DiseaseTreatmentToggleEvent:readStream(streamId, connection)
     self.object = NetworkUtil.readNodeObject(streamId)
     self.animal = RLAnimalUtil.readStreamIdentifiers(streamId, connection)
     self.diseaseTitle = streamReadString(streamId)
-    self.beingTreated = streamReadBool(streamId)
+    self.treatmentRunning = streamReadBool(streamId)
     self:run(connection)
 end
 
@@ -28,7 +28,7 @@ function DiseaseTreatmentToggleEvent:writeStream(streamId, connection)
     NetworkUtil.writeNodeObject(streamId, self.object)
     RLAnimalUtil.writeStreamIdentifiers(self.animal, streamId, connection)
     streamWriteString(streamId, self.diseaseTitle)
-    streamWriteBool(streamId, self.beingTreated)
+    streamWriteBool(streamId, self.treatmentRunning)
 end
 
 --- Resolve the record a toggle names, for the server's pre-rebroadcast refusal check.
@@ -48,7 +48,7 @@ local function findRecord(clusterSystem, identifiers, title)
     if animal == nil then return nil end
 
     for _, disease in pairs(animal.diseases) do
-        if disease.type.title == title then return disease end
+        if disease.title == title then return disease end
     end
 
     return nil
@@ -127,10 +127,14 @@ function DiseaseTreatmentToggleEvent:run(connection)
         local disease = findRecord(clusterSystem, identifiers, self.diseaseTitle)
         local refusal
 
+        -- Both clauses are REPOINTED, not re-decided, and they must keep mirroring the dialog's
+        -- own gate exactly - that mirroring is the whole reason this block exists. The state
+        -- test is the direct successor of the cured flag; which states may start or resume a
+        -- course is the enrolment slice's rule.
         if disease ~= nil then
-            if disease.cured then
-                refusal = "cured"
-            elseif disease.type.treatment == nil then
+            if disease.state == RLDiseaseRecord.STATE.RECOVERED then
+                refusal = "recovered"
+            elseif disease.model.treatment == nil then
                 refusal = "untreatable"
             end
         end
@@ -143,13 +147,13 @@ function DiseaseTreatmentToggleEvent:run(connection)
             Log:warning(
                 "DiseaseTreatmentToggleEvent:run: refusing a treatment toggle, reason=%s "
                     .. "(disease=%s ownerFarmId=%s uniqueId=%s user='%s' userId=%s) - dropping",
-                tostring(refusal), tostring(disease.type.title), tostring(ownerFarmId),
+                tostring(refusal), tostring(disease.title), tostring(ownerFarmId),
                 tostring(identifiers.uniqueId), tostring(userName), tostring(userId))
             return
         end
 
         g_server:broadcastEvent(
-            DiseaseTreatmentToggleEvent.new(self.object, self.animal, self.diseaseTitle, self.beingTreated),
+            DiseaseTreatmentToggleEvent.new(self.object, self.animal, self.diseaseTitle, self.treatmentRunning),
             nil, connection, nil)
         Log:debug("DiseaseTreatmentToggleEvent:run: rebroadcasting treatment toggle to other clients")
     end
@@ -158,10 +162,10 @@ function DiseaseTreatmentToggleEvent:run(connection)
 
     if animal ~= nil then
         for _, disease in pairs(animal.diseases) do
-            if disease.type.title == self.diseaseTitle then
-                disease.beingTreated = self.beingTreated
+            if disease.title == self.diseaseTitle then
+                disease.treatmentRunning = self.treatmentRunning
                 Log:trace("DiseaseTreatmentToggleEvent:run: %s treatment=%s uniqueId=%s",
-                    self.diseaseTitle, tostring(self.beingTreated), tostring(identifiers.uniqueId))
+                    self.diseaseTitle, tostring(self.treatmentRunning), tostring(identifiers.uniqueId))
                 return
             end
         end
@@ -171,10 +175,10 @@ function DiseaseTreatmentToggleEvent:run(connection)
     end
 end
 
-function DiseaseTreatmentToggleEvent.sendEvent(object, animal, diseaseTitle, beingTreated)
+function DiseaseTreatmentToggleEvent.sendEvent(object, animal, diseaseTitle, treatmentRunning)
     if g_server ~= nil then
-        g_server:broadcastEvent(DiseaseTreatmentToggleEvent.new(object, animal, diseaseTitle, beingTreated))
+        g_server:broadcastEvent(DiseaseTreatmentToggleEvent.new(object, animal, diseaseTitle, treatmentRunning))
     else
-        g_client:getServerConnection():sendEvent(DiseaseTreatmentToggleEvent.new(object, animal, diseaseTitle, beingTreated))
+        g_client:getServerConnection():sendEvent(DiseaseTreatmentToggleEvent.new(object, animal, diseaseTitle, treatmentRunning))
     end
 end

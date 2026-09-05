@@ -250,6 +250,47 @@ RLDiseaseRecord.STATE = {
 }
 
 
+--- The states in WIRE ORDER, and the reverse map a stream read resolves through.
+---
+--- APPEND-ONLY, and this is the constraint the whole pair exists to state: the
+--- INDEX is what crosses the wire, so inserting or reordering a name reinterprets
+--- every record already in flight as a different state. A retired state keeps its
+--- slot. Same hazard as the dealer preset table, one layer down - and unlike that
+--- one this is never PERSISTED either, because the savegame codec writes the state
+--- NAME. The ordinal exists only to keep a join snapshot's per-record cost fixed.
+---
+--- One array and one map DERIVED from it, never two hand-written tables: a second
+--- literal list is the drift `RECOVERY_EXITS` documents at length, and here it
+--- would send a client to the wrong state rather than merely refusing one.
+---
+--- Five names fit three bits, and the wire slot is a UInt8 anyway. That is not
+--- waste, it is what makes the slot PROVABLE: the shared stream mock wraps
+--- UInt8 / UInt16 / Int16 / Int32 / Float32 / String / Bool and NO `UIntN`, so a
+--- bit-width slot would bypass the op ledger and call the real engine primitive
+--- against a mock stream id. Five spare bits per record is the cheaper side of
+--- that trade against widening a mock six suites share.
+---
+--- SUSCEPTIBLE holds slot 1 although no record ever carries it. The array is the
+--- state vocabulary in a fixed order, not the set of encodable values, and giving
+--- the unreachable name a slot is what keeps the ordinals stable if a later slice
+--- ever does make it reachable.
+---
+--- READ-ONLY by contract, exactly like `STATE`.
+RLDiseaseRecord.STATE_WIRE_ORDER = {
+    SUSCEPTIBLE,
+    "EXPOSED",
+    "INFECTIOUS",
+    "RECOVERED",
+    "DEAD"
+}
+
+RLDiseaseRecord.STATE_WIRE_ORDINAL = {}
+
+for ordinal, state in ipairs(RLDiseaseRecord.STATE_WIRE_ORDER) do
+    RLDiseaseRecord.STATE_WIRE_ORDINAL[state] = ordinal
+end
+
+
 --- The four endpoint names - what ends a disease's INFECTIOUS phase.
 ---
 --- THIS IS THE ONE HOME FOR THESE NAMES. `RLDiseaseDefinition` reads them from here
