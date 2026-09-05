@@ -500,7 +500,7 @@
 
         <text name="rl_disease_ped" text="Varkensdiarree (PED)"/>
 
-        <text name="rl_disease_avianFlu" text="Vogelgriep"/>
+        <text name="rl_disease_avianFluLPAI" text="Vogelgriep (LPAI)"/>
 
 
 

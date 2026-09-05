@@ -510,7 +510,7 @@
 
         <text name="rl_disease_ped" text="PED (sikojen epidemiaripuli)"/>
 
-        <text name="rl_disease_avianFlu" text="Lintuinfluenssa"/>
+        <text name="rl_disease_avianFluLPAI" text="Lintuinfluenssa (LPAI)"/>
 
 
 

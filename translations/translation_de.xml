@@ -495,7 +495,7 @@
 
         <text name="rl_disease_ped" text="Porzine Epizootische Diarrhoe"/>
 
-        <text name="rl_disease_avianFlu" text="Geflügelpest"/>
+        <text name="rl_disease_avianFluLPAI" text="Geflügelpest (LPAI)"/>
 
 
 

@@ -62,7 +62,7 @@ Five diseases can affect your animals:
 | CVM | Cattle (genetic) | No | Carrier cows produce extra milk, but calves may die |
 | Foot & Mouth | Cows, Sheep, Pigs | Yes (slow) | Major milk and price reduction |
 | PED | Pigs | Yes | Devastating to newborn piglets |
-| Avian Influenza | Chickens | No | Stops all egg production |
+| Avian Flu (LPAI) | Chickens | No | Stops all egg production |
 
 Diseases can spread between animals in the same pen. Some diseases grant immunity after recovery.
 

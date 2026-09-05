@@ -1,21 +1,6 @@
 <diseases>
 
-	<disease title="mastitis" animals="COW SHEEP" value="0.85" transmission="0.05" immunity="12" recovery="3">
-		<prerequisites>
-			<prerequisite path="isLactating" value="true" valueType="Bool"/>
-		</prerequisites>
-		<probability>
-			<key age="0" value="0"/>
-			<key age="12" value="0.005"/>
-		</probability>
-		<fatality>
-			<key time="0" value="0"/>
-		</fatality>
-		<output>
-			<fillType type="milk" modifier="0"/>
-			<fillType type="pallets" modifier="0"/>
-		</output>
-		<treatment cost="200" duration="1"/>
+	<disease title="mastitis" animals="COW SHEEP">
 		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="1.2" durationMonths="2"
 			caseFatality="0.01" immunityMonths="12" salePrice="0.85">
@@ -34,14 +19,10 @@
 		</model>
 	</disease>
 
-	<disease title="cvm" animals="COW" value="0.75">
-		<probability>
-			<key age="0" value="0"/>
-		</probability>
-		<fatality>
-			<key time="0" value="0.95"/>
-			<key time="1" value="1"/>
-		</fatality>
+	<disease title="cvm" animals="COW">
+		<!-- The two blocks below sit outside the model element and are read by nothing.
+		     They are retained deliberately, so the authored genetics and carrier values
+		     survive until the schema grows a home for them. -->
 		<carrier>
 			<output>
 				<fillType type="milk" modifier="1.5"/>
@@ -63,21 +44,7 @@
 		</model>
 	</disease>
 
-	<disease title="footAndMouth" animals="COW SHEEP PIG" value="0.5" transmission="0.1" immunity="24">
-		<probability>
-			<key age="0" value="0"/>
-			<key age="6" value="0.00075"/>
-		</probability>
-		<fatality>
-			<key time="0" value="0.2"/>
-			<key time="6" value="0.12"/>
-			<key time="18" value="0.035"/>
-		</fatality>
-		<output>
-			<fillType type="milk" modifier="0.35"/>
-			<fillType type="pallets" modifier="0.9"/>
-		</output>
-		<treatment cost="250" duration="3"/>
+	<disease title="footAndMouth" animals="COW SHEEP PIG">
 		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="6.0" durationMonths="2"
 			caseFatality="0.06" immunityMonths="24" salePrice="0.5">
@@ -93,23 +60,7 @@
 		</model>
 	</disease>
 
-	<disease title="ped" animals="PIG" value="0.65" transmission="0.075" immunity="12" recovery="3">
-		<probability>
-			<key age="0" value="0.125"/>
-			<key age="6" value="0.05"/>
-			<key age="18" value="0.01"/>
-			<key age="24" value="0.001"/>
-		</probability>
-		<fatality>
-			<key time="0" value="0.85"/>
-			<key time="1" value="0.075"/>
-			<key time="2" value="0.00025"/>
-		</fatality>
-		<output>
-			<fillType type="liquidManure" modifier="4"/>
-			<fillType type="manure" modifier="0.25"/>
-		</output>
-		<treatment cost="150" duration="1"/>
+	<disease title="ped" animals="PIG">
 		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="2.5" durationMonths="2"
 			caseFatality="0.22" immunityMonths="12" salePrice="0.65">
@@ -126,17 +77,7 @@
 		</model>
 	</disease>
 
-	<disease title="avianFlu" animals="CHICKEN" value="0.25" transmission="0.2" immunity="24" recovery="1">
-		<probability>
-			<key age="0" value="0.005"/>
-		</probability>
-		<fatality>
-			<key time="0" value="0.65"/>
-			<key time="3" value="0.15"/>
-		</fatality>
-		<output>
-			<fillType type="pallets" modifier="0"/>
-		</output>
+	<disease title="avianFluLPAI" animals="CHICKEN">
 		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="2.5" durationMonths="2"
 			caseFatality="0.06" immunityMonths="12" salePrice="0.25">

@@ -503,7 +503,7 @@
 
         <text name="rl_disease_ped" text="Porcine Epidemic Diarrhoea"/>
 
-        <text name="rl_disease_avianFlu" text="Avian Influenza"/>
+        <text name="rl_disease_avianFluLPAI" text="Avian Flu (LPAI)"/>
 
 
 

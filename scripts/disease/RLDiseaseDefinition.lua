@@ -2,16 +2,26 @@
     RLDiseaseDefinition.lua
     The one home for parsing xml/diseases.xml.
 
-    `parse` walks the definition file once and returns three things: the LEGACY
-    type list exactly as the old inline loader built it, a new `models` table
-    keyed by title carrying the redesign's parameter set, and an array of
-    authoring warnings. `DiseaseManager:loadDiseases` is a thin wrapper that
-    opens the file, calls parse, assigns both tables and logs the warnings.
+    `parse` walks the definition file once and returns two things: the disease
+    REGISTRY - a map keyed by title, carrying each disease's identity and the
+    redesign's parameter set - and an array of authoring warnings.
+    `DiseaseManager:loadDiseases` is a thin wrapper that opens the file, calls
+    parse, assigns the registry and logs the warnings.
 
-    Two halves, one pass, on purpose. The legacy half is what the shipped model
-    runs on today and must stay byte-equivalent for the shipped file; the model
-    half is what the later slices read and nothing consumes yet. Keeping both in
-    one walk is what lets the teardown delete a branch rather than untangle one.
+    THE REGISTRY IS A MAP, NOT AN ARRAY. Every read is a lookup by title, and
+    `#` on a map is ALWAYS 0 - so emptiness is `next(registry) == nil` and a
+    count is a walk. A `#` here does not error, it silently reads zero.
+
+    ONE FORMAT, ALL OR NOTHING. A disease is either fully expressed in the
+    `<model>` schema or it is absent: an absent or refused `<model>` drops the
+    whole disease. The file previously carried a second, legacy attribute set
+    alongside it and tolerated a disease that had only that half; the switchover
+    removed the legacy engine, so that tolerance would now ship a disease no
+    consumer can read. The rule is enforced on the model's ABSENCE, not on stray
+    content beside it: nothing below reads a child or attribute at the old
+    top-level position, so nothing can warn about one either. A definition
+    migrated a field at a time therefore loads clean and quietly loses whatever
+    stayed behind.
 
     WARNINGS ARE RETURNED, NEVER LOGGED HERE. A logger spy on the shared logger
     is banned portfolio-wide, so a rule asserted through the log is unassertable;
@@ -28,11 +38,23 @@
     field-compares `rule` and `title`; the wrapper renders the line. Warnings are
     emitted in document order.
 
-    ROW-FATAL VERSUS FIELD-LOCAL is explicit. A disease missing `#title` or
-    `#animals` is dropped from BOTH tables. Every other defect is field-local:
-    the offending field or child is skipped, one warning is emitted, and the
-    disease still loads. A malformed `<model>` never costs the disease its
-    LEGACY entry - a new-half authoring error must not regress shipped gameplay.
+    ROW-FATAL VERSUS FIELD-LOCAL is explicit, and the boundary is the ENTRY, not
+    the `<model>` element. A disease is DROPPED when it is missing `#title`,
+    missing `#animals`, resolves no animal type, has no `<model>`, or has one
+    that cannot be built - and that last case includes defects INSIDE the model:
+    a missing required scalar, an unknown endpoint, an endpoint/duration
+    mismatch, and `cureOnly` without a curative treatment are all row-fatal.
+    What stays field-local is a defect in a COLLECTION the entry can be built
+    without: an output channel, an infection key, a treatment child, a
+    prerequisite. The offending row is skipped, one warning is emitted, and the
+    disease still loads. `model-unknown-archetype` is neither - it warns and
+    carries the value through verbatim, because the archetype vocabulary is open.
+
+    A third shape exists and is deliberate: the animal rules run BEFORE the
+    `<model>` presence check, so a row can contribute a field-local
+    `unknown-animal-type` warning and then be dropped by `missing-model`. An
+    author reading the warning list can therefore see a field-local rule fire for
+    a disease that never entered the registry.
 
     `deps` arrives as a PARAMETER with no default: `{ animalTypes, i18n }`. No
     RUNTIME global is read here and none is cached at module load - that is the
@@ -65,13 +87,10 @@
     fire on one of the two runners, and the dual-run count gate is blind to the
     split because the divergence is in values.
 
-    THE LEGACY CARRIER PATH IS DELIBERATELY WRONG. `readLegacyOutputs` is called
-    for the carrier block against the BASE key, not the carrier key, reproducing
-    the shipped defect exactly. Repairing it would hand every cvm carrier +50%
-    milk immediately, which contradicts "the shipped model behaves identically".
-    The MODEL half reads the carrier profile correctly, through the same helper
-    as `<effects>` against a different base key. Do not unify them into one
-    "fixed" reader.
+    THE ANIMAL RULES RUN FIRST, ahead of the `<model>` presence check. A disease
+    bound to no animal type is unreachable whatever its model says, so a row with
+    neither a usable `#animals` nor a `<model>` earns `missing-animals` or
+    `no-animal-types` - never `missing-model`.
 ]]
 
 RLDiseaseDefinition = {}
@@ -152,8 +171,8 @@ local ENDPOINTS = {
 --- the "one home" claim above true instead of aspirational. A second hand-kept list
 --- drifts in one direction silently: an endpoint mapped to an attribute missing
 --- from the walk matches no iteration, so its required check never runs, its value
---- is never assigned, and the model half loads with no duration AND no warning -
---- the exact silent-default class this module exists to prevent.
+--- is never assigned, and the model loads with no duration AND no warning - the
+--- exact silent-default class this module exists to prevent.
 ---
 --- Sorted for a stable walk order. Order does not change any verdict - the required
 --- attribute is matched by name and every other declared one is refused - but it
@@ -188,7 +207,7 @@ local OUTCOMES = {
 }
 
 --- Prerequisite value types, as an ALLOWLIST rather than a `type(fn) == "function"`
---- probe: the legacy loader indexes `XMLFile["get" .. valueType]`, so a typo is a
+--- probe: the reader below indexes `XMLFile["get" .. valueType]`, so a typo is a
 --- nil call, and a probe would admit any XMLFile method whose name happens to start
 --- with "get".
 local PREREQUISITE_VALUE_TYPES = {
@@ -282,58 +301,8 @@ local function readProbability(xmlFile, path, label, title, warnings)
 end
 
 
---- Read a `<fillType type modifier>` list into a `type -> modifier` map.
----
---- Used by the LEGACY half against the disease's own `.output` and, deliberately,
---- against the SAME base key for the legacy carrier block - see the header. The
---- model half has its own reader, which additionally applies the channel
---- allowlist; this one deliberately does not, because an unknown channel here is
---- a pre-existing inert multiplier rather than something this slice may change.
----
---- Byte-equivalent for the SHIPPED file, where all eight rows carry both
---- attributes. The two guards below change behaviour only for malformed input:
---- a missing `#type` makes the shipped loader evaluate `output[nil] = v` and
---- RAISE inside `DiseaseManager.new()`, leaving `g_diseaseManager` nil and
---- silently skipping every registration below it, and a missing `#modifier`
---- writes a nil that reads as "no penalty" forever.
----@param xmlFile table open XMLFile document
----@param baseKey string key whose `.fillType` children are read
----@param title string the owning disease, for warning attribution
----@param warnings table the accumulator
----@return table map of channel name to modifier
-local function readLegacyOutputs(xmlFile, baseKey, title, warnings)
-
-    local output = {}
-
-    xmlFile:iterate(baseKey .. ".fillType", function(_, outputKey)
-
-        local channel = xmlFile:getString(outputKey .. "#type")
-        local modifier = xmlFile:getFloat(outputKey .. "#modifier")
-
-        if channel == nil then
-            warn(warnings, title, "legacy-output-missing-type",
-                string.format("a <fillType> row under %s has no #type; row skipped",
-                    tostring(baseKey)))
-            return
-        end
-
-        if modifier == nil then
-            warn(warnings, title, "legacy-output-missing-modifier",
-                string.format("<fillType> %s has no #modifier; row skipped", tostring(channel)))
-            return
-        end
-
-        output[channel] = modifier
-
-    end)
-
-    return output
-
-end
-
-
---- Read a `<output type modifier>` list for the MODEL half, refusing an unknown
---- channel, an incomplete row and a negative multiplier.
+--- Read a `<output type modifier>` list, refusing an unknown channel, an
+--- incomplete row and a negative multiplier.
 ---
 --- The carrier profile and the base effects profile are read by THIS function
 --- against different base keys, which is what makes the class of bug it repairs -
@@ -390,13 +359,15 @@ end
 
 --- Read a `<prerequisites>` list, refusing an incomplete or badly-typed entry.
 ---
---- Shared by both halves against different base keys. The `valueType` check is an
---- allowlist rather than a callable probe, because the read below indexes
---- `XMLFile["get" .. valueType]` and a typo is otherwise a nil call - a raise.
+--- The `valueType` check is an allowlist rather than a callable probe, because the
+--- read below indexes `XMLFile["get" .. valueType]` and a typo is otherwise a nil
+--- call - a raise.
 ---@param xmlFile table open XMLFile document
 ---@param baseKey string key whose `.prerequisite` children are read
 ---@param title string the owning disease, for warning attribution
----@param rulePrefix string warning-rule prefix, so each half is attributable
+---@param rulePrefix string warning-rule prefix. One caller today
+--- (`model-prerequisite-`); kept as a parameter so the rule ids stay declared at
+--- the call site rather than baked into this reader.
 ---@param warnings table the accumulator
 ---@return table array of `{ path, value }`
 local function readPrerequisites(xmlFile, baseKey, title, rulePrefix, warnings)
@@ -441,183 +412,6 @@ local function readPrerequisites(xmlFile, baseKey, title, rulePrefix, warnings)
     end)
 
     return prerequisites
-
-end
-
-
---- Build the LEGACY type entry for one disease, or nil where the row is dropped.
----
---- Every key the old inline loader produced is produced here, with the same
---- defaults and the same optional-key nilness, because `Disease.lua` dereferences
---- eleven distinct type fields and the three readers of `self.diseases` are out of
---- scope for this slice.
----@param xmlFile table open XMLFile document
----@param key string this disease's element key
----@param title string resolved, non-empty title
----@param deps table `{ animalTypes, i18n }`
----@param warnings table the accumulator
----@return table|nil the legacy entry, or nil when the row must be dropped
----@return table|nil the type NAMES that resolved, in document order, for the MODEL
---- half to carry. Nil exactly when the entry is nil, so a caller that checks the
---- first return never has to check this one.
-local function buildLegacyEntry(xmlFile, key, title, deps, warnings)
-
-    local translationKey = "rl_disease_" .. title
-    local animalNames = xmlFile:getString(key .. "#animals")
-
-    -- Row-fatal: today `string.split(nil, " ")` raises here, which aborts
-    -- DiseaseManager.new() and leaves g_diseaseManager nil for the whole session.
-    if animalNames == nil then
-        warn(warnings, title, "missing-animals", "no #animals attribute; disease dropped")
-        return nil
-    end
-
-    local animals = {}
-
-    -- The same resolve, collected a second way for the MODEL half. The legacy set
-    -- is keyed by type INDEX because that is what its consumers walk; the model
-    -- half needs NAMES, and the two shapes coexist until the legacy half is torn
-    -- down. Collected HERE rather than re-read inside `buildModelEntry`: a second
-    -- read of the attribute would emit every unknown-name warning a second time
-    -- under a second rule, and resolving once at load keeps the name-to-index hop
-    -- off every later path.
-    local resolvedNames = {}
-
-    -- `ipairs`, not `pairs`, and that is load-bearing rather than tidy: the array
-    -- built below is stored as `model.animals`, whose contract is DOCUMENT ORDER,
-    -- while `pairs` traversal order is undefined. Both runners' splits return a
-    -- contiguous sequence, so the two walk the same tokens.
-    for _, animalName in ipairs(string.split(animalNames, " ")) do
-
-        -- An empty token is skipped rather than resolved. The engine's split
-        -- yields one for a leading, trailing or doubled space while the headless
-        -- one drops it, so without this the two runners emit different warning
-        -- sets for the same file.
-        if animalName ~= "" then
-
-            local typeIndex = deps.animalTypes[animalName]
-
-            -- Today `animals[nil] = true` raises here, with the same blast radius.
-            if typeIndex == nil then
-                warn(warnings, title, "unknown-animal-type",
-                    string.format("animal type %s does not resolve; name skipped",
-                        tostring(animalName)))
-            else
-                animals[typeIndex] = true
-                table.insert(resolvedNames, animalName)
-            end
-
-        end
-
-    end
-
-    -- Row-fatal: a disease bound to no animal type is unreachable, so keeping it
-    -- would put an entry in the registry that nothing can ever match.
-    if #resolvedNames == 0 then
-        warn(warnings, title, "no-animal-types",
-            string.format("no name in '%s' resolves to an animal type; disease dropped",
-                tostring(animalNames)))
-        return nil
-    end
-
-    local prerequisites = readPrerequisites(xmlFile, key .. ".prerequisites", title,
-        "prerequisite-", warnings)
-
-    local probability = {}
-
-    xmlFile:iterate(key .. ".probability.key", function(_, probabilityKey)
-
-        local age = xmlFile:getInt(probabilityKey .. "#age")
-        local value = xmlFile:getFloat(probabilityKey .. "#value")
-
-        -- Today an absent attribute here raises during GAMEPLAY rather than at
-        -- load, in the per-animal probability walk.
-        if age == nil or value == nil then
-            warn(warnings, title, "probability-key-incomplete",
-                string.format("a <probability><key> is missing #age or #value "
-                    .. "(age=%s value=%s); key skipped", tostring(age), tostring(value)))
-            return
-        end
-
-        table.insert(probability, { ["age"] = age, ["value"] = value })
-
-    end)
-
-    local fatality = {}
-
-    xmlFile:iterate(key .. ".fatality.key", function(_, fatalityKey)
-
-        local time = xmlFile:getInt(fatalityKey .. "#time")
-        local value = xmlFile:getFloat(fatalityKey .. "#value")
-
-        if time == nil or value == nil then
-            warn(warnings, title, "fatality-key-incomplete",
-                string.format("a <fatality><key> is missing #time or #value "
-                    .. "(time=%s value=%s); key skipped", tostring(time), tostring(value)))
-            return
-        end
-
-        table.insert(fatality, { ["time"] = time, ["value"] = value })
-
-    end)
-
-    local treatment = {
-        ["cost"] = xmlFile:getFloat(key .. ".treatment#cost"),
-        ["duration"] = xmlFile:getInt(key .. ".treatment#duration")
-    }
-
-    if treatment.cost == nil or treatment.duration == nil then treatment = nil end
-
-    local disease = {
-        ["title"] = title,
-        ["key"] = translationKey,
-        ["name"] = deps.i18n:getText(translationKey),
-        ["animals"] = animals,
-        ["value"] = xmlFile:getFloat(key .. "#value", 1.0),
-        ["transmission"] = xmlFile:getFloat(key .. "#transmission", 0),
-        ["immunity"] = xmlFile:getInt(key .. "#immunity", 12),
-        ["prerequisites"] = prerequisites,
-        ["probability"] = probability,
-        ["fatality"] = fatality,
-        ["output"] = readLegacyOutputs(xmlFile, key .. ".output", title, warnings),
-        ["treatment"] = treatment,
-        ["recovery"] = xmlFile:getFloat(key .. "#recovery")
-    }
-
-    if xmlFile:hasProperty(key .. ".carrier") then
-
-        local carrier = {}
-
-        if xmlFile:hasProperty(key .. ".carrier.output") then
-            -- DELIBERATELY the base key, not the carrier key. See the header:
-            -- this reproduces the shipped defect so the legacy half stays
-            -- byte-equivalent; the model half reads the carrier correctly.
-            carrier.output = readLegacyOutputs(xmlFile, key .. ".output", title, warnings)
-        end
-
-        disease.carrier = carrier
-
-    end
-
-    if xmlFile:hasProperty(key .. ".genetic") then
-
-        -- Row-fatal: the sale-animal pass dereferences `probability[1].value`
-        -- unguarded, so a genetic disease with no probability keys raises there.
-        if #probability == 0 then
-            warn(warnings, title, "genetic-empty-probability",
-                "a <genetic> disease declares no <probability><key>; disease dropped")
-            return nil
-        end
-
-        disease.genetic = {
-            ["recessive"] = xmlFile:getBool(key .. ".genetic#recessive", false),
-            ["dominant"] = xmlFile:getBool(key .. ".genetic#dominant", false),
-            ["saleChance"] = xmlFile:getFloat(key .. ".genetic#saleChance", 0)
-        }
-
-    end
-
-    return disease, resolvedNames
 
 end
 
@@ -676,8 +470,8 @@ local function readModelTreatment(xmlFile, modelKey, model, title, warnings)
         return
     end
 
-    -- The silent arm. See the header: `buildModelEntry` refuses the whole model
-    -- half for a `cureOnly` that ends up with no treatment, and this is one of the
+    -- The silent arm. See the header: `buildModelEntry` refuses the whole disease
+    -- for a `cureOnly` that ends up with no treatment, and this is one of the
     -- three shapes that reaches it.
     if model.endpoint == RECORD_ENDPOINT.cureOnly and outcome == "relief" then
         return
@@ -735,38 +529,89 @@ local function readModelTreatment(xmlFile, modelKey, model, title, warnings)
 end
 
 
---- Build the MODEL entry for one disease, or nil where the model half is skipped.
+--- Build the registry entry for one disease, or nil where the disease is dropped.
 ---
---- A refusal here costs the disease only its MODEL half; its legacy entry is built
---- by the caller and survives regardless.
+--- EVERY nil return here drops the whole disease. The animal rules run FIRST, so a
+--- row with neither a usable `#animals` nor a `<model>` reports the animal defect
+--- rather than the missing model - a disease bound to no type is unreachable
+--- whatever its model would have said.
+---
+--- The entry carries its own identity (`title`, `key`, `name`) so that nothing
+--- downstream needs a second table to render or persist a record.
 ---@param xmlFile table open XMLFile document
 ---@param key string this disease's element key
 ---@param title string resolved, non-empty title
----@param animalTypeNames table the type NAMES that resolved for this disease, from
---- `buildLegacyEntry`. Stored verbatim as `model.animals` - never re-read from the
---- attribute here, and never uppercased, since the resolve that produced it already
---- required the authored casing.
+---@param deps table `{ animalTypes = <name-to-index map>, i18n = <text resolver> }`
 ---@param warnings table the accumulator
----@return table|nil the model entry, or nil where absent or refused
-local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
+---@return table|nil the registry entry, or nil when the disease must be dropped
+local function buildModelEntry(xmlFile, key, title, deps, warnings)
+
+    local translationKey = "rl_disease_" .. title
+    local animalNames = xmlFile:getString(key .. "#animals")
+
+    -- Row-fatal: without this attribute `string.split(nil, " ")` raises, which
+    -- aborts DiseaseManager.new() and leaves g_diseaseManager nil for the session.
+    if animalNames == nil then
+        warn(warnings, title, "missing-animals", "no #animals attribute; disease dropped")
+        return nil
+    end
+
+    -- `ipairs`, not `pairs`, and that is load-bearing rather than tidy: the array
+    -- built below is stored as `model.animals`, whose contract is DOCUMENT ORDER,
+    -- while `pairs` traversal order is undefined. Both runners' splits return a
+    -- contiguous sequence, so the two walk the same tokens.
+    local animals = {}
+
+    for _, animalName in ipairs(string.split(animalNames, " ")) do
+
+        -- An empty token is skipped rather than resolved. The engine's split
+        -- yields one for a leading, trailing or doubled space while the headless
+        -- one drops it, so without this the two runners emit different warning
+        -- sets for the same file.
+        if animalName ~= "" then
+
+            -- Resolved for its SIDE EFFECT of validating the name: the entry
+            -- stores NAMES, because its consumers are pure modules that may not
+            -- reach the animal-type registry. Warns once per unresolvable
+            -- OCCURRENCE, so `animals="FOO FOO"` warns twice.
+            if deps.animalTypes[animalName] == nil then
+                warn(warnings, title, "unknown-animal-type",
+                    string.format("animal type %s does not resolve; name skipped",
+                        tostring(animalName)))
+            else
+                table.insert(animals, animalName)
+            end
+
+        end
+
+    end
+
+    -- Row-fatal: a disease bound to no animal type is unreachable, so keeping it
+    -- would put an entry in the registry that nothing can ever match.
+    if #animals == 0 then
+        warn(warnings, title, "no-animal-types",
+            string.format("no name in '%s' resolves to an animal type; disease dropped",
+                tostring(animalNames)))
+        return nil
+    end
 
     local modelKey = key .. ".model"
 
-    -- A file mid-migration must still load: no <model> is not a defect.
+    -- Row-fatal. One format, all or nothing: the legacy engine that could have run
+    -- a model-less disease is gone, so a row with no <model> describes nothing any
+    -- consumer can read.
     if not xmlFile:hasProperty(modelKey) then
-        Log:trace("RLDiseaseDefinition: %s carries no <model> block, legacy half only",
-            tostring(title))
+        warn(warnings, title, "missing-model",
+            "no <model> block; the definition file carries one format and a disease "
+                .. "must be fully expressed in it; disease dropped")
         return nil
     end
 
     local model = {
-        -- The affected type NAMES, threaded from the legacy resolve rather than
-        -- re-read here. The shedding bound a chronic disease needs is the
-        -- shortest-lived affected species, and its consumer is a pure module that
-        -- may not reach the animal-type registry - so the resolve stays where it
-        -- already happens, at LOAD, and the model carries the result. The legacy
-        -- half's own set stays INDEX-keyed; the two shapes coexist until it goes.
-        ["animals"] = animalTypeNames,
+        ["title"] = title,
+        ["key"] = translationKey,
+        ["name"] = deps.i18n:getText(translationKey),
+        ["animals"] = animals,
         ["archetype"] = xmlFile:getString(modelKey .. "#archetype"),
         ["endpoint"] = xmlFile:getString(modelKey .. "#endpoint"),
         ["cullRequired"] = xmlFile:getBool(modelKey .. "#cullRequired"),
@@ -788,7 +633,7 @@ local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
             -- an attribute that is in the file.
             warn(warnings, title, "model-missing-scalar",
                 string.format("<model> is missing or refused required attribute #%s; "
-                    .. "model half skipped", field))
+                    .. "disease dropped", field))
             return nil
         end
     end
@@ -807,7 +652,7 @@ local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
     if ENDPOINTS[model.endpoint] == nil then
         warn(warnings, title, "model-unknown-endpoint",
             string.format("endpoint %s is not one of recovers/terminal/lifelong/"
-                .. "cureOnly; model half skipped", tostring(model.endpoint)))
+                .. "cureOnly; disease dropped", tostring(model.endpoint)))
         return nil
     end
 
@@ -849,7 +694,7 @@ local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
                 -- refused, `readNonNegative` has already said why.
                 warn(warnings, title, "model-endpoint-duration-mismatch",
                     string.format("endpoint %s requires a usable #%s, which is "
-                        .. "missing or refused; model half skipped",
+                        .. "missing or refused; disease dropped",
                         tostring(model.endpoint), attribute))
                 return nil
             end
@@ -860,7 +705,7 @@ local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
 
             warn(warnings, title, "model-endpoint-duration-mismatch",
                 string.format("endpoint %s forbids #%s, which is declared; "
-                    .. "model half skipped", tostring(model.endpoint), attribute))
+                    .. "disease dropped", tostring(model.endpoint), attribute))
             return nil
 
         end
@@ -885,9 +730,9 @@ local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
             return
         end
 
-        -- The legacy age-banded consumer walks its curve assuming ascending age,
-        -- so an out-of-order pair silently selects the wrong band. A DUPLICATE age
-        -- is deliberately NOT flagged: two rows at one age resolve to a hard step
+        -- The age-banded consumer walks its curve assuming ascending age, so an
+        -- out-of-order pair silently selects the wrong band. A DUPLICATE age is
+        -- deliberately NOT flagged: two rows at one age resolve to a hard step
         -- rather than an interpolation, which is a deliberate authoring idiom.
         if lastAge ~= nil and ageMonths < lastAge then
             warn(warnings, title, "infection-keys-unordered",
@@ -905,7 +750,7 @@ local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
 
     readModelTreatment(xmlFile, modelKey, model, title, warnings)
 
-    -- MODEL-local, and it cannot live inside `readModelTreatment`: that function
+    -- ROW-FATAL, and it cannot live inside `readModelTreatment`: that function
     -- early-returns when `<treatment>` is absent, so a `cureOnly` model carrying no
     -- block at all never reaches a single line of it. Testing the ASSIGNED field
     -- here instead catches all three failing shapes with one predicate, because
@@ -913,9 +758,9 @@ local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
     -- a block refused for its months / cost / efficacy, and a block declaring
     -- `relief` (which returns silently for exactly this reason).
     --
-    -- Refusing the whole model half is the right severity: the endpoint says the
-    -- infection ends only through a completed cure, so without one it never ends
-    -- at all and the model describes an animal nothing can ever help.
+    -- Dropping the disease is the right severity: the endpoint says the infection
+    -- ends only through a completed cure, so without one it never ends at all and
+    -- the model describes an animal nothing can ever help.
     -- Tests the assigned RESULT, not the outcome attribute, and that is the spec's
     -- prescribed shape rather than an accident. A second clause reading
     -- `model.treatment.outcome ~= "cure"` was written here at code review and
@@ -928,7 +773,7 @@ local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
     if model.endpoint == RECORD_ENDPOINT.cureOnly and model.treatment == nil then
         warn(warnings, title, "endpoint-requires-curative-treatment",
             "endpoint cureOnly requires a <treatment outcome=\"cure\">, and none was "
-                .. "usable; model half skipped")
+                .. "usable; disease dropped")
         return nil
     end
 
@@ -943,20 +788,18 @@ local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
     if xmlFile:hasProperty(modelKey .. ".carrier") then
 
         -- The carrier profile is read against the CARRIER key by the same helper
-        -- the base effects use. This is the carrier repair, and it lives only on
-        -- this half.
+        -- the base effects use.
         model.carrier = {
             ["output"] = readModelOutputs(xmlFile, modelKey .. ".carrier.effects",
                 title, warnings)
         }
 
-        -- A carrier that declares itself and then resolves to nothing is the same
-        -- silent-empty-table failure this half exists to repair, one level down -
-        -- and the usual cause is putting <output> directly under <carrier> instead
-        -- of inside its <effects> wrapper. Nothing downstream can tell that apart
-        -- from a carrier with no production effect, and the wrapper's confirming
-        -- DEBUG line is gated on a non-empty profile, so without this it is
-        -- invisible.
+        -- A carrier that declares itself and then resolves to nothing is a silent
+        -- empty table - and the usual cause is putting <output> directly under
+        -- <carrier> instead of inside its <effects> wrapper. Nothing downstream can
+        -- tell that apart from a carrier with no production effect, and the
+        -- wrapper's confirming DEBUG line is gated on a non-empty profile, so
+        -- without this it is invisible.
         if next(model.carrier.output) == nil then
             warn(warnings, title, "carrier-empty-profile",
                 "<model><carrier> declares no usable output; check that <output> sits "
@@ -973,8 +816,8 @@ local function buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
 end
 
 
---- Parse the disease definition document into the legacy list, the model map and
---- the authoring warnings.
+--- Parse the disease definition document into the registry and the authoring
+--- warnings.
 ---
 --- Never raises for any DOCUMENT, however malformed - which is what lets the
 --- wrapper call it without a `pcall`. A definition file is authored inside the mod
@@ -991,28 +834,27 @@ end
 ---@param deps table `{ animalTypes = <name-to-index map>, i18n = <text resolver> }`.
 --- Injected, never read from the environment - a module-load read of either is the
 --- load-order trap that reads populated headless and empty in-game.
----@return table legacy array of legacy type entries, in document order
----@return table models map of title to model entry, for the diseases that carry one
+---@return table registry map of title to disease entry. A MAP, not an array: use
+--- `next(registry) == nil` for emptiness and a walk for a count, never `#`.
 ---@return table warnings array of `{ title, rule, detail }`, in document order
 function RLDiseaseDefinition.parse(xmlFile, deps)
 
-    local legacy = {}
-    local models = {}
+    local registry = {}
     local warnings = {}
     local seenTitles = {}
 
     if xmlFile == nil then
         warn(warnings, nil, "no-definition-file",
             "the disease definition file is absent; no disease is defined")
-        return legacy, models, warnings
+        return registry, warnings
     end
 
     xmlFile:iterate("diseases.disease", function(_, key)
 
         local title = xmlFile:getString(key .. "#title")
 
-        -- Row-fatal, and it mirrors resolveRecordType's own predicate so the two
-        -- halves of the registry agree on what a usable title is.
+        -- Row-fatal, and it mirrors resolveRecordType's own predicate so the
+        -- registry and its readers agree on what a usable title is.
         if title == nil or title == "" then
             warn(warnings, nil, "missing-title",
                 string.format("a <disease> has no usable #title (got %s); disease dropped",
@@ -1020,11 +862,8 @@ function RLDiseaseDefinition.parse(xmlFile, deps)
             return
         end
 
-        -- First wins, matching getDiseaseByTitle's existing linear scan, so the
-        -- legacy array and the models map resolve a duplicate the same way. The
-        -- title is reserved only once a row actually BUILDS: a dropped first row
-        -- holds no place, or a malformed one would suppress a valid successor and
-        -- the title would resolve to nothing at all.
+        -- First wins, matching the lookup's own contract. The title is reserved
+        -- only once a row actually BUILDS - see below.
         if seenTitles[title] then
             warn(warnings, title, "duplicate-title",
                 "a later <disease> repeats this title; the first definition wins and "
@@ -1032,28 +871,28 @@ function RLDiseaseDefinition.parse(xmlFile, deps)
             return
         end
 
-        local entry, animalTypeNames = buildLegacyEntry(xmlFile, key, title, deps, warnings)
+        local entry = buildModelEntry(xmlFile, key, title, deps, warnings)
 
         if entry == nil then return end
 
+        -- The reservation sits BELOW the build deliberately: a dropped first row
+        -- holds no place, so a duplicate title behind a dropped row wins rather
+        -- than being suppressed by a definition that is not in the registry.
         seenTitles[title] = true
-        table.insert(legacy, entry)
+        registry[title] = entry
 
-        local model = buildModelEntry(xmlFile, key, title, animalTypeNames, warnings)
-
-        if model ~= nil then models[title] = model end
-
-        Log:trace("RLDiseaseDefinition: parsed %s (model=%s)",
-            tostring(title), tostring(model ~= nil))
+        Log:trace("RLDiseaseDefinition: parsed %s", tostring(title))
 
     end)
 
-    if #legacy == 0 then
+    -- `next`, never `#`: the registry is a map and `#` on a map is always 0, so a
+    -- length test here would emit this warning on every successful load.
+    if next(registry) == nil then
         warn(warnings, nil, "no-diseases",
             "the definition file defines no usable disease; the registry is empty")
     end
 
-    return legacy, models, warnings
+    return registry, warnings
 
 end
 

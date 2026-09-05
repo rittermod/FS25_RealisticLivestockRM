@@ -543,7 +543,7 @@
 
         <text name="rl_disease_ped" text="Diarrhée épidémique porcine"/>
 
-        <text name="rl_disease_avianFlu" text="Grippe aviaire"/>
+        <text name="rl_disease_avianFluLPAI" text="Grippe aviaire (LPAI)"/>
 
 
 

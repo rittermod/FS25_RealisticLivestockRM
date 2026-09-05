@@ -14,7 +14,7 @@ Realistic Livestock RM includes five diseases that can infect, spread between, a
 | **CVM** | Cow only | Genetic | Almost always (calves) | No | Moderate reduction |
 | **Foot & Mouth** | Cow, Sheep, Goat, Pig | High | Yes | Yes ($250/mo) | Major reduction |
 | **PED** | Pig only | Low | Devastating to newborns | Yes ($150) | Significant reduction |
-| **Avian Influenza** | Chicken only | Limited | Yes, high fatality | No | Severe reduction |
+| **Avian Flu (LPAI)** | Chicken only | Limited | Yes, high fatality | No | Severe reduction |
 
 ---
 
@@ -239,9 +239,11 @@ With pig litters of 11-16 piglets, a PED outbreak in a maternity pen can kill mo
 
 ---
 
-## Avian Influenza (Bird Flu)
+## Avian Flu (LPAI)
 
 **Affects:** Chickens only
+
+LPAI is short for low-pathogenic avian influenza - the milder, survivable strain.
 
 Avian Flu has **no treatment**. Infected chickens stop producing eggs entirely and have a high fatality rate. It is less contagious than its reputation suggests: a bird recovers after about a month, so an outbreak normally burns out instead of sweeping the coop. The danger is the fatality, not the spread.
 

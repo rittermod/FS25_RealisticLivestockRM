@@ -514,7 +514,7 @@
 
         <text name="rl_disease_ped" text="猪流行性腹泻"/>
 
-        <text name="rl_disease_avianFlu" text="禽流感"/>
+        <text name="rl_disease_avianFluLPAI" text="禽流感 (LPAI)"/>
 
 
 

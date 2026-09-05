@@ -515,7 +515,7 @@
 
         <text name="rl_disease_ped" text="Diarrea epidemica suina"/>
 
-        <text name="rl_disease_avianFlu" text="Influenza aviaria"/>
+        <text name="rl_disease_avianFluLPAI" text="Influenza aviaria (LPAI)"/>
 
         <!-- MESSAGES -->
 

@@ -9,12 +9,13 @@ function DiseaseManager.new()
 
     local self = setmetatable({}, diseaseManager_mt)
 
-	self.diseases = {}
 	-- Initialised ABOVE the loader call. loadDiseases assigns it unconditionally,
 	-- so this is a guard against a future edit that stops doing so rather than a
 	-- value anything reads today - but an init placed BELOW the call would clobber
-	-- the parsed table with an empty one, and no test would see it.
-	self.diseaseModels = {}
+	-- the parsed registry with an empty one, and no test would see it.
+	--
+	-- A title-keyed MAP, not an array: `#` on it is always 0.
+	self.diseases = {}
 	self.diseasesEnabled = true
 	self.diseasesChance = 1
 
@@ -25,11 +26,10 @@ function DiseaseManager.new()
 end
 
 
---- Load the disease definition file into the legacy registry and the model map.
+--- Load the disease definition file into the registry.
 ---
---- Runs from `new()`, which the mod re-runs on every map load, so both tables are
---- rebuilt from the archive each time and neither can carry a previous save's
---- contents.
+--- Runs from `new()`, which the mod re-runs on every map load, so the registry is
+--- rebuilt from the archive each time and cannot carry a previous save's contents.
 ---
 --- The single emission point for the parser's authoring warnings: the parse
 --- RETURNS them rather than logging them, so each rule stays assertable without a
@@ -39,8 +39,7 @@ end
 function DiseaseManager:loadDiseases()
 
     -- Thin wrapper: open, parse, assign, log, delete. The parse itself lives in
-    -- RLDiseaseDefinition so both halves of the registry are built in one place
-    -- and a later teardown deletes a branch rather than untangling one.
+    -- RLDiseaseDefinition, so this function owns no schema knowledge at all.
     --
     -- Deliberately NO pcall around parse. Its contract is that it does not raise
     -- for any input, so a raise here is a wiring bug that must crash loudly
@@ -51,13 +50,12 @@ function DiseaseManager:loadDiseases()
     -- function the SINGLE emission point for the whole vocabulary.
     local xmlFile = XMLFile.loadIfExists("diseases", modDirectory .. "xml/diseases.xml")
 
-    local legacy, models, warnings = RLDiseaseDefinition.parse(xmlFile, {
+    local registry, warnings = RLDiseaseDefinition.parse(xmlFile, {
         ["animalTypes"] = AnimalType,
         ["i18n"] = g_i18n
     })
 
-    self.diseases = legacy
-    self.diseaseModels = models
+    self.diseases = registry
 
     -- Every value goes through %s + tostring(): the headless harness formats with
     -- a bare string.format and RAISES where the in-game logger degrades, so a
@@ -70,11 +68,13 @@ function DiseaseManager:loadDiseases()
             tostring(authoringWarning.detail))
     end
 
-    local modelCount = 0
+    -- Counted by WALKING, never with `#`: the registry is a title-keyed map and
+    -- `#` on a map is always 0, so a length here would report every load as empty.
+    local diseaseCount = 0
     local titles = {}
 
-    for title in pairs(models) do
-        modelCount = modelCount + 1
+    for title in pairs(registry) do
+        diseaseCount = diseaseCount + 1
         table.insert(titles, title)
     end
 
@@ -86,7 +86,7 @@ function DiseaseManager:loadDiseases()
 
     for _, title in ipairs(titles) do
 
-        local model = models[title]
+        local model = registry[title]
 
         if model.carrier ~= nil and next(model.carrier.output) ~= nil then
 
@@ -109,21 +109,31 @@ function DiseaseManager:loadDiseases()
 
     end
 
-    Log:info("loadDiseases: %s disease(s) defined, %s with a model block, %s authoring warning(s)",
-        tostring(#legacy), tostring(modelCount), tostring(#warnings))
+    -- One count, not two: with a single format there is no "N of which carry a
+    -- model block" to report - a disease is in the registry only if its model built.
+    Log:info("loadDiseases: %s disease(s) defined, %s authoring warning(s)",
+        tostring(diseaseCount), tostring(#warnings))
 
     if xmlFile ~= nil then xmlFile:delete() end
 
 end
 
 
+--- Resolve a title to its registry entry.
+---
+--- A direct lookup: the registry is keyed by title, so the linear scan this
+--- replaced is gone along with the array it walked.
+---
+--- Returns the registry's own entry table, or nil - NEVER `false`. Both stream
+--- call sites fold the result through an `and`/`or` chain that would turn a false
+--- into nil, so the two outcomes must stay distinguishable by nilness alone. A nil
+--- or empty title is a legal read that returns nil, which is what lets
+--- `resolveRecordType`'s guard above it keep working unchanged.
+---@param title string|nil the title as persisted, transmitted or authored
+---@return table|nil the registry entry, or nil when the title is not defined
 function DiseaseManager:getDiseaseByTitle(title)
 
-	for _, disease in pairs(self.diseases) do
-		if disease.title == title then return disease end
-	end
-
-	return nil
+	return self.diseases[title]
 
 end
 

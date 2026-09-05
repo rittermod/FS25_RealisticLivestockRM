@@ -474,7 +474,7 @@
 
         <text name="rl_disease_ped" text="Епідемічна діарея свиней"/>
 
-        <text name="rl_disease_avianFlu" text="Пташиний грип"/>
+        <text name="rl_disease_avianFluLPAI" text="Пташиний грип (LPAI)"/>
 
 
 

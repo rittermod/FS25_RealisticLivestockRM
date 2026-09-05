@@ -543,7 +543,7 @@
 
         <text name="rl_disease_ped" text="Sertés járványos hasmenése (PED)"/>
 
-        <text name="rl_disease_avianFlu" text="Madárinfluenza"/>
+        <text name="rl_disease_avianFluLPAI" text="Madárinfluenza (LPAI)"/>
 
 
 

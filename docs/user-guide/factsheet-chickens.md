@@ -35,7 +35,7 @@ Hens lay eggs regardless of whether a rooster is present - a rooster is only nee
 | 60 mo | 1 - 5 |
 | 72+ mo | 0 |
 
-*Egg production peaks at 12 months and holds steady until 48 months, then declines to zero by 72 months (6 years). Genetics cause large variation between individual hens. Avian Influenza stops ALL egg production.*
+*Egg production peaks at 12 months and holds steady until 48 months, then declines to zero by 72 months (6 years). Genetics cause large variation between individual hens. Avian Flu (LPAI) stops ALL egg production.*
 
 ```mermaid
 %%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#e65100"}}}}%%
@@ -68,7 +68,7 @@ Chicken prices are low and identical for hens and roosters:
 | Quality genetics | Better genetics -> noticeably higher price |
 | Weight | Well-fed birds near target weight are worth more |
 | Health | Healthy birds sell for more |
-| Avian Influenza | Drastically reduces price |
+| Avian Flu (LPAI) | Drastically reduces price |
 
 ---
 
@@ -141,7 +141,7 @@ A successful hatch is typically around 5 chicks, and can reach up to 12 from a h
 
 | Disease | Spread | Fatal? | Treatment | Impact |
 |---------|--------|--------|-----------|--------|
-| **Avian Influenza** | Rapidly | Yes, high fatality | **None** | Stops ALL egg production, severe price loss |
+| **Avian Flu (LPAI)** | Rapidly | Yes, high fatality | **None** | Stops ALL egg production, severe price loss |
 
 > **Avian Flu is untreatable.** It spreads fast, kills many infected birds, and completely stops egg production. Infected chickens that survive gain immunity for about two years, but an outbreak can devastate a flock. See the [Disease Guide](guide-diseases.md).
 

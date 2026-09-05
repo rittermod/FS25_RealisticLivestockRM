@@ -539,7 +539,7 @@
         <text name="rl_disease_cvm" text="CVM"/>
         <text name="rl_disease_footAndMouth" text="Şap Hastalığı"/>
         <text name="rl_disease_ped" text="Domuz Epidemik İshali"/>
-        <text name="rl_disease_avianFlu" text="Kuş Gribi"/>
+        <text name="rl_disease_avianFluLPAI" text="Kuş Gribi (LPAI)"/>
 
 
 

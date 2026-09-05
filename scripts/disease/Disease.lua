@@ -130,34 +130,54 @@ function Disease:affectReproduction(child, otherParent)
 end
 
 
---- Scale a sale price by this record's configured multiplier.
+--- Refuse to scale a sale price: the legacy multiplier is switched off for the SEIR
+--- switchover, so a diseased animal sells for the undiseased price.
 ---
---- Gated on `diseasesEnabled` ALONE, deliberately. The sibling `modifyOutput` also tests
---- `cured`, and matching it here would be a latent sell-price change that outlives the
---- switchover for no benefit now - under the lock nothing reaches this arm anyway. The
---- symptomatic shaping of both functions belongs to the record slice.
+--- Dereferences NO `self.type` field, and that is the point rather than tidiness. The
+--- registry entry this record's type now points at is a MODEL entry carrying
+--- `salePrice`, not the legacy `value`, so the old body would not degrade to nil - it
+--- would RAISE. B0.2b owns the real repoint onto `model.salePrice`.
 ---
---- No TRACE here, and that is not an oversight: Lua evaluates a log call's arguments before
---- the logger tests the level, and this runs per record per `getSellPrice`.
+--- Unconditional rather than keyed on `diseasesEnabled`, matching the sibling refusals:
+--- the setting is forced off beside them but stays writable, so the two mechanisms fail
+--- in OPPOSITE directions and only this one still holds once something turns the setting
+--- back on.
+---
+--- The TRACE passes no FORMAT arguments, deliberately. Lua evaluates a log call's
+--- arguments before the logger tests the level, and this runs per record per
+--- `getSellPrice`; a bare message has nothing to evaluate, so the diagnostic costs a
+--- level test rather than a `tostring` per record per price read.
 ---@param value number The undiseased price.
----@return number The price after this record's multiplier, or `value` unchanged while the
----        engine is off.
+---@return number `value`, always and unconditionally.
 function Disease:modifyValue(value)
 
-	if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled then return value end
+	Log:trace("Disease:modifyValue: refused, reason=legacy engine off")
 
-	return value * self.type.value
+	return value
 
 end
 
 
+--- Refuse to scale a production output: the legacy multiplier is switched off for the
+--- SEIR switchover, so a diseased animal produces at its undiseased rate.
+---
+--- Dereferences NO `self.type` field, and here that closes something worse than a raise.
+--- The old body read `self.type.carrier.output[type]`, and a model entry writes
+--- `carrier = { output = ... }` with cvm at `milk = 1.5` - the path shapes are
+--- IDENTICAL. So against the new registry a cvm carrier would SILENTLY collect the +50%
+--- milk that has never applied in any shipped build, which is a balance grant no raise
+--- and no red assert would surface. B0.2b owns the real repoint onto
+--- `model.effects.output`.
+---
+--- Unconditional, for the same fail-closed reason as `modifyValue` above.
+---@param type any The fill type being produced. Unread.
+---@param value number The undiseased output.
+---@return number `value`, always and unconditionally.
 function Disease:modifyOutput(type, value)
 
-	if self.cured or not g_diseaseManager.diseasesEnabled then return value end
+	Log:trace("Disease:modifyOutput: refused, reason=legacy engine off")
 
-	if self.isCarrier and self.type.carrier ~= nil and self.type.carrier.output ~= nil then return value * (self.type.carrier.output[type] or 1) end
-
-	return value * (self.type.output[type] or 1)
+	return value
 
 end
 
