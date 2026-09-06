@@ -280,40 +280,42 @@ end
 
 --- Collect the contagious disease sources across a pen.
 ---
---- A record contributes when its type transmits AND the record is not cured, or is
---- a genetic carrier - an asymptomatic shedder is still shedding. A dead animal is
---- skipped whole: a corpse does not shed, and it remains in the array until the
---- pending cluster removal runs.
+--- INERT, and the body below says why: the gate it applies per record reads a key the shipped
+--- model entry does not carry, so the walk reaches its `continue` for every record and the
+--- function returns an empty source set for any input. Left standing rather than deleted
+--- because an empty set is the correct inert behaviour while the SEIR pipeline has no caller,
+--- and because deleting it would move a test matrix that is not this slice's.
 ---
---- Deliberately NOT the display predicate. The list surfaces and the saveable-filter
---- catalog ask "should a player see this animal as sick" and exclude carriers; this
---- asks "is this animal shedding" and includes them. Folding the two into one shared
---- helper silently stops carriers transmitting.
+--- It has NO production caller: what remains reaches it from the test tier only, which is what
+--- pins the inert contract described above. The slice that wires spread replaces the whole body
+--- with a delegation to `RLDiseaseSpread`, which already owns the shedding question and answers
+--- it from the record's STATE - re-implementing that rule here instead would make this a further
+--- predicate over the same records, which is the repair this codebase refuses.
+---
+--- Deliberately NOT the display predicate. The list surfaces and the saveable-filter catalog
+--- ask "should a player see this animal as sick"; this asks "is this animal shedding". Folding
+--- the two into one shared helper is what the separation exists to prevent.
 --- @see RLFilterFieldCatalog.FIELDS hasAnyDisease
 --- @see Animal.getHasAnyDisease
 ---
---- Call it with the DOT form. DiseaseManager carries a Class() metatable, so a colon
---- call resolves and passes the manager itself as `animals`; the walk then reaches a
---- scalar field and RAISES on `animal.isDead`. Loud rather than silent - but the pen's
---- period tick runs inside a safe-call that swallows the raise, so the mistake still
---- costs a tick.
+--- Call it with the DOT form. DiseaseManager carries a Class() metatable, so a colon call
+--- resolves and passes the manager itself as `animals`; the walk then reaches a scalar field
+--- and RAISES on `animal.isDead`. Loud rather than silent - and with no production caller left
+--- the blast radius is now a test run rather than a pen's period tick.
 ---
---- The sole production caller is `snapshotTransmission`, and the blast radius of a raise
---- here is wider than it looks: the pen takes that snapshot ABOVE its per-animal loop, so
---- a raise abandons disease progression and the treatment charge for that pen that period,
---- not just the transmission pass. `type` is read unguarded on purpose: the reachable
---- producer of a nil one - a savegame or a join snapshot naming a title the registry no
---- longer carries - is refused at the reconstruction paths instead, so no record here can
---- carry one.
+--- `model` is read unguarded on purpose: the reachable producer of a nil one - a savegame or a
+--- join snapshot naming a title the registry no longer carries - is refused at the
+--- reconstruction paths instead, so no record reaching this walk can carry one.
 --- @see DiseaseManager.resolveRecordType
 ---
 ---@param animals table|nil the pen's animals; nil yields no sources rather than raising
----@return table sources keyed by disease title -> { type = <type table>, amount = <integer> }; ALWAYS a table
----@return boolean hasSources true when at least one record was counted
+---@return table sources keyed by disease title -> { type = <model entry>, amount = <integer> }; ALWAYS a table, and ALWAYS empty while the gate below is unsatisfiable
+---@return boolean hasSources true when at least one record was counted; always false today
 ---@return table stats { curedSkipped, deadSkipped, animals } - tallies the caller cannot recover
---- without re-walking. The two skip counters are DIFFERENT UNITS and must be rendered as such:
---- `curedSkipped` counts RECORDS (one animal can contribute several), while `deadSkipped` counts
---- ANIMALS, because a corpse is skipped whole before its records are read.
+--- without re-walking. The two skip counters are DIFFERENT UNITS: `curedSkipped` counts RECORDS
+--- (one animal can contribute several) and `deadSkipped` counts ANIMALS, because a corpse is
+--- skipped whole before its records are read. `curedSkipped` can no longer move at all - the
+--- transition that fed it went with the legacy progression engine - so it reports a real zero.
 function DiseaseManager.collectTransmissionSources(animals)
 
 	local sources = {}
@@ -360,9 +362,10 @@ function DiseaseManager.collectTransmissionSources(animals)
 			-- different name and no `transmission` key at all - so the walk reaches this
 			-- `continue` for every record of every animal and the collector returns empty.
 			--
-			-- Left standing rather than removed because the pen tick still calls this, and a
-			-- body that returns an empty source set is the correct inert behaviour while the
-			-- SEIR pipeline has no caller. The slice that wires spread replaces the whole
+			-- Left standing rather than removed even though the pen tick no longer calls this
+			-- at all: an empty source set is the correct inert behaviour while the SEIR
+			-- pipeline has no caller, and deleting the function would move a test matrix that
+			-- pins exactly that contract. The slice that wires spread replaces the whole
 			-- function with a delegation to the spread module, which already owns the shedding
 			-- question and answers it from the record's STATE.
 			if model.transmission == nil or model.transmission <= 0 then continue end
@@ -386,70 +389,39 @@ function DiseaseManager.collectTransmissionSources(animals)
 end
 
 
---- Take a pen's contagious-source snapshot, for a caller that must roll the susceptibles
---- LATER in the same tick.
----
---- The pen's period tick advances every disease record before it rolls transmission, and
---- the collector skips resolved records and dead animals whole - so a snapshot taken after
---- progression has already dropped every infection that resolved during it. The animal was
---- contagious for the whole month and shed to nobody. Snapshotting ahead of the progression
---- loop and handing the result to `calculateTransmission` restores that month.
----
---- Carries the SAME `diseasesEnabled` guard as `calculateTransmission`, deliberately. This is the
---- SOLE production caller of the collector - `calculateTransmission` reaches it only through here -
---- so an unguarded path at this level is what a player who toggled diseases off would fall through.
----
---- Calls the collector in the DOT form, from inside the manager, which is what stops any
---- caller becoming its first production colon-caller - see the call-shape warning on
---- `collectTransmissionSources`.
----
---- `penName` is DISPLAY-ONLY and carries the same weight it does on `calculateTransmission`: these
---- lines report per-pen facts, and a multi-pen save otherwise emits a stream of them with nothing
---- to attribute them to.
----@param animals table|nil the pen's animals; nil yields an empty snapshot rather than raising
----@param penName string|nil the husbandry's display name, for log attribution only
----@return table|nil snapshot `{ sources = <table>, hasSources = <boolean>, stats = <table> }`
---- carrying the collector's three return values verbatim, or nil when diseases are disabled
-function DiseaseManager:snapshotTransmission(animals, penName)
-
-	if not self.diseasesEnabled then
-
-		Log:trace("snapshotTransmission [%s]: no snapshot, reason=diseases disabled", tostring(penName))
-
-		return nil
-
-	end
-
-	local sources, hasSources, stats = DiseaseManager.collectTransmissionSources(animals)
-
-	Log:trace("snapshotTransmission [%s]: %s animal(s), hasSources=%s (skipped %s cured record(s), %s dead animal(s))",
-		tostring(penName), tostring(stats.animals), tostring(hasSources),
-		tostring(stats.curedSkipped), tostring(stats.deadSkipped))
-
-	return { sources = sources, hasSources = hasSources, stats = stats }
-
-end
-
-
 --- Refuse one pen's transmission pass: the legacy engine is switched off for the switchover,
 --- so no animal catches anything from a pen mate until the SEIR spread pass lands.
 ---
---- Only the APPLY half is stubbed. `snapshotTransmission` is left alone because it is the
---- collector the SEIR spread pass reuses, NOT because it keeps producing evidence: it carries
---- its own `diseasesEnabled` guard and returns nil before reaching the collector, so under the
---- lock nothing is gathered and the pen tick logs only that it skipped. The `title=amount`
---- source summary went with this function's body. There is therefore no per-pen transmission
---- observability during the switchover window, at any log level - state that plainly rather
---- than implying the collector still reports, because the next reader will look for a line
---- that is not there.
+--- THE ONLY ENTRY POINT to the transmission pass, called once per pen from the period tick,
+--- ABOVE that tick's per-animal progression loop.
 ---
---- `penName` stays DISPLAY-ONLY and stays nil-tolerant: it is what attributes the line to a
---- pen on a multi-pen save, and a missing name must degrade the line rather than the pass.
+--- **NOTHING ON THE TRANSMISSION TICK PATH READS THE PLAYER'S DISEASE SETTING ANY MORE, and that
+--- is deliberate rather than an oversight.** The `diseasesEnabled` refusal sat on the collect half,
+--- which is no longer called from the tick; this body is a single trace that falls off the end, so
+--- it has no refusal statement of its own to inherit it. Scope that claim to THIS path and no
+--- wider: other gameplay surfaces still gate on the setting, `RLFilterFieldCatalog`'s
+--- `hasAnyDisease` getter and `Animal.getHasAnyDisease` among them, and the herdsman planner
+--- evaluates the first of those to decide what it autonomously sells.
+---
+--- **What makes the gap safe is that this body is a STUB, not that the setting is unreachable.**
+--- The settings lock refuses an interactive change but explicitly does not refuse a programmatic
+--- `applyChange`, so the flag can still read true at runtime. The slice that re-arms this pass must
+--- therefore ADD a guard here, not restore one - there is no statement left to move back, and
+--- giving this function a body behind an unguarded entry point is exactly the order that would
+--- spread with the player's setting off.
+--- @see RLSettings.applyChange
+---
+--- The `title=amount` per-pen SOURCE summary went with this function's body, and the collect half
+--- no longer runs on the tick, so nothing reports WHICH titles are shedding or how many animals
+--- were scanned. Tick-level evidence does survive: the pen tick emits a pen-named TRACE on its
+--- transmission-on arm, and this function emits its own pen-named refusal TRACE. State the gap at
+--- that precision, or the next reader hunts for a per-title line that was never going to be there.
+---
+--- `penName` is DISPLAY-ONLY and stays nil-tolerant: it is what attributes the line to a pen on
+--- a multi-pen save, and a missing name must degrade the line rather than the pass.
 ---@param animals table the pen's animals. Unread while the engine is off.
 ---@param penName string|nil the husbandry's display name, for log attribution only
----@param snapshot table|nil a record from `DiseaseManager:snapshotTransmission`. Unread while
----        the engine is off; the parameter stays so the pen tick's call site is unchanged.
-function DiseaseManager:calculateTransmission(animals, penName, snapshot)
+function DiseaseManager:calculateTransmission(animals, penName)
 
 	Log:trace("calculateTransmission [%s]: refused, reason=legacy engine off", tostring(penName))
 
