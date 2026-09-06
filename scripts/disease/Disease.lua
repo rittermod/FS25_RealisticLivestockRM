@@ -84,11 +84,13 @@ function Disease:loadFromXMLFile(xmlFile, key)
 
 	self.state = xmlFile:getString(key .. "#state", RLDiseaseRecord.STATE.EXPOSED)
 	self.incubationTicksRemaining = xmlFile:getInt(key .. "#incubationTicksRemaining", 0)
-	self.monthsElapsed = xmlFile:getInt(key .. "#monthsElapsed", 0)
-	-- FLOAT, both of them. The treatment counter is decremented by `1 / daysPerPeriod` per
-	-- daily advance, so it is fractional by construction; the immunity counter takes the same
-	-- slot because the cadence that decrements it is not settled yet and a float survives
-	-- either answer, while an integer slot would silently truncate a per-tick one.
+	-- FLOAT, all three of them, and the elapsed counter joined them when the progression
+	-- driver landed: it is advanced by `1 / daysPerPeriod` per daily tick, so an integer
+	-- slot would silently truncate every fractional month at each save and each join -
+	-- discarding almost a whole illness at the longer period lengths. The treatment
+	-- counter is fractional by the same construction, and the immunity counter shares the
+	-- slot because a float survives whichever cadence decrements it.
+	self.monthsElapsed = xmlFile:getFloat(key .. "#monthsElapsed", 0)
 	self.treatmentMonthsRemaining = xmlFile:getFloat(key .. "#treatmentMonthsRemaining", 0)
 	self.immunityMonthsRemaining = xmlFile:getFloat(key .. "#immunityMonthsRemaining", 0)
 	self.treatmentRunning = xmlFile:getBool(key .. "#treatmentRunning", false)
@@ -112,7 +114,7 @@ function Disease:saveToXMLFile(xmlFile, key)
 	xmlFile:setInt(key .. "#version", Disease.RECORD_VERSION)
 	xmlFile:setString(key .. "#state", self.state)
 	xmlFile:setInt(key .. "#incubationTicksRemaining", self.incubationTicksRemaining)
-	xmlFile:setInt(key .. "#monthsElapsed", self.monthsElapsed)
+	xmlFile:setFloat(key .. "#monthsElapsed", self.monthsElapsed)
 	xmlFile:setFloat(key .. "#treatmentMonthsRemaining", self.treatmentMonthsRemaining)
 	xmlFile:setFloat(key .. "#immunityMonthsRemaining", self.immunityMonthsRemaining)
 	xmlFile:setBool(key .. "#treatmentRunning", self.treatmentRunning)
@@ -152,7 +154,7 @@ function Disease:writeStream(streamId, connection)
 	streamWriteString(streamId, self.model.title)
 	streamWriteUInt8(streamId, RLDiseaseRecord.STATE_WIRE_ORDINAL[self.state])
 	streamWriteUInt16(streamId, self.incubationTicksRemaining)
-	streamWriteUInt16(streamId, self.monthsElapsed)
+	streamWriteFloat32(streamId, self.monthsElapsed)
 	streamWriteFloat32(streamId, self.treatmentMonthsRemaining)
 	streamWriteFloat32(streamId, self.immunityMonthsRemaining)
 	streamWriteBool(streamId, self.treatmentRunning)
@@ -170,7 +172,7 @@ function Disease:readStream(streamId, connection)
 
 	self.state = RLDiseaseRecord.STATE_WIRE_ORDER[streamReadUInt8(streamId)]
 	self.incubationTicksRemaining = streamReadUInt16(streamId)
-	self.monthsElapsed = streamReadUInt16(streamId)
+	self.monthsElapsed = streamReadFloat32(streamId)
 	self.treatmentMonthsRemaining = streamReadFloat32(streamId)
 	self.immunityMonthsRemaining = streamReadFloat32(streamId)
 	self.treatmentRunning = streamReadBool(streamId)
@@ -286,6 +288,13 @@ function Disease:showInfo(box)
 	-- The elapsed counter starts at 0 and only ever rises, so the clamp is a floor over a
 	-- domain that cannot go below it - kept because this renders whatever a codec produced,
 	-- and a hand-edited save is the one shape that can hand it a negative.
+	--
+	-- KNOWN DEFECT, DEFERRED TO THE SLICE THAT WIRES THE PEN TICK, and unreachable in this
+	-- build for the same reason `getStatus`'s own marker gives: `monthsElapsed` is now a
+	-- FRACTION (the codec carries a float), but nothing advances it yet. Once it does,
+	-- `%d` truncates while the plural predicate `months == 1` runs on the UNROUNDED value, so
+	-- 1.0357 renders "1 months" and a record in its first sub-month renders "0 months". The
+	-- rounding decision belongs to whoever wires the tick; it is not made here.
 	local elapsed = math.max(self.monthsElapsed, 0)
 	local years = math.floor(elapsed / 12)
 	local months = elapsed - years * 12

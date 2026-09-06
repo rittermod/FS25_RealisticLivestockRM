@@ -431,24 +431,37 @@ source(modDirectory .. "scripts/disease/RLDiseaseVulnerability.lua")
 -- that forces the record ahead of the parser above has no counterpart here. It still
 -- precedes the entities that will consume it, like its three siblings.
 source(modDirectory .. "scripts/disease/RLDiseaseFatality.lua")
--- The transmission rate closes the pure tier. Like the fatality hazard above it
+-- The transmission rate continues the pure tier. Like the fatality hazard above it
 -- reads its FOUR siblings - RLDiseaseRates, RLDiseaseRecord, RLDiseaseVulnerability
 -- and RLDiseaseFatality - at CALL time only, with no file-scope capture of any of
 -- them, which is why this position is ordinary rather than required. It still
 -- precedes the entities that will consume it, like the four before it.
 source(modDirectory .. "scripts/disease/RLDiseaseTransmission.lua")
--- The spread pass sits on top of the pure tier and is the last of it. It reads its
+-- The spread pass sits on top of the pure tier. It reads its
 -- TWO siblings - RLDiseaseRecord for the state vocabulary and RLDiseaseTransmission
 -- for the rate - at CALL time only, with no file-scope capture of either, which is
 -- why this position is ordinary rather than required. Nothing calls it yet, so its
 -- only observable effect at load is its own line.
 source(modDirectory .. "scripts/disease/RLDiseaseSpread.lua")
--- The sub-lethal multiplier resolver is the last of the pure tier. It reads ONE
+-- The sub-lethal multiplier resolver continues the pure tier. It reads ONE
 -- sibling - RLDiseaseRecord, for the state vocabulary - at CALL time only, with no
 -- file-scope capture of it, which is why this position is ordinary rather than
 -- required. Nothing calls it yet, so its only observable effect at load is its own
 -- line.
 source(modDirectory .. "scripts/disease/RLDiseaseEffects.lua")
+-- The per-tick progression driver closes the pure tier. It reads TWO siblings -
+-- RLDiseaseRecord for the state vocabulary and its four advance functions, and
+-- RLDiseaseFatality for the result vocabulary - at CALL time only, with no
+-- file-scope capture of either, which is why this position is ordinary rather
+-- than required. Be precise about the fatality half rather than under-claiming
+-- it: the driver CALLS RLDiseaseFatality.roll itself - `advance` rolls, and
+-- `advanceWithoutFatality` structurally skips the call - and it also reads that
+-- module's RESULT vocabulary on every call to seed its detail table. Nothing is
+-- injected; an earlier revision passed the roll in through the context table and
+-- that shape was rejected. So the dependency is on the file being loaded before
+-- the first CALL, not before this line is SOURCED. Nothing calls it yet, so its
+-- only observable effect at load is its own line.
+source(modDirectory .. "scripts/disease/RLDiseaseProgression.lua")
 source(modDirectory .. "scripts/disease/Disease.lua")
 source(modDirectory .. "scripts/disease/DiseaseManager.lua")
 
