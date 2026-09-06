@@ -1,3 +1,14 @@
+--[[
+    DiseaseManager.lua
+    The disease registry: loads `xml/diseases.xml` through `RLDiseaseDefinition`, keeps
+    the title-keyed model map, and resolves a persisted or transmitted title back to it.
+
+    Four of its behaviour methods are SWITCHED OFF for the SEIR switchover and refuse
+    unconditionally rather than keying on `diseasesEnabled`, and `collectTransmissionSources`
+    is inert with no production caller. The slice that re-arms the transmission pass must
+    ADD a guard rather than restore one.
+]]
+
 DiseaseManager = {}
 
 local modDirectory = g_currentModDirectory
@@ -9,12 +20,9 @@ function DiseaseManager.new()
 
     local self = setmetatable({}, diseaseManager_mt)
 
-	-- Initialised ABOVE the loader call. loadDiseases assigns it unconditionally,
-	-- so this is a guard against a future edit that stops doing so rather than a
-	-- value anything reads today - but an init placed BELOW the call would clobber
-	-- the parsed registry with an empty one, and no test would see it.
-	--
-	-- A title-keyed MAP, not an array: `#` on it is always 0.
+	-- Initialised ABOVE the loader call: an init placed below it would clobber the
+	-- parsed registry with an empty one, and no test would see it. A title-keyed MAP,
+	-- not an array, so `#` on it is always 0.
 	self.diseases = {}
 	self.diseasesEnabled = true
 	self.diseasesChance = 1
@@ -28,26 +36,15 @@ end
 
 --- Load the disease definition file into the registry.
 ---
---- Runs from `new()`, which the mod re-runs on every map load, so the registry is
---- rebuilt from the archive each time and cannot carry a previous save's contents.
----
---- The single emission point for the parser's authoring warnings: the parse
---- RETURNS them rather than logging them, so each rule stays assertable without a
---- logger spy, and every line a malformed definition file produces comes from
---- here.
+--- The SINGLE emission point for the parser's authoring warnings: the parse RETURNS
+--- them rather than logging them, so each rule stays assertable without a logger spy.
 ---@return nil
 function DiseaseManager:loadDiseases()
 
-    -- Thin wrapper: open, parse, assign, log, delete. The parse itself lives in
-    -- RLDiseaseDefinition, so this function owns no schema knowledge at all.
-    --
-    -- Deliberately NO pcall around parse. Its contract is that it does not raise
-    -- for any input, so a raise here is a wiring bug that must crash loudly
-    -- rather than be swallowed into a silently empty registry.
-    --
-    -- A nil xmlFile is handed straight to parse rather than short-circuited here:
-    -- the absent-file case is one of parse's own warning rules, which keeps this
-    -- function the SINGLE emission point for the whole vocabulary.
+    -- Deliberately NO pcall around parse: its contract is that it does not raise for
+    -- any input, so a raise here is a wiring bug that must crash loudly rather than be
+    -- swallowed into a silently empty registry. A nil xmlFile is handed straight to it
+    -- because the absent-file case is one of parse's own warning rules.
     local xmlFile = XMLFile.loadIfExists("diseases", modDirectory .. "xml/diseases.xml")
 
     local registry, warnings = RLDiseaseDefinition.parse(xmlFile, {
@@ -57,10 +54,9 @@ function DiseaseManager:loadDiseases()
 
     self.diseases = registry
 
-    -- Every value goes through %s + tostring(): the headless harness formats with
-    -- a bare string.format and RAISES where the in-game logger degrades, so a
-    -- typed specifier here would turn a malformed-input warning into a suite
-    -- crash on one runner only.
+    -- Every value goes through %s + tostring(): the headless harness formats bare and
+    -- RAISES where the in-game logger degrades, so a typed specifier here would turn a
+    -- malformed-input warning into a suite crash on one runner only.
     for _, authoringWarning in ipairs(warnings) do
         Log:warning("loadDiseases: %s (disease=%s) - %s",
             tostring(authoringWarning.rule),
@@ -68,8 +64,8 @@ function DiseaseManager:loadDiseases()
             tostring(authoringWarning.detail))
     end
 
-    -- Counted by WALKING, never with `#`: the registry is a title-keyed map and
-    -- `#` on a map is always 0, so a length here would report every load as empty.
+    -- Counted by WALKING, never with `#`: the registry is a title-keyed map, so a
+    -- length here would report every load as empty.
     local diseaseCount = 0
     local titles = {}
 
@@ -78,10 +74,9 @@ function DiseaseManager:loadDiseases()
         table.insert(titles, title)
     end
 
-    -- Sorted at BOTH levels, and for the same reason: pairs order is undefined, so
-    -- an unsorted walk names the same diseases and the same channels in a
-    -- different order on every load, which defeats a grep across two logs and
-    -- would make any ordered log pin flaky the moment a second carrier exists.
+    -- Sorted at BOTH levels: `pairs` order is undefined, so an unsorted walk names the
+    -- same diseases and channels in a different order on every load, defeating a grep
+    -- across two logs and making any ordered log pin flaky.
     table.sort(titles)
 
     for _, title in ipairs(titles) do
@@ -92,10 +87,8 @@ function DiseaseManager:loadDiseases()
 
             local channels = {}
 
-            -- %.6g, not tostring: the engine reads these as 32-bit floats, so
-            -- tostring renders 0.35 as 0.3499999940395355 in-game and 0.35
-            -- headless. Six significant digits round that away and still carry
-            -- every authored value.
+            -- %.6g, not tostring: the engine reads these as 32-bit floats, so tostring
+            -- renders 0.35 as 0.3499999940395355 in-game and 0.35 headless.
             for channel, modifier in pairs(model.carrier.output) do
                 table.insert(channels, string.format("%s=%.6g", tostring(channel), modifier))
             end
@@ -109,8 +102,7 @@ function DiseaseManager:loadDiseases()
 
     end
 
-    -- One count, not two: with a single format there is no "N of which carry a
-    -- model block" to report - a disease is in the registry only if its model built.
+    -- One count, not two: a disease is in the registry only if its model built.
     Log:info("loadDiseases: %s disease(s) defined, %s authoring warning(s)",
         tostring(diseaseCount), tostring(#warnings))
 
@@ -121,14 +113,9 @@ end
 
 --- Resolve a title to its registry entry.
 ---
---- A direct lookup: the registry is keyed by title, so the linear scan this
---- replaced is gone along with the array it walked.
----
---- Returns the registry's own entry table, or nil - never `false`. A nil or empty
---- title is a legal read that returns nil, which is what lets `resolveRecordType`'s
---- guard above it keep working unchanged. (The `and`/`or` folds at the two stream
---- call sites that made the nil-versus-false distinction load-bearing are gone: the
---- stream now resolves unconditionally and raises on an unresolvable title.)
+--- Returns the registry's own entry table, or nil - never `false`. A nil or empty title
+--- is a legal read that returns nil, which is what lets `resolveRecordType`'s guard
+--- above it keep working unchanged.
 ---@param title string|nil the title as persisted, transmitted or authored
 ---@return table|nil the registry entry, or nil when the title is not defined
 function DiseaseManager:getDiseaseByTitle(title)
@@ -140,17 +127,9 @@ end
 
 --- Render a caller-supplied identity table as a stable "key=value" list for a warning line.
 ---
---- The sort is load-bearing rather than cosmetic: pairs order is undefined, so an unsorted line
---- names the same fields in a different order on every call and defeats a grep across a load.
----
---- TOTAL by construction, and that is the point rather than defensiveness: this renders the
---- argument of a WARNING, so a raise in here would turn a benign dropped record into an aborted
---- stream read - the one outcome the drop exists to avoid. Two things buy it. A non-table
---- identity degrades instead of reaching `pairs`, and the sort keys through `tostring` rather
---- than comparing raw keys, because `table.sort` raises on a mixed-type key set and a caller
---- that hands over a table with one positional entry would otherwise take the read down with it.
---- Values go through `tostring` because a bare `string.format` raises on an argument that does not
---- match its specifier, and not every runtime this code has to survive wraps that call.
+--- TOTAL by construction rather than defensive: this renders a WARNING's argument, so a
+--- raise here would turn a benign dropped record into an aborted stream read. The sort
+--- keys through `tostring` because `table.sort` raises on a mixed-type key set.
 ---@param identity table|nil whatever the call site holds; nil and a non-table both degrade
 ---@return string a sorted "key=value ..." list, or "no identity" when there is nothing to name
 local function formatIdentity(identity)
@@ -175,41 +154,20 @@ local function formatIdentity(identity)
 end
 
 
---- Resolve a persisted or transmitted disease title to its registry type, refusing any title the
---- shipped definition file no longer carries.
+--- Resolve a persisted or transmitted disease title to its registry entry, refusing any
+--- title the shipped definition file no longer carries.
 ---
---- Every reconstruction path routes through here, so no `Disease` carrying a nil `type` is ever
---- RETAINED. That is what lets `saveToXMLFile`, `writeStream`, `onPeriodChanged`, `modifyValue`,
---- `modifyOutput`, `showInfo`, `affectReproduction` and `collectTransmissionSources` dereference
---- `self.type` unguarded. Do NOT add nil-type tolerance to any of them; the one pre-existing
---- guard, in `RLAnimalInfoService.buildDiseaseRows`, is now dead against these paths rather than
---- load-bearing. Note "retained" rather than "exists": both stream paths deliberately CONSTRUCT a
---- nil-type record and read it off the wire before discarding it, because the bytes have to leave
---- the stream either way.
----
---- The reachable producer is a savegame or a join snapshot naming a title the registry has since
---- lost - a disease renamed or removed between sessions. Refusing the record costs the animal its
---- immunity window, its `genes` and its `isCarrier` state, and because `Animal:getHasAnyDisease`
---- then reads it as healthy it also changes what a herdsman rule bound to the saved-filter
---- `hasAnyDisease` field does with that animal. The alternative is a save that RAISES on the next
---- write, because `Disease:saveToXMLFile` opens with `self.type.title`.
----
---- A migration that RENAMES a title must install its old-to-new mapping AHEAD of this call: the
---- record is discarded here, inside the codec, before any consumer could map it.
----
---- WARNING rather than ERROR: the load continues, the animal's other records survive, and the
---- audience is a player or a server admin rather than a developer.
----
---- Deliberately does NOT validate the definition file itself. A malformed definition is authored
---- inside the mod archive and reaches its author on the first run.
+--- Every reconstruction path routes through here, so no `Disease` carrying a nil model is
+--- ever RETAINED - which is what lets the codecs and the behaviour methods dereference it
+--- unguarded. Do NOT add tolerance to any of them. A migration that RENAMES a title must
+--- install its old-to-new mapping AHEAD of this call, because the record is discarded
+--- here, inside the codec, before any consumer could map it.
 ---@param title string|nil the title as it was persisted or transmitted
 ---@param identity table|nil whatever the calling path can actually name - farmId, uniqueId,
---- subTypeIndex, context - rendered verbatim into the warning. A path holding none of them passes
---- nil rather than inventing a field it does not have. Callers `tostring` their values on the way
---- in, so an absent field renders as nil rather than vanishing from the line.
----@return table|nil the registry's own type table, or nil when the record must be dropped. NEVER
---- `false`: both stream call sites fold the result through an `and`/`or` chain that would turn a
---- false into nil, so the two outcomes must stay distinguishable by nilness alone.
+--- subTypeIndex, context - rendered verbatim into the warning. A path holding none of them
+--- passes nil rather than inventing a field it does not have.
+---@return table|nil the registry's own entry table, or nil when the record must be dropped.
+--- NEVER `false`: the two outcomes must stay distinguishable by nilness alone.
 function DiseaseManager:resolveRecordType(title, identity)
 
     if title == nil or title == "" then
@@ -232,21 +190,20 @@ function DiseaseManager:resolveRecordType(title, identity)
 
     end
 
-    -- No line on the RESOLVED path, deliberately. Lua evaluates a log call's arguments before the
-    -- logger tests the level, so a trace here would render the identity - a table walk, a sort and
-    -- a concat - for every record of every animal on every savegame load and every join, at every
-    -- level including production INFO. The two refusal arms above are where the diagnosis lives.
+    -- No line on the RESOLVED path, deliberately: Lua evaluates a log call's arguments
+    -- before the level is tested, so a trace here would render the identity - a table
+    -- walk, a sort and a concat - for every record of every animal on every load and
+    -- every join, at every level including production INFO.
     return diseaseType
 
 end
 
 
---- Refuse the daily spontaneous-infection roll: the legacy engine is switched off for the
---- switchover, so no animal contracts a new disease from this path until the SEIR driver
---- lands. The per-disease eligibility walk and its `math.random` draw are gone with it.
+--- Refuse the daily spontaneous-infection roll: the legacy engine is switched off, so no
+--- animal contracts a new disease from this path. Its `math.random` draw is gone with it.
 ---
---- Unconditional rather than keyed on `diseasesEnabled`, so it keeps holding once something
---- turns the setting back on.
+--- Unconditional rather than keyed on `diseasesEnabled`, so it keeps holding once
+--- something turns the setting back on.
 ---@param animal table The animal that would have rolled. Read for log identity only.
 function DiseaseManager:onDayChanged(animal)
 
@@ -256,19 +213,13 @@ function DiseaseManager:onDayChanged(animal)
 end
 
 
---- Refuse to seed a genetic record onto a freshly generated sale animal: the legacy engine
---- is switched off for the switchover, so dealer stock carries no carrier and no `genes`.
+--- Refuse to seed a genetic record onto a freshly generated sale animal: the legacy
+--- engine is switched off, so dealer stock carries no carrier and no `genes`.
 ---
---- This is the only one of the five refusals whose body had no `diseasesEnabled` guard, so it
---- is the only one whose `math.random` draws ran even with the setting OFF - one per eligible
---- genetic disease, plus a second on a hit. Removing them re-rolls every later draw in the
---- caller's sale-animal generation, so dealer stock differs from a pre-slice save at the same
---- seed. That is expected, not a defect.
----
---- Be precise about the scope of that claim, because the obvious stronger version is false:
---- with the setting ON - which is the shipped DEFAULT - four other stubbed sites were drawing
---- too, so a normal save's progression, inheritance and transmission streams all moved as
---- well. "The only stream that moved" is true only of a save with diseases already off.
+--- This is the only one of the five refusals whose body had no `diseasesEnabled` guard,
+--- so its draws ran even with the setting OFF. Removing them re-rolls every later draw in
+--- sale-animal generation, so dealer stock differs from a pre-slice save at the same seed.
+--- That is expected, not a defect.
 ---@param animal table The sale animal that would have been seeded. Read for log identity only.
 function DiseaseManager:setGeneticDiseasesForSaleAnimal(animal)
 
@@ -280,42 +231,24 @@ end
 
 --- Collect the contagious disease sources across a pen.
 ---
---- INERT, and the body below says why: the gate it applies per record reads a key the shipped
---- model entry does not carry, so the walk reaches its `continue` for every record and the
---- function returns an empty source set for any input. Left standing rather than deleted
---- because an empty set is the correct inert behaviour while the SEIR pipeline has no caller,
---- and because deleting it would move a test matrix that is not this slice's.
+--- INERT, and with NO production caller: the gate it applies per record reads a key the
+--- shipped model entry does not carry, so it returns an empty source set for any input.
+--- The slice that wires spread replaces the whole body with a delegation to
+--- `RLDiseaseSpread` rather than re-answering the shedding question here.
 ---
---- It has NO production caller: what remains reaches it from the test tier only, which is what
---- pins the inert contract described above. The slice that wires spread replaces the whole body
---- with a delegation to `RLDiseaseSpread`, which already owns the shedding question and answers
---- it from the record's STATE - re-implementing that rule here instead would make this a further
---- predicate over the same records, which is the repair this codebase refuses.
----
---- Deliberately NOT the display predicate. The list surfaces and the saveable-filter catalog
---- ask "should a player see this animal as sick"; this asks "is this animal shedding". Folding
---- the two into one shared helper is what the separation exists to prevent.
+--- Call it with the DOT form. DiseaseManager carries a `Class()` metatable, so a colon
+--- call passes the manager itself as `animals` and the walk RAISES on `animal.isDead`.
 --- @see RLFilterFieldCatalog.FIELDS hasAnyDisease
 --- @see Animal.getHasAnyDisease
----
---- Call it with the DOT form. DiseaseManager carries a Class() metatable, so a colon call
---- resolves and passes the manager itself as `animals`; the walk then reaches a scalar field
---- and RAISES on `animal.isDead`. Loud rather than silent - and with no production caller left
---- the blast radius is now a test run rather than a pen's period tick.
----
---- `model` is read unguarded on purpose: the reachable producer of a nil one - a savegame or a
---- join snapshot naming a title the registry no longer carries - is refused at the
---- reconstruction paths instead, so no record reaching this walk can carry one.
 --- @see DiseaseManager.resolveRecordType
 ---
 ---@param animals table|nil the pen's animals; nil yields no sources rather than raising
 ---@return table sources keyed by disease title -> { type = <model entry>, amount = <integer> }; ALWAYS a table, and ALWAYS empty while the gate below is unsatisfiable
 ---@return boolean hasSources true when at least one record was counted; always false today
----@return table stats { curedSkipped, deadSkipped, animals } - tallies the caller cannot recover
---- without re-walking. The two skip counters are DIFFERENT UNITS: `curedSkipped` counts RECORDS
---- (one animal can contribute several) and `deadSkipped` counts ANIMALS, because a corpse is
---- skipped whole before its records are read. `curedSkipped` can no longer move at all - the
---- transition that fed it went with the legacy progression engine - so it reports a real zero.
+---@return table stats { curedSkipped, deadSkipped, animals }. The two skip counters are
+--- DIFFERENT UNITS: `curedSkipped` counts RECORDS and `deadSkipped` counts ANIMALS,
+--- because a corpse is skipped whole before its records are read. `curedSkipped` can no
+--- longer move at all, so it reports a real zero.
 function DiseaseManager.collectTransmissionSources(animals)
 
 	local sources = {}
@@ -356,23 +289,14 @@ function DiseaseManager.collectTransmissionSources(animals)
 
 			local model = disease.model
 
-			-- THIS GATE NOW SHORT-CIRCUITS EVERY RECORD, and the honest description of the
-			-- change below it is "a dead read deleted", not "transmission repointed". The
-			-- registry entry is a model entry, which carries an authored spread figure under a
-			-- different name and no `transmission` key at all - so the walk reaches this
-			-- `continue` for every record of every animal and the collector returns empty.
-			--
-			-- Left standing rather than removed even though the pen tick no longer calls this
-			-- at all: an empty source set is the correct inert behaviour while the SEIR
-			-- pipeline has no caller, and deleting the function would move a test matrix that
-			-- pins exactly that contract. The slice that wires spread replaces the whole
-			-- function with a delegation to the spread module, which already owns the shedding
-			-- question and answers it from the record's STATE.
+			-- THIS GATE NOW SHORT-CIRCUITS EVERY RECORD: a model entry carries its
+			-- authored spread figure under a different name and no `transmission` key at
+			-- all, so the walk reaches this `continue` for every record.
 			if model.transmission == nil or model.transmission <= 0 then continue end
 
-			-- Reads NO record field beyond the title, deliberately. Deciding what sheds is the
-			-- spread module's contract, and answering it a second time here would make this the
-			-- sixth predicate over the same records - the repair this codebase refuses.
+			-- Reads NO record field beyond the title, deliberately: deciding what sheds
+			-- is the spread module's contract, and answering it a second time here would
+			-- make this a sixth predicate over the same records.
 			if sources[disease.title] == nil then
 				sources[disease.title] = { ["type"] = model, ["amount"] = 0 }
 				hasSources = true
@@ -389,36 +313,16 @@ function DiseaseManager.collectTransmissionSources(animals)
 end
 
 
---- Refuse one pen's transmission pass: the legacy engine is switched off for the switchover,
---- so no animal catches anything from a pen mate until the SEIR spread pass lands.
+--- Refuse one pen's transmission pass: the legacy engine is switched off, so no animal
+--- catches anything from a pen mate until the SEIR spread pass lands.
 ---
---- THE ONLY ENTRY POINT to the transmission pass, called once per pen from the period tick,
---- ABOVE that tick's per-animal progression loop.
+--- THE ONLY ENTRY POINT to the transmission pass, called once per pen from the period
+--- tick, ABOVE that tick's per-animal progression loop.
 ---
---- **NOTHING ON THE TRANSMISSION TICK PATH READS THE PLAYER'S DISEASE SETTING ANY MORE, and that
---- is deliberate rather than an oversight.** The `diseasesEnabled` refusal sat on the collect half,
---- which is no longer called from the tick; this body is a single trace that falls off the end, so
---- it has no refusal statement of its own to inherit it. Scope that claim to THIS path and no
---- wider: other gameplay surfaces still gate on the setting, `RLFilterFieldCatalog`'s
---- `hasAnyDisease` getter and `Animal.getHasAnyDisease` among them, and the herdsman planner
---- evaluates the first of those to decide what it autonomously sells.
----
---- **What makes the gap safe is that this body is a STUB, not that the setting is unreachable.**
---- The settings lock refuses an interactive change but explicitly does not refuse a programmatic
---- `applyChange`, so the flag can still read true at runtime. The slice that re-arms this pass must
---- therefore ADD a guard here, not restore one - there is no statement left to move back, and
---- giving this function a body behind an unguarded entry point is exactly the order that would
---- spread with the player's setting off.
+--- NOTHING ON THIS PATH READS THE PLAYER'S DISEASE SETTING ANY MORE, and what makes that
+--- safe is that this body is a STUB rather than that the setting is unreachable, so the
+--- slice that re-arms the pass must ADD a guard here rather than restore one.
 --- @see RLSettings.applyChange
----
---- The `title=amount` per-pen SOURCE summary went with this function's body, and the collect half
---- no longer runs on the tick, so nothing reports WHICH titles are shedding or how many animals
---- were scanned. Tick-level evidence does survive: the pen tick emits a pen-named TRACE on its
---- transmission-on arm, and this function emits its own pen-named refusal TRACE. State the gap at
---- that precision, or the next reader hunts for a per-title line that was never going to be there.
----
---- `penName` is DISPLAY-ONLY and stays nil-tolerant: it is what attributes the line to a pen on
---- a multi-pen save, and a missing name must degrade the line rather than the pass.
 ---@param animals table the pen's animals. Unread while the engine is off.
 ---@param penName string|nil the husbandry's display name, for log attribution only
 function DiseaseManager:calculateTransmission(animals, penName)

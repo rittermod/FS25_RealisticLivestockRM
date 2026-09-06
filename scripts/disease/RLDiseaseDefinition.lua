@@ -1,96 +1,17 @@
 --[[
     RLDiseaseDefinition.lua
-    The one home for parsing xml/diseases.xml.
+    The one home for parsing xml/diseases.xml. `parse` walks the file once and returns
+    the disease REGISTRY - a map keyed by title - plus an array of authoring warnings;
+    `DiseaseManager:loadDiseases` is the thin wrapper that renders them. Being a MAP,
+    emptiness is `next(registry) == nil` and a count is a walk - `#` silently reads 0.
 
-    `parse` walks the definition file once and returns two things: the disease
-    REGISTRY - a map keyed by title, carrying each disease's identity and the
-    redesign's parameter set - and an array of authoring warnings.
-    `DiseaseManager:loadDiseases` is a thin wrapper that opens the file, calls
-    parse, assigns the registry and logs the warnings.
-
-    THE REGISTRY IS A MAP, NOT AN ARRAY. Every read is a lookup by title, and
-    `#` on a map is ALWAYS 0 - so emptiness is `next(registry) == nil` and a
-    count is a walk. A `#` here does not error, it silently reads zero.
-
-    ONE FORMAT, ALL OR NOTHING. A disease is either fully expressed in the
-    `<model>` schema or it is absent: an absent or refused `<model>` drops the
-    whole disease. The file previously carried a second, legacy attribute set
-    alongside it and tolerated a disease that had only that half; the switchover
-    removed the legacy engine, so that tolerance would now ship a disease no
-    consumer can read. The rule is enforced on the model's ABSENCE, not on stray
-    content beside it: nothing below reads a child or attribute at the old
-    top-level position, so nothing can warn about one either. A definition
-    migrated a field at a time therefore loads clean and quietly loses whatever
-    stayed behind.
-
-    WARNINGS ARE RETURNED, NEVER LOGGED HERE. A logger spy on the shared logger
-    is banned portfolio-wide, so a rule asserted through the log is unassertable;
-    returning the array makes every authoring rule a value assertion and leaves
-    `loadDiseases` as the single emission point, which is what keeps the ModTest
-    error-line prediction honest. Read the thin TRACE coverage below as that
-    rather than as under-logging: every branch that REFUSES something already
-    reports itself through a structured warning carrying the title, the rule and
-    the detail - strictly more than a trace line would say. TRACE covers only the
-    branches that produce no warning.
-
-    A warning is a STRUCTURED value, never a formatted string:
-    `{ title = <string|nil>, rule = <string>, detail = <string> }`. The suite
-    field-compares `rule` and `title`; the wrapper renders the line. Warnings are
-    emitted in document order.
-
-    ROW-FATAL VERSUS FIELD-LOCAL is explicit, and the boundary is the ENTRY, not
-    the `<model>` element. A disease is DROPPED when it is missing `#title`,
-    missing `#animals`, resolves no animal type, has no `<model>`, or has one
-    that cannot be built - and that last case includes defects INSIDE the model:
-    a missing required scalar, an unknown endpoint, an endpoint/duration
-    mismatch, and `cureOnly` without a curative treatment are all row-fatal.
-    What stays field-local is a defect in a COLLECTION the entry can be built
-    without: an output channel, an infection key, a treatment child, a
-    prerequisite. The offending row is skipped, one warning is emitted, and the
-    disease still loads. `model-unknown-archetype` is neither - it warns and
-    carries the value through verbatim, because the archetype vocabulary is open.
-
-    A third shape exists and is deliberate: the animal rules run BEFORE the
-    `<model>` presence check, so a row can contribute a field-local
-    `unknown-animal-type` warning and then be dropped by `missing-model`. An
-    author reading the warning list can therefore see a field-local rule fire for
-    a disease that never entered the registry.
-
-    `deps` arrives as a PARAMETER with no default: `{ animalTypes, i18n }`. No
-    RUNTIME global is read here and none is cached at module load - that is the
-    load-order trap that reads populated headless and empty in-game.
-
-    THE ONE MODULE-LOAD GLOBAL READ IS `RLDiseaseRecord.ENDPOINT`, and it is the
-    exception that proves the rule above rather than a breach of it: a sibling
-    module's CONSTANT is populated the moment that file is sourced and never moves
-    afterwards, where the trap is about runtime state that fills later. The cost is
-    a hard ordering requirement - `RLDiseaseRecord.lua` MUST be sourced before this
-    file, in `main.lua` and in `tests/headless/animal_env.lua` alike. Get it wrong
-    and the read below raises on a nil global, which takes `parse` with it and is
-    loud in-game; the headless tier cannot see the mistake at all, because its env
-    sources the record itself whatever `main.lua` says.
-
-    Pure data-in / data-out apart from that: no GUI, no engine natives beyond the
-    XMLFile the caller hands over, so the module dual-runs headless.
-
-    SHARP EDGES, named so the next reader does not rediscover them.
-
-    The per-disease closure must NEVER `return false`: `XMLFile:iterate` stops on
-    an exact `false`, so a skip written that way would drop every LATER disease
-    too and leave the registry short with no error. Every skip path here falls
-    off the end of the closure instead.
-
-    Read every value that must be validated for INTEGRALITY as a float, never as
-    an int. The engine's native integer read TRUNCATES a fractional lexical
-    before the guard can see it, while the headless XML shim is `tonumber()` and
-    preserves it - so a whole-number check on an int-read value can only ever
-    fire on one of the two runners, and the dual-run count gate is blind to the
-    split because the divergence is in values.
-
-    THE ANIMAL RULES RUN FIRST, ahead of the `<model>` presence check. A disease
-    bound to no animal type is unreachable whatever its model says, so a row with
-    neither a usable `#animals` nor a `<model>` earns `missing-animals` or
-    `no-animal-types` - never `missing-model`.
+    ONE FORMAT, ALL OR NOTHING: an absent or refused `<model>` drops the whole disease.
+    WARNINGS ARE RETURNED, NEVER LOGGED HERE, as structured `{ title, rule, detail }`
+    values in document order, because a logger spy is banned portfolio-wide and that is
+    what makes every authoring rule a value assertion.
+    THE ONE MODULE-LOAD GLOBAL READ IS `RLDiseaseRecord.ENDPOINT`, so that file MUST be
+    sourced first, in `main.lua` and in the headless env alike; the headless tier cannot
+    see that mistake, because its env sources the record whatever the loader says.
 ]]
 
 RLDiseaseDefinition = {}
@@ -109,13 +30,9 @@ local OUTPUT_CHANNELS = {
 }
 
 --- Archetype is an OPEN vocabulary: an unknown value warns and is carried through
---- verbatim rather than rejected, so a future kind needs no schema churn. The
---- warning is what stops a typo becoming a silent third archetype.
----
---- `management` covers the non-transmissible, non-inherited conditions - wear,
---- diet, parasites. The archive's vaccination taxonomy names a degenerative kind
---- beside it, but mechanically the two are one class (neither transmits, neither
---- is inherited), so this is one value rather than two.
+--- verbatim rather than rejected, so a future kind needs no schema churn, and the
+--- warning is what stops a typo becoming a silent third archetype. `management` covers
+--- the non-transmissible, non-inherited conditions - wear, diet, parasites.
 local ARCHETYPES = {
     ["infectious"] = true,
     ["genetic"] = true,
@@ -139,17 +56,12 @@ local RECORD_ENDPOINT = RLDiseaseRecord.ENDPOINT
 --- where nothing clocks it. Keyed off `RECORD_ENDPOINT` so the NAMES live in one
 --- place while the endpoint-to-duration MAPPING, a parsing concern, lives here.
 ---
---- CLOSED, unlike `ARCHETYPES`: an endpoint decides which OTHER attributes are
---- required and forbidden, so an unrecognised one has no defined parse at all.
---- Membership is tested with `~= nil`, never for truthiness - `false` is a legal
---- entry and the clockless pair would otherwise read as unknown.
----
---- The two durations are NOT interchangeable and must never be merged into one
---- attribute. `durationMonths` is a fractional SPAN - how long the infectious
---- phase runs before natural recovery. `chronicMonthsToDeath` is a MEDIAN,
---- converted `1 - 0.5 ^ (1/m)` into a per-month hazard by its consumer. Merging
---- them turns a geometric tail into a deterministic death at the clock boundary,
---- with no error and plausible numbers on either side.
+--- CLOSED, unlike `ARCHETYPES`, and membership is tested with `~= nil` rather than
+--- for truthiness - `false` is a legal entry and the clockless pair would otherwise
+--- read as unknown. The two durations are NOT interchangeable and must never be
+--- merged: `durationMonths` is a fractional SPAN, `chronicMonthsToDeath` a MEDIAN its
+--- consumer converts into a hazard, so merging them turns a geometric tail into a
+--- deterministic death at the clock boundary, with plausible numbers on either side.
 local ENDPOINTS = {
     -- the span elapses and the animal recovers naturally
     [RECORD_ENDPOINT.recovers] = "durationMonths",
@@ -163,21 +75,12 @@ local ENDPOINTS = {
 }
 
 
---- The duration attributes the pairing rule walks: exactly one is required per
---- endpoint and every other one is FORBIDDEN, so the walk needs the whole set
---- rather than just the required member.
+--- The duration attributes the pairing rule walks: exactly one is required per endpoint
+--- and every other one is FORBIDDEN, so the walk needs the whole set.
 ---
---- DERIVED from `ENDPOINTS` rather than hand-written beside it, which is what makes
---- the "one home" claim above true instead of aspirational. A second hand-kept list
---- drifts in one direction silently: an endpoint mapped to an attribute missing
---- from the walk matches no iteration, so its required check never runs, its value
---- is never assigned, and the model loads with no duration AND no warning - the
---- exact silent-default class this module exists to prevent.
----
---- Sorted for a stable walk order. Order does not change any verdict - the required
---- attribute is matched by name and every other declared one is refused - but it
---- decides WHICH detail string an author sees first, and a `pairs` order would make
---- that differ per process and between the two runners.
+--- DERIVED from `ENDPOINTS`, never hand-written beside it: an endpoint mapped to an
+--- attribute missing from the walk matches no iteration, so the model would load with no
+--- duration AND no warning. Sorted, so the first detail string an author sees is stable.
 local DURATION_ATTRIBUTES = {}
 
 do
@@ -240,13 +143,10 @@ end
 
 --- Read one non-negative scalar.
 ---
---- Negativity is ONE rule rather than a per-field matrix: every scalar in this
---- schema is a count, a duration, a rate or a multiplier, and none of them has a
---- meaningful negative value.
----
---- The reader is selected with an explicit branch rather than `asInt and getInt or
---- getFloat`: that idiom falls through to the float reader whenever the int reader
---- returns nil, so a caller asking for an int would silently get a float.
+--- Negativity is ONE rule rather than a per-field matrix - no scalar in this schema
+--- has a meaningful negative value. The reader is selected with an explicit branch
+--- rather than `asInt and getInt or getFloat`, which falls through to the float reader
+--- whenever the int reader returns nil.
 ---@param xmlFile table open XMLFile document
 ---@param path string full attribute path
 ---@param label string field name for the warning
@@ -418,20 +318,12 @@ end
 
 --- Read the `<model><treatment>` child onto `model`, or refuse it.
 ---
---- All four fields are required together. A partially-populated record is worse
---- than none: the module's contract is that there are no silent defaults, and a
---- consumer doing arithmetic on a nil cost raises far from here.
+--- All four fields are required together, because there are no silent defaults here
+--- and a consumer doing arithmetic on a nil cost raises far from this function.
 ---
---- `efficacy` is the probability that a COMPLETED course achieves its `outcome`,
---- rolled once at completion - not per tick, and not a partial-effect multiplier.
---- Its consumer owns the failure path; this function only pins the domain.
----
---- ONE ARM OF THE COMPATIBILITY TABLE IS DELIBERATELY SILENT, and that is the
---- single trap in this function. A `cureOnly` model whose block declares `relief`
---- is refused by returning without assigning `model.treatment` and WITHOUT a
---- warning, because the caller's endpoint gate emits the one warning that case
---- earns - see `buildModelEntry`. Warning here as well would report the same
---- authoring mistake twice under two different rules.
+--- ONE ARM OF THE COMPATIBILITY TABLE IS DELIBERATELY SILENT, and it is the single
+--- trap here: a `cureOnly` model whose block declares `relief` returns WITHOUT a
+--- warning, because `buildModelEntry`'s endpoint gate emits the one that case earns.
 ---@param xmlFile table open XMLFile document
 ---@param modelKey string the `<model>` element key
 ---@param model table the model entry being built, carrying a validated `endpoint`
@@ -657,20 +549,10 @@ local function buildModelEntry(xmlFile, key, title, deps, warnings)
     end
 
     -- Exactly one duration attribute, selected by `endpoint`, and every other one
-    -- FORBIDDEN. The pair stays two attributes rather than one overloaded field
-    -- because they are different quantities - a span and a median - and a consumer
-    -- that forgot to branch would read one as the other and get plausible wrong
-    -- numbers with no error.
-    --
-    -- The FORBIDDEN half is tested by PRESENCE, not by the parsed value. A refused
-    -- value (a negative one) also reads as nil, so a value test would let a
-    -- declared-but-negative forbidden attribute through while refusing a merely
-    -- wrong positive one - a more corrupt file passing where a less corrupt one
-    -- fails.
-    --
-    -- Both are read unconditionally, so a negative one still reports itself; the
-    -- walk then returns on the FIRST offence, so a model earns exactly one mismatch
-    -- warning however many attributes it got wrong.
+    -- FORBIDDEN. The FORBIDDEN half is tested by PRESENCE, not by the parsed value: a
+    -- refused negative also reads as nil, so a value test would pass a
+    -- declared-but-negative forbidden attribute while refusing a merely wrong positive
+    -- one. The walk returns on the FIRST offence, so a model earns one mismatch warning.
     local requiredDuration = ENDPOINTS[model.endpoint]
 
     local durationDeclared = {}
@@ -752,24 +634,9 @@ local function buildModelEntry(xmlFile, key, title, deps, warnings)
 
     -- ROW-FATAL, and it cannot live inside `readModelTreatment`: that function
     -- early-returns when `<treatment>` is absent, so a `cureOnly` model carrying no
-    -- block at all never reaches a single line of it. Testing the ASSIGNED field
-    -- here instead catches all three failing shapes with one predicate, because
-    -- `model.treatment` is written only on that function's success path: no block,
-    -- a block refused for its months / cost / efficacy, and a block declaring
-    -- `relief` (which returns silently for exactly this reason).
-    --
-    -- Dropping the disease is the right severity: the endpoint says the infection
-    -- ends only through a completed cure, so without one it never ends at all and
-    -- the model describes an animal nothing can ever help.
-    -- Tests the assigned RESULT, not the outcome attribute, and that is the spec's
-    -- prescribed shape rather than an accident. A second clause reading
-    -- `model.treatment.outcome ~= "cure"` was written here at code review and
-    -- REVERTED: it is unreachable, because the relief arm above returns before
-    -- assigning, so nothing can construct a `model.treatment` whose outcome is not
-    -- `cure`. An unreachable defensive clause cannot be tested or break-proved, and
-    -- it made this line contradict the Design Note that explains why one predicate
-    -- covers all three shapes. The coupling to the relief arm is real and is
-    -- documented at BOTH sites instead.
+    -- block never reaches a line of it. Testing the ASSIGNED field catches all three
+    -- failing shapes with one predicate - no block, a refused block, and a block
+    -- declaring `relief`, which is why that arm above returns silently.
     if model.endpoint == RECORD_ENDPOINT.cureOnly and model.treatment == nil then
         warn(warnings, title, "endpoint-requires-curative-treatment",
             "endpoint cureOnly requires a <treatment outcome=\"cure\">, and none was "
@@ -819,17 +686,11 @@ end
 --- Parse the disease definition document into the registry and the authoring
 --- warnings.
 ---
---- Never raises for any DOCUMENT, however malformed - which is what lets the
---- wrapper call it without a `pcall`. A definition file is authored inside the mod
---- archive, so a malformed one must reach its author as a readable warning at the
---- next launch rather than as an aborted `DiseaseManager.new()` that leaves
---- `g_diseaseManager` nil and silently skips every registration below it. The
---- `deps` contract is a caller concern and is not defended here: it is supplied by
---- the wrapper two lines up, and a wiring bug there should crash loudly.
----
---- A nil `xmlFile` is a legitimate input, not a caller error: `loadIfExists`
---- returns nil for an absent file, and routing that case through here rather than
---- through the wrapper keeps ONE emission point for the whole rule vocabulary.
+--- Never raises for any DOCUMENT, however malformed - which is what lets the wrapper
+--- call it without a `pcall`, and what keeps a malformed file reaching its author as a
+--- readable warning rather than as an aborted `DiseaseManager.new()` that leaves
+--- `g_diseaseManager` nil. A nil `xmlFile` is a legitimate input, not a caller error:
+--- routing it through here keeps ONE emission point for the whole rule vocabulary.
 ---@param xmlFile table|nil open XMLFile document, or nil where the file is absent
 ---@param deps table `{ animalTypes = <name-to-index map>, i18n = <text resolver> }`.
 --- Injected, never read from the environment - a module-load read of either is the
