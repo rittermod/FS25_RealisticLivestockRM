@@ -1,26 +1,16 @@
 -- RLDealerSaleSelectorDialog.lua
--- Dealer sale-availability selector (B2): a sectioned icon + age-range checkbox
--- list. One SECTION per catalog subType, one ROW per age stage (icon + age-range text +
--- checkbox, checked = currently buyable). A plain SELECTION-OUT control:
--- OK returns the checked in-scope for-sale set, Back returns nil. It never mutates the
--- registry / store, applies, or dispatches MP - the caller (B3/C1) reconciles the returned
--- set against baseline and owns the persistence side.
+-- Dealer sale-availability selector: a sectioned icon + age-range checkbox list, one section
+-- per catalog subType and one row per age stage.
 --
--- MERGES the RLHerdsmanHusbandryPickerDialog skeleton (MessageDialog lifecycle, in-place
--- checkbox toggle, RL_SELECT wiring, select-all, OK/Back callback, RmSafeUtils.safeCall)
--- with an engine-sectioned SmoothList (a listSectionHeader name-keyed header cell + row
--- cells), driven by the three-parallel-table delegate model (sectionOrder / itemsBySection
--- / titlesBySection).
+-- A selection-out control only: OK returns the checked in-scope for-sale set, Back returns
+-- nil. It never mutates the registry or store, applies, or dispatches MP - the caller
+-- reconciles against baseline and owns persistence. The off-by-one-prone section and collect
+-- logic lives in the pure, dual-run RLDealerSaleSelectorModel.
 --
--- The off-by-one-prone section/collect logic lives in the pure, dual-run
--- RLDealerSaleSelectorModel; this file is thin GUI wiring over it: buildSectionModel on
--- show, buildResult on OK, and toggleAll / toggleSection plus their predicates for the two
--- select-all controls.
---
--- TWO toggle scopes, deliberately: SPACE (MENU_ACTIVATE) is LIST-WIDE, matching every other
--- RL multi-select surface, while RL_SELECT_SECTION acts on the focused section alone. Both
--- carry a stateful label, and both labels are refreshed at EVERY mutation site rather than
--- left to the list delegate - that hook fires on focus movement only, never on a re-render.
+-- Two toggle scopes: SPACE is list-wide, matching the other RL multi-select surfaces, while
+-- RL_SELECT_SECTION acts on the focused section alone. Both labels are refreshed at every
+-- mutation site rather than left to the list delegate, whose hook fires on focus movement
+-- only, never on a re-render.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -52,9 +42,8 @@ function RLDealerSaleSelectorDialog.new(target, customMt)
     return self
 end
 
---- Static entry point. The caller passes the B1 catalog view-model; the dialog FULLY
---- rebuilds its per-session state (section model + selection seeded from initial buyability)
---- on EVERY call, so a prior open's toggles never leak into this one.
+--- Static entry point. Per-session state is fully rebuilt on every call, so a prior open's
+--- toggles never leak into this one.
 ---@param callback function fn(target, result) - result is the checked in-scope for-sale set (array of {subTypeName, minAge}, possibly {}) on OK, or nil on cancel
 ---@param target table|nil callback target (the caller frame); may be nil
 ---@param catalog table|nil B1 catalog: RLDealerSaleCatalog.enumerate() result
@@ -106,12 +95,9 @@ function RLDealerSaleSelectorDialog:onGuiSetupFinished()
         self.dealerSaleList:setDelegate(self)
     end
 
-    -- Warn loudly on any missing critical element so an XML id drift is caught at load, not as
-    -- silent mis-behaviour (a missing list = no rows; a missing okButton = un-disable-able OK on
-    -- the empty state). BOTH select-all buttons are listed: each now carries a STATEFUL label, so
-    -- an id drift on either leaves a button whose text nothing ever writes, with no other symptom.
-    -- buttonsPC and backButton are deliberately absent - they feed the geometry log only, which is
-    -- diagnostic and does not run at all on the empty state.
+    -- Warn on any missing critical element so an XML id drift surfaces at load rather than as
+    -- silent misbehaviour. Both select-all buttons are listed: each carries a stateful label,
+    -- so an id drift on either leaves a button nothing ever writes text to.
     local missing = {}
     if self.dealerSaleList == nil then table.insert(missing, "dealerSaleList") end
     if self.emptyListText == nil then table.insert(missing, "emptyListText") end
@@ -131,11 +117,8 @@ end
 -- onOpen: visibility + action events + per-open geometry log
 -- =============================================================================
 
---- Toggle the list vs the empty-state text + the OK/Select/SelectAll/Section disabled state,
---- register the RL_SELECT and RL_SELECT_SECTION action events (only with rows to toggle -
---- keyboard routing needs an explicit registerActionEvent in this dialog context), reload,
---- seed BOTH toggle labels, then emit a PER-OPEN screen-space geometry log so the
---- sectioned-list-in-a-modal layout and the button row are provable from the log.
+--- Swap between the list and the empty state, register the two action events when there are
+--- rows, reload, seed both toggle labels, then log the per-open geometry.
 function RLDealerSaleSelectorDialog:onOpen()
     RLDealerSaleSelectorDialog:superClass().onOpen(self)
 
@@ -146,15 +129,10 @@ function RLDealerSaleSelectorDialog:onOpen()
     if self.okButton ~= nil then self.okButton:setDisabled(not hasRows) end
     if self.selectButton ~= nil then self.selectButton:setDisabled(not hasRows) end
     if self.selectAllButton ~= nil then self.selectAllButton:setDisabled(not hasRows) end
-    -- The two select-all buttons close by DIFFERENT routes, and it matters which:
-    --   * SPACE is a menu navigation action, so it reaches selectAllButton through the dialog's
-    --     own button dispatch, which skips a disabled button. Disabling that button therefore
-    --     closes its key as well as its click.
-    --   * The section key does NOT arrive that way. A mod action is not part of a dialog's
-    --     navigation set, which is why it needs the explicit registerActionEvent below - and a
-    --     registered action event keeps firing regardless of the button's disabled state. What
-    --     closes the section key on an empty catalog is the `hasRows` REGISTRATION gate below,
-    --     not this line.
+    -- The two select-all buttons close by different routes. SPACE is a menu navigation action
+    -- and reaches its button through the dialog's own dispatch, which skips a disabled button.
+    -- A mod action is not in that navigation set and keeps firing whatever the button's state,
+    -- so what closes the section key on an empty catalog is the `hasRows` registration gate.
     if self.selectSectionButton ~= nil then self.selectSectionButton:setDisabled(not hasRows) end
 
     -- RL_SELECT (KEY_a) / RL_SELECT_SECTION (KEY_s): custom mod actions do not fire from a
@@ -167,10 +145,9 @@ function RLDealerSaleSelectorDialog:onOpen()
             false, true, false, true)
         Log:trace("RLDealerSaleSelectorDialog:onOpen: registered RL_SELECT action event")
 
-        -- Guard the MEMBER, not just InputAction. A dropped or misspelled modDesc action
-        -- otherwise reaches registerActionEvent(nil, ...), and the button absorbs the same fault
-        -- independently: an action name that does not resolve leaves the button with no glyph
-        -- and no keybind while raising nothing. Without this WARNING there is no symptom at all.
+        -- Guard the MEMBER, not just InputAction: a dropped or misspelled modDesc action
+        -- otherwise reaches registerActionEvent(nil, ...) and the button silently loses its
+        -- glyph and keybind, raising nothing.
         if InputAction.RL_SELECT_SECTION ~= nil then
             g_inputBinding:registerActionEvent(
                 InputAction.RL_SELECT_SECTION, self, self.onClickSelectSection,
@@ -184,18 +161,15 @@ function RLDealerSaleSelectorDialog:onOpen()
 
     if hasRows and self.dealerSaleList ~= nil then
         self.dealerSaleList:reloadData()
-        -- Re-anchor focus to the first section/row on EACH open. The singleton reuses the
-        -- SmoothList across opens; without this a prior open's focused section leaks in
-        -- (reloadData only clamps a stale index into range, it does not reset it). This is the
-        -- sanctioned reset-to-(1,1) on OPEN - distinct from the post-toggle restore the toggle
-        -- paths avoid (SmoothList preserves focus across a toggle reload).
+        -- Re-anchor focus on each open: the singleton reuses the SmoothList, and reloadData
+        -- only clamps a stale index into range rather than resetting it, so a prior open's
+        -- focused section would otherwise leak in.
         self.dealerSaleList:setSelectedItem(1, 1)
     end
 
-    -- Seed BOTH labels AFTER the reload + re-anchor. They cannot be left to the delegate:
-    -- setSelectedItem fires onListSelectionChanged only when the index actually CHANGED, so on
-    -- a repeat open that re-anchors to the same (1,1) the labels would survive from the prior
-    -- open and describe a selection that no longer exists.
+    -- Seed both labels after the reload and re-anchor: setSelectedItem fires
+    -- onListSelectionChanged only when the index actually changed, so on a repeat open to the
+    -- same position the delegate never runs and stale labels would survive.
     self:_refreshListWideLabel()
     self:_refreshSectionLabel()
 
@@ -240,11 +214,9 @@ function RLDealerSaleSelectorDialog:_logGeometry()
     logElem("okButton",            self.okButton)
     logElem("buttonsPC",           self.buttonsPC)
 
-    -- The button row, measured rather than eyeballed. These buttons size themselves to their
-    -- label text and the row re-lays itself out whenever they change, so BOTH stateful labels
-    -- re-flow the whole row horizontally on every toggle. Logging each button's own extent plus
-    -- the row's total span is what makes "does it still fit the dialog" answerable from the log
-    -- - a single container size cannot show it.
+    -- The button row, measured rather than eyeballed: buttons size to their label text and the
+    -- row re-lays out whenever they change, so both stateful labels re-flow it on every toggle.
+    -- A single container size cannot answer whether the row still fits.
     local names = { "selectButton", "selectAllButton", "selectSectionButton", "okButton", "backButton" }
     local minLeft, maxRight = nil, nil
     for _, name in ipairs(names) do
@@ -449,10 +421,9 @@ function RLDealerSaleSelectorDialog:onClickSelect()
     end
     local section = self.dealerSaleList.selectedSectionIndex
     local index   = self.dealerSaleList:getSelectedIndexInSection()
-    -- Section resolution is SECTION-AWARE and three-armed, each arm named in its own TRACE:
-    -- nil, the documented 0 sentinel, and an index with no sectionOrder entry. The last is the
-    -- REACHABLE one here - buildSectionModel never emits a row-less section, so the engine's 0
-    -- is documented rather than produced, while a stale out-of-range index survives a reopen.
+    -- Three arms: nil, the engine's 0 sentinel, and an index with no sectionOrder entry. Only
+    -- the last is reachable here - buildSectionModel never emits a row-less section, while a
+    -- stale out-of-range index survives a reopen.
     if section == nil then
         Log:trace("RLDealerSaleSelectorDialog:onClickSelect: no usable section (nil)")
         return

@@ -24,9 +24,8 @@ function AIAnimalInseminationEvent.new(object, items)
 end
 
 
---- Server-context check, factored out so the in-game rlTest can swap it without mutating the root
---- g_server global (rlTest cannot reassign a root g_*, only a level below it - so run()'s
---- server-vs-pure-client branch is driven through this function). Production reads g_server.
+--- Server-context check, factored out as an overridable seam so a test can drive run()'s
+--- server-vs-pure-client branch without reassigning the root g_server global.
 --- @return boolean true if this process is the authoritative server
 function AIAnimalInseminationEvent.isServer()
 	return g_server ~= nil
@@ -62,8 +61,7 @@ function AIAnimalInseminationEvent:writeStream(streamId, connection)
 	streamWriteUInt16(streamId, #self.items)
 
 	-- Dense array (ipairs): the #self.items written here must equal numItems read back. Every
-	-- producer emits a dense items array (dialog: one item; herdsman/executor: 1:1 with count;
-	-- run()'s rebroadcast: the dense `applied` subset), so ipairs and #self.items always agree.
+	-- producer emits a dense items array, so ipairs and #self.items always agree.
 	for _, item in ipairs(self.items) do
 
 		RLAnimalUtil.writeStreamIdentifiers(item.animal, streamId, connection)
@@ -75,22 +73,11 @@ function AIAnimalInseminationEvent:writeStream(streamId, connection)
 end
 
 
---- Execute the event on the receiver. Server-authoritative apply + straw decrement.
+--- Execute the event on the receiver. Server-authoritative apply plus straw decrement.
 ---
---- Two orthogonal axes decide behavior:
----   * onServer (`g_server ~= nil`): authoritative. Validates each item with
----     getCanBeInseminatedByAnimal, and owns setInsemination + the straw decrement.
----     True on the dedi/host server branch AND on the herdsman loopback - which
----     `broadcastEvent(event, true)` runs through the CLIENT branch (its reverse
----     local connection is isServer=true), so the decrement gates on onServer, not
----     on the branch.
----   * isServerBranch (`not connection:getIsServer()`): the event arrived from a
----     REMOTE client - the menu path. Only then do we rebroadcast the applied
----     subset to the other clients, excluding the sender (Pattern A), so a client
----     never applies a server-rejected item.
---- A pure client (`g_server == nil`) only mirrors setInsemination for prompt
---- visibility (idempotent, no decrement); the dewar dirty-sync delivers the
---- absolute straw count, so clients never race the server on the count.
+--- Two orthogonal axes: `onServer` owns validation, setInsemination and the decrement - true on
+--- the herdsman loopback too, which arrives on the CLIENT branch, so the decrement gates on
+--- onServer, never on the branch. `isServerBranch` means a remote client sent it.
 ---@param connection table Network connection the event arrived on
 function AIAnimalInseminationEvent:run(connection)
 
@@ -167,9 +154,8 @@ function AIAnimalInseminationEvent:run(connection)
 
 		if isServerBranch and #applied > 0 then
 			-- Menu path (arrived from a REMOTE client): rebroadcast ONLY the server-applied subset,
-			-- excluding the sender (which already mutated optimistically before sendEvent). The
-			-- herdsman path does not reach here (its loopback takes the client branch), so its remote
-			-- clients apply the full broadcast optimistically and self-heal via the full animal sync.
+			-- excluding the sender, which already mutated optimistically. The herdsman path does not
+			-- reach here - its loopback takes the client branch.
 			g_server:broadcastEvent(
 				AIAnimalInseminationEvent.new(self.object, applied),
 				nil, connection, nil)
@@ -181,13 +167,11 @@ function AIAnimalInseminationEvent:run(connection)
 end
 
 
---- Thin dispatch: broadcast to clients if we are the server, otherwise send to the
---- server. Preserve the two-producer asymmetry (do NOT unify): the DIALOG caller
---- (AnimalAIDialog:onClickOk) pre-mutates local dewar + animal and calls this with NO
---- sendLocal (so a listen-server host never runs run() locally - the pre-mutation is its
---- sole apply); the HERDSMAN caller (RLHerdsmanExecutor._doAi / legacy AIAnimalManager, removed 1.3.2.0)
---- does NOT pre-mutate and broadcasts with sendLocal=true, applying server-side through
---- the loopback client branch.
+--- Thin dispatch: broadcast when this is the server, otherwise send to it.
+---
+--- The two producers are deliberately asymmetric: the dialog pre-mutates and passes no
+--- sendLocal, so a listen host never runs run() locally; the herdsman does not pre-mutate and
+--- broadcasts with sendLocal=true, applying server-side through the loopback client branch.
 ---@param object table Husbandry placeable
 ---@param items table Array of { animal = identifiers|Animal, dewar = <live dewar node object> }
 function AIAnimalInseminationEvent.sendEvent(object, items)

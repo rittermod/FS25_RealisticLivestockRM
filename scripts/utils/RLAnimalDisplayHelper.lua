@@ -1,29 +1,15 @@
 -- RLAnimalDisplayHelper.lua
--- Display helpers for the animal list surfaces (name tag + sort order).
---
--- Owns the two presentation helpers every animal list shares:
---   * formatDisplayName - append the genetics tag to a name per the player's
---     geneticsDisplay / geneticsPosition settings.
---   * sortAnimals       - the table.sort comparator (disease-first, subtype,
---     optional genetics, age).
---
--- A utils home (loads early, neutral to every consumer tree) so the rlmenu
--- services, the kept page-4 frame, and the shop item models can all reach one
--- copy of this behavior.
+-- Display helpers for the animal list surfaces: the genetics name tag and the sort order.
 
 local Log = RmLogging.getLogger("RLRM")
 
 RLAnimalDisplayHelper = {}
 
---- Apply the genetics name tag to a display name per the player's geneticsDisplay
---- / geneticsPosition settings.
+--- Apply the genetics name tag to a display name.
 ---
---- Mode (RLSettings.SETTINGS.geneticsDisplay.state): 1/nil = off (name returned
---- unchanged); 2 = compact `[NN]` average only; 3 = full `[NN-MM:HH:FF:QQ(:PP)]`
---- per-stat tag (productivity appended only when the species carries it).
---- Position (geneticsPosition.state == 2) puts the tag after the name, otherwise
---- before. An empty/nil name yields the bare tag. Missing / empty / non-table
---- genetics returns the name untouched (and never divides by zero).
+--- geneticsDisplay.state: 1 or nil off, 2 the compact `[NN]` average, 3 the full
+--- `[NN-MM:HH:FF:QQ(:PP)]` per-stat tag. geneticsPosition.state 2 puts the tag after the
+--- name, otherwise before.
 ---@param name string|nil display name to tag
 ---@param animal table|nil animal carrying a `genetics` sub-table
 ---@return string tagged name (or the original when tagging does not apply)
@@ -81,14 +67,10 @@ function RLAnimalDisplayHelper.formatDisplayName(name, animal)
     end
 end
 
---- Comparator for the animal list (passed to table.sort). Orders diseased animals
---- first, then ascending subTypeIndex, then - when RLSettings.SETTINGS.sortByGenetics
---- is on (state 2) - descending cached average genetics, and finally ascending age.
+--- Comparator for the animal list, for table.sort.
 ---
---- Operates on list ITEMS shaped `{ cluster = <cluster>, cachedAvgGenetics = <n> }`:
---- the cluster must expose `getHasAnyDisease()`, `subTypeIndex`, and `age`. A nil
---- cluster on either side sorts as `false` (intentionally asymmetric - safe inside
---- table.sort, where the caller supplies well-formed items).
+--- Operates on items shaped `{ cluster = <cluster>, cachedAvgGenetics = <n> }`, the cluster
+--- exposing `getHasAnyDisease()`, `subTypeIndex` and `age`.
 ---@param a table list item carrying a `.cluster`
 ---@param b table list item carrying a `.cluster`
 ---@return boolean aBeforeB true when `a` sorts before `b`

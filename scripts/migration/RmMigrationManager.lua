@@ -1,24 +1,15 @@
 --[[
     RmMigrationManager.lua
-    Handles migration from FS25_RealisticLivestock to FS25_RealisticLivestockRM
+    Migration from FS25_RealisticLivestock to FS25_RealisticLivestockRM: detect the old mod,
+    detect whether migration is needed, and prompt.
 
-    Migration responsibilities:
-    1. Detect old mod conflict (both mods installed)
-    2. Detect if migration is needed (old data exists, new data doesn't)
-    3. Show migration dialog to user
+    The migration itself is non-destructive and happens through dual-read in the loading
+    code - each loader tries the rm_-prefixed filename first and falls back to the old one.
+    The game then saves under the new names only, which completes the migration, so a user
+    can revert to the old mod before saving without losing data.
 
-    NON-DESTRUCTIVE MIGRATION APPROACH:
-    All migration is handled via dual-read support in the loading code:
-    - RLSettings.lua tries rm_RlSettings.xml first, falls back to rlSettings.xml
-    - RealisticLivestock_AnimalSystem.lua tries rm_RlAnimalSystem.xml first, falls back to animalSystem.xml
-    - RmItemSystemMigration.lua patches items.xml and handTools.xml in-memory
-
-    When the game saves, it writes to the NEW filenames only, effectively completing
-    the migration. The user can revert to the old mod before saving without data loss.
-
-    NOTE: No state file is used because FS25 replaces the entire savegame folder on save,
-    only preserving files written during the save callback. Migration detection relies on
-    checking whether new files (rm_RlSettings.xml) exist.
+    No state file: FS25 replaces the whole savegame folder on save and keeps only what the
+    save callback wrote, so detection asks whether the new files exist.
 ]]
 
 local Log = RmLogging.getLogger("RLRM")
@@ -27,16 +18,12 @@ RmMigrationManager = {}
 
 local RmMigrationManager_mt = Class(RmMigrationManager)
 
--- Legacy mod name - used by the in-file migration helpers (items.xml / handTools.xml
--- old-data detection). Scoped private so the conflict-detection registry below is the
--- single public source of truth for mod-compatibility checks.
+-- Legacy mod name, for the in-file items.xml / handTools.xml old-data detection.
 local LEGACY_MOD_NAME = "FS25_RealisticLivestock"
 
--- Single declarative registry of known-incompatible mods, partitioned at runtime by
--- :checkModCompatibility() into self.blockingMods (severity="block", existing UX with
--- doRestart) and self.warningMods (severity="warn", new dismissible InfoDialog).
--- Block entries use the shared rm_rl_mod_conflict_message body (one-dialog UX), so
--- their reasonKey is intentionally nil. Warn entries require a per-mod reasonKey.
+-- Known-incompatible mods, partitioned by :checkModCompatibility() into blockingMods
+-- (doRestart) and warningMods (dismissible InfoDialog). A block entry shares one message
+-- body so its reasonKey is nil; a warn entry needs a per-mod reasonKey.
 RmMigrationManager.KNOWN_INCOMPATIBLE_MODS = {
     { name = "FS25_RealisticLivestock",     severity = "block", reasonKey = nil },
     { name = "FS25_MoreVisualAnimals",      severity = "block", reasonKey = nil },
@@ -45,7 +32,6 @@ RmMigrationManager.KNOWN_INCOMPATIBLE_MODS = {
     { name = "FS25_AnimalFoodCalculator",   severity = "block", reasonKey = nil },
 }
 
--- Global instance
 g_rmMigrationManager = nil
 
 -- Pending dialog flags (set during checkModCompatibility, consumed by the startup
@@ -125,14 +111,8 @@ function RmMigrationManager:checkModCompatibility()
                 Log:debug("  block-tier match: %s", entry.name)
             elseif entry.severity == "warn" then
                 table.insert(self.warningMods, entry)
-                -- Resolve reason text with safe fallback to entry.name. Two miss paths:
-                --   (a) reasonKey is nil    -> registry contract drift (warn-tier should
-                --                              always have a reasonKey); fall back to name.
-                --   (b) reasonKey unresolved -> active locale missing the key; getText
-                --                              returns a placeholder string that would
-                --                              leak into UX as visible text. Route through
-                --                              hasText first and fall back to name.
-                -- Same fallback used by showWarningDialog (single source of truth).
+                -- Fall back to entry.name on a nil or unresolved reasonKey: getText returns
+                -- a "Missing 'KEY'" placeholder that would otherwise render as visible text.
                 local reasonText = entry.name
                 if entry.reasonKey ~= nil and g_i18n:hasText(entry.reasonKey) then
                     reasonText = g_i18n:getText(entry.reasonKey)
@@ -148,9 +128,8 @@ function RmMigrationManager:checkModCompatibility()
     if #self.blockingMods > 0 then
         local names = {}
         for _, e in ipairs(self.blockingMods) do table.insert(names, e.name) end
-        -- ERROR (escalated from prior WARNING): dediserver has no dialog surface,
-        -- so this log line is the admin-visible signal that a hard-conflict mod
-        -- is present. See docs/conventions/logging-levels.md.
+        -- A dedicated server has no dialog surface, so this line is the only admin-visible
+        -- signal that a hard-conflict mod is present.
         Log:error("Conflicting mods found: %s", table.concat(names, ", "))
     end
 
@@ -180,20 +159,15 @@ end
 function RmMigrationManager:showConflictDialog(callback)
     Log:info("Scheduling conflict dialog...")
 
-    -- Defensive: if called without a populated partition (e.g. test misuse,
-    -- or queue dispatch on a manager whose check never ran), skip the dialog.
-    -- The Log:error in checkModCompatibility is the only reliable surface for a
-    -- block-tier conflict; presenting a dialog with an empty mod list would mislead.
+    -- Skip rather than present an empty mod list, which would mislead.
     if self.blockingMods == nil or #self.blockingMods == 0 then
         Log:warning("showConflictDialog called with no blockingMods; skipping dialog")
         return
     end
 
     Timer.createOneshot(100, function()
-        -- Guard against mid-startup unload: if the user backed out during the
-        -- 100ms window, g_currentMission/g_gui can be torn down. Skip the
-        -- dialog and abandon the chain; doRestart wouldn't fire either way
-        -- because there's nothing to OK.
+        -- Mid-startup unload guard: the chain is abandoned rather than continued, since
+        -- doRestart could not fire anyway with no dialog to acknowledge.
         if g_currentMission == nil or g_gui == nil then
             Log:debug("showConflictDialog timer fired post-unload; skipping")
             return
@@ -242,10 +216,7 @@ function RmMigrationManager:showWarningDialog(callback)
     end
 
     Timer.createOneshot(100, function()
-        -- Guard against mid-startup unload: if the user backed out during
-        -- the 100ms window, advance the queue from the timer (callback is the
-        -- queue's showNext) so we don't leave it stalled. The next showNext
-        -- will hit its own teardown guard if needed.
+        -- Mid-startup unload guard: advance the queue from the timer so it is not stalled.
         if g_currentMission == nil or g_gui == nil then
             Log:debug("showWarningDialog timer fired post-unload; skipping dialog")
             if callback ~= nil then callback() end
@@ -253,9 +224,8 @@ function RmMigrationManager:showWarningDialog(callback)
         end
         Log:info("Showing warning dialog (%d warning(s))", #self.warningMods)
 
-        -- Resolve i18n with safe fallbacks. g_i18n:getText on a missing key returns
-        -- "Missing 'KEY' in l10n*.xml" placeholder text leaks into UX,
-        -- so route through hasText first.
+        -- getText on a missing key returns a "Missing 'KEY'" placeholder that would leak
+        -- into the UI, so route through hasText first.
         local title = g_i18n:hasText("rl_mod_warn_title")
             and g_i18n:getText("rl_mod_warn_title")
             or "Mod Compatibility Warning"
@@ -263,8 +233,7 @@ function RmMigrationManager:showWarningDialog(callback)
             and g_i18n:getText("rl_mod_compat_url")
             or "https://rittermod.github.io/FS25_RealisticLivestockRM/user-guide/reference-mod-compatibility"
 
-        -- Build bullet list. Same fallback contract as checkModCompatibility:
-        -- nil reasonKey OR unresolved key -> entry.name (single source of truth).
+        -- Same fallback contract as checkModCompatibility.
         local bullets = ""
         for _, entry in ipairs(self.warningMods) do
             local reasonText = entry.name
@@ -276,12 +245,9 @@ function RmMigrationManager:showWarningDialog(callback)
                 entry.name, tostring(entry.reasonKey))
         end
 
-        -- Format-string protection: rl_mod_warn_message expects exactly two %s
-        -- (bullets, urlLine). A community translator dropping one would crash
-        -- string.format and abort the dispatch chain. Guard with pcall and fall
-        -- back to manual concatenation. Only applied to the warn body where the
-        -- format string includes the URL placeholder; rm_rl_mod_conflict_message
-        -- has only one %s and is unchanged byte-for-byte (block-tier scope).
+        -- rl_mod_warn_message expects exactly two %s. A community translator dropping one
+        -- would crash string.format and abort the dispatch chain, so it runs under pcall
+        -- with a plain-concatenation fallback.
         local fmtTemplate = g_i18n:hasText("rl_mod_warn_message")
             and g_i18n:getText("rl_mod_warn_message")
             or "The following mod(s) loaded with Realistic Livestock RM may cause issues:%s\n\nSee %s for details. The game will continue."

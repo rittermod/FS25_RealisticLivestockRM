@@ -1,40 +1,22 @@
 --[[
     FS25_SeasonalWoolProduction.lua  (RLRM compat shim)
 
-    Makes RLRM and Argsy Gaming's Seasonal Wool Production (SWP) coexist:
-    - Every game-hour, recompute litersPerHour[WOOL] as a stable cluster
-      rate (count of mature sheep * per-animal curve value / 24) and hand
-      it off to SWP's modifyWoolRate. SWP records the rate into its
-      accumulator and zeroes litersPerHour[WOOL], so no continuous wool
-      spawns between shearing seasons. This intentionally overwrites
-      RLRM's per-animal output value because SWP's seasonal payout formula
-      expects rates that don't fluctuate hour-to-hour.
-    - In the deferred phase, replace SWP's countMatureAnimals with an
-      RLRM-aware version that walks clusterSystem:getClusters(). SWP's
-      pen iteration reads animalsSpec.clusterSystem.clusters as a field;
-      RLRM keeps that field empty (per-individual animals live in
-      clusterSystem.animals, exposed via :getClusters()), so without
-      this replacement SWP would count zero sheep and skip every pen
-      at shearing time.
-    - calcHealthAdjustedRate is NOT patched: it iterates the same empty
-      .clusters field under RLRM, totalAnimals stays 0, and the function
-      returns rawRate unchanged. One less foreign function to maintain.
+    Makes RLRM and Seasonal Wool Production (SWP) coexist. Every game-hour it recomputes
+    litersPerHour[WOOL] as a stable cluster rate and hands it to SWP's modifyWoolRate, which
+    records it and zeroes litersPerHour[WOOL] so no wool spawns between shearing seasons -
+    deliberately overwriting RLRM's per-animal output, since SWP's seasonal payout expects a
+    rate that does not fluctuate hour to hour.
 
-    Install timing:
-    - MODULE LOAD (this file is source()-d by RLModBridge while RLRM main.lua
-      runs): install the spec-registration append. MUST happen before spec
-      init captures function references.
-    - DEFERRED (Mission00.loadMission00Finished, via RLModBridge): replace
-      SeasonalWoolProduction.countMatureAnimals, populate activeShims,
-      save originals for restoreOriginals(modName).
-
-    Install-last shim discipline (see docs/architecture/mod-support-bridge.md):
-    all definitions first; the appendedFunction call is on the LAST line.
+    In the deferred phase it replaces SWP's countMatureAnimals with a version walking
+    clusterSystem:getClusters(), because SWP reads animalsSpec.clusterSystem.clusters as a
+    field that RLRM keeps empty and would otherwise count zero sheep. Install order is
+    load-bearing: the spec-registration append goes in at module load, before spec init
+    captures function references, so it is the LAST line of this file.
 ]]
 
--- Module-level guard: source-time safe per server-client-guards.md:482.
--- Returning here skips ALL installs including the spec-registration append,
--- which is the desired behavior on clients (RLRM's wool path is server-only).
+-- Source-time safe: only g_server is valid this early. Returning skips every install,
+-- the spec-registration append included, which is right on a client - the wool path is
+-- server-only.
 if g_server == nil then return end
 
 local Log = RmLogging.getLogger("RLRM")

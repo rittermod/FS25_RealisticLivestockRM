@@ -5,25 +5,13 @@ local Log = RmLogging.getLogger("RLRM")
 
 
 --[[
-    Pure builder for the startup dialog queue. No globals read, no side effects.
-    Takes a context table (assembled by the caller from globals + RLMapBridge state)
-    and returns an ordered array of {kind=..., text?=...} items.
+    Pure builder for the startup dialog queue: a context table in, an ordered array of
+    {kind, text?} items out. No globals read, no side effects.
 
-    Ordering and rules:
-    - conflict (block-tier) wins over migration when both flags are set, because
-      doRestart will reload everything anyway and the user must address the blocker
-      first. Conflict has NO isServer guard - a joining client with a bad host
-      modlist needs to fire its own dialog and doRestart out of the broken session
-      (FS25 enforces identical mod sets in MP). On a headless dedicated server the
-      InfoDialog primitive no-ops; the Log:error in checkModCompatibility is the
-      admin-visible surface.
-    - migration is server-only because RmMigrationDialog references the savegame.
-    - warn and bridge are suppressed on dedicated servers because there is no GUI
-      to render them; their log lines (in checkModCompatibility / RLMapBridge)
-      are the dediserver-visible surfaces.
-
-    Exposed as a module-table field (not local) so the test suite can call it
-    directly with a synthetic ctx and assert on queue shape.
+    Conflict outranks migration when both are set - doRestart reloads everything anyway -
+    and it carries NO isServer guard, because a joining client with a bad host modlist must
+    fire its own dialog and restart out of the session. Migration is server-only; warn and
+    bridge are suppressed on a dedicated server, which has no GUI to render them.
 
     @param ctx table {isServer, isDedicatedServer, hasConflict, hasMigration,
         hasWarn, hasBridgeWarning, bridgeText, hasConfigOverrideConflict,
@@ -47,10 +35,8 @@ function RealisticLivestock_FSBaseMission._buildStartupQueue(ctx)
         table.insert(q, { kind = "bridge", text = ctx.bridgeText })
     end
 
-    -- bridge-conflict sits AFTER bridge so a player hitting both warnings sees
-    -- the version-unknown notice first, then the configOverride collision notice.
-    -- Same dediserver-suppression rule as bridge: no GUI on a headless host;
-    -- the summary Log:warning emitted in RLMapBridge is the admin-visible surface.
+    -- bridge-conflict sits after bridge so a player hitting both sees the version-unknown
+    -- notice first, then the configOverride collision. Same dedicated-server suppression.
     if ctx.hasConfigOverrideConflict and not ctx.isDedicatedServer then
         table.insert(q, { kind = "bridge-conflict", text = ctx.configOverrideConflictText })
     end
@@ -60,26 +46,20 @@ end
 
 
 --[[
-    Assemble queue, log it, and dispatch the first item. Each presenter takes
-    `showNext` as its close callback so the chain advances on dismissal. The
-    conflict path's callback is intentionally never invoked - doRestart ends
-    the Lua state, and the queue is abandoned at that point.
+    Assemble the queue, log it, and dispatch the first item. Each presenter takes `showNext`
+    as its close callback so the chain advances on dismissal; the conflict path's callback
+    never fires, because doRestart ends the Lua state.
 
-    Each presenter is responsible for its own Timer.createOneshot(100, ...) -
-    the 100ms guards against the loading->gameplay transition swallowing the
-    dialog. RmMigrationDialog's onClickContinue closes BEFORE invoking the
-    callback,
-    so two startup dialogs are never on screen simultaneously.
+    Each presenter owns its own Timer.createOneshot(100, ...) - the delay stops the
+    loading-to-gameplay transition swallowing the dialog.
 ]]
 local function _showStartupDialogs(self)
-    -- Atomic capture-and-clear of bridge warning (mirrors prior pattern that
-    -- sat at this exact location pre-refactor).
+    -- Atomic capture-and-clear of the bridge warning.
     local bridgeText = RLMapBridge.pendingVersionWarning
     RLMapBridge.pendingVersionWarning = nil
 
-    -- Atomic capture-and-clear of bridge configOverride conflict warning,
-    -- mirroring the bridge-version slot above. Separate slot per spec - the
-    -- two warnings render as two sequential InfoDialogs.
+    -- Atomic capture-and-clear of the configOverride conflict warning. A separate slot, so
+    -- the two warnings render as two sequential InfoDialogs.
     local conflictText = RLMapBridge.pendingConfigOverrideConflictWarning
     RLMapBridge.pendingConfigOverrideConflictWarning = nil
 
@@ -89,10 +69,8 @@ local function _showStartupDialogs(self)
         hasConflict                  = g_rmMigrationConflict,
         hasMigration                 = g_rmPendingMigration,
         hasWarn                      = g_rmPendingModWarning,
-        -- Filter empty string in addition to nil; an empty bridge warning
-        -- would otherwise enqueue a bridge-kind item with empty body, rendering
-        -- a blank InfoDialog. Defensive against future producers - RLMapBridge
-        -- itself only writes string.format results today.
+        -- Empty string as well as nil: an empty warning would enqueue a bridge item with an
+        -- empty body and render a blank InfoDialog.
         hasBridgeWarning             = (bridgeText ~= nil and bridgeText ~= ""),
         bridgeText                   = bridgeText,
         -- Same nil-and-empty filter as bridgeText for the same reason.
@@ -123,15 +101,11 @@ local function _showStartupDialogs(self)
         elseif item.kind == "warn" then
             g_rmMigrationManager:showWarningDialog(showNext)
         elseif item.kind == "bridge" then
-            -- Bridge presenter wraps its own 100ms Timer here (the other
-            -- presenter kinds wrap inside their own RmMigrationManager methods).
-            -- The 100ms guard preserves the loading->gameplay transition behaviour
-            -- the pre-refactor inline block had at this site.
+            -- This presenter wraps its own Timer; the other kinds wrap inside their
+            -- RmMigrationManager methods. The delay guards the loading-to-gameplay transition.
             Timer.createOneshot(100, function()
-                -- Mid-startup unload guard (symmetric with RmMigrationManager
-                -- presenters): if the user backed out during the 100ms window,
-                -- advance the queue rather than calling InfoDialog against a
-                -- torn-down GUI.
+                -- Mid-startup unload guard: if the user backed out during the window, advance
+                -- the queue rather than call InfoDialog against a torn-down GUI.
                 if g_currentMission == nil or g_gui == nil then
                     Log:debug("bridge presenter timer fired post-unload; advancing queue")
                     showNext()
@@ -144,10 +118,8 @@ local function _showStartupDialogs(self)
                 end)
             end)
         elseif item.kind == "bridge-conflict" then
-            -- bridge-conflict presenter mirrors the bridge presenter exactly:
-            -- 100ms Timer, mid-startup unload guard, InfoDialog with showNext
-            -- as close-callback. Separate kind so the two warnings sequence
-            -- correctly when both fire in the same load.
+            -- Mirrors the bridge presenter. A separate kind, so the two warnings sequence
+            -- correctly when both fire in one load.
             Timer.createOneshot(100, function()
                 if g_currentMission == nil or g_gui == nil then
                     Log:debug("bridge-conflict presenter timer fired post-unload; advancing queue")
@@ -234,23 +206,12 @@ function RealisticLivestock_FSBaseMission:onStartMission()
 
     -- Re-load the BASE AnimalScreen GUI so its callback bindings re-snapshot.
     --
-    -- The GUI layer stores `onOpen` / `onClose` / `onCreate` as FUNCTION REFERENCES captured
-    -- when the XML is parsed (`addCallback` does `self[funcName] = self.target[callbackName]`),
-    -- and raises them from that stored reference - it never re-looks-up the class table. So
-    -- RLAnimalScreenBridge's `AnimalScreen.onOpen` wrapper, installed when our scripts are
-    -- sourced, is INVISIBLE to a tree that snapshotted before it: the base game registers this
-    -- GUI during its own init, so its snapshot holds the untouched vanilla `onOpen`.
-    --
-    -- Re-loading here - after our wrappers exist - re-runs the binding and re-points every
-    -- callback at the wrapped versions. This is why the EPP butcher's direct
-    -- `g_gui:showGui("AnimalScreen")` reaches our redirect at all; `AnimalScreen.show` needs no
-    -- such treatment because a plain class-table lookup resolves at call time.
-    --
-    -- Keep the file name pointing at the BASE screen: RLRM ships no AnimalScreen XML
-    -- any more, and the onOpen redirect requires the base GUI to stay REGISTERED
-    -- under this name.
-    -- Do NOT "simplify" this away - deleting it silently orphans the onOpen redirect, and the
-    -- automated suite cannot see that (the bridge tests call the function directly).
+    -- The GUI layer captures onOpen / onClose / onCreate as function references at XML parse
+    -- time and never re-looks-up the class table, so the base game's snapshot holds the
+    -- vanilla onOpen and RLAnimalScreenBridge's wrapper is invisible to it. Re-loading
+    -- re-points the callbacks; removing this line silently orphans the onOpen redirect, which
+    -- no automated test can see. The name must stay the BASE screen - RLRM ships no
+    -- AnimalScreen XML, and the redirect needs the base GUI registered under it.
     if g_gui.guis.AnimalScreen ~= nil then
         g_gui.guis.AnimalScreen:delete()
         g_gui:loadGui("dataS/gui/AnimalScreen.xml", "AnimalScreen", g_animalScreen)
@@ -288,21 +249,16 @@ function RealisticLivestock_FSBaseMission:onStartMission()
     RLDealerSaleSelectorDialog.register()
     RmMigrationDialog.register()
 
-    -- Mod-compatibility detection runs on every peer (g_modIsLoaded is authoritative
-    -- per peer). The lazy-create is idempotent - the `g_rmMigrationManager == nil`
-    -- guard makes a re-run a no-op; on a server the singleton is already created with
-    -- savegameDir set, on a pure client it's a thin singleton with savegameDir=nil -
-    -- safe because the methods reachable via the queue (showConflictDialog /
-    -- showWarningDialog / checkModCompatibility) never touch savegameDir.
+    -- Mod-compatibility detection runs on every peer, g_modIsLoaded being per-peer
+    -- authoritative. On a pure client the lazy-created singleton has savegameDir=nil, which
+    -- is safe: no method the queue can reach touches it.
     if g_rmMigrationManager == nil then
         Log:debug("FSBaseMission: lazy-creating RmMigrationManager (client path)")
         g_rmMigrationManager = RmMigrationManager.new()
     end
     g_rmMigrationManager:checkModCompatibility()
 
-    -- Build and dispatch the startup-dialog queue (migration / mod-warning / bridge).
-    -- Replaces three previously-independent if-blocks that could race for
-    -- g_gui:showDialog. The pure _buildStartupQueue is exposed for unit tests.
+    -- One queue rather than independent if-blocks, which could race for g_gui:showDialog.
     _showStartupDialogs(self)
 
     RLSettings.applyDefaultSettings()
@@ -319,10 +275,9 @@ function RealisticLivestock_FSBaseMission:onStartMission()
         local animals = placeable:getClusters()
 
         for _, animal in pairs(animals) do
-            -- Repair animals that got fallback IDs due to load-order race:
-            -- Placeables load before FarmManager:loadFromXMLFile, so farm lookup
-            -- in Animal.new returns nil for first-time RL installs on existing saves.
-            -- By onStartMission everything is initialized, so setUniqueId works.
+            -- Repair fallback ids from a load-order race: placeables load before
+            -- FarmManager:loadFromXMLFile, so the farm lookup in Animal.new returns nil on a
+            -- first-time install over an existing save. By onStartMission it resolves.
             if isServer and animal.uniqueId == "1" and animal.farmId == "1" then
                 animal:setUniqueId()
                 Log:debug("Fallback ID repair: 1/1 -> %s/%s (subType=%s)",

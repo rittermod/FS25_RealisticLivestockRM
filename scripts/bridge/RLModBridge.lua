@@ -1,32 +1,13 @@
 --[[
     RLModBridge.lua
-    Lightweight mod-compat bridge for RealisticLivestockRM.
+    Mod-compat bridge: lets RLRM coexist with a foreign mod that overlaps the same hooks.
 
-    Sibling to RLMapBridge but deliberately scoped down: no compat.xml schema,
-    no version-spec gating, no console command, no third-party scanning. Used
-    where RLRM needs to coexist with a single foreign mod that overlaps the
-    same hooks (current target: FS25_SeasonalWoolProduction).
-
-    Two-phase install:
-    - Module-load phase  (runModuleLoadPhase): runs when this file is sourced
-      from main.lua. Iterates SUPPORTED_MODS and source()s each shim file
-      unconditionally on the server. Required for shims whose hooks must be
-      installed before SpecializationUtil captures function references at
-      spec-init time. g_modIsLoaded is not yet populated for mods that load
-      alphabetically after RLRM at this point, so source-load cannot gate on
-      mod presence; per-shim safeCall isolates failures.
-    - Deferred phase     (runDeferredPhase): appended to
-      Mission00.loadMission00Finished. Iterates the registry again, checks
-      g_modIsLoaded[mod], invokes the shim's lateInstall(bridge) for state
-      population + late-binding patches (foreign class tables exist by now).
-
-    Observable state:
-    - activeShims[modName] = true     -- shim's hourly hook is wired and the
-                                         required foreign methods are callable
-    - shimErrors[modName] = "<reason>" -- WARN companion; lets tests assert
-                                         on state instead of log spies
-    - originalRefs[modName]            -- saved foreign-function references
-                                         for restoreOriginals(modName)
+    Two-phase install. The module-load phase sources every shim unconditionally on the
+    server, because a shim's hooks must be installed before SpecializationUtil captures
+    function references, and g_modIsLoaded is not yet populated for mods that load
+    alphabetically after RLRM. The deferred phase, on Mission00.loadMission00Finished,
+    checks g_modIsLoaded and calls each shim's lateInstall now that the foreign class
+    tables exist.
 ]]
 
 RLModBridge = {}
@@ -34,11 +15,9 @@ RLModBridge = {}
 local Log = RmLogging.getLogger("RLRM")
 local modDirectory = g_currentModDirectory
 
---- Registry of compat shims.
---- Each entry: { modName = "FS25_...", shimPath = "mod_support/.../*.lua",
----               shimGlobal = "ShimXxx", name = "Human-readable name" }
---- shimGlobal is the global table name the shim exports; the deferred phase
---- looks up _G[shimGlobal].lateInstall(bridge). No naming convention magic.
+--- Registry of compat shims. Each entry is
+--- `{ modName, shimPath, shimGlobal, name }`; the deferred phase looks up
+--- `_G[shimGlobal].lateInstall(bridge)`.
 RLModBridge.SUPPORTED_MODS = {
     {
         modName = "FS25_SeasonalWoolProduction",
@@ -54,21 +33,16 @@ RLModBridge.originalRefs = {}
 RLModBridge._sourced = false
 RLModBridge._deferredRan = false
 
---- Server-context check, factored out so tests can swap it without mutating
---- root g_* globals.
+--- Server-context check, an overridable seam so a test can swap it without touching g_server.
 --- @return boolean true if this process is acting as a server
 function RLModBridge.isServer()
     return g_server ~= nil
 end
 
---- Indirect handle on the global `source` function. Tests swap this to a
---- counting/throwing stub so the source-load loop can be exercised without
---- actually loading lua files (and without mutating the global `source`).
+--- Indirect handle on the global `source`, so a test can swap it without mutating the global.
 RLModBridge._sourceLoader = source
 
---- Source-load every shim file once. Safe to call multiple times: second and
---- later calls are no-ops via _sourced. Server-only - clients have no need
---- for compat hooks since RLRM's wool path is server-side.
+--- Source-load every shim file once; later calls are no-ops. Server-only.
 function RLModBridge.runModuleLoadPhase()
     if RLModBridge._sourced then
         Log:trace("RLModBridge: runModuleLoadPhase already ran, skipping")
@@ -96,9 +70,8 @@ function RLModBridge.runModuleLoadPhase()
     end
 end
 
---- State-population + late-binding-patch phase. Fires from
---- Mission00.loadMission00Finished. Idempotent via _deferredRan.
---- Server-only at first line so client bookkeeping stays empty.
+--- State-population and late-binding-patch phase, from Mission00.loadMission00Finished.
+--- Idempotent, and server-only at the first line so client bookkeeping stays empty.
 function RLModBridge.runDeferredPhase()
     if not g_currentMission:getIsServer() then return end
 
@@ -132,9 +105,7 @@ function RLModBridge.runDeferredPhase()
     end
 end
 
---- Restore originals saved by a shim's lateInstall. Used by tests (between
---- cases) and could be used by a future runtime toggle. Idempotent: a second
---- restore after originalRefs has been cleared is a no-op.
+--- Restore the originals a shim's lateInstall saved. Idempotent.
 --- @param modName string e.g. "FS25_SeasonalWoolProduction"
 function RLModBridge.restoreOriginals(modName)
     local refs = RLModBridge.originalRefs[modName]

@@ -1,29 +1,14 @@
 -- RLPermissionHelper.lua
--- The permission + farm-scope decision for server-side event validation, and the
--- matching client-side read.
---
--- Three layers, deliberately separated:
---   * authorize            - PURE. Data in, data out: the whole decision as a
---     truth table, with a `reason` so a rejection is observable without a logger spy.
---   * authorizeConnection  - resolves user context and the requester farm from the
---     live managers, then delegates to authorize.
---   * hasLocalPermission   - the nil-guarded client-side read, for UX gating only.
---
--- The decision is extracted rather than inlined because the clauses subsume one
--- another at the verdict level: deleting the requester-validity test still leaves
--- the owner test rejecting the same pair, so an inline chain has no per-clause
--- observable. Returning a `reason` is what makes each arm discriminable.
---
--- A utils home (loads early, neutral to every consumer tree). FarmManager is read
--- at CALL time only, so the module load stays game-state-free.
+-- The permission + farm-scope decision for server-side event validation, and the matching
+-- client-side read. FarmManager is read at call time only, so the module load stays
+-- game-state-free.
 
 local Log = RmLogging.getLogger("RLRM")
 
 RLPermissionHelper = {}
 
---- Rejection reasons returned by `authorize`. These strings are the discriminator a
---- test asserts against, and the text a caller renders into its rejection warning so
---- a server log says WHICH arm refused a request.
+--- Rejection reasons returned by `authorize`, and the text a caller renders into its
+--- rejection warning so a server log says which arm refused a request.
 RLPermissionHelper.REASON = {
     NO_PERMISSION = "NO_PERMISSION",
     INVALID_REQUESTER = "INVALID_REQUESTER",
@@ -34,10 +19,8 @@ RLPermissionHelper.REASON = {
 
 --- Test whether a farm id denotes a real, actionable player farm.
 ---
---- Reads `FarmManager.MAX_NUM_FARMS` RAW and at call time: a nil FarmManager is a
---- load-order fault that must crash loudly, not degrade into a guard that admits
---- everything. The bound rejects the reserved guided-tour (14) and invalid (15) ids
---- without naming them, and `> 0` rejects the spectator farm.
+--- `> 0` rejects the spectator farm and the upper bound rejects the reserved guided-tour
+--- and invalid ids; all three reach a permission check as ordinary-looking numbers.
 ---@param id any Candidate farm id
 ---@return boolean valid True when the id denotes a real player farm
 local function isRealFarmId(id)
@@ -47,15 +30,9 @@ end
 
 --- The whole authorization decision, as a pure function over plain data.
 ---
---- Evaluates in a fixed order - permission, requester validity, owner validity, then
---- strict equality - so a rejection always reports the FIRST failing arm. Both farm
---- ids are validated before they are compared, because farm id 0 reaches both sides
---- at once (the requester lookup falls through to the spectator farm and an unowned
---- or destroyed-farm pen reports owner 0), and a bare `~=` then evaluates `0 ~= 0`
---- and authorizes.
----
---- Pure: no `g_*`, no GUI, no XML. Reaches FarmManager only through the validity
---- test above, which is a code constant.
+--- Both ids are validated before they are compared: farm id 0 reaches both sides at once -
+--- a requester lookup falls through to the spectator farm, an unowned pen reports owner 0 -
+--- so a bare `~=` evaluates `0 ~= 0` and authorizes.
 ---@param hasPermission any The permission read for the requester; anything but `true` rejects
 ---@param requesterFarmId any The requesting player's resolved farm id
 ---@param ownerFarmId any The target object's owning farm id
@@ -91,18 +68,8 @@ function RLPermissionHelper.authorize(hasPermission, requesterFarmId, ownerFarmI
 end
 
 
---- Resolve the requesting user and farm from a connection, then authorize against a
---- target's owning farm.
----
---- Calls `getHasPlayerPermission(permissionKey, connection)` - the two-argument form
---- every server-side event in this tree uses - and resolves the requester farm with
---- `g_farmManager:getFarmForUniqueUserId`, matching the same set. Both managers are
---- hard dependencies and are read unguarded: an absent one is a load-order fault, not
---- a data problem.
----
---- Returns the resolved user context alongside the verdict because the caller's
---- rejection warning is required to name the user and both farm ids; resolving them
---- internally and not returning them would make that warning impossible to write.
+--- Resolve the requesting user and farm from a connection, then authorize against a target's
+--- owning farm.
 ---@param connection table The network connection the request arrived on
 ---@param permissionKey string Permission name, e.g. "tradeAnimals"
 ---@param ownerFarmId any The target object's owning farm id
@@ -131,11 +98,9 @@ function RLPermissionHelper.authorizeConnection(connection, permissionKey, owner
 end
 
 
---- Read a permission for the LOCAL player, for client-side UX gating only.
+--- Read a permission for the local player, for client-side UX gating only.
 ---
---- Never a security boundary: the server revalidates every request regardless of what
---- this returns. Coerced with `== true` so a non-boolean read cannot enable a control.
---- The nil guards mirror the shape `RLMenuAIFrame` already uses for the same read.
+--- Never a security boundary - the server revalidates every request regardless.
 ---@param permissionKey string Permission name, e.g. "tradeAnimals"
 ---@return boolean granted True only when the local player holds the permission
 function RLPermissionHelper.hasLocalPermission(permissionKey)

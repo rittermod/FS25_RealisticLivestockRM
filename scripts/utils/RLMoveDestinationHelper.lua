@@ -1,31 +1,17 @@
 -- RLMoveDestinationHelper.lua
--- Move-destination enumeration + validation for the animal move flows.
---
--- Owns the two move-destination helpers every move surface shares:
---   * getValidDestinations      - scan the owning farm's placeables for pens and
---     butchers (EPP) that support a given animal subtype, returning capacity (and,
---     for an EPP, age-bound) entries.
---   * buildMoveValidationResult - split a set of animals into valid / rejected
---     against one destination entry (EPP age gate, then cumulative capacity).
---
--- A utils home (loads early, neutral to every consumer tree) so the rlmenu move
--- service, the destination pickers, and the legacy move controller can all reach
--- one copy of this behavior. getValidDestinations reads g_currentMission only at
--- CALL time, so the module load stays game-state-free.
+-- Move-destination enumeration and validation for the animal move flows.
+-- g_currentMission is read at call time only, so the module load stays game-state-free.
 
 local Log = RmLogging.getLogger("RLRM")
 
 RLMoveDestinationHelper = {}
 
---- Enumerate the move destinations a farm offers for one animal subtype: every
---- owner-farm placeable that is either a husbandry supporting the subtype (excluding
---- the source husbandry) or an EPP (butcher) whose production point accepts it.
---- Husbandry entries carry live capacity; EPP entries additionally carry the
---- production point's min/max age bounds. An unresolvable subtype yields an empty list.
+--- Enumerate the move destinations a farm offers for one animal subtype: owner-farm
+--- husbandries supporting it, plus any EPP (butcher) whose production point accepts it.
 ---
---- Reads g_currentMission (animalSystem + placeableSystem) at CALL time - the caller
---- guards nil/invalid farmId. A nil sourceHusbandry turns the source-exclusion into a
---- no-op, so every owner-farm placeable supporting the subtype is returned (dealer-buy).
+--- Husbandry entries carry live capacity; EPP entries also carry the production point's age
+--- bounds. A nil sourceHusbandry makes the source-exclusion a no-op, so every owner-farm
+--- placeable supporting the subtype is returned - the dealer-buy case.
 ---@param sourceHusbandry table|nil Source husbandry excluded from the results (nil admits every owner-farm placeable)
 ---@param farmId number Owning farm ID the destinations must belong to
 ---@param animalSubTypeIndex number Animal subtype the destination must support
@@ -104,15 +90,11 @@ function RLMoveDestinationHelper.getValidDestinations(sourceHusbandry, farmId, a
 end
 
 
---- Split animals into valid / rejected against one destination entry, in input order.
---- Each animal faces, in order: the EPP age gate (applied ONLY when the entry is an EPP
---- AND advertises BOTH minAge and maxAge - a single missing bound skips the gate),
---- rejecting AGE_TOO_YOUNG / AGE_TOO_OLD; then a cumulative-capacity check against the
---- entry's freeSlots that rejects NO_CAPACITY once the running valid count fills them.
+--- Split animals into valid and rejected against one destination entry, in input order.
 ---
---- Pure: data in, data out, reaches no g_*. Indexes destination.name and
---- destination.freeSlots UNCONDITIONALLY - the caller guards nil animals / nil
---- destination before calling.
+--- The EPP age gate applies only when the entry is an EPP advertising BOTH bounds - a single
+--- missing bound skips it. `destination.name` and `.freeSlots` are indexed unconditionally,
+--- so the caller guards a nil destination.
 ---@param animals table Array of animals to validate (each may carry age, name, uniqueId)
 ---@param destination table Destination entry from getValidDestinations
 ---@param animalTypeIndex number Animal type index (logged only)
@@ -130,7 +112,6 @@ function RLMoveDestinationHelper.buildMoveValidationResult(animals, destination,
         local age = animal.age or 0
         local rejected = false
 
-        -- Check EPP age constraints
         if destination.isEPP and destination.minAge ~= nil and destination.maxAge ~= nil then
             local minAge = destination.minAge
             local maxAge = destination.maxAge
@@ -149,7 +130,6 @@ function RLMoveDestinationHelper.buildMoveValidationResult(animals, destination,
         end
 
         if not rejected then
-            -- Check cumulative capacity
             if slotsUsed >= freeSlots then
                 table.insert(result.rejected, { animal = animal, reason = "NO_CAPACITY" })
                 Log:trace("  rejected '%s': NO_CAPACITY (used=%d, free=%d)",

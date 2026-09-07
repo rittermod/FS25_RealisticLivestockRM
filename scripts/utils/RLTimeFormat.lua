@@ -2,17 +2,8 @@ local Log = RmLogging.getLogger("RLRM")
 
 RLTimeFormat = {}
 
---- Render a month count as a player-facing duration string.
----
---- Domain: a NON-NEGATIVE INTEGER number of months. There is deliberately no runtime
---- validation - every caller passes one of this mod's own integer month fields (an
---- animal's age, a treatment duration, a disease's remaining immunity), and an
---- out-of-domain value is a wiring bug that should stay loud rather than be absorbed
---- here. Note what an absorbing guard would hide: a negative count renders a plausible
---- wrong answer (-1 becomes "11 months") instead of failing.
----
---- The month term is emitted unconditionally once the year term is non-zero, so a
---- whole number of years reads "1 year, 0 months" rather than "1 year".
+--- Render a month count as a player-facing duration string. Unvalidated: the domain is a
+--- non-negative integer.
 ---@param age number month count; non-negative integer
 ---@return string localised "N years, M months", or "M months" below one year
 function RLTimeFormat.formatAge(age)

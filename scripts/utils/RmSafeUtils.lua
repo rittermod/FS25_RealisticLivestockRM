@@ -1,25 +1,13 @@
 RmSafeUtils = {}
 
---- Wraps a function body in xpcall with traceback logging, and emits
---- TRACE enter/exit log lines bracketing the call. Use for outer protection
---- of timer-driven handler callbacks (HOUR/DAY/PERIOD_CHANGED, deferred
---- Timer.createOneshot bodies). The enter/exit pair makes performance
---- triageable from the log: in-game time on enter, elapsed wall-clock
---- duration on exit. Both gated at TRACE; default DEBUG view stays clean.
----
---- Output shape:
----   [safeCall] <context>: enter (gameTime=D125 P3 06:00)   -- TRACE
----   [safeCall] <context>: exit  (took 42.18ms)             -- TRACE
----
---- Exit log fires even if the body throws (xpcall itself never raises).
---- The error log on failure is preserved.
+--- Run `fn` under xpcall, bracketed by enter/exit trace lines. The exit line carries the
+--- elapsed wall-clock time and fires even when the body throws.
 ---@param context string  identifier for log/error messages (e.g. "AnimalSystem:onDayChanged")
 ---@param fn function     the function body to protect
 ---@return boolean ok
 function RmSafeUtils.safeCall(context, fn)
     local startSec = getTimeSec()
     local gameTime = (RLDebugUtils and RLDebugUtils.formatGameTime and RLDebugUtils.formatGameTime()) or "?"
-    -- Enter/exit is execution-path detail (TRACE), not per-item DEBUG content.
     Log:trace("[safeCall] %s: enter (gameTime=%s)", context, gameTime)
 
     local ok, err = xpcall(fn, function(e) return tostring(e) end)
@@ -34,8 +22,7 @@ function RmSafeUtils.safeCall(context, fn)
     return ok
 end
 
---- Calls fn inside xpcall; returns defaults on error.
---- Use inside animal loops where one bad animal shouldn't kill all.
+--- Run `fn` under xpcall, returning `defaults` on error so one bad animal cannot kill a loop.
 ---@param animal table           the animal (for identity in log)
 ---@param context string         handler name for log
 ---@param fn function            function() -> values

@@ -1,17 +1,10 @@
 --[[
     RLVersionSpec.lua
-    Version parsing, normalization, comparison, and specifier matching.
-
-    Implements a subset of the Python packaging version spec:
-    - Pre-release normalization (alpha/beta/rc/dev with case/separator tolerance)
-    - Structured comparison (dev < a < b < rc < release)
-    - Specifier matching with < exclusion rule for pre-releases
-    - Operators: >=, <=, >, <, ==, !=
-
-    Most map/mod versions seems to match something like the Python packaging spec,
-    so this should provide robust handling of version strings and constraints in mod metadata.
+    Version parsing, normalization, comparison and specifier matching, implementing a
+    subset of the Python packaging version spec: pre-release normalization tolerant of
+    case and separator, structured comparison (dev < a < b < rc < release), and the
+    >=, <=, >, <, ==, != operators with the < pre-release exclusion rule.
     Reference: https://packaging.python.org/en/latest/specifications/version-specifiers/
-    Reference impl: https://github.com/pypa/packaging/blob/main/src/packaging/specifiers.py
 ]]
 
 RLVersionSpec = {}
@@ -19,10 +12,8 @@ RLVersionSpec = {}
 local Log = RmLogging.getLogger("RLRM")
 
 
---- Pre-release tag normalization table.
---- Maps recognized tags (lowercase) to a numeric type order for comparison.
---- Ordering: dev(0) < alpha(1) < beta(2) < rc(3) < release(nil)
---- Tags per Python packaging spec regex: a|b|c|rc|alpha|beta|pre|preview + dev
+--- Pre-release tags, lowercase, mapped to a numeric type order:
+--- dev(0) < alpha(1) < beta(2) < rc(3) < release(nil).
 local PRE_RELEASE_TAGS = {
     alpha = 1,
     a = 1,
@@ -36,8 +27,7 @@ local PRE_RELEASE_TAGS = {
 }
 
 
---- Supported operators for version specifier matching.
---- Maps operator string to a function that evaluates a compareVersions result.
+--- Operator string -> predicate over a compareVersions result.
 local VERSION_SPEC_OPS = {
     [">="] = function(cmp) return cmp >= 0 end,
     ["<="] = function(cmp) return cmp <= 0 end,
@@ -48,9 +38,7 @@ local VERSION_SPEC_OPS = {
 }
 
 
---- Normalize a raw pre-release suffix string into a structured object.
---- Strips separator characters (dot, dash, underscore), extracts the tag and optional number,
---- and maps to a canonical type order for comparison.
+--- Normalize a raw pre-release suffix into `{ typeOrder, num }`, stripping `.`, `-` and `_`.
 --- @param rawSuffix string|nil Raw suffix (e.g. "Beta1", "b.1", "RC-1", "dev3", "alpha")
 --- @return table|nil pre { typeOrder = number, num = number } or nil if unrecognized
 function RLVersionSpec.normalizeSuffix(rawSuffix)
@@ -77,12 +65,10 @@ function RLVersionSpec.normalizeSuffix(rawSuffix)
     return { typeOrder = typeOrder, num = num }
 end
 
---- Parse a version string into a structured version object.
---- Handles version strings with pre-release suffixes in various formats:
----   Space/dash/underscore separator: "1.4.0.0 Beta1", "1.4.0.0-RC1", "1.4.0.0_beta1"
----   No separator (attached):         "1.4.0.0a1", "1.4.0.0beta1"
----   Dot-separated suffix:            "1.4.0.0.beta1", "1.4.0.0.b.1"
---- Strips optional leading 'v'/'V' prefix and surrounding whitespace.
+--- Parse a version string into a structured version object, stripping a leading `v`.
+---
+--- Accepts a pre-release suffix separated by space, dash or underscore, attached directly,
+--- or dot-separated: "1.4.0.0 Beta1", "1.4.0.0-RC1", "1.4.0.0a1", "1.4.0.0.b.1".
 --- @param versionStr string|nil Version string (e.g. "1.3.0.1", "v1.4.0.0 Beta1", "1.4.0.0.b.1")
 --- @return table|nil version { tuple={numbers}, suffix=string|nil, pre={typeOrder,num}|nil }
 function RLVersionSpec.parseVersion(versionStr)
@@ -153,12 +139,10 @@ function RLVersionSpec.parseVersion(versionStr)
 end
 
 --- Compare two version objects component by component.
---- Accepts both structured format ({ tuple, suffix, pre }) and plain arrays (backward compat).
---- Treats missing tuple components as 0 (e.g. {1,3} == {1,3,0,0}).
---- When tuples are equal, uses normalized pre-release comparison:
----   nil (release) > any pre-release
----   dev(0) < alpha(1) < beta(2) < rc(3) < release(nil)
---- Falls back to lexicographic suffix comparison for unrecognized suffixes.
+---
+--- Accepts either the structured `{ tuple, suffix, pre }` form or a plain array, and treats
+--- missing tuple components as 0, so `{1,3}` equals `{1,3,0,0}`. A release outranks any
+--- pre-release; an unrecognized suffix falls back to lexicographic comparison.
 --- @param a table Version object or plain tuple
 --- @param b table Version object or plain tuple
 --- @return number result Negative if a < b, 0 if equal, positive if a > b
@@ -208,13 +192,11 @@ function RLVersionSpec.compareVersions(a, b)
     end
 end
 
---- Check if a version satisfies a Python-style version specifier string.
---- Spec format: comma-separated constraints (AND logic), each is <operator><version>.
---- Supported operators: >=, <=, >, <, ==, !=
---- The < operator excludes pre-releases of the specified version (per packaging spec):
----   <1.4.0.0 returns false for 1.4.0.0 Beta1 (same base, pre-release excluded)
----   <1.4.0.0 returns true for 1.3.0.0 dev1 (different base, not excluded)
---- Whitespace around operators and between constraints is tolerated.
+--- Check whether a version satisfies a Python-style specifier: comma-separated constraints,
+--- ANDed, each `<operator><version>`.
+---
+--- `<` also excludes pre-releases of the named version, so `<1.4.0.0` is false for
+--- "1.4.0.0 Beta1" (same base) and true for "1.3.0.0 dev1" (different base).
 --- @param versionStr string|nil Version to check (e.g. "1.4.0.0", "1.4.0.0 Beta1")
 --- @param specStr string|nil Specifier (e.g. ">=1.3.0.0,<1.5.0.0")
 --- @return boolean matches True if version satisfies ALL constraints (nil/empty spec = true)

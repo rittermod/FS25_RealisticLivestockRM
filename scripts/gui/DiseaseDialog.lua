@@ -31,19 +31,10 @@ end
 
 --- Open the treatment dialog for one animal.
 ---
---- Refuses while the disease engine is off. Both callers funnel through here - the RL Menu Info
---- frame's button and `createFromExistingGui` - so while the lock holds, no open reaches
---- `onClickOk`, its treatment-running write, the treatment toggle event or the three treatment
---- messages.
----
---- "While the lock holds" is the honest scope, not "every future open". `createFromExistingGui`
---- passes no animal at all, so with the setting back ON it still raises on the clone below -
---- a pre-existing defect this gate MASKS rather than fixes. The record slice rewrites the
---- dialog and owns it; do not read the refusal as having closed it.
----
---- It does NOT close an already-open dialog: `onClickOk` carries no recheck. Under the lock
---- the dialog can never have opened in the first place, so that residual has no
---- player-reachable path and no recheck is added for it.
+--- Refuses while the disease engine is off, and both callers funnel through here, so under
+--- the lock no open reaches onClickOk's treatment write, the toggle event or the messages.
+--- It does not close an already-open dialog and needs no recheck: under the lock one could
+--- never have opened.
 ---@param animal table|nil The animal whose records to show.
 ---@param onCloseCallback function|nil Invoked on close so the parent can refresh.
 ---@param onCloseTarget table|nil `self` for the close callback.
@@ -95,10 +86,7 @@ function DiseaseDialog:onClickOk()
 
     local disease = self.diseases[self.diseaseList.selectedIndex]
 
-    -- REPOINTED, not re-decided. Every clause below means what it meant before - a record with
-    -- no authored course, or one already past its infection - and the state test is the direct
-    -- successor of the cured flag. Which states may start, pause or resume a course is the
-    -- enrolment slice's rule to write, not this one's to guess at.
+    -- Each clause means: a record with no authored course, or one already past its infection.
     if disease == nil or disease.model.treatment == nil
         or disease.state == RLDiseaseRecord.STATE.RECOVERED then
         return
@@ -107,21 +95,14 @@ function DiseaseDialog:onClickOk()
     local newState = not disease.treatmentRunning
     local husbandry = self.animal.clusterSystem.owner
 
-    -- Send network event (server broadcasts, client sends to server)
-    -- The remaining counter is months LEFT, captured before the toggle: on a stop it is what the
-    -- paused course resumes from, on a start it is whatever a previous course left behind. It is
-    -- the local machine's value, so read it as "what THIS peer will render" rather than as the
-    -- authoritative course state: the toggle event replicates the RUNNING flag and never this
-    -- counter. A client's copy arrives on the pen flush that each disease transition schedules,
-    -- so it is accurate as of the last transition and drifts from there, because the per-month
-    -- decrement is deliberately not synced.
-    -- uniqueId names the animal so the line stands on its own.
+    -- The remaining counter is months left, captured before the toggle. It is this peer's own
+    -- value, not authoritative course state: the toggle event replicates the running flag and
+    -- never the counter, whose per-month decrement is deliberately unsynced.
     Log:trace("DiseaseDialog:onClickOk sending event disease=%s treatment=%s treatmentMonthsRemaining=%s uniqueId=%s",
         disease.title, tostring(newState), tostring(disease.treatmentMonthsRemaining),
         tostring(self.animal.uniqueId))
     DiseaseTreatmentToggleEvent.sendEvent(husbandry, self.animal, disease.title, newState)
 
-    -- Local UI feedback (immediate)
     disease.treatmentRunning = newState
     for _, aDisease in pairs(self.animal.diseases) do
         if aDisease.title == disease.title then
@@ -130,7 +111,6 @@ function DiseaseDialog:onClickOk()
         end
     end
 
-    -- Messages (keep existing logic)
     if not newState then
         self.animal:addMessage("DISEASE_TREATMENT_STOP", { disease.model.name })
     else
@@ -194,15 +174,9 @@ function DiseaseDialog:populateCellForItemInSection(list, section, index, cell)
     local treatment = model.treatment
 
     cell:getAttribute("title"):setText(model.name)
-    -- Months REMAINING once a course is under way, the authored total otherwise. A
-    -- paused course still counts as under way and reads as remaining; a recovered or
-    -- never-started record is back at zero and reads as the total. The nil-treatment
-    -- arm must stay short-circuited - two shipped diseases carry no treatment block,
-    -- so the duration term below may not be evaluated for them.
-    --
-    -- The remaining counter is a float, so a part-served course would render its decimal
-    -- expansion through a formatter that takes `age % 12` and prints it with `%s`. Nothing
-    -- advances it in this build, so every record reaches here at zero and reads the total.
+    -- Months remaining once a course is under way, the authored total otherwise. The
+    -- nil-treatment arm must stay short-circuited: two shipped diseases carry no treatment
+    -- block, so the duration term below may not be evaluated for them.
     cell:getAttribute("duration"):setText(treatment == nil and "N/A"
         or RealisticLivestock.formatAge(
             disease.treatmentMonthsRemaining > 0 and disease.treatmentMonthsRemaining or treatment.months))

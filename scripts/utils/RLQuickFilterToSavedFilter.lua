@@ -1,25 +1,14 @@
 -- RLQuickFilterToSavedFilter.lua
--- Pure-data conversion from AnimalFilterDialog widget state into the saved-filter
--- payload shape expected by g_rlFilterService:create.
+-- Pure-data conversion from AnimalFilterDialog widget state into the saved-filter payload
+-- shape `g_rlFilterService:create` expects.
 --
--- Mirrors the prune semantics of AnimalFilterDialog:onClickOk (full-range sliders
--- are dropped; "ignore" binaries are dropped) so save-from-QF matches apply-from-QF
--- on identical widget state. Catalog-key renames (`getHasAnyDisease` -> `hasAnyDisease`,
--- `getHasName` -> `hasName`) bridge the QF target string to the RLFilterFieldCatalog key.
--- Layered genetics slider targets are flattened to `genetics.<axis>` and the raw
--- 0.25-1.75 range is mapped to the catalog's 0-99 integer scale via
--- RLScaleHelper.scaleToNinetyNine.
+-- Prune semantics match AnimalFilterDialog:onClickOk - full-range sliders and "ignore"
+-- binaries are dropped - so save-from-QF and apply-from-QF agree on identical widget state.
+-- Layered genetics targets flatten to `genetics.<axis>` and the raw 0.25-1.75 range maps to
+-- the catalog's 0-99 scale. `getSellPrice` has no catalog counterpart and is dropped, with
+-- `droppedValue` set on the return so the caller can warn once.
 --
--- The `getSellPrice` (Value) row has no catalog counterpart and is dropped from the
--- saved expression; `droppedValue` is set on the return so the caller can surface a
--- one-time warning to the user.
---
--- Consumers: AnimalFilterDialog:onClickSaveFilter (production), the
--- RLQuickFilterToSavedFilterTests suite (rlTest).
---
--- No GUI imports. No global mutations. Frame-agnostic: the `usage` axis is supplied
--- by the caller (OWNED for Info/Sell/Move, DEALER for Buy) and threaded verbatim
--- into the payload.
+-- No GUI imports and no global mutations; the `usage` axis is supplied by the caller.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -29,19 +18,16 @@ RLQuickFilterToSavedFilter = {}
 -- Catalog key map (QF target -> RLFilterFieldCatalog key)
 -- =============================================================================
 
--- QF binary rows reference live getter functions (`getHasAnyDisease`, `getHasName`);
--- the catalog stores the same data under boolean keys (`hasAnyDisease`, `hasName`).
--- The map is the single source of truth for the rename so a future binary row
--- (e.g. `getHasAnyMark` -> `hasAnyMark`) only needs an entry added here.
+-- QF binary rows reference live getter functions; the catalog stores the same data under
+-- boolean keys. A future binary row only needs an entry added here.
 local QF_TO_CATALOG_KEY = {
     getHasAnyDisease = "hasAnyDisease",
     getHasName       = "hasName",
 }
 
---- Resolve a single QF row's target to its saved-filter catalog key.
---- Returns nil for `getSellPrice` (intentionally not in catalog; dropped with warning)
---- and for any unknown target (defensive; warn so a future row with no mapping is
---- visible in logs).
+--- Resolve a QF row's target to its saved-filter catalog key.
+---
+--- nil for `getSellPrice`, which has no catalog counterpart, and for an unknown target.
 ---@param filter table the QF row
 ---@return string|nil catalog key
 local function resolveCatalogKey(filter)
@@ -58,7 +44,7 @@ local function resolveCatalogKey(filter)
     end
     local renamed = QF_TO_CATALOG_KEY[filter.target]
     if renamed ~= nil then return renamed end
-    -- Plain catalog-aligned target ("age", "gender", "isPregnant", "isLactating").
+    -- Plain catalog-aligned target.
     return filter.target
 end
 
@@ -67,24 +53,16 @@ end
 -- =============================================================================
 
 --- Convert one QF slider row to zero or two `>=`/`<=` leaf conditions.
---- Mirrors AnimalFilterDialog:onClickOk prune semantics:
---- a full-range slider (left thumb at 1, right thumb at cachedCount) is pruned.
---- Crossed thumbs are tolerated via math.min/math.max (legacy parity).
 ---
---- For genetics rows the raw [0.25, 1.75] value is mapped to the catalog's 0-99
---- integer scale via RLScaleHelper.scaleToNinetyNine. For all other slider rows
---- the raw value is used directly (age in months, health 0-100, weight kg).
----
---- `getSellPrice` rows return `dropped=true` so the caller can surface a warning
---- and skip emitting children.
----
+--- A full-range slider is pruned and crossed thumbs are tolerated, both matching
+--- AnimalFilterDialog:onClickOk. Genetics rows map the raw [0.25, 1.75] value to the
+--- catalog's 0-99 scale; every other row uses the raw value. `getSellPrice` returns
+--- `dropped=true` so the caller can warn and skip emitting children.
 ---@param filter table QF slider row
 ---@param appendChild fun(child:table) emit a condition child into the AND group
 ---@return boolean dropped true iff the row was intentionally not emitted
 local function convertSliderRow(filter, appendChild)
-    -- Full-range prune. cachedTexts may be nil if the slider was constructed in a
-    -- degenerate state (the dialog logs a warning at line ~464 for this); treat it
-    -- as full-range (no narrowing) and prune defensively.
+    -- Full-range prune. A degenerate slider has nil cachedTexts; treat that as full-range.
     local cachedCount = (filter.cachedTexts ~= nil) and #filter.cachedTexts or 0
     local left  = filter.uiLeftState  or 1
     local right = filter.uiRightState or 1
@@ -99,10 +77,8 @@ local function convertSliderRow(filter, appendChild)
         return false
     end
 
-    -- getSellPrice -> dropped with warning. The catalog has no `getSellPrice`
-    -- field and the QF buy-mode markup (the active dealer-quality preset's,
-    -- resolved at evaluation time) is dialog-layer only; saving the raw value
-    -- would silently match different animals across Info/Sell/Buy.
+    -- Dropped: the catalog has no `getSellPrice`, and the QF buy-mode markup is dialog-layer
+    -- only, so saving the raw value would silently match different animals across the frames.
     if (not filter.isLayered) and filter.target == "getSellPrice" then
         Log:trace("RLQuickFilterToSavedFilter.convertSliderRow: getSellPrice narrowed (left=%d right=%d); dropping with warning",
             left, right)
@@ -143,10 +119,9 @@ local function convertSliderRow(filter, appendChild)
 end
 
 --- Convert one QF binary row to zero or one `==` leaf condition.
---- Mirrors AnimalFilterDialog:onClickOk: state=2 ("ignore") is
---- pruned; the selected value is read from filter.text[state].value (the row's
---- canonical value, not a localized label).
 ---
+--- "ignore" is pruned, and the value comes from `filter.text[state].value` - the row's
+--- canonical value, never a localized label.
 ---@param filter table QF binary row
 ---@param appendChild fun(child:table) emit a condition child into the AND group
 local function convertBinaryRow(filter, appendChild)

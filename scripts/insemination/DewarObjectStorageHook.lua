@@ -1,56 +1,24 @@
 --[[
     DewarObjectStorageHook.lua
 
-    Makes rlDewar vehicles round-trip through PlaceableObjectStorage without
-    losing their DewarData spec state (uniqueId, straw count, stored animal).
+    Makes rlDewar vehicles round-trip through PlaceableObjectStorage without losing their
+    DewarData spec state (uniqueId, straw count, stored animal), which the storage otherwise
+    drops - only the standard pallet attributes survive. The extra state rides on the
+    abstractObject instance and persists under a namespaced nested XML key; the restore path
+    goes through DewarData's public setters only.
 
-    Problem:
-    Storing a dewar in a PlaceableObjectStorage and taking it back out
-    loses all DewarData state (uniqueId, straws, assigned animal). Only
-    the standard pallet attributes are preserved by the storage.
-
-    Solution:
-    Hook the AbstractPalletObject entry/exit/save/load methods via
-    PlaceableObjectStorage.ABSTRACT_OBJECTS_BY_CLASS_NAME["Vehicle"], carry
-    the extra dewar state on the abstractObject instance itself, and
-    persist it under a namespaced nested XML key. We only touch DewarData
-    through its public API (setUniqueId/setStraws/setAnimal) on the
-    restore path, so there is no coupling to DewarData internals.
-
-    Timing:
-    Placeable.xmlSchemaSavegame and the ABSTRACT_OBJECTS_BY_CLASS_NAME
-    table are not yet populated when our main.lua runs. We defer all
-    installation to an addInitSchemaFunction callback, which fires once
-    both are ready. Same pattern the original RealisticLivestock mod's
-    PlaceableAuctionMart uses for its PlayerStyle savegame paths.
-
-    Module layout:
-      DewarObjectStorageHook.snapshot(vehicle)           -> state or nil
-      DewarObjectStorageHook.restore(vehicle, state)     -> void
-      DewarObjectStorageHook.writeStateToXML(state, xmlFile, baseKey)
-      DewarObjectStorageHook.readStateFromXML(xmlFile, baseKey) -> state or nil
-
-    The four base-game hooks installed inside installHooks() below delegate
-    to the module functions so each piece of logic is independently
-    unit-testable via rlTest.
-
-    g_dewarManager registration is handled automatically: onDelete on the old
-    vehicle unregisters it, and setAnimal on the new vehicle re-registers it.
+    Timing: Placeable.xmlSchemaSavegame and ABSTRACT_OBJECTS_BY_CLASS_NAME are not populated
+    when main.lua runs, so every hook is installed from an addInitSchemaFunction callback.
 ]]
 
 DewarObjectStorageHook = {}
 DewarObjectStorageHook.SAVEGAME_KEY = "dewarData"
 DewarObjectStorageHook.GENETICS_FIELDS = { "metabolism", "fertility", "health", "quality", "productivity" }
 
--- -----------------------------------------------------------------------------
--- ensurePalletAttributesShape: backfill nil fillLevel/fillType
--- -----------------------------------------------------------------------------
---- Ensures a stored-pallet attribute table exposes non-nil fillLevel and
---- fillType. Some third-party mods that read palletAttributes for stored
---- pallets assume both fields are always populated and crash on nil
---- comparisons (observed with Time Saving Stock Check). This is a backstop
---- for dewar.xml's placeholder fillUnit block: if that block is ever removed
---- or misconfigured, this guard still prevents the crash.
+--- Ensure a stored-pallet attribute table exposes non-nil fillLevel and fillType.
+---
+--- Third-party mods reading palletAttributes assume both are populated and crash on a nil
+--- comparison. A backstop for dewar.xml's placeholder fillUnit block.
 ---@param palletAttributes table|nil Attribute table to normalise
 function DewarObjectStorageHook.ensurePalletAttributesShape(palletAttributes)
     if palletAttributes == nil then return end
@@ -62,11 +30,8 @@ function DewarObjectStorageHook.ensurePalletAttributesShape(palletAttributes)
     end
 end
 
--- -----------------------------------------------------------------------------
--- snapshot: capture DewarData state from a live vehicle
--- -----------------------------------------------------------------------------
---- Returns a plain-table snapshot of the vehicle's DewarData spec state,
---- or nil if the vehicle isn't a dewar or has no spec table.
+--- Returns a plain-table snapshot of the vehicle's DewarData spec state, or nil when the
+--- vehicle is not a dewar or has no spec table.
 ---@param vehicle table|nil Live vehicle (or mock with the same surface)
 ---@return table|nil state
 function DewarObjectStorageHook.snapshot(vehicle)
@@ -74,9 +39,7 @@ function DewarObjectStorageHook.snapshot(vehicle)
     local spec = vehicle[DewarData.SPEC_TABLE_NAME]
     if spec == nil then return nil end
 
-    -- Zero-straw zombie guard: a dewar entering object storage with no straws
-    -- is illegal state; refuse to capture so the storage round-trip can't
-    -- resurrect it.
+    -- Zero-straw zombie guard: refuse to capture, so the round-trip cannot resurrect one.
     if (spec.straws or 0) <= 0 then
         Log:warning("DewarStorage SNAPSHOT: refusing zero-straw dewar uniqueId=%s",
             tostring(vehicle:getUniqueId()))
@@ -103,22 +66,15 @@ function DewarObjectStorageHook.snapshot(vehicle)
     return state
 end
 
--- -----------------------------------------------------------------------------
--- restore: apply captured state onto a freshly spawned dewar
--- -----------------------------------------------------------------------------
---- Applies a previously captured snapshot onto a dewar vehicle via its public
---- setters. No-op if state is nil or vehicle isn't a dewar.
+--- Apply a captured snapshot onto a dewar vehicle through its public setters.
 ---@param vehicle table Live vehicle
 ---@param state table|nil Snapshot from DewarObjectStorageHook.snapshot
 function DewarObjectStorageHook.restore(vehicle, state)
     if vehicle == nil or state == nil then return end
     if not vehicle.isDewar then return end
 
-    -- Zero-straw zombie guard: never restore state onto a vehicle that
-    -- would immediately be illegal. Defer the delete via
-    -- Timer.createOneshot(0, ...) - same rationale as
-    -- DewarData:loadDewarFromSavegame (this runs inside the storage-exit
-    -- load chain, so direct delete is unsafe).
+    -- Zero-straw zombie guard. The delete is deferred through Timer.createOneshot(0, ...)
+    -- because this runs inside the storage-exit load chain, where a direct delete is unsafe.
     if g_server ~= nil and (state.straws or 0) <= 0 then
         Log:warning("DewarStorage RESTORE: refusing zero-straw state uniqueId=%s, scheduling deferred delete",
             tostring(state.uniqueId))
@@ -146,10 +102,7 @@ function DewarObjectStorageHook.restore(vehicle, state)
     end
 end
 
--- -----------------------------------------------------------------------------
--- writeStateToXML: serialize state under a base XML key
--- -----------------------------------------------------------------------------
---- Writes the nested dewar state XML block under `baseKey`. No-op if state nil.
+--- Write the nested dewar state XML block under `baseKey`.
 ---@param state table|nil Snapshot to write
 ---@param xmlFile table XMLFile handle (must support setValue)
 ---@param baseKey string Path prefix (e.g. "placeables.placeable(1).objectStorage.object(0)")
@@ -182,11 +135,7 @@ function DewarObjectStorageHook.writeStateToXML(state, xmlFile, baseKey)
     end
 end
 
--- -----------------------------------------------------------------------------
--- readStateFromXML: deserialize state from a base XML key
--- -----------------------------------------------------------------------------
---- Reads the nested dewar state XML block under `baseKey` and returns a state
---- table, or nil if no `.dewarData` block exists at that base.
+--- Read the nested dewar state XML block under `baseKey`, or nil when there is none.
 ---@param xmlFile table XMLFile handle (must support getValue + hasProperty)
 ---@param baseKey string Path prefix
 ---@return table|nil state
@@ -223,21 +172,17 @@ end
 -- =============================================================================
 -- DEFERRED HOOK INSTALLATION
 --
--- Runs via g_xmlManager:addInitSchemaFunction - the same deferral pattern
--- the original RealisticLivestock mod uses for its PlayerStyle savegame
--- paths. By the time this callback fires, Placeable.xmlSchemaSavegame and
--- PlaceableObjectStorage.ABSTRACT_OBJECTS_BY_CLASS_NAME are both ready.
+-- Runs via g_xmlManager:addInitSchemaFunction, by which time Placeable.xmlSchemaSavegame
+-- and PlaceableObjectStorage.ABSTRACT_OBJECTS_BY_CLASS_NAME are both ready.
 -- =============================================================================
 
 local function installHooks()
-    -- Idempotency guard: addInitSchemaFunction callbacks can fire more
-    -- than once during startup. Re-applying the hook would double-wrap
-    -- the target methods and cause each callback to run twice.
+    -- Idempotency guard: addInitSchemaFunction can fire more than once during startup, and
+    -- re-applying would double-wrap the targets so each callback ran twice.
     if DewarObjectStorageHook._installed then return end
     DewarObjectStorageHook._installed = true
 
-    -- Resolve AbstractPalletObject via the public class-name lookup table
-    -- (it is not exposed as a global).
+    -- AbstractPalletObject is not exposed as a global; the class-name table is the way in.
     if PlaceableObjectStorage == nil
         or PlaceableObjectStorage.ABSTRACT_OBJECTS_BY_CLASS_NAME == nil
     then
@@ -329,12 +274,11 @@ local function installHooks()
     )
 
     -- -------------------------------------------------------------------------
-    -- Savegame load: annotate newly-inserted abstractObject with our state
+    -- Savegame load: annotate the newly-inserted abstractObject
     --
-    -- loadFromXMLFile is called without a `self` argument, so we wrap it
-    -- manually rather than through Utils.overwrittenFunction. We snapshot
-    -- #storedObjects before delegating so we can identify the new entry
-    -- by index rather than relying on "last element".
+    -- loadFromXMLFile is called without a `self` argument, so it is wrapped by hand rather
+    -- than through Utils.overwrittenFunction, and #storedObjects is snapshotted before
+    -- delegating so the new entry is identified by index, not by "last element".
     -- -------------------------------------------------------------------------
     local origLoadFromXMLFile = AbstractPalletObject.loadFromXMLFile
     AbstractPalletObject.loadFromXMLFile = function(storage, xmlFile, key)
