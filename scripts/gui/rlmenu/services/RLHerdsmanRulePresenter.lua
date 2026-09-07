@@ -62,10 +62,9 @@ local ALLOWED_USAGES = {
     horseCare = { [RLFilterUsage.ANY] = true, [RLFilterUsage.OWNED]  = true },
 }
 
---- Operation x animalType restrictions, declared by type NAME. OWNED by
---- RLHerdsmanRuleService: the editor decides what the player can express and the planner
---- what actually runs, so a one-sided declaration is honoured by one and ignored by the
---- other. Re-exported here only so this module's callers keep one name.
+--- Operation x animalType restrictions, declared by type NAME and OWNED by
+--- RLHerdsmanRuleService - a one-sided declaration would bind the editor or the planner but
+--- not both. Re-exported here only so this module's callers keep one name.
 RLHerdsmanRulePresenter.OPERATION_ANIMAL_TYPES = RLHerdsmanRuleService.OPERATION_ANIMAL_TYPES
 
 -- -----------------------------------------------------------------------------
@@ -492,10 +491,9 @@ local PARAM_VALIDATORS = {
 --- invalid op in the editor must not spam the log (the spec's one-shot contract).
 local _warnedValidateParamsUnknownOp = false
 
---- Validate an operation's params against their domains: one boolean per USED param,
---- each meaning present AND in-domain, so `ok` guarantees the rule is wire-writable.
---- `previous` is never a field. The unknown-operation warning is one-shot, because the
---- live-validation caller would otherwise spam it.
+--- Validate an operation's params against their domains: one boolean per USED param, each
+--- meaning present AND in-domain, so `ok` guarantees the rule is wire-writable. `previous`
+--- is never a field, and the unknown-operation warning is one-shot.
 ---@param operation any rule operation key
 ---@param params table|nil operation params table
 ---@return table { ok = boolean, fields = table<string, boolean> }
@@ -693,10 +691,9 @@ local function keepHusbandryType(animalTypeIndex, filterAnimalType, operation, a
     return RLHerdsmanRuleService.isOperationAnimalTypeCompatible(operation, animalTypeIndex, animalTypeIndexByName)
 end
 
---- Set-aware DESTINATION type gate: `typeSpec` is a scalar type index for a husbandry, or
---- an array for an EPP butcher accepting several. Admits when the scalar gate passes for
---- the scalar or for ANY set member. Destination axis only, so the source picker and the
---- target revalidation keep the scalar gate untouched.
+--- Set-aware DESTINATION type gate: `typeSpec` is a scalar index for a husbandry, or an array
+--- for an EPP butcher accepting several, admitted when the scalar gate passes for ANY member.
+--- Destination axis only - the source picker and target revalidation keep the scalar gate.
 ---@param typeSpec any scalar animalType index, or an array of type indices (EPP)
 ---@param filterAnimalType any filter scope animalType, or nil for ANY
 ---@param operation any rule operation key (always "move" on the dest axis)
@@ -749,9 +746,9 @@ function RLHerdsmanRulePresenter.filterCandidateFilters(filters, operation, anim
 end
 
 --- Whether switching to `operation` must CLEAR the bound filter: nil keeps it, else the
---- cause. The reason is DIAGNOSTIC - every arm produces the same clear, so no caller may
---- branch on it. The animalType arm tests a NON-NIL filter type, or every ANY-type filter
---- would be cleared; an unresolvable binding is left alone, to be repaired by rebinding.
+--- cause. The reason is DIAGNOSTIC - every arm clears alike, so no caller may branch on it.
+--- The animalType arm tests a NON-NIL filter type, or every ANY-type filter would clear;
+--- an unresolvable binding is left for a rebind to repair.
 ---@param operation any the operation being switched TO
 ---@param filter table|nil the RESOLVED filter record `{ usage, animalType, ... }`, or nil
 ---@param animalTypeIndexByName table|nil map of declared animal type NAME -> live animalType index
@@ -816,7 +813,7 @@ end
 
 --- Gate and order the destination candidates for a MOVE rule, then drop any uid in
 --- `excludeUids` - a source pen is never a valid destination. The SOURCE gate cannot be
---- reused here: it is scalar-only and would drop every EPP butcher.
+--- reused: it is scalar-only and would drop every EPP butcher.
 ---@param husbandries table[]|nil descriptors { uniqueId, animalType|animalTypes, name, isEPP? }
 ---@param filterAnimalType any filter scope animalType, or nil for ANY (all types)
 --- NOTE the argument POSITION: this function takes no `operation` (it applies "move"
@@ -891,10 +888,9 @@ function RLHerdsmanRulePresenter.revalidateTargets(targetHusbandries, typeByUid,
     return kept
 end
 
---- The single-key twin of revalidateTargets, durable against BOTH gate axes. An
---- unresolvable dest is PRESERVED; a resolvable one drops to nil when its type leaves the
---- scope, or when it has become one of `sourceUids` - the executor treats source == dest
---- as bad data.
+--- The single-key twin of revalidateTargets, durable against BOTH gate axes. An unresolvable
+--- dest is PRESERVED; a resolvable one drops to nil when its type leaves the scope or it
+--- becomes one of `sourceUids`, source == dest being bad data to the executor.
 ---@param destinationHusbandry any the stored dest uniqueId string, or nil
 ---@param typeByUid table|nil map uniqueId -> animalType index (husbandry) or type-index set (EPP) for LIVE dests
 ---@param filterAnimalType any filter scope animalType, or nil for ANY
@@ -965,10 +961,8 @@ function RLHerdsmanRulePresenter.getHusbandrySummary(targetHusbandries, resolveN
     return table.concat(names, ", ")
 end
 
---- Count-form label for the detail-pane husbandries BUTTON: 0 targets -> `labels.none`, one
---- target -> its resolved name via the injected `resolveName(uid)` (unresolvable, or a nil
---- resolver -> `labels.missing`), 2 or more -> `labels.selected` formatted with the count.
---- Never a name-join - that overflows a single-line button.
+--- Count-form label for the detail-pane husbandries BUTTON: none, the single resolved name
+--- (`labels.missing` when unresolvable), else the count. Never a name-join, which overflows.
 ---@param targetHusbandries table|nil array of placeable uniqueId strings
 ---@param resolveName function|nil function(uid) -> name string|nil (frame wires the placeableSystem lookup)
 ---@param labels table { none = string, missing = string, selected = string (a "%d" format) }
@@ -1048,10 +1042,9 @@ local function isNonBlankString(value)
     return type(value) == "string" and value:find("%S") ~= nil
 end
 
---- A resolved filter is usable only when it carries a RENDERABLE NAME - the same test the
---- summary applies. Shared so the marker and the button cannot disagree: a blank-named
---- record renders exactly like an unset one, and a mere table test would leave that row
---- showing a CTA with no marker beside it.
+--- A resolved filter is usable only when it carries a RENDERABLE NAME. Shared so the marker
+--- and the button cannot disagree: a blank-named record renders exactly like an unset one,
+--- and a mere table test would leave that row showing a CTA with no marker.
 ---@param filter any the resolved filter record, or nil
 ---@return boolean
 local function isUsableFilter(filter)
@@ -1082,10 +1075,9 @@ local function destinationPresent(draft)
     return isNonBlankString(destinationKey(draft))
 end
 
---- Validate an in-progress rule draft for the detail pane, returning a per-field boolean
---- breakdown plus an overall `valid`. Deliberately STRICTER than RLHerdsmanRuleService's
---- floor on targets: the service accepts an empty target list, the editor requires >= 1 so
---- a saved rule actually does something. nil / non-table draft -> all-false.
+--- Validate an in-progress rule draft for the detail pane: a per-field boolean breakdown plus
+--- an overall `valid`. Deliberately STRICTER than the service's target floor - the service
+--- accepts an empty target list, the editor requires >= 1. A non-table draft is all-false.
 ---@param draft table|nil { name, operation, enabled, filterId, targetHusbandries, params }
 ---@return table { valid, nameOk, operationOk, filterOk, filterRequired, husbandriesOk, paramsOk, destinationOk, destinationRequired } (all boolean)
 function RLHerdsmanRulePresenter.validateEdit(draft)
@@ -1173,11 +1165,10 @@ local DEMOTION_BREAKDOWN_KEYS = {
     "destinationOk", "destinationRequired",
 }
 
---- Which ENABLE-GATED axes stop this draft flushing - the ones that would come good if the
---- rule were simply not enabled - or nil to leave the enable alone. A blank name or a bad
---- param value is NOT one: demoting on those would disable a rule the player can still
---- repair by fixing the field they just broke. ORDER IS CONTRACT, since the frame renders
---- these into a log line pinned as an ordered sequence.
+--- Which ENABLE-GATED axes stop this draft flushing - those that would come good if the rule
+--- were not enabled - or nil to leave the enable alone. A blank name or bad param is NOT one:
+--- demoting there would disable a rule the player can still repair. ORDER IS CONTRACT, the
+--- frame rendering these into a log line pinned as an ordered sequence.
 ---@param g table|nil a RLHerdsmanRulePresenter.validateFlush breakdown
 ---@return table|nil axes array of "filter" | "husbandries" | "destination" in that order, or nil
 function RLHerdsmanRulePresenter.enableDemotionAxes(g)
@@ -1223,12 +1214,11 @@ end
 --- spam the log (same one-shot contract as validateParams).
 local _warnedRowIssuesUnknownOp = false
 
---- Which rows are required-but-empty or filled-but-out-of-domain, as field -> "required"
---- | "invalid" | nil. Driven by REQUIREMENT, never by the flush breakdown, which is
---- enable-gated and so reports clean on exactly the post-demote draft a player is staring
---- at. An unresolvable reference counts as absent, because the buttons render one CTA for
---- both; husbandries mark only when EVERY target fails, since unresolvable uids are
---- deliberately preserved and a count test would read dead references as healthy.
+--- Which rows are required-but-empty or filled-but-out-of-domain, as field -> "required" |
+--- "invalid" | nil. Driven by REQUIREMENT, never by the flush breakdown, which is enable-gated
+--- and reports clean on exactly the post-demote draft a player is staring at. An unresolvable
+--- reference counts as absent; husbandries mark only when EVERY target fails, unresolvable
+--- uids being deliberately preserved.
 ---@param draft table|nil the overlay-merged rule record
 ---@param resolveFilter function|nil function(filterId) -> filter table|nil
 ---@param resolveName function|nil function(uid) -> placeable name string|nil
@@ -1387,10 +1377,9 @@ function RLHerdsmanRulePresenter.computeDefaultRuleName(existingNames, baseLabel
     return result
 end
 
---- Collision-free duplicate name from a source name and the live names. The localized
---- suffixes are passed in, since the numbered format carries the language's own word order.
---- Tracks the MAX N, not the count, so sparse copies left by deletes never collide; the
---- bare-suffix form counts as N=1 and the source's own name never contributes.
+--- Collision-free duplicate name from a source name and the live names, the localized
+--- suffixes passed in since the numbered format carries the language's word order. Tracks
+--- the MAX N, not the count, so sparse copies left by deletes never collide.
 ---@param sourceName string the source rule's (merged) name
 ---@param existingNames string[]|nil the current rule names on the farm
 ---@param suffixFirst string the localized first-duplicate suffix
