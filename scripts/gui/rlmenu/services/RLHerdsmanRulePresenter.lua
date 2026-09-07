@@ -1,31 +1,20 @@
 -- RLHerdsmanRulePresenter.lua
--- Pure view-model for the Herdsman rule menu frame (M-Frame F1).
---
--- The single home for every list / detail / visibility / validation decision the
--- Herdsman frame needs, so the frame `.lua` stays bind-only (read element -> call a
--- presenter function -> write the element). This is the deliberate counter-move to
--- the Filters subtab (RLMenuSettingsFrame), which inlines that logic in the frame and
--- is the anti-example for wiring thickness.
+-- Pure view-model for the Herdsman rule menu frame: the single home for every list, detail,
+-- visibility and validation decision the frame needs, so the frame `.lua` stays bind-only -
+-- read element, call a presenter function, write the element.
 --
 -- PURITY CONTRACT (hard):
---   * Every function takes plain data (plus injected resolver / label deps) and
---     returns plain data: tables / strings / booleans.
---   * ZERO g_* globals, ZERO element refs, ZERO setText/setVisible/SmoothList,
---     ZERO XML, ZERO RLFilterService / placeableSystem.
---   * Game-state reads arrive through INJECTED resolvers (resolveName, resolveFilter);
---     the frame layer owns wiring those to g_currentMission.placeableSystem and
---     RLFilterService.
---   * Sibling pure-module constants ARE referenced directly: RLFilterUsage.* for the
---     allowed-usage map, and from RLHerdsmanRuleService the operation validity set
---     (OPERATIONS), the run/visual order (OPERATION_ORDER) and the whole operation x
---     animalType gate (OPERATION_ANIMAL_TYPES + getDeclaredAnimalTypeNames +
---     isOperationAnimalTypeCompatible, re-exported below). The canonical copies live there
---     because the planner needs them too; the presenter does not duplicate them. These are
---     pure constant tables and pure functions, not game state.
+--   * Every function takes plain data, plus injected resolver / label deps, and returns plain
+--     data: tables, strings, booleans.
+--   * ZERO g_* globals, element refs, setText/setVisible/SmoothList, XML, RLFilterService or
+--     placeableSystem.
+--   * Game-state reads arrive through INJECTED resolvers; the frame layer wires those.
+--   * Sibling pure-module constants ARE referenced directly - RLFilterUsage's allowed-usage map,
+--     and from RLHerdsmanRuleService the operation validity set, the run/visual order and the
+--     whole operation x animalType gate. Those canonical copies live there because the planner
+--     needs them too, and they are pure constants and pure functions, not game state.
 --
--- Mirrors RLFilterFieldCatalog's SHAPE (top-level table, module-local Log, module
--- constants, LuaDoc + logging on every function). 100% dual-run: in-game
--- RLHerdsmanRulePresenterTests + headless herdsman_rule_presenter_suite.lua.
+-- Dual-run: in-game and headless.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -1355,28 +1344,24 @@ local DEMOTION_BREAKDOWN_KEYS = {
 --- good if the rule were simply not enabled. Returns an array of axis names to DEMOTE on
 --- (a subset of `filter`, `husbandries`, `destination`), or nil to leave the enable alone.
 ---
---- The frame consumes this in two places - the edit-time flip and the flush backstop - and the
---- decision lives here, once, so the two can never diverge on what "invalidated by this edit"
---- means. The input is `validateFlush`'s breakdown verbatim; this function re-derives nothing.
+--- The frame consumes this at both the edit-time flip and the flush backstop, and the decision
+--- lives here once so the two cannot diverge on what "invalidated by this edit" means. The input
+--- is `validateFlush`'s breakdown verbatim; nothing is re-derived.
 ---
---- Answers a non-nil result when AND ONLY WHEN all of:
----   * the draft fails the flush gate (`ok` false) - a valid draft is never demoted;
----   * `nameOk`, `operationOk` and `paramsOk` all hold - a blank name or a bad param value is
----     NOT an enable-gated failure, and demoting on one would silently disable a rule the
----     player can still repair by fixing the field they just broke. Those keep the frame's
----     full revert;
----   * at least one required-and-failing enable-gated axis exists.
---- The `*Required` flags already encode `enabled == true` (validateEdit :1340/:1360,
---- validateFlush's `husbandriesRequired`), so there is deliberately no separate enabled check:
---- on a disabled draft all three are false, no axis can fire, and the answer is nil.
+--- Non-nil when AND ONLY WHEN the draft fails the flush gate, `nameOk`/`operationOk`/`paramsOk`
+--- all hold, and at least one required-and-failing enable-gated axis exists. A blank name or a
+--- bad param value is NOT an enable-gated failure - demoting on one would silently disable a rule
+--- the player can still repair by fixing the field they just broke. The `*Required` flags already
+--- encode `enabled == true`, so there is no separate enabled check: on a disabled draft all three
+--- are false and the answer is nil.
 ---
---- ORDER IS CONTRACT: filter, husbandries, destination - validateEdit's own field order. The
+--- ORDER IS CONTRACT - filter, husbandries, destination, matching validateEdit's field order. The
 --- frame renders these into a DEBUG line that ModTest pins as an ordered sequence, so an
 --- unordered result would make that pin nondeterministic rather than merely ugly.
 ---
---- Fails SAFE on garbage: nil, a non-table, or a table that is not a flush breakdown answers
---- nil (no demote). A demote WRITES `enabled = false` onto a real rule, so guessing from a
---- malformed input is the one failure mode worth spending a key check to avoid.
+--- Fails SAFE on garbage: anything that is not a flush breakdown answers nil. A demote WRITES
+--- `enabled = false` onto a real rule, so guessing from a malformed input is worth a key check to
+--- avoid.
 ---@param g table|nil a RLHerdsmanRulePresenter.validateFlush breakdown
 ---@return table|nil axes array of "filter" | "husbandries" | "destination" in that order, or nil
 function RLHerdsmanRulePresenter.enableDemotionAxes(g)
@@ -1425,29 +1410,26 @@ local _warnedRowIssuesUnknownOp = false
 --- Which detail-pane rows are REQUIRED-but-empty or filled-but-out-of-domain, as a map of
 --- row-field token -> `"required"` | `"invalid"` | nil (absent = nothing to mark).
 ---
---- Driven by REQUIREMENT, never by the flush breakdown. `validateFlush` /
+--- Driven by REQUIREMENT, never by the flush breakdown, because `validateFlush` and
 --- `enableDemotionAxes` are enable-gated: on a disabled draft with a nil filter they report
 --- clean, which is exactly the post-demote state a player is left staring at. So this reads
---- `PARAM_VISIBILITY` (plus the always-required `name` / `husbandries`, whose rows are visible
---- for every operation and therefore carry no `vis` key) and answers the same for an enabled
---- and a disabled rule.
+--- `PARAM_VISIBILITY` plus the always-required `name` / `husbandries`, and answers the same for
+--- an enabled and a disabled rule.
 ---
---- An unresolvable reference counts as ABSENT, not present: the buttons already render the
---- same CTA for "never set" and "the filter was deleted", so the marker must agree with what
---- the player sees. That is why both resolvers are injected - fed the SAME
---- `resolveFilterById` / `resolvePlaceableName` the frame passes to `getFilterSummary` and
---- `formatHusbandryButtonLabel`, so listing, labelling and marking cannot diverge.
+--- An unresolvable reference counts as ABSENT, not present: the buttons render the same CTA for
+--- "never set" and "the filter was deleted", so the marker must agree with what the player sees.
+--- That is why both resolvers are injected and fed the SAME ones the frame passes to the label
+--- helpers, so listing, labelling and marking cannot diverge.
 ---
---- Husbandries mark only when EVERY target fails to resolve. One live target means the rule
---- still runs, and `revalidateTargets` deliberately PRESERVES unresolvable uids - so a plain
---- count test would read a list of dead references as healthy.
+--- Husbandries mark only when EVERY target fails to resolve. One live target means the rule still
+--- runs, and `revalidateTargets` deliberately PRESERVES unresolvable uids, so a plain count test
+--- would read a list of dead references as healthy.
 ---
---- Fails CLOSED on its OWN inputs: a nil / non-table draft and an unknown operation both answer an
---- empty map rather than raising, because the frame calls this on every render and a raise here
---- kills the whole detail pane. That guarantee does NOT extend to the injected resolvers - they are
---- frame-side closures over live game state and a raise inside one propagates out of here. The
---- frame clears every marker BEFORE calling this for exactly that reason, so such a raise leaves
---- blank rows rather than another rule's text.
+--- Fails CLOSED on its OWN inputs - a malformed draft or unknown operation answers an empty map
+--- rather than raising, since the frame calls this every render and a raise kills the detail
+--- pane. That does NOT extend to the injected resolvers, which are frame-side closures over live
+--- game state; the frame clears every marker BEFORE calling this so such a raise leaves blank
+--- rows rather than another rule's text.
 ---@param draft table|nil the overlay-merged rule record
 ---@param resolveFilter function|nil function(filterId) -> filter table|nil
 ---@param resolveName function|nil function(uid) -> placeable name string|nil

@@ -1,28 +1,22 @@
 -- RLMenuHusbandryAnchor.lua
--- Pure decision helper for the RL Tabbed Menu's one-shot MODE_FULL husbandry
--- anchor. Plain data in, plain data out: no g_*, no GUI, no XML handles, so the
--- whole module loads and runs under the headless harness (project-context
--- Rule A; mirrors RLMenuTabPolicy / RLFilterFieldCatalog as pure helpers).
+-- Pure decision helper for the RL Tabbed Menu's one-shot MODE_FULL husbandry anchor. Plain data
+-- in, plain data out - no g_*, no GUI, no XML handles - so the whole module loads and runs under
+-- the headless harness.
 --
--- resolveIndex answers ONE question for a husbandry frame's refresh: which entry
--- in the farm's sorted husbandry list should land selected. Priority:
---   1. the anchor placeable (a caller-supplied one-shot target), if in the list;
---   2. else the persistent shared-selection placeable, if in the list;
---   3. else the first entry.
--- It returns the 1-based index AND a boolean anchorMatched, so the caller can log
--- a resolved-to-anchor open distinctly from an anchor MISS (a valid pen that is
--- not in this farm's list - foreign / stale / sold - which silently falls back).
+-- resolveIndex answers ONE question for a husbandry frame's refresh: which entry in the farm's
+-- sorted husbandry list should land selected. It prefers the caller-supplied one-shot anchor,
+-- then the persistent shared selection, then the first entry, and returns the 1-based index plus
+-- an anchorMatched boolean so the caller can log a resolved-to-anchor open distinctly from an
+-- anchor MISS - a valid pen that is not in this farm's list, foreign, stale or sold, which
+-- silently falls back.
 --
--- Comparison is object-identity (==) on the placeable refs, matching the frames'
--- existing shared-selection match. TOTAL: a nil / empty list, or nil refs,
--- resolve to (1, false) rather than erroring.
---
--- Author: Ritter
+-- Comparison is object identity on the placeable refs, matching the frames' shared-selection
+-- match. TOTAL: a nil or empty list, or nil refs, resolve to (1, false) rather than erroring.
 
 RLMenuHusbandryAnchor = {}
 
---- Resolve which husbandry index a frame should land on, preferring the one-shot
---- anchor over the persistent shared selection over the first entry.
+--- Resolve which husbandry index a frame should land on, preferring the one-shot anchor over the
+--- persistent shared selection over the first entry.
 --- @param sortedHusbandries table|nil ordered husbandry placeables (the frame's list)
 --- @param anchorHusbandry table|nil the one-shot anchor placeable (nil when unanchored)
 --- @param sharedHusbandry table|nil the persistent shared-selection placeable (nil when none)

@@ -3,35 +3,25 @@
     Shared cross-fire guard + timeout watchdog for the RL Tabbed Menu trade
     services (RLAnimalBuyService / RLAnimalSellService / RLAnimalMoveService).
 
-    The three services each open a per-call g_messageCenter subscription whose
-    reply carries only a 3-bit errorCode and no correlation id. Base game avoids
-    cross-fire structurally (one shop screen = one live subscriber per MessageType);
-    RLRM regressed that by letting every in-flight service open its own subscriber,
-    so the first server reply fired EVERY live subscriber of that class. A dropped
-    reply also leaked the closure (animals / callback / target) for the lifetime of
-    g_messageCenter (zombie leak).
+    The three services each open a per-call g_messageCenter subscription whose reply carries
+    only an errorCode and NO correlation id. Base game avoids cross-fire structurally - one
+    shop screen means one live subscriber per MessageType - so letting every in-flight
+    service open its own subscriber made the first server reply fire EVERY live subscriber
+    of that class, and a dropped reply leaked its closure for the lifetime of
+    g_messageCenter.
 
-    This helper restores the "one live subscriber per event class" invariant by
-    serializing to a SINGLE in-flight request PER EVENT CLASS: a second same-class
-    request is rejected (returns false - reject, never queue) so the caller keeps
-    its selection, and each request arms a CANCELLABLE Timer.createOneshot watchdog
-    that fires the callback once with a synthetic timeout code if the server never
-    replies (then unsubscribes + clears the flag - no zombie). A single-consume
-    token means the callback never fires twice for one request (reply OR timeout,
-    whichever lands first).
+    This restores the one-live-subscriber-per-class invariant by serializing to a SINGLE
+    in-flight request per event class: a second same-class request is REJECTED rather than
+    queued, so the caller keeps its selection, and each request arms a cancellable watchdog
+    that fires the callback once with a synthetic timeout code if the server never replies.
+    A single-consume token means the callback never fires twice for one request.
 
-    No MP wire change: it wraps the existing subscribe / sendEvent seam only. The
-    late-reply-after-timeout residual (a reply with no correlation id can still
-    cross-fire into the NEXT same-class request's subscriber) is a documented, accepted
-    follow-up - the token stops double-fire for the SAME request but cannot attribute a
-    late reply; the generous timeout makes it rare.
+    No MP wire change - it wraps the existing subscribe / sendEvent seam only. Accepted
+    residual: a late reply after a timeout can still cross-fire into the NEXT same-class
+    request, because it carries no correlation id; the generous timeout makes it rare.
 
-    Injection seam (in-game recorder test): dispatch() takes an optional `deps`
-    table { messageCenter, sendEvent, timerFactory }. Production callers omit it
-    (defaults to the real g_messageCenter / g_client sendEvent / Timer.createOneshot);
-    the in-game recorder test injects fakes so the helper's mechanics are asserted
-    without touching a root global or a live server. Keying is per event CLASS (a
-    table, not one module boolean) so a Buy and a Move in flight together never
+    dispatch() takes an optional `deps` table so a test can inject fakes without touching a
+    root global. Keying is per event CLASS, so a Buy and a Move in flight together never
     collide.
 ]]
 

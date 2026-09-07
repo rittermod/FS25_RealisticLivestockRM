@@ -2,41 +2,21 @@
     RLTransferEppAdapter.lua
     The EPP (butcher) counterpart adapter behind the RLTransferAdapter seam.
 
-    When a third-party EPP butcher trigger (boucherie / MeatProcessingPlant /
-    Butcher_Table) direct-opens the vanilla AnimalScreen with its own controller,
-    RLAnimalScreenBridge's onOpen redirect reroutes it into RLMenu MODE_TRAILER with
-    this EPP counterpart. The butcher is a pure SINK: you DELIVER a loaded trailer to
-    it, you never pull animals back out. So this adapter is ONE-WAY:
-      * getDisplayData -> the butcher sidebar entry (owning-placeable name + free slots).
-      * enumerate      -> {} ALWAYS (nothing lists on the butcher side; the frame
-                          already tolerates an empty counterpart - empty-state text,
-                          no action button - exactly as the NULL adapter proves).
-      * actionLabel    -> the pure RLTransferAdapter.eppActionLabelKey ("Deliver").
-      * dispatch       -> guards the reverse (DIR_INTO_TRAILER -> false BEFORE any
-                          move), then routes deliver to RLAnimalMoveService.moveAnimals
-                          (trailer, pp, animals, "TARGET") - the SAME AnimalMoveEvent EPP
-                          delivery leg the vanilla EPP screen fires (whose
-                          _dispatchTargetDelivery primitive the herdsman
-                          AIAnimalMoveEvent path also reuses); mutation parity, never a
-                          new event class.
+    When a third-party EPP butcher trigger direct-opens the vanilla AnimalScreen with its own
+    controller, RLAnimalScreenBridge's onOpen redirect reroutes it into RLMenu MODE_TRAILER
+    with this EPP counterpart. The butcher is a pure SINK - you DELIVER a loaded trailer to
+    it and never pull animals back out - so this adapter is ONE-WAY: it enumerates nothing,
+    and dispatch guards the reverse direction BEFORE any move, then routes the deliver to
+    RLAnimalMoveService.moveAnimals, the SAME AnimalMoveEvent leg the vanilla EPP screen
+    fires. Mutation parity, never a new event class.
 
-    context.counterpartHandle IS the production point (the EPP loading trigger sets
-    controller.husbandry = the pp itself). moveAnimals auto-detects a pp target by its
-    animalsTypeData and age/type-filters CLIENT-side before dispatch (server rechecks),
-    so no new validation lives here; this module only maps the deliver onto the real
-    objects.
+    context.counterpartHandle IS the production point - the EPP loading trigger assigns
+    itself there. moveAnimals auto-detects a pp target by its animalsTypeData and
+    age/type-filters client-side before dispatch, with the server rechecking, so no new
+    validation lives here.
 
-    Tier: IN-GAME. Its methods deref RLAnimalMoveService / RLTrailerEndpointService and
-    the engine pp getters, so it is NOT headless. The parity-critical pure bit
-    (RLTransferAdapter.eppActionLabelKey) dual-runs. The headless harness never sources
-    this file, so the seam stays NULL there - which keeps the pure RLTransferAdapterTests
-    true in both runners (the concrete epp -> adapter / one-way-sink assertions live in
-    the in-game-only RLTransferEppAdapterTests).
-
-    Stateless: a plain table whose methods take self via `:` and read everything from
-    the passed context (no instance fields). Registered at load into
-    RLTransferAdapter._adapters[RLMenuTabPolicy.EPP] so forCounterpart("epp") resolves
-    it in-game.
+    Tier: IN-GAME, since its methods deref the engine pp getters. Stateless, and registered
+    at load so forCounterpart resolves it in-game.
 ]]
 
 RLTransferEppAdapter = {}

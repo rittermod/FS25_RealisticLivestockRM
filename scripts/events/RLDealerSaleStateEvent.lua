@@ -2,35 +2,23 @@
     RLDealerSaleStateEvent.lua
     Full dealer sale-availability override set (server -> client).
 
-    Dispatched from `sendInitialClientState` for every connecting client so a late
-    joiner converges with the authoritative server state, and broadcast after each
-    accepted admin change so every peer's live `store.canBeBought` flags follow the
-    server's registry.
+    Dispatched to every connecting client so a late joiner converges with the authoritative
+    server state, and broadcast after each accepted admin change. Wire format is
+    `RLDealerSaleWire.writeList`; every record in a snapshot is an override, so a record
+    arriving as a clear is a protocol error and is skipped.
 
-    Wire format: `RLDealerSaleWire.writeList` (count prefix + N four-field records).
-    Every record in a snapshot is an override, so all are written `isSet = true`; a
-    record arriving as a clear is a protocol error and is skipped.
+    Receiver flow: guard server-authoritative receive, then RECONSTRUCT
+    `g_rlDealerSaleRegistry` and re-`set` each record - never a merge, because the registry
+    is `or`-guarded at load and the server-only loader never runs on a client, so a merge
+    would carry a previous session's overrides into this one. Then
+    `applyToLiveSubTypes()` for local flags only, NEVER `applyAndRepopulate()`, which ends
+    in a dealer-reset REQUEST and would produce one per connected client.
 
-    Receiver flow (`run`):
-      1. Server-authoritative-receive guard - a crafted client send must not be
-         able to rewrite the server's registry.
-      2. RECONSTRUCT `g_rlDealerSaleRegistry` and re-`set` each record. Never a
-         merge: the registry is `or`-guarded at load so it survives a map load,
-         while the server-only loader never runs on a client - a merge would carry
-         a previous session's overrides into this one. Reconstruction is the
-         registry's documented reset idiom (it has no clear-all).
-      3. `RLDealerSaleApply.applyToLiveSubTypes()` - local flags only. NEVER
-         `applyAndRepopulate()`: that ends in a dealer-reset REQUEST, so one admin
-         change would produce one reset request per connected client. The server
-         re-rolls once and broadcasts the stock itself.
+    `sessionBaseline` is never touched here: the client's FIRST apply lazily captures the
+    shipped defaults from a store no apply has written yet, so re-capturing afterwards would
+    record already-overridden values as the defaults and permanently break restore-on-clear.
 
-    `RLDealerSaleApply.sessionBaseline` is never touched here. It is re-created at
-    each map load and the client's FIRST apply lazily captures the shipped defaults
-    from a store no apply has written yet; re-capturing after an apply would record
-    already-overridden values as the defaults and permanently break restore-on-clear.
-
-    Empty-set (count = 0) is a valid state event: it is the deterministic
-    "clear-to-empty" signal that returns a client's flags to the shipped defaults.
+    An empty set is a valid state event - the deterministic clear-to-empty signal.
 ]]
 
 RLDealerSaleStateEvent = {}

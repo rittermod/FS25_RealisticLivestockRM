@@ -2,37 +2,26 @@
     RLAnimalBuyService.lua
     Stateless service for dealer-buy operations in the RL Tabbed Menu.
 
-    Wraps AnimalBuyEvent dispatch with the same subscription pattern as
-    RLAnimalSellService / RLAnimalMoveService. All buys route through
-    AnimalBuyEvent (server-authoritative in AnimalBuyEvent:run): the server
-    calls animalSystem:removeSaleAnimal, self.object:addAnimals, and addMoney.
-    The client MUST NOT mutate dealer stock, husbandry contents, or farm
-    money directly - MUTATION PARITY with legacy AnimalScreenDealer.
+    Wraps AnimalBuyEvent dispatch with the same subscription pattern as the sell and move
+    services. Every buy routes through AnimalBuyEvent, which is server-authoritative: the
+    server calls removeSaleAnimal, addAnimals and addMoney. The client MUST NOT mutate
+    dealer stock, husbandry contents or farm money directly.
 
-    Sign convention (CRITICAL):
-    AnimalBuyEvent:run calls
-        g_currentMission:addMoney(buyPrice + transportPrice, ...)
-    so both values MUST be dispatched as NEGATIVE numbers. addMoney adds
-    the value to the balance; the MoneyType is a statistics label and does
-    not change the sign. Legacy AnimalScreenDealer negates both values before
-    dispatch, and the server abs()-wraps them purely for display - confirming
-    it expects stored values to be negative. A positive dispatch credits the
-    farm.
+    SIGN CONVENTION, critical: AnimalBuyEvent:run passes the values straight to addMoney,
+    which ADDS them to the balance, so both the buy price and the transport price MUST be
+    dispatched as NEGATIVE numbers. The MoneyType is a statistics label and does not change
+    the sign, and the server abs()-wraps them purely for display. A positive dispatch credits
+    the farm.
 
-    Price markup: dealer buy price = cluster:getSellPrice() *
-    RLDealerQualityResolver.getMarkup(), i.e. the markup of the active
-    dealer-quality preset (see AnimalItemNew, which resolves through the same
-    accessor, so the displayed and charged prices cannot drift apart).
+    The buy price is the cluster's sell price times the active dealer-quality markup, resolved
+    through the same accessor the dealer list uses, so displayed and charged prices cannot
+    drift apart.
 
-    Error mapping: delegates to AnimalScreenDealerFarm.BUY_ERROR_CODE_MAPPING
-    (shape `[code] = { warning = bool, text = i18n_key }`). Do NOT define a
-    parallel table - the base-game map already covers every
-    AnimalBuyEvent error code and is shared by AnimalScreenDealer,
-    AnimalScreenDealerFarm, and AnimalScreenDealerTrailer.
+    Error mapping delegates to AnimalScreenDealerFarm.BUY_ERROR_CODE_MAPPING. Do NOT define a
+    parallel table: the base-game map already covers every AnimalBuyEvent error code.
 
-    All methods are static (module-level functions). The service does not
-    hold state between calls; the messageCenter subscription for buy
-    responses is scoped to each buyAnimals() invocation via closure.
+    All methods are static and hold no state between calls; the response subscription is
+    scoped to each invocation by closure.
 ]]
 
 local Log = RmLogging.getLogger("RLRM")

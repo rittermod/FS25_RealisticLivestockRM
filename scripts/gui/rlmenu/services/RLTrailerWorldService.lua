@@ -1,43 +1,19 @@
 --[[
     RLTrailerWorldService.lua
-    The WORLD trailer-placement mechanics for the RL Tabbed Menu Transfer frame
-    When a livestock/horse trailer is triggered standalone (no pen,
-    no dealer), the Transfer frame's "other side" is the free rideables in the
-    trailer's trigger zone. This service owns the parity-critical world mechanics
-    behind the RLTransferWorldAdapter seam:
+    The WORLD trailer-placement mechanics behind the RLTransferWorldAdapter seam. When a
+    livestock or horse trailer is triggered standalone - no pen, no dealer - the Transfer
+    frame's other side is the free rideables in the trailer's trigger zone.
 
-      * convertRideableCluster - the vanilla-cluster -> RLRM Animal conversion,
-        ported verbatim from the legacy RL_AnimalScreenTrailer:initSourceItems
-        (identity generation, canBeSold capture, the non-loadable / unknown-subtype
-        skip rules, already-individual idempotent passthrough). The DUAL-RUN leaf.
-      * buildSourceItems / countSourceItems - the in-game source-item build over the
-        trigger rideables (one builder feeds both the list and its count, so the
-        sidebar count can never diverge from the listed items).
-      * loadRideables / unloadClusters - the SEQUENTIAL single-item dispatch: one
-        base-game AnimalLoadEvent / AnimalUnloadEvent in flight at a time, advancing
-        on each reply, aggregated to ONE completion. The events are the SAME ones
-        base-game AnimalScreenTrailer:applySource / applyTarget fire (mutation parity,
-        never a new event class). The multi-select batch (pre-validate N, continue
-        past failures, one aggregated result) is a deliberate RLMenu enhancement
-        matching the pen flow - EACH EVENT is byte-identical to one legacy apply.
-      * errorKey / getErrorText - the base-game LOAD/UNLOAD error-code -> i18n mapping,
-        direction-aware (the same numeric code means different things across load vs
-        unload), nil on SUCCESS.
+    The load and unload dispatch is SEQUENTIAL: one base-game AnimalLoadEvent /
+    AnimalUnloadEvent in flight at a time, advancing on each reply and aggregated to one
+    completion. That is forced, not stylistic - base-game replies publish a class-keyed
+    message with NO correlation id, and code 0 means SUCCESS rather than nil, so concurrent
+    dispatch could not attribute replies. Every engaged path reaches onComplete EXACTLY ONCE,
+    the all-pre-validation-fail case included, so the frame's movePending lock never strands.
+    Each event is byte-identical to one legacy apply; only the multi-select batching is new.
 
-    Tiers:
-      * DUAL-RUN (headless via animal_env, real Animal): convertRideableCluster (the
-        conversion semantics) and errorKey (the pure code+isLoad -> KEY lookup).
-      * IN-GAME ONLY: buildSourceItems / countSourceItems (deref AnimalItemStock + the
-        engine getters), loadRideables / unloadClusters (MP wire + g_messageCenter +
-        g_client), and getErrorText's getText leaf.
-
-    The N-event aggregation is reply-driven, not fire-and-count: base-game replies
-    publish a class-keyed message with NO correlation id and code 0 = SUCCESS (not
-    nil), so concurrent dispatch could not attribute replies. Sequential (subscribe
-    -> send -> reply -> advance, one in flight) is exact base-game parity and yields
-    one unambiguous aggregated completion. EVERY engaged path reaches onComplete
-    EXACTLY ONCE (including the all-pre-validation-fail case, which sends nothing),
-    so the frame's movePending lock never strands.
+    convertRideableCluster and errorKey dual-run; the source-item builders, the dispatchers
+    and getErrorText are in-game only.
 ]]
 
 RLTrailerWorldService = {}

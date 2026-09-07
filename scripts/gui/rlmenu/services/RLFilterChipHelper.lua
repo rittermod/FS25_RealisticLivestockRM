@@ -16,10 +16,8 @@ RLFilterChipHelper = {}
 ---   both active    -> { visible = true, textKey = "rl_menu_filter_chip_quick_plus_saved",
 ---                       savedName = <name or unnamed fallback> }
 ---
---- Resolves an empty-string saved name to the unnamed fallback as well as
---- nil; legacy frame code only caught nil, so empty-string previously
---- rendered as "Filter: " (trailing space). This is a deliberate small
---- behavior change called out in the spec Design Notes.
+--- An empty-string saved name resolves to the unnamed fallback, not just a nil one, so it can
+--- no longer render as "Filter: " with a trailing space.
 ---
 --- No logging inside; callers log the chosen branch at their own prefix.
 ---

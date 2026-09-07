@@ -2,20 +2,15 @@
     RLTransferAdapter.lua
     The counterpart-adapter seam for the RL Tabbed Menu Transfer frame.
 
-    One Transfer frame serves every trailer placement (pen / world); the part
-    that varies per placement - where the "other side" animals come from, what
-    the action button says, and what a confirmed transfer does - lives behind
-    this data-in/data-out seam. Each placement supplies a small adapter object
-    implementing the contract below; the frame talks only to the contract, never
-    to a placement directly.
+    One Transfer frame serves every trailer placement; the part that varies - where the
+    other side's animals come from, what the action button says, and what a confirmed
+    transfer does - lives behind this data-in/data-out seam. The frame talks only to the
+    contract, never to a placement directly.
 
-    Purity contract (this is the headless dual-run boundary):
-      * No g_*, GUI, engine class, or getText - at load OR in any function. The
-        whole module runs under the headless harness against plain tables.
-      * A display NAME is an ENGINE STRING for a concrete adapter and an i18n KEY
-        for NULL. The FRAME resolves the NULL key via getText when it builds the
-        sidebar label, so this module never calls getText (which would drag in
-        g_i18n and break the pure run).
+    Purity contract, the headless dual-run boundary: no g_*, GUI, engine class or getText,
+    at load or in any function. A display NAME is an ENGINE STRING for a concrete adapter and
+    an i18n KEY for NULL, and the FRAME resolves that key, so this module never calls getText
+    - which would drag in g_i18n and break the pure run.
 
     Adapter contract (each method takes self via `:`):
       * adapter:getDisplayData()                  -> { name, used, total }
