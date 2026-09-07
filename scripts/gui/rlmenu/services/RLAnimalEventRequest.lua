@@ -1,28 +1,16 @@
 --[[
     RLAnimalEventRequest.lua
-    Shared cross-fire guard + timeout watchdog for the RL Tabbed Menu trade
-    services (RLAnimalBuyService / RLAnimalSellService / RLAnimalMoveService).
+    Shared cross-fire guard + timeout watchdog for the trade services (Buy / Sell / Move).
+    It wraps the existing subscribe / sendEvent seam and changes no MP wire format.
 
-    The three services each open a per-call g_messageCenter subscription whose reply carries
-    only an errorCode and NO correlation id. Base game avoids cross-fire structurally - one
-    shop screen means one live subscriber per MessageType - so letting every in-flight
-    service open its own subscriber made the first server reply fire EVERY live subscriber
-    of that class, and a dropped reply leaked its closure for the lifetime of
-    g_messageCenter.
-
-    This restores the one-live-subscriber-per-class invariant by serializing to a SINGLE
-    in-flight request per event class: a second same-class request is REJECTED rather than
-    queued, so the caller keeps its selection, and each request arms a cancellable watchdog
-    that fires the callback once with a synthetic timeout code if the server never replies.
-    A single-consume token means the callback never fires twice for one request.
-
-    No MP wire change - it wraps the existing subscribe / sendEvent seam only. Accepted
-    residual: a late reply after a timeout can still cross-fire into the NEXT same-class
-    request, because it carries no correlation id; the generous timeout makes it rare.
-
-    dispatch() takes an optional `deps` table so a test can inject fakes without touching a
-    root global. Keying is per event CLASS, so a Buy and a Move in flight together never
-    collide.
+    Each service opens a per-call g_messageCenter subscription whose reply carries only an
+    errorCode and NO correlation id, so the first server reply fires EVERY live subscriber
+    of that class. This holds the one-live-subscriber-per-class invariant by serializing to
+    a SINGLE in-flight request per event class: a second same-class request is REJECTED
+    rather than queued, and each request arms a cancellable watchdog that fires the callback
+    once with a synthetic timeout code if the server never replies. A single-consume token
+    stops the callback firing twice; keying is per event CLASS, so a Buy and a Move in
+    flight together never collide.
 ]]
 
 local Log = RmLogging.getLogger("RLRM")

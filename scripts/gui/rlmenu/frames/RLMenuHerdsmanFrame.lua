@@ -2,18 +2,15 @@
     RLMenuHerdsmanFrame.lua
     RL Tabbed Menu Herdsman tab - rule list (master) + rule editor (detail).
 
-    The list binds to the real rule registry (F3) and the right pane is the rule
-    editor (F4b): name / operation / enabled / op-params + read-only filter and
-    husbandries summaries. Edits stash to a per-id pending overlay and flush through
-    the real g_rlHerdsmanRuleService:update (Approach B); MP syncs through the
+    The list binds to the real rule registry; the right pane edits name / operation / enabled
+    / op-params plus read-only filter and husbandry summaries. Edits stash to a per-id pending
+    overlay and flush through g_rlHerdsmanRuleService:update, so MP syncs through the
     resulting RLHerdsmanRuleUpdateEvent.
 
-    Bind-only by design: every policy decision routes to a pure module -
-    visibility / validation / domains / summaries to RLHerdsmanRulePresenter, the
-    overlay-merge + op-change carry-over to RLHerdsmanRuleEditModel. This frame holds
-    only element read/write, index<->value lookups over the presenter domains, the
-    engine-coupled live dewar enumeration (semen options), the tostring(v).."%"
-    percentage labels, the fixed interim flush gate, nil-guards, and logging.
+    Bind-only by design: visibility, validation, domains and summaries route to
+    RLHerdsmanRulePresenter, the overlay merge and op-change carry-over to
+    RLHerdsmanRuleEditModel. The frame holds only element read/write, lookups over the
+    presenter domains, the live dewar enumeration, label formatting, nil-guards and logging.
 ]]
 
 RLMenuHerdsmanFrame = {}
@@ -1675,17 +1672,14 @@ function RLMenuHerdsmanFrame:revalidatePendingDestination(id, merged, sourceUids
 end
 
 --- Demote an ENABLED rule the edit just invalidated: stash `enabled = false` so the edit
---- survives as a disabled draft instead of being thrown away whole at flush. The player watches
---- the toggle turn off and repairs the rule at their own pace.
+--- survives as a disabled draft instead of being thrown away whole at flush.
 ---
---- Why a WRITE of `false` and never `nil`: for a rule stored ENABLED there is nothing to fall
---- back to, and `overlayRule` only overrides on a non-nil value - so `nil` would demote nothing
---- while reading exactly like it works.
+--- A WRITE of `false`, never `nil`: a rule stored ENABLED has nothing to fall back to, and
+--- `overlayRule` only overrides on a non-nil value, so `nil` would demote nothing while
+--- reading exactly like it works.
 ---
---- The demote decision itself is RLHerdsmanRulePresenter.enableDemotionAxes, shared with the
---- flush backstop; this is the wiring. Call it at an edit site AFTER that site's revalidations
---- (so the axes reflect the finished edit) and BEFORE its first render (so no display model is
---- built from a pre-demote overlay).
+--- Call this at an edit site AFTER that site's revalidations, so the axes reflect the finished
+--- edit, and BEFORE its first render, so no display model is built from a pre-demote overlay.
 --- @param id any rule id
 --- @return boolean demoted true when the enable was written false; no caller branches on it
 ---         today - it exists so the decision is observable to a test without reading the log
@@ -1710,14 +1704,12 @@ end
 -- DESTINATION PICKER (move only; in-row button -> single-select dialog -> stash dest)
 -- =============================================================================
 
---- Destination row button click (move only): open the SINGLE-select destination picker scoped to the
---- rule's filter animalType (D8) and EXCLUDING the rule's own source husbandries (decision 3b). The
---- presenter owns the gate + sort + source-exclusion (selectDestinationHusbandries); this frame
---- enumerates the farm's live husbandries (the same RLAnimalQuery source as the husbandry picker),
---- resolves the filter animalType + CHICKEN index, nil-guards farm / husbandrySystem (mirror
---- onClickRuleHusbandries' refuse-to-open), and flags a stored dest the gate dropped as
---- currentUnavailable so the picker requires an explicit pick. Opens even on an empty candidate set
---- (the dialog shows empty-text + disabled OK - feedback, never a dead click).
+--- Destination row button click (move only): open the SINGLE-select destination picker, scoped
+--- to the rule's filter animalType and excluding the rule's own source husbandries. The
+--- presenter owns the gate, sort and source-exclusion; this frame enumerates the farm's live
+--- husbandries and flags a stored dest the gate dropped as currentUnavailable, so the picker
+--- requires an explicit pick. Opens even on an empty candidate set - the dialog shows
+--- empty-text with OK disabled, which is feedback rather than a dead click.
 --- @param _button table the ruleDestinationButton element (unused; selection = selectedRuleId)
 function RLMenuHerdsmanFrame:onClickRuleDestination(_button)
     local id = self.selectedRuleId
@@ -2017,16 +2009,11 @@ end
 -- FLUSH (pending overlay -> g_rlHerdsmanRuleService:update)
 -- =============================================================================
 
---- Flush one id's pending overlay through the real service update. Gates via the presenter's
---- enabled-conditional RLHerdsmanRulePresenter.validateFlush: nameOk + operationOk +
---- paramsOk always required; AND both husbandriesOk (>= 1 target) and a bound non-naming filter
---- are required ONLY when the rule is enabled (F7's enabled-conditional filter, the frame-side
---- twin of the relaxed service floor). A disabled / incomplete rule therefore persists as a draft (nil filterId
---- / 0 targets = no-op); a rule that is enabled but missing one of those is DEMOTED here (the
---- backstop below writes `enabled = false` and re-evaluates, keeping every other edit). On a
---- validation skip OR a service reject, clears the pending overlay and reverts the display to the
---- stored record (the next render shows stored). On success, clears the overlay and refreshes the
---- stored snapshot to the persisted record.
+--- Flush one id's pending overlay through the real service update, gated by the presenter's
+--- enabled-conditional validateFlush. A disabled or incomplete rule persists as a draft; a rule
+--- that is enabled but missing an enable-gated axis is DEMOTED by the backstop below, which
+--- keeps every other edit. A validation skip or a service reject clears the overlay and reverts
+--- the display to the stored record.
 --- @param id any
 --- @return string outcome "updated" | "skipped" | "rejected"
 function RLMenuHerdsmanFrame:flushPendingForId(id)
@@ -2048,24 +2035,20 @@ function RLMenuHerdsmanFrame:flushPendingForId(id)
     -- filterId / 0 targets = no-op); an enabled rule missing either is handled by the
     -- demote backstop below, not a service reject.
 
-    -- Demote backstop: when the ONLY thing stopping this flush is an enable-gated axis - an
-    -- unfiltered non-naming rule (filterRequired), a 0-target rule (husbandriesRequired), and/or a
-    -- destination-less move (destinationRequired) - write the enable OFF and re-evaluate, rather
-    -- than discarding the overlay. The rule persists as a disabled draft carrying every edit the
-    -- player made; they re-complete it and re-enable. Dropping enable relaxes all three gates, so
-    -- the re-eval below normally passes (a residual malformed value still falls through to the
-    -- full revert).
+    -- Demote backstop: when the ONLY thing stopping this flush is an enable-gated axis, write
+    -- the enable OFF and re-evaluate rather than discarding the overlay, so the rule persists
+    -- as a disabled draft carrying every edit the player made. Dropping enable relaxes all
+    -- three gates, so the re-eval normally passes; a residual malformed value still falls
+    -- through to the full revert.
     --
-    -- The three edit sites demote as they happen, so the player sees the toggle move; this catches
-    -- everything they cannot - an illegal session enable, a frame-close flush, and a rule already
-    -- persisted enabled-but-incomplete, which becomes an honest disabled draft instead of staying
-    -- flush-blocked forever. That last one heals on the first flush that carries an overlay for it,
-    -- which is not quite "on selection": an id with no pending entry returns above without reaching
-    -- here, so a rule the player only looks at is healed only once something stashes for it.
+    -- The edit sites demote as they happen, so the player sees the toggle move; this catches
+    -- what they cannot - a frame-close flush, and a rule already persisted
+    -- enabled-but-incomplete, which would otherwise stay flush-blocked forever. That one heals
+    -- only once something stashes an overlay for it, since an id with no pending entry returns
+    -- above without reaching here.
     --
     -- `false`, never `nil`: a stored-ENABLED rule has nothing to fall back to, and overlayRule
-    -- only overrides on a non-nil value. For the session-toggle case the two are equivalent
-    -- anyway (stored enabled is false either way), which is why one branch serves both.
+    -- only overrides on a non-nil value.
     local demotionAxes = RLHerdsmanRulePresenter.enableDemotionAxes(g)
     if demotionAxes ~= nil then
         pending.enabled = false

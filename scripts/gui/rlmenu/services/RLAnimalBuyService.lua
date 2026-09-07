@@ -1,27 +1,16 @@
 --[[
     RLAnimalBuyService.lua
-    Stateless service for dealer-buy operations in the RL Tabbed Menu.
-
-    Wraps AnimalBuyEvent dispatch with the same subscription pattern as the sell and move
-    services. Every buy routes through AnimalBuyEvent, which is server-authoritative: the
-    server calls removeSaleAnimal, addAnimals and addMoney. The client MUST NOT mutate
-    dealer stock, husbandry contents or farm money directly.
+    Stateless service for dealer-buy operations, wrapping AnimalBuyEvent dispatch with the
+    same subscription pattern as the sell and move services. Every buy is server-authoritative
+    - the server calls removeSaleAnimal, addAnimals and addMoney - so the client MUST NOT
+    mutate dealer stock, husbandry contents or farm money directly.
 
     SIGN CONVENTION, critical: AnimalBuyEvent:run passes the values straight to addMoney,
-    which ADDS them to the balance, so both the buy price and the transport price MUST be
-    dispatched as NEGATIVE numbers. The MoneyType is a statistics label and does not change
-    the sign, and the server abs()-wraps them purely for display. A positive dispatch credits
-    the farm.
-
-    The buy price is the cluster's sell price times the active dealer-quality markup, resolved
-    through the same accessor the dealer list uses, so displayed and charged prices cannot
-    drift apart.
-
-    Error mapping delegates to AnimalScreenDealerFarm.BUY_ERROR_CODE_MAPPING. Do NOT define a
-    parallel table: the base-game map already covers every AnimalBuyEvent error code.
-
-    All methods are static and hold no state between calls; the response subscription is
-    scoped to each invocation by closure.
+    which ADDS them, so both the buy price and the transport price MUST be dispatched as
+    NEGATIVE numbers; a positive dispatch credits the farm. The MoneyType is a statistics
+    label and the server's abs() is display-only. The buy price is the cluster's sell price
+    times the active dealer-quality markup, read through the same accessor the dealer list
+    uses, so displayed and charged prices cannot drift apart.
 ]]
 
 local Log = RmLogging.getLogger("RLRM")

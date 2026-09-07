@@ -1,19 +1,16 @@
 --[[
     RLTrailerWorldService.lua
-    The WORLD trailer-placement mechanics behind the RLTransferWorldAdapter seam. When a
-    livestock or horse trailer is triggered standalone - no pen, no dealer - the Transfer
-    frame's other side is the free rideables in the trailer's trigger zone.
+    The WORLD trailer-placement mechanics behind the RLTransferWorldAdapter seam: when a
+    trailer is triggered standalone, the Transfer frame's other side is the free rideables
+    in the trailer's trigger zone.
 
-    The load and unload dispatch is SEQUENTIAL: one base-game AnimalLoadEvent /
-    AnimalUnloadEvent in flight at a time, advancing on each reply and aggregated to one
-    completion. That is forced, not stylistic - base-game replies publish a class-keyed
-    message with NO correlation id, and code 0 means SUCCESS rather than nil, so concurrent
-    dispatch could not attribute replies. Every engaged path reaches onComplete EXACTLY ONCE,
-    the all-pre-validation-fail case included, so the frame's movePending lock never strands.
-    Each event is byte-identical to one legacy apply; only the multi-select batching is new.
-
-    convertRideableCluster and errorKey dual-run; the source-item builders, the dispatchers
-    and getErrorText are in-game only.
+    Load and unload dispatch is SEQUENTIAL - one base-game AnimalLoadEvent /
+    AnimalUnloadEvent in flight at a time, advancing on each reply and aggregated into one
+    completion. That is forced: base-game replies publish a class-keyed message with NO
+    correlation id and code 0 means SUCCESS rather than nil, so concurrent dispatch could
+    not attribute replies. Every engaged path reaches onComplete EXACTLY ONCE, so the
+    frame's movePending lock never strands. convertRideableCluster and errorKey dual-run;
+    the source-item builders, the dispatchers and getErrorText are in-game only.
 ]]
 
 RLTrailerWorldService = {}

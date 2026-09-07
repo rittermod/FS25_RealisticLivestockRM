@@ -1,36 +1,14 @@
 --[[
     RLHerdsmanRuleStateEvent.lua
-    Full-state Herdsman rule snapshot.
+    Full-state Herdsman rule snapshot, server -> client only.
 
-    Server -> client only. Dispatched from `sendInitialClientState` for every
-    connecting client so late-joiners converge with the authoritative server
-    rule registry. Also the reconciliation path for the S3/S4 delta events: a
-    bounded `targetHusbandries` divergence on a create/update hop is re-sent
-    whole here, so a late joiner (or a peer that narrowed a target set during a
-    delta hop) converges to the server's truth.
+    Dispatched from sendInitialClientState for every connecting client, and the
+    reconciliation path for the create/update delta events: a bounded targetHusbandries
+    divergence on a delta hop is re-sent whole here.
 
-    Wire format (the per-record codec is S3's RLHerdsmanRuleWire, reused
-    UNCHANGED; this event owns ONLY the count prefix + the N-record loop):
-        streamWriteUInt16(count)
-        for i = 1, count do RLHerdsmanRuleWire.writeRule(streamId, rules[i]) end
-
-    Receiver flow (`run`):
-      1. Server-authoritative-receive guard: drop the event if this machine is a
-         server. The snapshot is strictly server->client; a crafted client send
-         must not `clear()` + replace authoritative state.
-      2. `g_rlHerdsmanRuleService:clear()` -- drop stale local state.
-      3. For each received rule, route through `applyIncomingCreate`, which does
-         NOT dispatch further events (the receiver apply is not a local mutation
-         that should re-broadcast), re-enforces the S1 field floor per record
-         (defense in depth), and deep-clones the wire payload (ownership).
-
-    Empty-set (count=0) is a valid state event -- a server with zero rules still
-    sends, giving clients a deterministic "clear-to-empty" signal on join.
-
-    State-event Event-class shape: emptyNew/new/writeStream/readStream/run +
-    a server-only static sendEvent dispatcher (the single guarded send path),
-    matching the in-mod RLFilterStateEvent and the sibling state events
-    (AnimalSystemStateEvent, HusbandryMessageStateEvent).
+    Wire format -- a UInt16 count prefix, then N records through the shared
+    RLHerdsmanRuleWire codec. count=0 is a valid state event and gives a joining client
+    a deterministic clear-to-empty signal.
 ]]
 
 RLHerdsmanRuleStateEvent = {}
@@ -58,28 +36,20 @@ function RLHerdsmanRuleStateEvent.new(rules)
     return self
 end
 
---- Upper sanity bound on the wire-side rule count. Any server that ever
---- accumulates 10,000 Herdsman rules is pathological; the real purpose of this
---- cap is to defend the reader against a desynced upstream stream that could
---- produce a count up to 65535 and spin the reader to a session-timing-out
---- crash. Exceeding the cap drops the event and leaves the receiver in its
---- prior state.
+--- Upper sanity bound on the wire-side count; exceeding it drops the event rather than
+--- spinning the reader through the up-to-65535 records a desynced stream can present.
 RLHerdsmanRuleStateEvent.MAX_RULE_COUNT = 10000
 
 --- Serialize via the shared RLHerdsmanRuleWire codec with a UInt16 count prefix.
 ---
---- Counts contiguous 1..N entries via `ipairs` rather than `#self.rules` so a
---- future `list()` refactor that yields a sparse / map-shaped table surfaces as
---- :warning rather than a silent under-count on the wire.
+--- Counts contiguous 1..N entries via `ipairs` rather than `#self.rules` so a sparse or
+--- map-shaped list surfaces as :warning rather than a silent under-count on the wire.
 function RLHerdsmanRuleStateEvent:writeStream(streamId, connection)
     local rules = self.rules or {}
 
     local count = 0
     for _, _ in ipairs(rules) do count = count + 1 end
 
-    -- Surface any divergence between the sequence-count (`ipairs`) and a raw
-    -- `pairs` sweep. Normal `g_rlHerdsmanRuleService:list()` input produces equal
-    -- counts because it builds via `table.insert`.
     local pairCount = 0
     for _, _ in pairs(rules) do pairCount = pairCount + 1 end
     if pairCount ~= count then
@@ -94,12 +64,7 @@ function RLHerdsmanRuleStateEvent:writeStream(streamId, connection)
     end
 end
 
---- Deserialize + run on this machine.
----
---- Defends against a desynced / corrupted stream by capping the count at
---- `MAX_RULE_COUNT`. If exceeded, the event is dropped -- receiver stays in its
---- prior state rather than spinning the reader through up to 65535 invalid
---- records.
+--- Deserialize + run on this machine, dropping the event if the count exceeds MAX_RULE_COUNT.
 function RLHerdsmanRuleStateEvent:readStream(streamId, connection)
     local count = streamReadUInt16(streamId)
     if count > RLHerdsmanRuleStateEvent.MAX_RULE_COUNT then
@@ -119,33 +84,13 @@ function RLHerdsmanRuleStateEvent:readStream(streamId, connection)
     self:run(connection)
 end
 
---- Apply the received state on the client.
----
---- Flow:
----   1. Server-authoritative-receive guard: drop the event if this machine is
----      running a server. The state event is strictly server-to-client; a
----      crafted client send would otherwise cause the server's `run()` to
----      `clear()` and replace authoritative state from a client payload.
----   2. Nil-guard `g_rlHerdsmanRuleService`. Unlikely (the eager source-time
----      singleton exists before sendInitialClientState) but cheap and explicit.
----   3. `clear()` to drop any stale local state.
----   4. Apply each wire-decoded rule via `applyIncomingCreate`, which:
----      - does not dispatch further events (receiver apply is not a local
----        mutation that should re-broadcast),
----      - re-enforces the S1 field floor per record (a crafted payload that
----        satisfied the typed codec cannot bypass the rule invariants),
----      - deep-clones the payload before storing (ownership contract).
----      Malformed records (nil / nil-or-empty `id`) are skipped with :warning.
----      A well-formed (unique-id) snapshot never fires the method's existing-id
----      overwrite :warning post-clear; a crafted snapshot carrying duplicate ids
----      does (benign, last-wins).
+--- Clear the client's registry and re-apply the received snapshot through applyIncomingCreate,
+--- which re-enforces the field floor per record and deep-clones the payload before storing.
 function RLHerdsmanRuleStateEvent:run(connection)
     local rules = self.rules or {}
 
     -- Iterate by highest numeric key, NOT `#rules`: `#` on a list with a nil hole
     -- ({valid, nil, valid}) is a border that can truncate before a later valid record.
-    -- Real inputs (readStream loop / service:list()) are always dense, but a sparse
-    -- input must still apply every present record and warn-skip the holes.
     local count = 0
     for k in pairs(rules) do
         if type(k) == "number" and k > count then count = k end
@@ -181,22 +126,14 @@ function RLHerdsmanRuleStateEvent:run(connection)
     Log:debug("RLHerdsmanRuleStateEvent:run: received %d rule(s), applied %d (registry cleared first)",
         count, applied)
 
-    -- F7: refresh an open Herdsman menu frame after the join-time state convergence. This is a
-    -- one-way server->client sync that fires mainly at join (menu usually closed), so it sits
-    -- outside the Pattern-A no-double-fire reasoning; the refreshIfOpen no-op + refreshData's
-    -- orphan-prune make a rare while-open fire harmless. Same nil-guards as the delta events.
+    -- Refresh an open Herdsman menu frame; nil-guarded for early lifecycle / never opened.
     if g_rlMenu ~= nil and g_rlMenu.herdsmanFrame ~= nil
        and g_rlMenu.herdsmanFrame.refreshIfOpen ~= nil then
         g_rlMenu.herdsmanFrame:refreshIfOpen()
     end
 end
 
---- Server-only dispatcher. Sends the full rule state to a single target
---- connection. Clients that call this get a `:warning` drop
---- (server-authoritative). This is the SINGLE dispatch path -- both the primary
---- wiring in `RealisticLivestock_FSBaseMission:sendInitialClientState` and any
---- future admin-triggered resend route through here, so the `g_server == nil` +
---- nil-connection guards below cover every send site.
+--- Server-only dispatcher: send the full rule state to a single target connection.
 ---@param rules table[] list of rule records
 ---@param connection table target connection (single client)
 function RLHerdsmanRuleStateEvent.sendEvent(rules, connection)

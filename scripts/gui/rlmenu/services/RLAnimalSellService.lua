@@ -1,24 +1,15 @@
 --[[
     RLAnimalSellService.lua
-    Stateless service for animal sell operations in the RL Tabbed Menu.
+    Stateless service for animal sell operations, wrapping AnimalSellEvent dispatch with
+    the same subscription pattern as RLAnimalMoveService. Single and bulk sells both route
+    through AnimalSellEvent, so the MoneyType is always SOLD_ANIMALS.
 
-    Wraps AnimalSellEvent dispatch with the same subscription pattern as
-    RLAnimalMoveService. All sells route through AnimalSellEvent (both
-    single and bulk), fixing the legacy single-sell MoneyType bug where
-    AnimalScreenDealer.applyTarget used direct removeCluster + addMoney
-    with MoneyType.NEW_ANIMALS_COST instead of SOLD_ANIMALS.
+    Fee sign convention: Animal:getTranportationFee(1) returns a POSITIVE number. This
+    service stores fees positive internally and negates when passing them to
+    AnimalSellEvent, which expects a negative transportPrice.
 
-    Fee sign convention: Animal:getTranportationFee(1) returns a positive
-    number. This service stores fees as positive internally and negates
-    when passing to AnimalSellEvent (which expects negative transportPrice).
-
-    RL messages are handled server-side by AnimalSellEvent:run() -- the
-    service does NOT add them (unlike RLAnimalMoveService which adds
-    move messages client-side).
-
-    All methods are static (module-level functions). The service does not
-    hold state between calls; the messageCenter subscription for sell
-    responses is scoped to each sellAnimals() invocation via closure.
+    RL messages are added server-side by AnimalSellEvent:run - this service adds none,
+    unlike RLAnimalMoveService's client-side move message.
 ]]
 
 local Log = RmLogging.getLogger("RLRM")

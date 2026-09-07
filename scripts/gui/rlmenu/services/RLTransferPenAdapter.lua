@@ -2,38 +2,24 @@
     RLTransferPenAdapter.lua
     The PEN counterpart adapter behind the RLTransferAdapter seam.
 
-    When a livestock trailer is triggered at an animal pen, the Transfer frame's
-    "other side" is that pen. This adapter reads the pen husbandry from the open
-    context (context.counterpartHandle) and routes a confirmed transfer to
-    RLAnimalMoveService.moveAnimals - the SAME AnimalMoveEvent the legacy
-    trailer-at-pen controller fired (mutation parity). It ROUTES; it never
-    constructs the event or mutates state itself.
+    When a trailer is triggered at an animal pen, the Transfer frame's other side is that
+    pen. This adapter reads the husbandry from context.counterpartHandle and routes a
+    confirmed transfer to RLAnimalMoveService.moveAnimals - the SAME AnimalMoveEvent the
+    legacy trailer-at-pen controller fired. It ROUTES; it never constructs the event.
 
-    Tier: IN-GAME. Its methods deref RLAnimalQuery / RLAnimalMoveService and the
-    engine husbandry getters, so it is NOT headless. The parity-critical pure bits
-    (RLTransferAdapter.resolveMovePlan / penActionLabelKey) dual-run; this module
-    only maps the resolved sides onto the real objects.
-
-    Stateless: a plain table whose methods take self via `:` and read everything
-    from the passed context (no instance fields). Registered at load into
-    RLTransferAdapter._adapters[RLMenuTabPolicy.PEN] so forCounterpart("pen")
-    resolves it in-game. The headless harness never sources this file, so the seam
-    stays NULL there - which is what keeps the pure RLTransferAdapterTests true in
-    both runners (the concrete pen -> adapter assertion lives in the in-game-only
-    RLTransferPenAdapterTests).
+    Tier: IN-GAME (derefs RLAnimalQuery, RLAnimalMoveService and the engine husbandry
+    getters). Stateless - it reads everything from the passed context. Registered at load
+    into RLTransferAdapter._adapters[RLMenuTabPolicy.PEN]; the headless harness never
+    sources this file, so the seam stays NULL there.
 ]]
 
 RLTransferPenAdapter = {}
 
 local Log = RmLogging.getLogger("RLRM")
 
---- Display data for the pen counterpart sidebar entry: the pen's engine name and
---- its used / total animal counts. `total` is `used + getNumOfFreeAnimalSlots()`
---- (the no-arg per-pen free total) - one definition, not the subtype-sensitive
---- getMaxNumOfAnimals form. The name is an ENGINE STRING used verbatim by the
---- frame (the frame getText's only the NULL adapter's KEY). Nil / handle-missing
---- -> { name = "", used = 0, total = 0 } (defensive; the redirect always supplies
---- a live husbandry).
+--- Display data for the pen sidebar entry: the pen's engine name and its used / total
+--- counts, where total is `used + getNumOfFreeAnimalSlots()` (the per-pen free total, not
+--- the subtype-sensitive getMaxNumOfAnimals form).
 --- @param context table  { counterpartHandle = <husbandry placeable>, ... }
 --- @return table display  { name, used, total }
 function RLTransferPenAdapter:getDisplayData(context)
@@ -52,11 +38,9 @@ function RLTransferPenAdapter:getDisplayData(context)
     return { name = name, used = used, total = total }
 end
 
---- Enumerate the pen's animals as sorted AnimalItemStock items (each exposes
---- .cluster) via the same helper the shipped Move frame uses. No pre-filter by
---- the trailer's locked type (legacy initTargetItems parity - the move service is
---- the type/capacity gate). Nil / no-spec handle -> {} (listAnimalsForHusbandry
---- hard-requires spec_husbandryAnimals).
+--- Enumerate the pen's animals as sorted AnimalItemStock items, via the same helper the
+--- shipped Move frame uses. No pre-filter by the trailer's locked type (legacy
+--- initTargetItems parity - the move service is the type and capacity gate).
 --- @param context table  { counterpartHandle = <husbandry placeable>, ... }
 --- @return table items
 function RLTransferPenAdapter:enumerate(context)
@@ -70,26 +54,16 @@ function RLTransferPenAdapter:enumerate(context)
     return items
 end
 
---- The footer action-label i18n KEY for a direction (legacy text parity):
---- "shop_moveToTrailer" loading, "shop_moveToFarm" unloading. Delegates to the
---- pure penActionLabelKey; the frame resolves the returned KEY.
+--- The footer action-label i18n KEY for a direction; the frame resolves the key.
 --- @param direction string  DIR_INTO_TRAILER | DIR_OUT_OF_TRAILER
 --- @return string i18nKey
 function RLTransferPenAdapter:actionLabel(direction)
     return RLTransferAdapter.penActionLabelKey(direction)
 end
 
---- Route the selected animals to RLAnimalMoveService.moveAnimals for the
---- direction's move plan. Resolves the (source, target, moveType) via the pure
---- resolveMovePlan, maps the sides onto the real objects (SIDE_COUNTERPART ->
---- context.counterpartHandle, SIDE_TRAILER -> context.trailer), and dispatches.
---- Returns true when routed to the move service (which owns the filter pipeline +
---- survivor dispatch + single broadcast). The move-service errorCode result - incl.
---- the all-rejected firstErrorCode - is wrapped here into the frame's uniform
---- (success, errorText) completion contract, so the frame stays adapter-agnostic;
---- mutation parity holds (still routes to moveAnimals). Returns false WITHOUT
---- dispatching when the plan is nil or either endpoint is missing (fail-closed);
---- the frame then leaves its state unchanged.
+--- Route the selected animals to RLAnimalMoveService.moveAnimals for the direction's plan,
+--- mapping the resolved sides onto the real objects. Fail-closed on a nil plan or a missing
+--- endpoint: no dispatch, and the frame leaves its state unchanged.
 --- @param direction string  DIR_INTO_TRAILER | DIR_OUT_OF_TRAILER
 --- @param animals table  the selected animals (clusters)
 --- @param context table  { trailer, counterpartHandle, onComplete, ... }
@@ -114,15 +88,9 @@ function RLTransferPenAdapter:dispatch(direction, animals, context)
         tostring(target and target.getName and target:getName()),
         animals ~= nil and #animals or 0)
 
-    -- Wrap the move-service errorCode callback into the frame's generalized
-    -- (success, errorText) completion contract. Mutation parity is
-    -- preserved - this still routes to moveAnimals; only the result space is adapted.
-    -- moveAnimals fires the callback with MOVE_SUCCESS / an error code (incl. the
-    -- all-rejected firstErrorCode), never nil, so the nil success branch is defensive.
-    -- Propagate the move service's accept/reject boolean instead of an
-    -- unconditional true: a false return (a same-class move already in flight) must reach
-    -- RLMenuTransferFrame:dispatchTransfer so it releases movePending + keeps the selection
-    -- rather than stranding the lock waiting on a completion that will never fire.
+    -- The move service's accept/reject boolean is propagated rather than an unconditional
+    -- true: a false return (a same-class move already in flight) must reach the frame so it
+    -- releases movePending instead of waiting on a completion that will never fire.
     local accepted = RLAnimalMoveService.moveAnimals(source, target, animals, plan.moveType, function(errorCode)
         local success = (errorCode == nil or errorCode == AnimalMoveEvent.MOVE_SUCCESS)
         local errorText = (not success) and RLAnimalMoveService.getErrorText(errorCode) or nil
@@ -136,10 +104,8 @@ function RLTransferPenAdapter:dispatch(direction, animals, context)
     return accepted
 end
 
--- Register at load so forCounterpart("pen") resolves this adapter in-game. The
--- registry is a plain Lua table (assigning into it is registration ceremony, not
--- game state - the sanctioned load-time escape). Keyed by RLMenuTabPolicy.PEN,
--- which equals g_rlMenu.trailerCounterpart for the pen redirect.
+-- Register at load so forCounterpart("pen") resolves this adapter in-game. The registry is
+-- a plain Lua table, so this is registration ceremony rather than game state.
 RLTransferAdapter._adapters[RLMenuTabPolicy.PEN] = RLTransferPenAdapter
 
 Log:debug("RLTransferPenAdapter: loaded and registered for counterpart '%s'", tostring(RLMenuTabPolicy.PEN))

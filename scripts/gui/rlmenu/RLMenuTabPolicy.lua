@@ -1,19 +1,16 @@
 -- RLMenuTabPolicy.lua
 -- Pure decision layer for RL Tabbed Menu tab visibility and the trailer-mode anchor. Plain data
--- in, plain data out - no g_*, no GUI, no XML handles - so the whole module loads and runs under
--- the headless harness.
+-- in, plain data out - no g_*, no GUI, no XML handles - so the whole module runs headless.
 --
 -- Two concerns live here so RLMenu's setupMenuPages closures stay thin wiring:
 --   1. isVisible(pageKey, openMode, counterpart) -> bool   (which tabs show)
 --   2. anchorPage(counterpart, trailerIsEmpty)  -> index  (which tab lands first)
 --
 -- Both functions are TOTAL: an unrecognized openMode, counterpart or pageKey resolves to a safe
--- default - hidden, or Buy - rather than erroring. The RLMenu bridge validates the counterpart up
--- front, so those defaults are reached only by the headless suite, never by a real open.
+-- default - hidden, or Buy - rather than erroring.
 --
--- Open-mode and counterpart string values are owned here, because the pure layer loads first, and
--- re-exported by RLMenu. The in-game regression suite pins MODE_FULL / MODE_DEALER visibility
--- across all 8 frames, so any string drift between the two owners fails loudly.
+-- Open-mode and counterpart string values are owned here, because the pure layer loads first,
+-- and re-exported by RLMenu; any string drift between the two owners fails the in-game suite.
 
 local Log = RmLogging.getLogger("RLRM")
 

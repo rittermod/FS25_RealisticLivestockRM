@@ -1,31 +1,14 @@
 --[[
     RLFilterStateEvent.lua
-    Full-state filter snapshot.
+    Full-state filter snapshot, server -> client only.
 
-    Server -> client only. Dispatched from `sendInitialClientState` for every
-    connecting client so late-joiners converge with the authoritative server
-    state. Also serves as the reconciliation path when a Pattern A delta
-    mutation is rejected server-side -- the next state event
-    wipes and re-applies, which reconciles divergent local state.
+    Dispatched from `sendInitialClientState` for every connecting client, and the
+    reconciliation path when a Pattern A delta mutation is rejected server-side: the
+    next state event wipes and re-applies, converging divergent local state.
 
-    Wire format (recursive codec via RLFilterWire):
-        streamWriteUInt16(count)
-        for i = 1, count do writeFilter(streamId, filter) end
-
-    Receiver flow (`run`):
-      1. `g_rlFilterService:clear()` -- drop stale local state.
-      2. For each received filter, invoke `applyIncomingCreate` which does
-         NOT dispatch further events (the receiver apply is not a local
-         mutation that should re-broadcast) AND deep-clones the wire payload
-         (ownership contract).
-
-    Empty-set (count=0) is a valid state event -- a server with zero filters
-    still sends, giving clients a deterministic "clear-to-empty" signal.
-
-    Pattern references:
-      - AnimalSystemStateEvent.lua (send-per-connection state snapshot)
-      - HusbandryMessageStateEvent.lua (wiring site in sendInitialClientState)
-      - RLFilterCreateEvent.lua (wire conventions + validation style)
+    Wire format -- a UInt16 count prefix, then N filters through the recursive
+    RLFilterWire codec. count=0 is a valid state event and gives a joining client a
+    deterministic clear-to-empty signal.
 ]]
 
 RLFilterStateEvent = {}
@@ -53,29 +36,20 @@ function RLFilterStateEvent.new(filters)
     return self
 end
 
---- Upper sanity bound on the wire-side filter count. Any server that ever
---- accumulates 10,000 user-defined filters is pathological; the real
---- purpose of this cap is to defend the reader against a desynced upstream
---- stream (e.g. unbounded-recursion readGroup walking into the
---- next event's bytes) that could produce a count up to 65535 and spin
---- the reader to a session-timing-out crash. Exceeding the cap drops the
---- event and leaves the receiver in its prior state.
+--- Upper sanity bound on the wire-side count; exceeding it drops the event rather than
+--- spinning the reader through the up-to-65535 records a desynced stream can present.
 RLFilterStateEvent.MAX_FILTER_COUNT = 10000
 
 --- Serialize via the shared RLFilterWire codec with a UInt16 count prefix.
 ---
---- Counts contiguous 1..N entries via `ipairs` rather than `#self.filters`
---- so a future `list()` refactor that yields a sparse / map-shaped table
---- surfaces as :warning rather than a silent under-count on the wire.
+--- Counts contiguous 1..N entries via `ipairs` rather than `#self.filters` so a sparse or
+--- map-shaped list surfaces as :warning rather than a silent under-count on the wire.
 function RLFilterStateEvent:writeStream(streamId, connection)
     local filters = self.filters or {}
 
     local count = 0
     for _, _ in ipairs(filters) do count = count + 1 end
 
-    -- Surface any divergence between the sequence-count (`ipairs`) and a
-    -- raw `pairs` sweep. Normal `g_rlFilterService:list()` input produces
-    -- equal counts because it builds via `table.insert`.
     local pairCount = 0
     for _, _ in pairs(filters) do pairCount = pairCount + 1 end
     if pairCount ~= count then
@@ -90,12 +64,7 @@ function RLFilterStateEvent:writeStream(streamId, connection)
     end
 end
 
---- Deserialize + run on this machine.
----
---- Defends against a desynced / corrupted stream by capping the count at
---- `MAX_FILTER_COUNT`. If exceeded, the event is dropped -- receiver stays
---- in its prior state rather than spinning the reader through up to 65535
---- invalid filters.
+--- Deserialize + run on this machine, dropping the event if the count exceeds MAX_FILTER_COUNT.
 function RLFilterStateEvent:readStream(streamId, connection)
     local count = streamReadUInt16(streamId)
     if count > RLFilterStateEvent.MAX_FILTER_COUNT then
@@ -115,24 +84,8 @@ function RLFilterStateEvent:readStream(streamId, connection)
     self:run(connection)
 end
 
---- Apply the received state on the client.
----
---- Flow:
----   1. Server-authoritative-receive guard: drop the event if this machine
----      is running a server. The state event is strictly server-to-client;
----      a malicious or modded client that crafts + emits one would
----      otherwise cause the server's `run()` to `clear()` and replace
----      authoritative state from a client payload. Mirrors P3's receive-
----      side Pattern A validation (validate on receive, not just on send).
----   2. Nil-guard `g_rlFilterService`. Unlikely (loadMap runs before
----      sendInitialClientState) but cheap and explicit.
----   3. `clear()` to drop any stale local state (e.g. filters created
----      optimistically before the server rejected the mutation).
----   4. Apply each wire-decoded filter via `applyIncomingCreate`, which:
----      - does not dispatch further events (receiver apply is not a local
----        mutation that should re-broadcast)
----      - deep-clones the payload before storing (ownership contract)
----      The method's existing-id :warning cannot fire post-clear.
+--- Clear the client's registry and re-apply the received snapshot through applyIncomingCreate,
+--- which dispatches no further events and deep-clones each payload before storing it.
 function RLFilterStateEvent:run(connection)
     local filters = self.filters or {}
     local count = #filters
@@ -168,12 +121,7 @@ function RLFilterStateEvent:run(connection)
         count, applied)
 end
 
---- Server-only dispatcher. Sends the full filter state to a single target
---- connection. Clients that call this get a `:warning` drop
---- (server-authoritative). This is the SINGLE dispatch path -- both the
---- primary wiring in `RealisticLivestock_FSBaseMission:sendInitialClientState`
---- and any future admin-triggered resend route through here, so the
---- `g_server == nil` + nil-connection guards below cover every send site.
+--- Server-only dispatcher: send the full filter state to a single target connection.
 ---@param filters table[] list of filter records
 ---@param connection table target connection (single client)
 function RLFilterStateEvent.sendEvent(filters, connection)

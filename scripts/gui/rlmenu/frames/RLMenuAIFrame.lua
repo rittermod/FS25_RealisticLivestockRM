@@ -2,22 +2,15 @@
     RLMenuAIFrame.lua
     RL Tabbed Menu - AI (Artificial Insemination) tab.
 
-    Top-of-column species cycler with dot indicators (cow / pig / sheep & goats /
-    horse / chicken), multi-section SmoothList of AI-stock bull cards with the
-    overall-quality label in the cell's "price" attribute slot (legacy parity:
-    the price slot carries a quality label here, NOT a money amount), middle
-    column `aiPurchasePanel` with Average Success + Quantity + stepper + total
-    price, and a right-hand detail pane reusing RLDetailPaneHelper (bulls have
-    no husbandry).
+    A top-of-column species cycler with dot indicators, a multi-section SmoothList of
+    AI-stock bull cards, a middle `aiPurchasePanel` (Average Success + Quantity + stepper +
+    total price), and a right-hand detail pane reusing RLDetailPaneHelper (bulls have no
+    husbandry). The cell's "price" slot carries the overall-QUALITY label, not a money
+    amount - legacy parity.
 
-    Footer wiring:
-      - quantity stepper state-change -> recompute total price
-      - Favourite toggle (local, no network event; MP persistence gap
-        tracked separately)
-      - Buy action (SemenBuyEvent dispatch + PlacementUtil spawn + InfoDialog)
-
-    Selection is isolated: no read/write of g_rlMenu.sharedSelection (AI bulls
-    are not farm-owned).
+    Footer wiring: the quantity stepper recomputes the total price, the Favourite toggle is
+    local with no network event, and Buy dispatches SemenBuyEvent then spawns via
+    PlacementUtil. AI bulls are not farm-owned, so selection is isolated from sharedSelection.
 ]]
 
 RLMenuAIFrame = {}

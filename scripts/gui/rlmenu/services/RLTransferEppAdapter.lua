@@ -1,22 +1,16 @@
 --[[
     RLTransferEppAdapter.lua
-    The EPP (butcher) counterpart adapter behind the RLTransferAdapter seam.
+    The EPP (butcher) counterpart adapter behind the RLTransferAdapter seam, reached when
+    RLAnimalScreenBridge's onOpen redirect reroutes a third-party EPP butcher trigger into
+    RLMenu MODE_TRAILER.
 
-    When a third-party EPP butcher trigger direct-opens the vanilla AnimalScreen with its own
-    controller, RLAnimalScreenBridge's onOpen redirect reroutes it into RLMenu MODE_TRAILER
-    with this EPP counterpart. The butcher is a pure SINK - you DELIVER a loaded trailer to
-    it and never pull animals back out - so this adapter is ONE-WAY: it enumerates nothing,
-    and dispatch guards the reverse direction BEFORE any move, then routes the deliver to
+    The butcher is a pure SINK - you deliver a loaded trailer to it and never pull animals
+    back out - so this adapter is ONE-WAY: it enumerates nothing, and dispatch guards the
+    reverse direction BEFORE any move, then routes the deliver to
     RLAnimalMoveService.moveAnimals, the SAME AnimalMoveEvent leg the vanilla EPP screen
-    fires. Mutation parity, never a new event class.
-
-    context.counterpartHandle IS the production point - the EPP loading trigger assigns
-    itself there. moveAnimals auto-detects a pp target by its animalsTypeData and
-    age/type-filters client-side before dispatch, with the server rechecking, so no new
-    validation lives here.
-
-    Tier: IN-GAME, since its methods deref the engine pp getters. Stateless, and registered
-    at load so forCounterpart resolves it in-game.
+    fires. context.counterpartHandle IS the production point. moveAnimals auto-detects a pp
+    target by its animalsTypeData and age/type-filters before dispatch, with the server
+    rechecking, so no new validation lives here. Tier: IN-GAME; stateless; registered at load.
 ]]
 
 RLTransferEppAdapter = {}

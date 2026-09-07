@@ -2,23 +2,15 @@
     RLDealerSaleStateEvent.lua
     Full dealer sale-availability override set (server -> client).
 
-    Dispatched to every connecting client so a late joiner converges with the authoritative
-    server state, and broadcast after each accepted admin change. Wire format is
-    `RLDealerSaleWire.writeList`; every record in a snapshot is an override, so a record
-    arriving as a clear is a protocol error and is skipped.
-
-    Receiver flow: guard server-authoritative receive, then RECONSTRUCT
-    `g_rlDealerSaleRegistry` and re-`set` each record - never a merge, because the registry
-    is `or`-guarded at load and the server-only loader never runs on a client, so a merge
-    would carry a previous session's overrides into this one. Then
-    `applyToLiveSubTypes()` for local flags only, NEVER `applyAndRepopulate()`, which ends
-    in a dealer-reset REQUEST and would produce one per connected client.
-
-    `sessionBaseline` is never touched here: the client's FIRST apply lazily captures the
-    shipped defaults from a store no apply has written yet, so re-capturing afterwards would
-    record already-overridden values as the defaults and permanently break restore-on-clear.
-
-    An empty set is a valid state event - the deterministic clear-to-empty signal.
+    Dispatched to every connecting client and broadcast after each accepted admin change.
+    Wire format is `RLDealerSaleWire.writeList`; every record is an override, so a clear
+    arriving in a snapshot is a protocol error and is skipped. An empty set is valid.
+    The receiver RECONSTRUCTS `g_rlDealerSaleRegistry` rather than merging: the registry is
+    `or`-guarded at load and its loader is server-only, so a merge would carry a previous
+    session's overrides into this one. It then calls `applyToLiveSubTypes()` for local flags
+    only -- `applyAndRepopulate()` would end in a dealer-reset REQUEST, one per client.
+    `sessionBaseline` stays untouched: the first client apply lazily captures the shipped
+    defaults, so re-capturing would record overridden values as the defaults.
 ]]
 
 RLDealerSaleStateEvent = {}

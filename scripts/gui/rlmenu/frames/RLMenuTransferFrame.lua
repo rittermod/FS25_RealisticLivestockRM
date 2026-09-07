@@ -1,25 +1,17 @@
 --[[
     RLMenuTransferFrame.lua
-    RL Tabbed Menu - Transfer tab (pen/world trailer placements).
+    RL Tabbed Menu - Transfer tab, one frame for every trailer placement.
 
-    One frame for every trailer placement. The left sidebar is a fixed two-entry
-    source picker - the counterpart (a pen/world endpoint) and the trailer - each
-    labelled `name (used/total)`. Selecting a side lists that side's animals in a
-    multi-select SmoothList (checkbox cell, shared detail pane on the right). A
-    single footer action button (Load / Unload by side) routes the checked
-    animals to the counterpart adapter.
+    The left sidebar is a fixed two-entry source picker - the counterpart (a pen, EPP or
+    world endpoint) and the trailer - each labelled `name (used/total)`. Selecting a side
+    lists that side's animals in a multi-select SmoothList, and a single footer action
+    button (Load / Unload by side) routes the checked animals to the counterpart adapter.
+    Where those animals come from and what a confirmed transfer does is the adapter's job
+    (RLTransferAdapter); the frame only talks to that seam.
 
-    Where the counterpart's animals come from and what a confirmed transfer does
-    is the adapter's job (RLTransferAdapter); the frame only talks to that seam.
-    This shell ships the NULL adapter: the counterpart side lists nothing and the
-    action is a logged no-op (no mutation). Concrete pen/world adapters + the
-    trigger redirects land in later slices.
-
-    Chrome mirrors RLMenuInfoFrame (sidebar + list container); the multi-select
-    data row + footer mirror RLMenuMoveFrame (checkbox cell, onClickSelect /
-    onClickSelectAll, the populateCell checkbox callback). The pen + animal detail
-    columns reuse RLDetailPaneHelper unchanged; the pen column stays hidden while
-    no side supplies a husbandry.
+    Chrome mirrors RLMenuInfoFrame; the multi-select data row and footer mirror
+    RLMenuMoveFrame. The pen and animal detail columns reuse RLDetailPaneHelper, and the
+    pen column stays hidden while no side supplies a husbandry.
 ]]
 
 RLMenuTransferFrame = {}

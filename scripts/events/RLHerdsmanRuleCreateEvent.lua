@@ -2,22 +2,13 @@
     RLHerdsmanRuleCreateEvent.lua
     Network event for creating a Herdsman rule record.
 
-    Pattern A (caller-mutates-first + rebroadcast-from-run with
-    ignoreConnection=sender). The caller (RLHerdsmanRuleService:create) MUST mutate
-    local state BEFORE calling sendEvent. This event's run() applies the mutation on
-    every receiver that is NOT the original sender.
+    Pattern A: the caller (RLHerdsmanRuleService:create) MUST mutate local state BEFORE
+    calling sendEvent; run() applies the mutation on every receiver that is not the
+    original sender, and the server rebroadcasts with ignoreConnection=sender.
 
-    Server-side validation (server receiving from a remote client):
-      1. tradeAnimals permission for the sending connection.
-      2. The sender's farm must equal the rule's owning farmId (rules are farm-scoped;
-         a rule always carries an integer farmId per the S1 floor).
-      3. Reject if a rule with the same id already exists (pathological collision).
-    Permission + farm-scope collapse into the pure isAuthorized predicate so the
-    decision is unit-testable without the live permission system.
-
-    This slice is Create-only and NOT multiplayer-shippable on its own: late joiners
-    receive nothing until the state-sync slice, and a transiently-unresolvable target
-    husbandry is reconciled there. Ship Create+Update/Delete+State together.
+    Codec: RLHerdsmanRuleWire.writeRule / readRule. A server receiving from a remote
+    client checks the tradeAnimals permission, the sender's farm against the rule's
+    owning farmId, and a colliding id before it rebroadcasts.
 ]]
 
 RLHerdsmanRuleCreateEvent = {}
@@ -46,10 +37,7 @@ function RLHerdsmanRuleCreateEvent.new(rule)
     return self
 end
 
---- Pure authorization predicate. A remote create is authorized iff the sender holds
---- the trade permission AND the sender's farm matches the rule's owning farm. No
---- `g_*` access -- the caller resolves the inputs and feeds them in, so the decision
---- is unit-testable in isolation.
+--- Authorized iff the sender holds the trade permission and is on the rule's owning farm.
 ---@param hasTradePermission boolean sender holds the tradeAnimals permission
 ---@param senderFarmId number|nil the sending player's resolved farm id
 ---@param ruleFarmId number|nil the rule's owning farm id
@@ -88,15 +76,7 @@ local function getUserContext(connection)
     return userName, userId
 end
 
---- Execute the event on the receiver (Pattern A).
----
---- Flow:
----   1. Guard against a malformed payload (nil rule or nil/empty id).
----   2. If server receiving from a remote client, validate permission + farm scope
----      (via isAuthorized) and reject a duplicate id BEFORE rebroadcast. On failure,
----      log :warning and drop. On success, rebroadcast with ignoreConnection=sender.
----   3. Apply the create on this receiver unless this machine is the original sender
----      (excluded via ignoreConnection=sender).
+--- Validate a remote client's payload, rebroadcast to the other peers, then apply here.
 function RLHerdsmanRuleCreateEvent:run(connection)
     local rule = self.rule
     if rule == nil or rule.id == nil or rule.id == "" then
@@ -110,8 +90,7 @@ function RLHerdsmanRuleCreateEvent:run(connection)
 
         local hasTradePermission = g_currentMission:getHasPlayerPermission("tradeAnimals", connection)
 
-        -- Resolve the sender's farm with explicit nil guards (stale/absent lookups
-        -- are real in MP); the predicate treats a nil farm as unauthorized.
+        -- A stale or absent farm lookup is real in MP; the predicate treats nil as unauthorized.
         local userFarm = g_farmManager:getFarmForUniqueUserId(userId)
         local senderFarmId = (userFarm ~= nil) and userFarm.farmId or nil
 
@@ -122,16 +101,14 @@ function RLHerdsmanRuleCreateEvent:run(connection)
             return
         end
 
-        -- Pathological: payload id collides with an existing record. Reject BEFORE
-        -- rebroadcast. _rawGetById avoids an unnecessary deep-clone on this check.
+        -- _rawGetById avoids an unnecessary deep-clone on this read-only check.
         if g_rlHerdsmanRuleService ~= nil and g_rlHerdsmanRuleService:_rawGetById(rule.id) ~= nil then
             Log:warning("RLHerdsmanRuleCreateEvent:run: duplicate id '%s' for user '%s' (userId=%s); rejecting create before rebroadcast",
                 tostring(rule.id), tostring(userName), tostring(userId))
             return
         end
 
-        -- Rebroadcast to everyone except the sender (sender already mutated locally
-        -- before sendEvent and must not receive an echo).
+        -- Everyone except the sender: it already mutated locally before sendEvent.
         g_server:broadcastEvent(
             RLHerdsmanRuleCreateEvent.new(rule),
             nil, connection, nil)
@@ -140,11 +117,6 @@ function RLHerdsmanRuleCreateEvent:run(connection)
             tostring(userName), tostring(rule.id))
     end
 
-    -- Apply the create on this receiver (server-received-from-remote or a client
-    -- receiving the rebroadcast). The sender never enters run() thanks to
-    -- ignoreConnection=sender in the rebroadcast (and its own broadcastEvent sends
-    -- only remotely). applyIncomingCreate re-validates against the S1 floor, so a
-    -- crafted payload that passed the codec cannot bypass the rule invariants.
     if g_rlHerdsmanRuleService == nil then
         Log:warning("RLHerdsmanRuleCreateEvent:run: g_rlHerdsmanRuleService is nil; skipping apply for id=%s",
             tostring(rule.id))
@@ -155,19 +127,14 @@ function RLHerdsmanRuleCreateEvent:run(connection)
     Log:debug("RLHerdsmanRuleCreateEvent:run: applied create id=%s name=%s",
         tostring(rule.id), tostring(rule.name))
 
-    -- F7: refresh an open Herdsman menu frame on this machine after the remote create.
-    -- Nil-guarded (g_rlMenu / herdsmanFrame absent during early lifecycle or if the menu was
-    -- never opened). Idempotent: Pattern A keeps the originator out of its own run().
+    -- Refresh an open Herdsman menu frame; nil-guarded for early lifecycle / never opened.
     if g_rlMenu ~= nil and g_rlMenu.herdsmanFrame ~= nil
        and g_rlMenu.herdsmanFrame.refreshIfOpen ~= nil then
         g_rlMenu.herdsmanFrame:refreshIfOpen()
     end
 end
 
---- Thin dispatch: broadcast to clients if we are the server, otherwise upload to the
---- server. Caller (service) MUST have already mutated local state before calling
---- this. Guards on `g_server` / `g_client` so offline or early-lifecycle paths (mod
---- tests, service constructor wiring) stay safe.
+--- Broadcast to clients if we are the server, otherwise upload to the server.
 ---@param rule table rule record (with id populated)
 function RLHerdsmanRuleCreateEvent.sendEvent(rule)
     if rule == nil or rule.id == nil or rule.id == "" then

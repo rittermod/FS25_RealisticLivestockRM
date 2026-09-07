@@ -2,20 +2,13 @@
     RLFilterDeleteEvent.lua
     Network event for deleting a saveable filter by id.
 
-    Pattern A (caller-mutates-first). Caller (RLFilterService:delete) mutates
-    local state BEFORE calling sendEvent.
+    Pattern A: the caller (RLFilterService:delete) MUST mutate local state BEFORE calling
+    sendEvent; run() removes the filter on every receiver that is not the original sender,
+    and the server rebroadcasts with ignoreConnection=sender.
 
-    Server-side validation:
-      1. getHasPlayerPermission("tradeAnimals", connection)
-      2. stored = g_rlFilterService:getById(id) on SERVER. If unknown -> log
-         :warning + drop (no mutation, no rebroadcast); I/O matrix row
-         "Client delete, unknown id".
-      3. Farm-scope: if stored.farmId ~= nil, sender's farmId must match.
-
-    Note: the payload is just the id. farmId for the scope check is derived
-    from the server's stored record, which is the authoritative source.
-
-    Pattern reference: HusbandryMessageDeleteEvent.
+    The payload is JUST the id, so the farmId for the scope check is derived from the
+    server's stored record rather than the wire. An id the server does not hold is a
+    no-op rather than a rejection.
 ]]
 
 RLFilterDeleteEvent = {}
@@ -80,7 +73,6 @@ function RLFilterDeleteEvent:run(connection)
         -- _rawGetById avoids an unnecessary deep-clone on this read-only check.
         local stored = g_rlFilterService:_rawGetById(id)
         if stored == nil then
-            -- I/O matrix: "Client delete, unknown id -> :warning, no-op".
             Log:warning("RLFilterDeleteEvent:run: unknown id '%s' from user '%s' (userId=%s); no-op",
                 tostring(id), tostring(userName), tostring(userId))
             return
@@ -115,9 +107,6 @@ function RLFilterDeleteEvent:run(connection)
         return
     end
 
-    -- Branch log on apply outcome so an "applied" line only appears when a
-    -- record was actually removed. The "already gone" path downgrades to
-    -- :trace since it's a legitimate late-join / reconnect scenario.
     local applied = g_rlFilterService:applyIncomingDelete(id)
     if applied then
         Log:debug("RLFilterDeleteEvent:run: applied delete id=%s", tostring(id))
@@ -125,21 +114,13 @@ function RLFilterDeleteEvent:run(connection)
         Log:trace("RLFilterDeleteEvent:run: no-op delete id=%s (already gone)", tostring(id))
     end
 
-    -- Spec B fanout: notify the four consumer frames (Info/Buy/Sell/Move) so
-    -- their chip + animal list stay in sync with the remote mutation. Each
-    -- frame's onRemoteFilterChange id-match-gates against its own activeFilterId
-    -- so non-active remote changes are cheap no-ops (no chip / list churn).
-    -- Fires on both the applied and already-gone branches: a fanout on the
-    -- already-gone path means a peer's prior delete reached us out of order;
-    -- our local frame may still hold a stale activeFilterId pointing at the
-    -- just-removed filter, and the per-frame revalidate will clear it.
-    -- Nil-guarded for the same reasons as the settingsFrame:refreshIfOpen
-    -- block below: g_rlMenu may not exist during early lifecycle; frame
-    -- fields may be nil pre-menu-open or on a dedicated server.
+    -- The fanout fires on the already-gone branch too: that path means a peer's delete
+    -- reached us out of order, and a local frame can still hold a stale activeFilterId
+    -- pointing at the removed filter, which the per-frame revalidate clears.
     Log:trace("RLFilterDeleteEvent:run: fanout to consumer frames, id=%s", tostring(id))
     if g_rlMenu ~= nil then
-        -- Iterate frame NAMES (no-nil string array); see RLFilterCreateEvent
-        -- for the ipairs-nil rationale.
+        -- Iterate frame NAMES, not frame references: ipairs stops at the first nil, so an
+        -- array holding a nil frame field would silently skip every later frame.
         for _, frameName in ipairs({"infoFrame", "buyFrame", "sellFrame", "moveFrame"}) do
             local f = g_rlMenu[frameName]
             if f ~= nil and f.onRemoteFilterChange ~= nil then
@@ -148,22 +129,14 @@ function RLFilterDeleteEvent:run(connection)
         end
     end
 
-    -- Refresh the Settings frame if it is currently open on this machine.
-    -- Called after the branched if/else end so both applied and no-op
-    -- paths trigger the refresh - the no-op path means the id was already
-    -- gone locally (late-join reconcile or redundant rebroadcast), and a
-    -- pass through refreshData still costs little and keeps the UI
-    -- consistent with any concurrent events that may have landed.
-    -- Nil-guarded: g_rlMenu may not exist during early lifecycle,
-    -- settingsFrame may be nil if the menu was never opened.
+    -- Refresh an open Settings frame; nil-guarded for early lifecycle / never opened.
     if g_rlMenu ~= nil and g_rlMenu.settingsFrame ~= nil
        and g_rlMenu.settingsFrame.refreshIfOpen ~= nil then
         g_rlMenu.settingsFrame:refreshIfOpen()
     end
 
-    -- F7: a remote filter delete can change rule filter-summaries (a bound filter goes missing),
-    -- so an open Herdsman menu frame is a filter consumer that needs the same full reload (NOT
-    -- the id-gated onRemoteFilterChange fanout above). Same nil-guards as the settingsFrame block.
+    -- A remote delete can change rule filter-summaries (a bound filter goes missing), so an
+    -- open Herdsman frame needs the full reload rather than the id-gated fanout above.
     if g_rlMenu ~= nil and g_rlMenu.herdsmanFrame ~= nil
        and g_rlMenu.herdsmanFrame.refreshIfOpen ~= nil then
         g_rlMenu.herdsmanFrame:refreshIfOpen()

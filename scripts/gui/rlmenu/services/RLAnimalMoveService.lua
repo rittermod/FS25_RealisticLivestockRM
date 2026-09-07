@@ -1,41 +1,26 @@
 --[[
     RLAnimalMoveService.lua
-    Stateless service for animal move operations in the RL Tabbed Menu.
+    Stateless service for animal move operations in the RL Tabbed Menu, wrapping
+    RLMoveDestinationHelper and AnimalMoveEvent dispatch. Handles pen<->pen, pen->EPP and
+    pen<->trailer through one path, and fires the SAME AnimalMoveEvent the legacy
+    controller fires - mutation parity, never a new event class.
 
-    Wraps the move-destination helpers (RLMoveDestinationHelper) and
-    AnimalMoveEvent dispatch. Provides the same move code paths the legacy
-    AnimalScreen move flow used without coupling to a controller's instance state.
+    Moves run through the legacy AnimalScreenTrailerFarm bulk filter pipeline: per-animal
+    AnimalMoveEvent.validate, a destination EPP age-gate, then a running-count capacity
+    check, building a survivor list; only survivors are dispatched.
 
-    The service also moves animals to and from a livestock trailer,
-    mirroring the legacy AnimalScreenTrailerFarm bulk filter pipeline: per-animal
-    AnimalMoveEvent.validate, then a destination EPP age-gate, then a running-count
-    capacity check, builds a survivor list; only survivors are dispatched and the
-    broadcast count keys off the survivor count. It fires the SAME AnimalMoveEvent
-    the legacy controller fires (mutation parity, never a new event class):
-      * pen -> trailer : AnimalMoveEvent.new(pen, trailer, survivors, "SOURCE")
-      * trailer -> pen : AnimalMoveEvent.new(trailer, pen, survivors, "TARGET")
-
-    All methods are static (module-level functions). The service does not
-    hold state between calls; the messageCenter subscription for move
-    responses is scoped to each moveAnimals() invocation via closure.
-
-    Broadcast invariant: exactly one MOVED_ANIMALS_* RLMessage per move. The
-    server AnimalMoveEvent:run broadcasts in MP and skips pure SP; the client leg
-    here is the mirror-image (broadcasts in pure SP, defers to :run in MP) via
-    shouldClientBroadcast - so SP gets one (client leg), host/dedi gets one
-    (server leg), never zero, never two. The broadcast DECISION lives in the pure
-    resolveBroadcastPlan + shouldClientBroadcast helpers (dual-runnable); applying
-    it to live endpoints is the in-game wrapper.
+    Broadcast invariant: exactly one MOVED_ANIMALS_* RLMessage per move. The server
+    AnimalMoveEvent:run broadcasts in MP and skips pure SP; the client leg here is the
+    mirror-image via shouldClientBroadcast, so SP, host and dedi each get exactly one.
 ]]
 
 local Log = RmLogging.getLogger("RLRM")
 
 RLAnimalMoveService = {}
 
---- Error code to i18n key mapping for move operations (AnimalMoveEvent MOVE_ERROR_* -> text key).
---- MOVE_ERROR_INVALID_CLUSTER is returnable by the server AnimalMoveEvent:run when a
---- cluster transfer fails mid-batch; it maps to the generic "not supported" text since
---- there is no dedicated string and it is not a user-correctable condition.
+--- Error code to i18n key mapping for move operations.
+--- MOVE_ERROR_INVALID_CLUSTER maps to the generic "not supported" text: there is no
+--- dedicated string and it is not a user-correctable condition.
 RLAnimalMoveService.ERROR_CODE_MAPPING = {
     [AnimalMoveEvent.MOVE_ERROR_SOURCE_OBJECT_DOES_NOT_EXIST] = "rl_ui_moveErrorNotSupported",
     [AnimalMoveEvent.MOVE_ERROR_TARGET_OBJECT_DOES_NOT_EXIST] = "rl_ui_moveErrorNotSupported",
@@ -46,12 +31,11 @@ RLAnimalMoveService.ERROR_CODE_MAPPING = {
 }
 
 
---- Enumerate valid move destinations for a given source husbandry and animal subtype.
---- Delegates to RLMoveDestinationHelper.getValidDestinations.
+--- Enumerate valid move destinations for a source husbandry and animal subtype.
 ---
---- Nil `sourceHusbandry` is a supported use case for dealer-buy flows: the
---- delegate's `placeable ~= sourceHusbandry` exclusion check becomes a no-op,
---- so every farm-owned placeable supporting the subtype is returned.
+--- A nil `sourceHusbandry` is supported for dealer-buy flows: the delegate's
+--- `placeable ~= sourceHusbandry` exclusion becomes a no-op, so every farm-owned placeable
+--- supporting the subtype is returned.
 --- @param sourceHusbandry table|nil The source husbandry placeable (excluded from results; nil for dealer-buy)
 --- @param farmId number The owning farm ID
 --- @param animalSubTypeIndex number The animal subtype that destinations must support
@@ -71,7 +55,6 @@ end
 
 
 --- Validate animals against a destination, categorizing valid vs rejected.
---- Delegates to RLMoveDestinationHelper.buildMoveValidationResult.
 --- @param animals table Array of Animal/cluster objects to validate
 --- @param destination table Destination entry from getValidDestinations
 --- @param animalTypeIndex number The animal type index
@@ -90,9 +73,8 @@ function RLAnimalMoveService.buildMoveValidationResult(animals, destination, ani
 end
 
 
---- Client-side pre-validation for a single animal move.
---- Mirrors the legacy single-move pre-validation, which calls
---- AnimalMoveEvent.validate() before sending the event.
+--- Client-side pre-validation for a single animal move, mirroring the legacy single-move
+--- call to AnimalMoveEvent.validate() before sending the event.
 --- @param sourceHusbandry table The source husbandry placeable
 --- @param destination table The destination placeable (entry.placeable)
 --- @param farmId number The owning farm ID
@@ -111,10 +93,9 @@ end
 
 
 --- Resolve which endpoint receives the move broadcast and which key applies, mirroring
---- AnimalMoveEvent:run's endpoint resolution: SOURCE -> message on the source, naming the
---- target; TARGET -> message on the target, naming the source. The SINGLE vs MULTIPLE key
---- suffix keys off the survivor count, NOT the raw input count. Pure: returns roles + key,
---- reaches no g_*, so it dual-runs.
+--- AnimalMoveEvent:run: SOURCE puts the message on the source naming the target, TARGET the
+--- reverse. The SINGLE / MULTIPLE suffix keys off the SURVIVOR count, not the input count.
+--- Pure, so it dual-runs.
 --- @param moveType string "SOURCE" or "TARGET"
 --- @param survivorCount number Number of animals actually being moved
 --- @return table|nil plan { husbandryRole = "source"|"target", nameRole = "target"|"source", messageKey = string }, or nil when survivorCount <= 0 or moveType is invalid
@@ -132,13 +113,12 @@ function RLAnimalMoveService.resolveBroadcastPlan(moveType, survivorCount)
 end
 
 
---- Whether the client leg should add the MOVED_ANIMALS_* message itself. This is the
---- deliberate mirror-image of AnimalMoveEvent:run's pure-SP early-return guard (run
---- broadcasts only when `g_server ~= nil and g_server.netIsRunning`): the client leg
---- broadcasts ONLY in pure SP (server present, network not running) and defers to :run in
---- MP. A nil `netIsRunning` coerces to not-running, matching :run's `not g_server.netIsRunning`.
---- The two predicates are intentional mirror-images so the move broadcasts exactly once
---- across SP / host / dedi. Pure: no g_*, so it dual-runs.
+--- Whether the client leg should add the MOVED_ANIMALS_* message itself.
+---
+--- The deliberate mirror-image of AnimalMoveEvent:run's pure-SP early return (run
+--- broadcasts only when `g_server ~= nil and g_server.netIsRunning`), so the move
+--- broadcasts exactly once across SP / host / dedi. A nil `netIsRunning` coerces to
+--- not-running, matching :run. Pure, so it dual-runs.
 --- @param serverExists boolean g_server ~= nil
 --- @param netIsRunning boolean|nil g_server.netIsRunning (nil treated as not-running)
 --- @return boolean broadcast True when the client leg is the sole broadcaster (pure SP)
@@ -148,20 +128,13 @@ end
 
 
 --- Filter a single-type animal list to the subset that may move, mirroring the legacy
---- AnimalScreenTrailerFarm bulk pipeline (applySourceBulk / applyTargetBulk) verbatim. For
---- each animal, in order: skip a nil subTypeIndex (warn); run the per-animal validator
---- (permission + target subtype-support + target has >= 1 free slot) and skip on error;
---- apply the destination EPP age-gate ONLY when eppTypeData is non-nil (reject outside
---- [minimumAge or 0, maximumAge or 60]); then a running-count capacity check that rejects
---- when the target's free slots for the subtype do NOT strictly exceed the survivors queued
---- so far. Records the first rejection's error code.
+--- AnimalScreenTrailerFarm bulk pipeline verbatim: skip a nil subTypeIndex, run the
+--- per-animal validator, apply the destination EPP age-gate when eppTypeData is non-nil,
+--- then a running-count capacity check that rejects unless the target's free slots for the
+--- subtype STRICTLY exceed the survivors queued so far.
 ---
---- Pure / dual-run: takes the validator and both endpoints as parameters and reaches no
---- g_*. The only calls onto the endpoint objects are the injected validator and
---- `target:getNumOfFreeAnimalSlots`, so a headless test drives it with mock source/target
---- and an injected validator. eppTypeData is resolved by the caller (moveAnimals derives it
---- via the animalSystem); passing it in keeps the age-gate reachable without the registry.
----
+--- Pure / dual-run: the validator and both endpoints are parameters, and the only calls
+--- onto the endpoints are that validator and `target:getNumOfFreeAnimalSlots`.
 --- @param source table Move source endpoint (pen/trailer/EPP placeable)
 --- @param target table Move destination endpoint (pen/trailer/EPP placeable); capacity is read from it
 --- @param animals table Array of Animal refs for a single animalType (caller segments by type)
@@ -226,11 +199,9 @@ function RLAnimalMoveService.filterMovableAnimals(source, target, animals, owner
 end
 
 
---- Apply a resolved broadcast plan to live endpoint objects: add the MOVED_ANIMALS_*
---- message to the husbandry endpoint, naming the other endpoint. Mirrors :run's
---- `if husbandry.addRLMessage ~= nil` guard, so an EPP destination (which has no
---- addRLMessage) silently receives no message. The name is read nil-safe via getName so a
---- missing getName never crashes the leg.
+--- Apply a resolved broadcast plan to live endpoints: add the MOVED_ANIMALS_* message to
+--- the husbandry endpoint, naming the other one. Mirrors :run's `addRLMessage ~= nil` guard,
+--- so an EPP destination silently receives no message.
 --- @param plan table resolveBroadcastPlan result (non-nil)
 --- @param husbandryEndpoint table Endpoint that receives the message (may lack addRLMessage -> no-op)
 --- @param nameEndpoint table The other endpoint, named in the message
@@ -241,9 +212,8 @@ function RLAnimalMoveService.applyClientBroadcast(plan, husbandryEndpoint, nameE
         return
     end
 
-    -- Read the name nil-safe directly. getDisplayData would also probe trailer-only getters
-    -- (getCurrentAnimalType), which warn for husbandry / EPP endpoints; the name VALUE is identical,
-    -- so a plain getName keeps the shared pen<->pen / pen->EPP broadcast path warning-free.
+    -- A plain getName, not getDisplayData: the latter probes trailer-only getters that warn
+    -- for husbandry / EPP endpoints, and the name VALUE is identical either way.
     local name = (nameEndpoint ~= nil and nameEndpoint.getName ~= nil) and nameEndpoint:getName() or ""
     if survivorCount == 1 then
         husbandryEndpoint:addRLMessage(plan.messageKey, nil, { name })
@@ -256,11 +226,8 @@ end
 
 
 --- Filter animals through the legacy-parity pipeline, dispatch the survivors via the SAME
---- AnimalMoveEvent the legacy controller fires, and (in pure SP only) add the single
---- MOVED_ANIMALS_* message. Handles pen<->trailer and the existing pen<->pen /
---- pen->EPP moves through one shared path; the only endpoint difference is the source /
---- target objects and the moveType string.
----
+--- AnimalMoveEvent the legacy controller fires, and in pure SP add the one MOVED_ANIMALS_*
+--- message.
 --- @param source table The move source endpoint (husbandry / trailer)
 --- @param target table The move destination endpoint (husbandry / trailer / EPP)
 --- @param animals table Array of Animal/cluster objects to move (one animalType)
@@ -277,10 +244,8 @@ function RLAnimalMoveService.moveAnimals(source, target, animals, moveType, call
         return false
     end
 
-    -- Fail-closed moveType: a nil/garbage moveType would crash the client at
-    -- streamWriteString and yield zero broadcasts in SP. Reject before constructing or
-    -- sending any event. The exactly-one-broadcast invariant holds only for the two
-    -- valid moveTypes.
+    -- Fail closed before constructing any event: a garbage moveType crashes the client at
+    -- streamWriteString and yields zero broadcasts in SP.
     if moveType ~= "SOURCE" and moveType ~= "TARGET" then
         Log:warning("RLAnimalMoveService.moveAnimals: invalid moveType=%s, aborting (no dispatch, no broadcast)", tostring(moveType))
         return false
@@ -291,8 +256,8 @@ function RLAnimalMoveService.moveAnimals(source, target, animals, moveType, call
         tostring(source and source.getName and source:getName()),
         tostring(target and target.getName and target:getName()))
 
-    -- Owner farm for the per-animal validate. The client filter is advisory (the server
-    -- :run re-validates authoritatively); both endpoints are farm-owned, read from source.
+    -- Owner farm for the per-animal validate; both endpoints are farm-owned. The client
+    -- filter is advisory - the server :run re-validates authoritatively.
     local ownerFarmId = nil
     if source ~= nil and source.getOwnerFarmId ~= nil then
         ownerFarmId = source:getOwnerFarmId()
@@ -300,11 +265,9 @@ function RLAnimalMoveService.moveAnimals(source, target, animals, moveType, call
         ownerFarmId = target:getOwnerFarmId()
     end
 
-    -- Destination EPP age constraints, resolved from the first animal that carries a real
-    -- subTypeIndex (all animals in one move share a type). nil for a husbandry / trailer
-    -- destination (no animalsTypeData) -> no age-gate. Keying blindly off animals[1] would let a
-    -- leading malformed (nil-subTypeIndex) animal resolve a nil type and silently disable the
-    -- age-gate for the real survivors; :run never hits this because it only sees post-filter survivors.
+    -- Resolved from the first animal carrying a real subTypeIndex, not blindly from
+    -- animals[1]: a leading nil-subTypeIndex animal would resolve a nil type and silently
+    -- disable the age-gate for the real survivors.
     local eppTypeData = nil
     if target ~= nil and target.animalsTypeData ~= nil then
         local subTypeIndex = nil
@@ -323,17 +286,13 @@ function RLAnimalMoveService.moveAnimals(source, target, animals, moveType, call
         Log:trace("RLAnimalMoveService.moveAnimals: EPP destination, eppTypeData=%s", tostring(eppTypeData))
     end
 
-    -- Legacy-parity filter pipeline -> the survivor list (and the first rejection code).
     local survivors, firstErrorCode = RLAnimalMoveService.filterMovableAnimals(
         source, target, animals, ownerFarmId, eppTypeData, AnimalMoveEvent.validate)
 
     if #survivors == 0 then
-        -- All-rejected short-circuit: surface the first rejection synchronously (the callback
-        -- fires HERE) AND return false. This path NEVER arms the request helper (nothing is
-        -- dispatched), so it must not touch the in-flight flag. The callback-fired + false-return
-        -- co-occur by design: the callback surfaces the error (via onXxxComplete), while false
-        -- tells the caller no async request is pending - the frame's lock release on false is
-        -- idempotent with any release the callback already performed.
+        -- All-rejected short-circuit: the callback fires HERE and the return is false. This
+        -- path never arms the request helper, so it must not touch the in-flight flag; the
+        -- frame's lock release on false is idempotent with any the callback performed.
         if firstErrorCode ~= nil then
             Log:debug("RLAnimalMoveService.moveAnimals: all %d animals rejected (firstErrorCode=%d), surfacing without dispatch",
                 #animals, firstErrorCode)
@@ -350,11 +309,9 @@ function RLAnimalMoveService.moveAnimals(source, target, animals, moveType, call
         return false
     end
 
-    -- Route the subscribe + dispatch through the shared request helper: one in-flight
-    -- request per event CLASS, a cancellable watchdog, and a single-consume completion.
-    -- onMoveResponse keeps the caller-callback shape; the helper owns unsubscribe + cleanup.
-    -- errorCode may be RLAnimalEventRequest.TIMEOUT_CODE on watchdog expiry (!= MOVE_SUCCESS,
-    -- so it surfaces as a failure and getErrorText maps it to the timeout text).
+    -- The request helper owns the subscribe, the watchdog and the unsubscribe. errorCode may
+    -- be RLAnimalEventRequest.TIMEOUT_CODE on expiry, which is not MOVE_SUCCESS and so
+    -- surfaces as a failure.
     local function onMoveResponse(errorCode)
         Log:trace("RLAnimalMoveService.onMoveResponse: errorCode=%s", tostring(errorCode))
         if errorCode ~= AnimalMoveEvent.MOVE_SUCCESS then
@@ -382,9 +339,8 @@ function RLAnimalMoveService.moveAnimals(source, target, animals, moveType, call
     end
     Log:trace("RLAnimalMoveService.moveAnimals: dispatched %d survivor(s) via request helper", #survivors)
 
-    -- Exactly-one-broadcast: the client leg adds the message ONLY in pure SP, mirroring the
-    -- server :run pure-SP early-return. In MP (host / dedi / pure client) the server :run is
-    -- the sole broadcaster, so the client leg stays silent (prevents the double-broadcast).
+    -- Exactly-one-broadcast: the client leg adds the message ONLY in pure SP; in MP the
+    -- server :run is the sole broadcaster and this leg stays silent.
     local serverExists = g_server ~= nil
     local netIsRunning = serverExists and g_server.netIsRunning
     if RLAnimalMoveService.shouldClientBroadcast(serverExists, netIsRunning) then

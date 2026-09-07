@@ -2,43 +2,25 @@
     RLTransferWorldAdapter.lua
     The WORLD counterpart adapter behind the RLTransferAdapter seam.
 
-    When a livestock/horse trailer is triggered standalone (no pen, no dealer - the
-    LivestockTrailerActivatable walk-up), the Transfer frame's "other side" is the free
-    rideables in the trailer's trigger zone. This adapter ROUTES the 4-method seam to
-    RLTrailerWorldService - it never builds events or mutates state itself:
-      * getDisplayData -> the world sidebar entry (resolved name + the rideable count).
-      * enumerate      -> RLTrailerWorldService.buildSourceItems (the converted-Animal
-                          source list), storing the cluster -> rideable map on the
-                          context so dispatch can recover each rideable.
-      * actionLabel    -> the pure RLTransferAdapter.worldActionLabelKey.
-      * dispatch       -> RLTrailerWorldService.loadRideables / unloadClusters (the
-                          SAME base-game AnimalLoadEvent / AnimalUnloadEvent the legacy
-                          AnimalScreenTrailer fired; mutation parity, never a new event).
+    When a trailer is triggered standalone (no pen, no dealer), the Transfer frame's
+    other side is the free rideables in the trailer's trigger zone. This adapter ROUTES
+    the 4-method seam to RLTrailerWorldService and never builds events or mutates state
+    itself; dispatch fires the SAME AnimalLoadEvent / AnimalUnloadEvent the legacy
+    AnimalScreenTrailer fired.
 
-    Tier: IN-GAME. Its methods deref RLTrailerWorldService + g_i18n + the engine getters,
-    so it is NOT headless. The parity-critical pure bits (worldActionLabelKey, the
-    conversion + error mapping inside the service) dual-run; this module only maps the
-    resolved direction onto the real objects.
-
-    Stateless: a plain table whose methods take self via `:` and read everything from
-    the passed context (no instance fields). Registered at load into
-    RLTransferAdapter._adapters[RLMenuTabPolicy.WORLD] so forCounterpart("world")
-    resolves it in-game. The headless harness never sources this file, so the seam stays
-    NULL there - which keeps the pure RLTransferAdapterTests true in both runners (the
-    concrete world -> adapter assertion lives in the in-game-only RLTransferWorldAdapterTests).
+    Tier: IN-GAME (derefs RLTrailerWorldService, g_i18n and the engine getters). Stateless
+    - it reads everything from the passed context. Registered at load into
+    RLTransferAdapter._adapters[RLMenuTabPolicy.WORLD]; the headless harness never sources
+    this file, so the seam stays NULL there.
 ]]
 
 RLTransferWorldAdapter = {}
 
 local Log = RmLogging.getLogger("RLRM")
 
---- Display data for the world counterpart sidebar entry: the resolved "nearby
---- animals" name and the rideable count. The world side has no bounded capacity, so
---- used == total == the number of rideables enumerate would EMIT (derived from the
---- same builder, so the count cannot diverge from the list). The world adapter is
---- in-game tier, so it resolves the i18n KEY itself and returns an ENGINE STRING used
---- verbatim by the frame (the frame getTexts only the NULL adapter's KEY). Nil /
---- missing trailer -> { name = <resolved>, used = 0, total = 0 }.
+--- Display data for the world sidebar entry: the resolved name and the rideable count.
+--- The world side has no bounded capacity, so used == total, derived from the same
+--- builder enumerate uses so the count cannot diverge from the list.
 --- @param context table  { trailer = <livestock trailer>, ... }
 --- @return table display  { name, used, total }
 function RLTransferWorldAdapter:getDisplayData(context)
@@ -53,11 +35,10 @@ function RLTransferWorldAdapter:getDisplayData(context)
     return { name = name, used = n, total = n }
 end
 
---- Enumerate the trigger rideables as AnimalItemStock items (each exposes .cluster =
---- the converted Animal), via RLTrailerWorldService.buildSourceItems. REPLACES
---- context.clusterToVehicle with this build's cluster -> rideable map each call, so
---- dispatch recovers each rideable from the CURRENT build (selection and map stay in
---- lockstep across a re-enumerate). Nil / no-trigger trailer -> {}.
+--- Enumerate the trigger rideables as AnimalItemStock items (each exposes .cluster).
+---
+--- REPLACES context.clusterToVehicle with this build's map each call, so dispatch always
+--- recovers rideables from the CURRENT build and selection stays in lockstep with it.
 --- @param context table  { trailer = <livestock trailer>, ... }
 --- @return table items
 function RLTransferWorldAdapter:enumerate(context)
@@ -74,9 +55,7 @@ function RLTransferWorldAdapter:enumerate(context)
     return items
 end
 
---- The footer action-label i18n KEY for a direction (legacy text parity):
---- "shop_moveToTrailer" loading, "shop_moveToSpawnPlace" unloading. Delegates to the
---- pure worldActionLabelKey; the frame resolves the returned KEY.
+--- The footer action-label i18n KEY for a direction; the frame resolves the key.
 --- @param direction string  DIR_INTO_TRAILER | DIR_OUT_OF_TRAILER
 --- @return string i18nKey
 function RLTransferWorldAdapter:actionLabel(direction)
@@ -84,18 +63,10 @@ function RLTransferWorldAdapter:actionLabel(direction)
 end
 
 --- Route the selected world animals to RLTrailerWorldService for the direction's plan.
---- Fail-closed (log + return false, NO dispatch, NO completion) when the plan is nil,
---- the trailer is missing, or nothing is selected. Loading (DIR_INTO_TRAILER) maps each
---- selected cluster back to its rideable via context.clusterToVehicle - selection comes
---- from the CURRENT enumerate build (which rebuilt the map), so a miss is an INVARIANT
---- BREACH (logged at WARNING, that item dropped), not a normal condition. Unloading
---- (DIR_OUT_OF_TRAILER) maps each selected cluster to its RESOLVED wire id via
---- RLAnimalUtil.resolveClusterId (the 3-part identity toKey for an individual, not the
---- never-updated "0-0" placeholder cluster.id), dropping any cluster whose id is
---- unresolvable. Returns true only
---- when the service is engaged - and a true return GUARANTEES the service fires
---- context.onComplete EXACTLY ONCE. If the mapped list is empty after dropping
---- unrecoverable items, returns false (no completion) so the frame releases movePending.
+---
+--- Fail-closed: a false return means nothing dispatched and no completion fires, so the
+--- frame releases movePending itself. A true return guarantees the service fires
+--- context.onComplete exactly once.
 --- @param direction string  DIR_INTO_TRAILER | DIR_OUT_OF_TRAILER
 --- @param animals table  the selected clusters (current-build .cluster refs)
 --- @param context table  { trailer, clusterToVehicle, onComplete, ... }
@@ -118,6 +89,8 @@ function RLTransferWorldAdapter:dispatch(direction, animals, context)
             if rideable ~= nil then
                 rideables[#rideables + 1] = rideable
             else
+                -- Selection comes from the build that rebuilt the map, so a miss is an
+                -- invariant breach rather than a normal condition.
                 Log:warning("RLTransferWorldAdapter:dispatch: cluster '%s' has no rideable mapping (invariant breach), dropping it",
                     tostring(cluster ~= nil and cluster.uniqueId or cluster))
             end
@@ -131,8 +104,8 @@ function RLTransferWorldAdapter:dispatch(direction, animals, context)
         return true
     end
 
-    -- DIR_OUT_OF_TRAILER: unload the selected trailer clusters by their RESOLVED wire id
-    -- (toKey for an individual - what getClusterById matches - not the "0-0" cluster.id).
+    -- Unload by RESOLVED wire id - the 3-part identity toKey that getClusterById matches,
+    -- not the never-updated "0-0" placeholder cluster.id.
     local clusterIds = {}
     for _, cluster in ipairs(animals) do
         local id = RLAnimalUtil.resolveClusterId(cluster)
@@ -152,10 +125,8 @@ function RLTransferWorldAdapter:dispatch(direction, animals, context)
     return true
 end
 
--- Register at load so forCounterpart("world") resolves this adapter in-game. The
--- registry is a plain Lua table (assigning into it is registration ceremony, not game
--- state - the sanctioned load-time escape). Keyed by RLMenuTabPolicy.WORLD, which
--- equals g_rlMenu.trailerCounterpart for the world (activatable) redirect.
+-- Register at load so forCounterpart("world") resolves this adapter in-game. The registry
+-- is a plain Lua table, so this is registration ceremony rather than game state.
 RLTransferAdapter._adapters[RLMenuTabPolicy.WORLD] = RLTransferWorldAdapter
 
 Log:debug("RLTransferWorldAdapter: loaded and registered for counterpart '%s'", tostring(RLMenuTabPolicy.WORLD))

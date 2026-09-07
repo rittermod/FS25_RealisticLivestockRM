@@ -1,34 +1,17 @@
 --[[
     RLTransferAdapter.lua
-    The counterpart-adapter seam for the RL Tabbed Menu Transfer frame.
+    The counterpart-adapter seam for the Transfer frame. One frame serves every trailer
+    placement; what varies - where the other side's animals come from, what the action
+    button says, what a confirmed transfer does - lives behind this data-in/data-out seam.
 
-    One Transfer frame serves every trailer placement; the part that varies - where the
-    other side's animals come from, what the action button says, and what a confirmed
-    transfer does - lives behind this data-in/data-out seam. The frame talks only to the
-    contract, never to a placement directly.
-
-    Purity contract, the headless dual-run boundary: no g_*, GUI, engine class or getText,
-    at load or in any function. A display NAME is an ENGINE STRING for a concrete adapter and
-    an i18n KEY for NULL, and the FRAME resolves that key, so this module never calls getText
-    - which would drag in g_i18n and break the pure run.
-
-    Adapter contract (each method takes self via `:`):
-      * adapter:getDisplayData()                  -> { name, used, total }
-            name = engine string (concrete) | i18n KEY string (NULL).
-      * adapter:enumerate(context)                -> array of list items
-            context = { trailer, counterpart, counterpartHandle } - see below.
-      * adapter:actionLabel(direction)            -> i18n KEY for the footer button
-      * adapter:dispatch(direction, animals, context) -> boolean
-            true when the transfer was performed; the shell NULL logs + returns
-            false (no mutation), and the frame leaves all state unchanged on false.
-
-    `context.counterpartHandle` is the engine ref a concrete adapter enumerates
-    (a husbandry placeable for pen, a spawn-place/world set for world); the
-    trigger-redirect slices populate it, and the shell + NULL adapter ignore it.
-
-    DIR_INTO_TRAILER is the direction when the counterpart side is selected
-    (animals flow counterpart -> trailer); DIR_OUT_OF_TRAILER when the trailer
-    side is selected (trailer -> counterpart).
+    Contract, each method taking self via `:`: getDisplayData() -> { name, used, total };
+    enumerate(context) -> list items, where context.counterpartHandle is the engine ref to
+    enumerate; actionLabel(direction) -> an i18n KEY; dispatch(direction, animals, context)
+    -> true only when the transfer was performed, and the frame leaves all state unchanged
+    on false. DIR_INTO_TRAILER is counterpart -> trailer. Purity (the headless dual-run
+    boundary): no g_*, GUI, engine class or getText at load or in any function - a display
+    NAME is an engine string for a concrete adapter and an i18n KEY for NULL, which the
+    FRAME resolves.
 ]]
 
 RLTransferAdapter = {}

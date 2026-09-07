@@ -1,21 +1,16 @@
 --[[
     RLMenuSettingsFrame.lua
-    RL Tabbed Menu Settings tab.
-
-    Horizontal subcategory tab bar with two content panes:
+    RL Tabbed Menu Settings tab: a horizontal subcategory tab bar with two content panes.
       [General] - placeholder for future non-filter settings.
       [Filters] - single-section SmoothList of saved filters backed by
-                  g_rlFilterService:listAvailable, a footer New filter
-                  button, and a branched empty-state.
+                  g_rlFilterService:listAvailable, a footer New filter button, and a
+                  branched empty-state.
 
-    Tab highlight, pager texts, and focus are seeded in
-    initializeSubCategoryPages() called from onFrameOpen on every open,
-    so closures stay bound to the live frame instance across opens.
-
-    Selection is id-authoritative: self.selectedFilterId is the source of
-    truth, the list's selectedIndex is derived from it on every reload.
-    This keeps the cached id consistent with the highlighted row under
-    the service's undefined-pairs-order reloads.
+    Tab highlight, pager texts and focus are seeded in initializeSubCategoryPages(), called
+    from onFrameOpen on every open, so closures stay bound to the live frame instance.
+    Selection is id-authoritative: self.selectedFilterId is the source of truth and the
+    list's selectedIndex is derived from it on every reload, keeping the cached id consistent
+    with the highlighted row under the service's undefined pairs-order reloads.
 ]]
 
 RLMenuSettingsFrame = {}
@@ -1867,19 +1862,12 @@ local function resolveFieldLabel(key)
     return key
 end
 
---- Format a condition row for the read-only text display in the v2 conditions
---- list. Delegates to RLFilterFieldDisplay.formatConditionDisplay so enum
---- (subType, gender) labels resolve via FillTypeManager / i18n and the
---- catalog stays free of UI coupling. Local wrapper kept so the
---- populateCell call site doesn't have to thread animalType through.
+--- Format a condition row for the read-only conditions-list display, delegating to
+--- RLFilterFieldDisplay.formatConditionDisplay so enum labels resolve via FillTypeManager
+--- and i18n. A local wrapper, so the populateCell call site need not thread animalType.
 ---
---- animalType resolution is inlined (not via resolveEffectiveAnimalType
---- below) because Lua local-function-declaration ordering: this helper sits
---- ~340 lines before resolveEffectiveAnimalType in source order, and `local
---- function` declarations are only visible from their declaration point
---- onward. Lifting the inline lookup back into resolveEffectiveAnimalType
---- would require moving that helper up; the inline mirror is two lines and
---- carries no extra state.
+--- The animalType lookup is inlined rather than calling resolveEffectiveAnimalType: that
+--- helper is a `local function` declared later in the file and so is not visible here.
 ---@param self table frame instance (used to resolve the filter's animalType scope)
 ---@param row table {field, cmp, value}
 ---@param field table catalog entry resolved from row.field
@@ -2551,21 +2539,12 @@ end
 -- Filter editor: flush
 -- =============================================================================
 
---- Drain self.pendingChanges to service:update. Called from onFrameClose AFTER
---- isFrameOpen is cleared (so a mid-flush remote RLFilterUpdateEvent rebroadcast
---- early-returns through refreshIfOpen, closing the re-entry window).
+--- Drain self.pendingChanges to service:update. Called from onFrameClose AFTER isFrameOpen is
+--- cleared, so a mid-flush remote RLFilterUpdateEvent rebroadcast early-returns through
+--- refreshIfOpen and the re-entry window closes.
 ---
---- For each pending id:
----   - fetch stored via getById; skip + DEBUG-log if nil (orphan id, e.g.
----     deleted by another client while we held an edit)
----   - overlay pending onto stored to produce the merged record
----   - enforce flush-time name boundary: trim whitespace; revert to stored
----     name + WARNING if the trimmed result is empty (widget callbacks are
----     permissive mid-typing; flush is the enforcement point)
----   - call service:update(id, merged); WARNING on nil return
----
---- service:update dispatches RLFilterUpdateEvent (Pattern A); MP convergence
---- is the service's responsibility.
+--- Flush is the name-boundary enforcement point: the widget callbacks stay permissive
+--- mid-typing, so an empty trimmed name reverts to the stored one here.
 function RLMenuSettingsFrame:flushPendingChanges()
     local idsIn = 0
     for _ in pairs(self.pendingChanges) do idsIn = idsIn + 1 end
@@ -2605,18 +2584,12 @@ function RLMenuSettingsFrame:flushPendingChanges()
         idsIn, updated, skipped, idsIn - updated - skipped)
 end
 
---- Flush a single filter id's pending overlay through `RLFilterService:update`.
---- Extracted from `flushPendingChanges` so `onListSelectionChanged` can
---- flush the previously-selected filter on selection switch without draining
---- the whole table (data-loss avoidance: a rejected edit on filter A must
---- not silently drop edits on filter B when the user clicks B).
+--- Flush ONE filter id's pending overlay through `RLFilterService:update`, so a selection
+--- switch can flush the outgoing filter without draining the whole table - a rejected edit on
+--- filter A must not silently drop edits on filter B.
 ---
---- Returns one of three string codes:
----   - `"updated"` -> service:update returned non-nil; caller clears the entry.
----   - `"skipped"` -> orphan id (stored == nil); caller clears the entry.
----   - `"rejected"` -> service:update returned nil; caller MUST KEEP the
----                     entry so the user can retry / observe the next flush
----                     pass on close. WARNING already logged.
+--- `"updated"` and `"skipped"` (an orphan id) let the caller clear the entry; `"rejected"`
+--- means the caller MUST KEEP it so the next flush pass can retry.
 ---@param id string filter id
 ---@return string outcome code
 function RLMenuSettingsFrame:flushPendingChangesForId(id)
@@ -2976,18 +2949,13 @@ function RLMenuSettingsFrame:onDeleteConfirmed(yes, id)
     end
 end
 
---- SmoothList delegate: fired when the user picks a different row. The
---- frame hosts two SmoothLists (filtersList + filterConditionsList) on the
---- same `self` delegate; this entry point only handles the filtersList
---- case (left-pane selection switch). Conditions-list selection currently
---- has no side effect - row controls drive the edit state directly via
---- in-row widget callbacks.
+--- SmoothList delegate for a row change. The frame hosts two SmoothLists on the same `self`
+--- delegate, and only the filtersList case does anything here; conditions-list rows drive the
+--- edit state through their own in-row widget callbacks.
 ---
---- Before advancing selection, flush the previously-selected
---- filter's pending overlay via `flushPendingChangesForId(previousId)`.
---- The advance happens regardless of flush outcome - blocking selection on
---- service rejection would be hostile UX, and a rejected entry stays in
---- `self.pendingChanges[previousId]` for retry / onFrameClose final pass.
+--- The outgoing filter's pending overlay is flushed first, but the advance happens regardless
+--- of the outcome - blocking selection on a service rejection would be hostile UX, and a
+--- rejected entry stays in `self.pendingChanges` for the close-time pass.
 --- @param list table The SmoothList instance asking
 --- @param _section number Section index (single-section, ignored)
 --- @param index number 1-based row index
@@ -3410,22 +3378,14 @@ function RLMenuSettingsFrame:refreshIfGeneralOpen()
     self:refreshGeneralSubtab()
 end
 
---- XML onClick handler for state rows (BinaryOption / MultiTextOption).
---- Extracts the setting name from the widget's id (rlmenuSetting_<name>),
---- delegates to RLSettings.applyChange (the single write path for stateful
---- settings), then refreshes our widgets so the cascade and dynamic-tooltip
---- state stay current.
+--- XML onClick handler for state rows (BinaryOption / MultiTextOption): extract the setting
+--- name from the widget id, delegate to RLSettings.applyChange - the single write path for
+--- stateful settings - then refresh the widgets so the cascade and tooltips stay current.
 ---
---- The colon syntax binds `self` implicitly; the GUI loader's raiseCallback
---- chain raises onClickCallback for state-row widgets with
---- (target, state, widget, isLeftButtonEvent), and target arrives as `self`
---- here. So the explicit args are (state, widget) - state is the post-click
---- state index, widget is the BinaryOption/MultiTextOption that was clicked.
----
---- Defensive `widget == nil then widget = state` keeps an accidental
---- cross-wire from a Button (which raises with only (target, widget))
---- resolving to a sensible widget reference for the early-return guard
---- below; the ignore-flag check then redirects.
+--- The GUI loader raises onClickCallback for state rows with (target, state, widget,
+--- isLeftButtonEvent) and target arrives as `self` through the colon syntax, so the explicit
+--- args are (state, widget). A Button raises with only (target, widget), so the
+--- `widget == nil` fallback keeps an accidental cross-wire resolving to a real widget.
 --- @param state number 1-based new state from the widget post-click
 --- @param widget table The widget that was clicked
 function RLMenuSettingsFrame:onClickGeneralSetting(state, widget)

@@ -2,19 +2,15 @@
     HusbandryMessageAddEvent.lua
     Server-authoritative incremental broadcast of a SINGLE husbandry RL message.
 
-    The join snapshot (HusbandryMessageStateEvent) only syncs the full message set
-    at connect time; anything added during play stayed server-local. This event is
-    the incremental leg: the server-side add chokepoint (addRLMessageDirect)
-    broadcasts one already-decided message - individual OR consolidated
-    daily-summary - carrying the server-assigned uniqueId + date, so every client
-    inserts it VERBATIM and idempotently. That keeps a single per-husbandry uniqueId
-    namespace server<->client, which the uniqueId-keyed delete path
-    (HusbandryMessageDeleteEvent, first-match) depends on.
+    The join snapshot (HusbandryMessageStateEvent) syncs the full set at connect time;
+    this is the incremental leg. The server-side add chokepoint (addRLMessageDirect)
+    broadcasts one already-decided message carrying the server-assigned uniqueId + date,
+    so every client inserts it verbatim and idempotently. That keeps a single per-husbandry
+    uniqueId namespace, which the first-match delete path depends on.
 
-    Server->clients only. Broadcast with NO sendLocal (the host already inserted
-    its own copy at the chokepoint), so run() executes only on clients
-    (g_server == nil) and the apply-path addRLMessageDirect never re-broadcasts.
-    Clients never originate a message.
+    Server -> clients only, broadcast with NO sendLocal (the host already inserted its own
+    copy at the chokepoint), so run() executes only on clients and the apply path never
+    re-broadcasts. Clients never originate a message.
 ]]
 
 HusbandryMessageAddEvent = {}
@@ -52,10 +48,8 @@ function HusbandryMessageAddEvent.new(husbandry, uniqueId, id, animal, args, dat
     return self
 end
 
---- Serialize the event for network transmission.
---- Wire format mirrors HusbandryMessageStateEvent's per-message block:
---- nodeObject(husbandry) + id(String) + date(String) + uniqueId(UInt16)
---- + hasAnimal(Bool)[+ animal(String)] + argCount(UInt8) + argCount * String.
+--- Serialize the event: nodeObject(husbandry) + id + date + uniqueId + hasAnimal[+ animal]
+--- + argCount + argCount * String, mirroring HusbandryMessageStateEvent's per-message block.
 --- @param streamId number Network stream id
 --- @param connection table Network connection (unused, required by Event API)
 function HusbandryMessageAddEvent:writeStream(streamId, connection)
@@ -74,10 +68,9 @@ function HusbandryMessageAddEvent:writeStream(streamId, connection)
 
     streamWriteUInt8(streamId, #self.args)
 
-    -- Coerce each arg to a string at the wire boundary. RL message args are canonically strings
-    -- everywhere they serialize, but the engine's streamWriteString does NOT coerce a number - it
-    -- throws. Mirrors HusbandryMessageStateEvent's per-message arg handling. A non-string/number arg is a
-    -- corrupt caller: WARN, then still coerce so the broadcast survives.
+    -- streamWriteString does NOT coerce a number, it throws, so every arg is coerced at the
+    -- wire boundary. A non-string/number arg is a corrupt caller: warn, then still coerce so
+    -- the broadcast survives.
     for j = 1, #self.args do
         local arg = self.args[j]
         local argType = type(arg)
@@ -113,19 +106,7 @@ function HusbandryMessageAddEvent:readStream(streamId, connection)
     self:run(connection)
 end
 
---- Execute the event on the receiver (a client - the server never receives its own
---- no-sendLocal broadcast).
----
----   1. Guard against an invalid husbandry (stale node id or wrong object type) -
----      mirror HusbandryMessageDeleteEvent:run.
----   2. Idempotent insert: if the uniqueId already exists in spec.messages (the
----      join snapshot may have delivered the same message), skip + log. The
----      delete path is first-match on uniqueId, so a duplicate row would leave a
----      ghost after delete.
----   3. Otherwise insert VERBATIM via addRLMessageDirect with the server uniqueId
----      (never getNextRLMessageUniqueId - that would drift the client namespace).
----      addRLMessageDirect sets the unread flag and refreshes an open Messages tab;
----      on a client (g_server == nil) it does NOT re-broadcast.
+--- Insert the message on a client, verbatim and idempotently, via addRLMessageDirect.
 --- @param connection table Network connection the event arrived on
 function HusbandryMessageAddEvent:run(connection)
     if self.husbandry == nil or self.husbandry.spec_husbandryAnimals == nil then
@@ -133,7 +114,8 @@ function HusbandryMessageAddEvent:run(connection)
         return
     end
 
-    -- Idempotent guard: the same uniqueId may also arrive via the join snapshot.
+    -- The same uniqueId may also arrive via the join snapshot, and the delete path is
+    -- first-match on uniqueId, so a duplicate row would leave a ghost after delete.
     for _, message in pairs(self.husbandry.spec_husbandryAnimals.messages or {}) do
         if message.uniqueId == self.uniqueId then
             Log:debug("HusbandryMessageAddEvent:run: uniqueId=%s already present on husbandry '%s' - idempotent skip",
@@ -142,15 +124,14 @@ function HusbandryMessageAddEvent:run(connection)
         end
     end
 
+    -- The SERVER's uniqueId, never getNextRLMessageUniqueId - that would drift the namespace.
     self.husbandry:addRLMessageDirect(self.id, self.animal, self.args, self.date, self.uniqueId)
 
     Log:debug("HusbandryMessageAddEvent:run: applied id='%s' uniqueId=%s to husbandry '%s'",
         tostring(self.id), tostring(self.uniqueId), tostring(self.husbandry:getName()))
 end
 
---- Broadcast one resolved message to all connected clients. Server-only entry
---- (clients never originate). No sendLocal: the host already inserted its copy
---- at the chokepoint, so it must not receive an echo.
+--- Broadcast one resolved message to all connected clients (server-only entry, no sendLocal).
 --- @param husbandry table Husbandry placeable
 --- @param uniqueId number Server-assigned message uniqueId
 --- @param id string Message id

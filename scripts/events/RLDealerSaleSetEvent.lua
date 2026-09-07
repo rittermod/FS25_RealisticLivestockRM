@@ -2,34 +2,15 @@
     RLDealerSaleSetEvent.lua
     Dealer sale-availability change REQUEST (client -> server).
 
-    The payload is the OP LIST the selector's reconcile produced - never a desired
-    full set. The server applies those ops to ITS OWN registry, so the client is
-    the author only of the delta it explicitly performed. A client-computed full
-    set would turn every client-side staleness mode (a missed join snapshot, a
-    capped payload, a concurrent admin) into a server-side DELETION of overrides
-    the client never knew about, which the server would then broadcast.
+    The payload is the OP LIST the selector's reconcile produced, never a desired full
+    set: the server applies those ops to its own registry, so the client authors only
+    the delta it performed. A client-computed full set would turn any client staleness
+    into a server-side deletion of overrides the client never saw.
 
-    Wire format: `RLDealerSaleWire.writeList` (count prefix + N four-field records).
-    A `set` op is `isSet = true` carrying its desired value; a `clear` op is
-    `isSet = false` and its value slot is inert.
-
-    Flow:
-      * `sendEvent(ops)` is the only public entry. Host / singleplayer routes
-        straight to `executeOnServer`; a pure client uploads the request.
-      * `run(connection)` refuses a non-server receive, then validates master-user
-        permission (a global admin action, as the dealer reset already establishes),
-        then calls `executeOnServer`.
-      * `executeOnServer(ops)` is the single server mutation funnel: apply, gate on
-        "anything actually applied", broadcast the resulting authoritative set,
-        then apply + regenerate the dealer.
-
-    Persistence is NOT triggered here. The registry rides the career save through the
-    dealer append in the `RLSettings` savegame write, exactly like the saveable-filter
-    and herdsman-rule registries, so this path adds no save-timing behavior. No
-    persistence call belongs in this file - a grep for one is the standing tripwire.
-
-    `executeOnServer` dereferences `g_server` through the broadcast and must never
-    be reached on a client - `sendEvent` and `run` are its only callers.
+    Wire format: RLDealerSaleWire.writeList (count prefix + N four-field records). A
+    `set` op carries its value; a `clear` op's value slot is inert. executeOnServer
+    dereferences g_server and must never run on a client. The registry reaches disk
+    through the career save only -- nothing here writes a savegame.
 ]]
 
 RLDealerSaleSetEvent = {}
@@ -39,8 +20,7 @@ InitEventClass(RLDealerSaleSetEvent, "RLDealerSaleSetEvent")
 
 local Log = RmLogging.getLogger("RLRM")
 
---- Reconcile action tokens. Kept as named constants so the codec, the apply loop
---- and the unknown-action guard cannot drift apart on a typo.
+--- Reconcile action tokens, named so the codec and the apply loop cannot drift on a typo.
 local ACTION_SET = "set"
 local ACTION_CLEAR = "clear"
 
@@ -62,25 +42,18 @@ function RLDealerSaleSetEvent.new(ops)
     return self
 end
 
---- Server-context check, factored out so the in-game rlTest can swap it without mutating the root
---- g_server global (rlTest cannot reassign a root g_*, only a level below it - so run()'s
---- server-vs-pure-client branch and sendEvent's routing are driven through this function).
---- Production reads g_server.
+--- Server-context check as a seam: the in-game rlTest cannot reassign a root `g_*`, so
+--- run()'s branch and sendEvent's routing are driven through this function instead.
 ---@return boolean true if this process is the authoritative server
 function RLDealerSaleSetEvent.isServer()
     return g_server ~= nil
 end
 
---- Encode one reconcile op as a wire record. Returns nil plus a reason when the op
---- is not encodable. An unknown action is REFUSED rather than defaulted, because
---- defaulting it either way would silently turn a malformed op into a real
---- registry mutation.
+--- Encode one reconcile op as a wire record, or nil plus a reason when it is not encodable.
 ---
---- A `set` passes its value through VERBATIM - never `isSet and value or false`,
---- which collapses a nil into a valid `false` and would silently request
---- "not buyable" for a stage the caller never gave a value for. Passed through, a
---- nil fails the codec's boolean check and is dropped there with its key named.
---- Only a `clear`, whose value slot is inert by contract, is filled with `false`.
+--- A `set` passes its value through VERBATIM -- `isSet and value or false` would collapse
+--- a nil into a valid `false` and silently request "not buyable" for a stage the caller
+--- gave no value for. Only a `clear`, whose value slot is inert, is filled with `false`.
 ---@param op any
 ---@return table|nil rec
 ---@return string|nil reason
@@ -106,8 +79,7 @@ local function opToRecord(op)
     }
 end
 
---- Decode one wire record back into a reconcile op. A clear carries no value, so
---- the field is left absent rather than filled with a meaningless boolean.
+--- Decode one wire record back into a reconcile op; a clear leaves its value field absent.
 ---@param rec table
 ---@return table op
 local function recordToOp(rec)
@@ -141,9 +113,8 @@ function RLDealerSaleSetEvent:writeStream(streamId, connection)
     RLDealerSaleWire.writeList(streamId, records)
 end
 
---- Deserialize + run on this machine. A dropped payload MUST NOT reach `run()`:
---- an empty op list is indistinguishable from "the admin changed nothing", and
---- running it would log an authorization for a request that never arrived intact.
+--- Deserialize + run on this machine. A dropped payload MUST NOT reach `run()`: an empty
+--- op list is indistinguishable from "the admin changed nothing".
 function RLDealerSaleSetEvent:readStream(streamId, connection)
     local records, dropped = RLDealerSaleWire.readList(streamId)
 
@@ -163,15 +134,13 @@ function RLDealerSaleSetEvent:readStream(streamId, connection)
     self:run(connection)
 end
 
---- Server receives a change request from a remote client. Permission is folded in
---- here - there is no separate permission layer.
+--- Server receives a change request from a remote client; permission is folded in here.
 function RLDealerSaleSetEvent:run(connection)
     local ops = self.ops or {}
     local count = #ops
 
-    -- On a client `connection:getIsServer()` is TRUE, so a client that ever
-    -- receives this class would pass the authority gate below and then nil-crash
-    -- inside executeOnServer's broadcast. Refuse the receive outright.
+    -- On a client `connection:getIsServer()` is TRUE, so a client receiving this class
+    -- would pass the authority gate below and nil-crash in executeOnServer's broadcast.
     if not RLDealerSaleSetEvent.isServer() then
         Log:warning("RLDealerSaleSetEvent:run: received on a non-server peer; this class is a client -> server request only, dropping %d op(s) (nothing is applied locally)",
             count)
@@ -199,15 +168,11 @@ function RLDealerSaleSetEvent:run(connection)
     RLDealerSaleSetEvent.executeOnServer(ops)
 end
 
---- The single server mutation funnel. Applies the ops to the server's own
---- registry, and only when at least one op actually landed does it broadcast the
---- resulting authoritative set and regenerate the dealer.
+--- The single server mutation funnel: apply the ops, and only when at least one landed,
+--- broadcast the resulting authoritative set and regenerate the dealer.
 ---
---- Broadcast BEFORE the repopulate so a client holds the new flags before the
---- regenerated stock arrives via AnimalSystemStateEvent. Unconditional, as the
---- dealer reset already does - in singleplayer it reaches zero connections.
----
---- No savegame write: the registry reaches disk through the career save only.
+--- The broadcast precedes the repopulate so a client holds the new flags before the
+--- regenerated stock arrives via AnimalSystemStateEvent.
 ---@param ops table[] ops shaped like `RLDealerSaleReconcile.diff` returns
 function RLDealerSaleSetEvent.executeOnServer(ops)
     if type(ops) ~= "table" then
@@ -233,9 +198,8 @@ function RLDealerSaleSetEvent.executeOnServer(ops)
 
         elseif op.action == ACTION_CLEAR then
 
-            -- Count the removal, not the call: clear returns false for an absent or invalid key,
-            -- and a clear that removed nothing changed nothing - counting it would re-roll the
-            -- whole dealer for no effective change. Symmetric with the set branch below.
+            -- Count the removal, not the call: a clear that removed nothing changed
+            -- nothing, and counting it would re-roll the whole dealer for no effect.
             if g_rlDealerSaleRegistry:clear(op.subTypeName, op.minAge) then
                 applied = applied + 1
                 Log:trace("RLDealerSaleSetEvent.executeOnServer: cleared override %s @%s (back to its shipped default)",
@@ -247,14 +211,10 @@ function RLDealerSaleSetEvent.executeOnServer(ops)
 
         elseif op.action == ACTION_SET then
 
-            -- Count the CHANGE, not the call. `set` is an unconditional upsert that
-            -- returns true even when the stored value already equals the requested one,
-            -- so counting its return would let a redundant op re-roll the whole dealer
-            -- for no effective change. That is reachable in multiplayer: an admin whose
-            -- selector snapshot predates another admin's change diffs against the stale
-            -- value and emits an op the server has already applied. Reading the current
-            -- value first makes this branch genuinely symmetric with the clear branch
-            -- above, which counts the removal rather than the call.
+            -- Count the CHANGE, not the call: `set` is an unconditional upsert that returns
+            -- true even when the value is unchanged, and a stale admin snapshot really does
+            -- emit an op the server already applied. Reading the previous value first keeps
+            -- this branch symmetric with the clear branch above.
             local previous = g_rlDealerSaleRegistry:get(op.subTypeName, op.minAge)
 
             if g_rlDealerSaleRegistry:set(op.subTypeName, op.minAge, op.canBeBought) then
@@ -293,8 +253,7 @@ function RLDealerSaleSetEvent.executeOnServer(ops)
     RLDealerSaleApply.applyAndRepopulate()
 end
 
---- The only public entry. Host / singleplayer executes directly; a pure client
---- uploads the request to the server.
+--- The only public entry: host / singleplayer executes directly, a pure client uploads.
 ---@param ops table[] ops shaped like `RLDealerSaleReconcile.diff` returns
 function RLDealerSaleSetEvent.sendEvent(ops)
     if type(ops) ~= "table" then

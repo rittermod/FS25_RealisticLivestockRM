@@ -2,28 +2,13 @@
     RLHerdsmanRuleDeleteEvent.lua
     Network event for deleting a Herdsman rule record by id.
 
-    Pattern A (caller-mutates-first + rebroadcast-from-run with ignoreConnection=sender).
-    The caller (RLHerdsmanRuleService:delete) MUST mutate local state BEFORE calling
-    sendEvent. This event's run() removes the rule on every receiver that is NOT the
-    original sender.
+    Pattern A: the caller (RLHerdsmanRuleService:delete) MUST mutate local state BEFORE
+    calling sendEvent; run() removes the rule on every receiver that is not the original
+    sender, and the server rebroadcasts with ignoreConnection=sender.
 
-    Payload is JUST the id: writeStream -> streamWriteString, readStream -> streamReadString.
-    The farmId used for the scope check is derived from the SERVER's stored record (the
-    authoritative source), NOT the wire -- the delete payload carries no farmId.
-
-    Server-side validation (server receiving from a remote client) mirrors the CONTROL
-    FLOW of RLFilterDeleteEvent:run (granular, distinct :warning per failure mode):
-      1. tradeAnimals permission for the sending connection.
-      2. stored = _rawGetById(id). An unknown id is a benign NO-OP (a delete for an id a
-         late-joiner never saw), not a hard reject -- :warning + drop, no rebroadcast.
-      3. Farm scope: the sender's farm must equal the STORED rule's owning farmId.
-    The pure isAuthorized predicate collapses permission + farm-match for unit testing in
-    isolation; run() keeps the filter's granular checks so each failure mode logs a distinct
-    :warning. The predicate is fed the STORED rule's farmId (the rule already exists).
-
-    Like RLHerdsmanRuleCreateEvent, run() applies the removal on every receiver that is NOT
-    the sender, then refreshes an open Herdsman menu frame via g_rlMenu.herdsmanFrame. Paired
-    with the state-sync event for late joiners; ship the delta events + state together.
+    The payload is JUST the id, so the farmId for the scope check is derived from the
+    server's stored record rather than the wire. An id the server does not hold is a
+    benign no-op (a late joiner's delete), not a rejection.
 ]]
 
 RLHerdsmanRuleDeleteEvent = {}
@@ -51,11 +36,7 @@ function RLHerdsmanRuleDeleteEvent.new(id)
     return self
 end
 
---- Pure authorization predicate. A remote delete is authorized iff the sender holds the
---- trade permission AND the sender's farm matches the stored rule's owning farm. No `g_*`
---- access -- the caller resolves the inputs and feeds them in. Identical body to
---- RLHerdsmanRuleCreateEvent.isAuthorized; kept per-event (self-contained) so each event
---- stays independently testable.
+--- Authorized iff the sender holds the trade permission and is on the stored rule's farm.
 ---@param hasTradePermission boolean sender holds the tradeAnimals permission
 ---@param senderFarmId number|nil the sending player's resolved farm id
 ---@param ruleFarmId number|nil the STORED rule's owning farm id
@@ -89,17 +70,7 @@ local function getUserContext(connection)
     return userName, userId
 end
 
---- Execute the event on the receiver (Pattern A).
----
---- Flow (mirrors RLFilterDeleteEvent:run granular control flow, minus the UI fanout):
----   1. Guard against a malformed payload (nil/empty id).
----   2. If server receiving from a remote client:
----        a. reject on missing tradeAnimals permission,
----        b. NO-OP an unknown id (benign: a delete for an id this peer never saw),
----        c. reject a farm-scope mismatch (sender's farm != stored rule's farm),
----      logging a distinct :warning per failure and dropping (no rebroadcast/apply).
----      On success, rebroadcast with ignoreConnection=sender.
----   3. Apply the delete on this receiver. The sender never enters run() (ignoreConnection).
+--- Validate a remote client's delete, rebroadcast to the other peers, then apply here.
 function RLHerdsmanRuleDeleteEvent:run(connection)
     local id = self.id
     if id == nil or id == "" then
@@ -125,16 +96,11 @@ function RLHerdsmanRuleDeleteEvent:run(connection)
         -- _rawGetById avoids an unnecessary deep-clone on this read-only check.
         local stored = g_rlHerdsmanRuleService:_rawGetById(id)
         if stored == nil then
-            -- A delete for an id this peer never saw is benign (late-joiner / reconnect),
-            -- so it is a NO-OP, not a hard reject.
             Log:warning("RLHerdsmanRuleDeleteEvent:run: unknown id '%s' from user '%s' (userId=%s); no-op",
                 tostring(id), tostring(userName), tostring(userId))
             return
         end
 
-        -- Farm-scope: a rule is always farm-scoped (integer farmId per the S1 floor), so
-        -- the sender must be on the stored rule's farm. farmId is derived from the stored
-        -- record (the payload carries none).
         if stored.farmId ~= nil then
             local userFarm = g_farmManager:getFarmForUniqueUserId(userId)
             if userFarm == nil or userFarm.farmId == nil then
@@ -150,8 +116,7 @@ function RLHerdsmanRuleDeleteEvent:run(connection)
             end
         end
 
-        -- Rebroadcast to everyone except the sender (sender already mutated locally before
-        -- sendEvent and must not receive an echo).
+        -- Everyone except the sender: it already mutated locally before sendEvent.
         g_server:broadcastEvent(
             RLHerdsmanRuleDeleteEvent.new(id),
             nil, connection, nil)
@@ -166,8 +131,6 @@ function RLHerdsmanRuleDeleteEvent:run(connection)
         return
     end
 
-    -- Branch the apply log so an "applied" line only appears when a record was actually
-    -- removed. The already-gone path downgrades to :trace (legitimate late-join / reconnect).
     local applied = g_rlHerdsmanRuleService:applyIncomingDelete(id)
     if applied then
         Log:debug("RLHerdsmanRuleDeleteEvent:run: applied delete id=%s", tostring(id))
@@ -175,18 +138,14 @@ function RLHerdsmanRuleDeleteEvent:run(connection)
         Log:trace("RLHerdsmanRuleDeleteEvent:run: no-op delete id=%s (already gone)", tostring(id))
     end
 
-    -- F7: refresh an open Herdsman menu frame on this machine after the remote delete.
-    -- Nil-guarded (g_rlMenu / herdsmanFrame absent during early lifecycle or if the menu was
-    -- never opened). Idempotent: Pattern A keeps the originator out of its own run().
+    -- Refresh an open Herdsman menu frame; nil-guarded for early lifecycle / never opened.
     if g_rlMenu ~= nil and g_rlMenu.herdsmanFrame ~= nil
        and g_rlMenu.herdsmanFrame.refreshIfOpen ~= nil then
         g_rlMenu.herdsmanFrame:refreshIfOpen()
     end
 end
 
---- Thin dispatch: broadcast to clients if we are the server, otherwise upload to the
---- server. Caller (service) MUST have already mutated local state before calling this.
---- Guards on `g_server` / `g_client` so offline or early-lifecycle paths stay safe.
+--- Broadcast to clients if we are the server, otherwise upload to the server.
 ---@param id string rule id to delete
 function RLHerdsmanRuleDeleteEvent.sendEvent(id)
     if id == nil or id == "" then

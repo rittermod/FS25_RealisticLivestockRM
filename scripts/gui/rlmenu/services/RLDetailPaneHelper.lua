@@ -2,17 +2,12 @@
     RLDetailPaneHelper.lua
     Shared rendering logic for the pen column + animal column detail pane.
 
-    Both RLMenuInfoFrame and RLMenuMoveFrame (and later Buy/Sell) include
-    identical pen + animal column XML in their frame XMLs. This helper
-    provides the Lua rendering code so it is not duplicated per frame.
+    FS25 GUI XML has no <Include> mechanism, so each frame owns its own copy of the
+    identical pen + animal column XML; this helper keeps the Lua rendering in one place.
 
-    All functions take a `frame` parameter (the TabbedMenuFrameElement
-    instance) which owns the auto-bound element IDs from the XML. The
-    helper is stateless -- it reads element references from the frame and
+    Every function takes the `frame` (a TabbedMenuFrameElement) that owns the auto-bound
+    element IDs from that XML. Stateless - it reads element references off the frame and
     display data from RLAnimalInfoService.
-
-    FS25 GUI XML has no <Include> mechanism, so each frame owns its own
-    XML copy. This helper ensures the Lua rendering stays in one place.
 ]]
 
 local Log = RmLogging.getLogger("RLRM")

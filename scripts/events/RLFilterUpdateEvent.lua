@@ -2,17 +2,12 @@
     RLFilterUpdateEvent.lua
     Network event for whole-object replacement of a saveable filter.
 
-    Pattern A (caller-mutates-first). Caller (RLFilterService:update) mutates
-    local state BEFORE calling sendEvent.
+    Pattern A: the caller (RLFilterService:update) MUST mutate local state BEFORE calling
+    sendEvent; run() applies the mutation on every receiver that is not the original
+    sender, and the server rebroadcasts with ignoreConnection=sender.
 
-    Server-side validation:
-      1. getHasPlayerPermission("tradeAnimals", connection)
-      2. stored = g_rlFilterService:getById(payload.id); reject unknown id
-      3. Farm scope: payload.farmId ~= nil -> sender's farmId must match
-      4. Immutability: payload.id / payload.farmId / payload.version must
-         equal the stored record. Server rejects any divergence.
-
-    Pattern reference: HusbandryMessageDeleteEvent.
+    Codec: RLFilterWire.writeFilter / readFilter. id, farmId and version are immutable
+    across an update; the server rejects a divergence before it rebroadcasts.
 ]]
 
 RLFilterUpdateEvent = {}
@@ -87,7 +82,6 @@ function RLFilterUpdateEvent:run(connection)
             return
         end
 
-        -- Immutability guard: reject divergence on id/farmId/version.
         if filter.farmId ~= stored.farmId then
             Log:warning("RLFilterUpdateEvent:run: farmId tamper attempt on id=%s (payload=%s stored=%s) user='%s'",
                 tostring(filter.id), tostring(filter.farmId), tostring(stored.farmId), tostring(userName))
@@ -99,9 +93,6 @@ function RLFilterUpdateEvent:run(connection)
             return
         end
 
-        -- Farm-scope: if the stored record is per-farm, the sender must be
-        -- on that farm. Using stored.farmId (equal to payload.farmId post-
-        -- immutability check) is the defense-in-depth read.
         if stored.farmId ~= nil then
             local userFarm = g_farmManager:getFarmForUniqueUserId(userId)
             if userFarm == nil or userFarm.farmId == nil then
@@ -135,18 +126,11 @@ function RLFilterUpdateEvent:run(connection)
     Log:debug("RLFilterUpdateEvent:run: applied update id=%s name=%s",
         tostring(filter.id), tostring(filter.name))
 
-    -- Spec B fanout: notify the four consumer frames (Info/Buy/Sell/Move) so
-    -- their chip + animal list stay in sync with the remote mutation. Each
-    -- frame's onRemoteFilterChange id-match-gates against its own activeFilterId
-    -- so non-active remote changes are cheap no-ops (no chip / list churn).
-    -- Nil-guarded for the same reasons as the settingsFrame:refreshIfOpen
-    -- block below: g_rlMenu may not exist during early lifecycle; frame
-    -- fields may be nil pre-menu-open or on a dedicated server.
     Log:trace("RLFilterUpdateEvent:run: fanout to consumer frames, id=%s",
         tostring(filter.id))
     if g_rlMenu ~= nil then
-        -- Iterate frame NAMES (no-nil string array); see RLFilterCreateEvent
-        -- for the ipairs-nil rationale.
+        -- Iterate frame NAMES, not frame references: ipairs stops at the first nil, so an
+        -- array holding a nil frame field would silently skip every later frame.
         for _, frameName in ipairs({"infoFrame", "buyFrame", "sellFrame", "moveFrame"}) do
             local f = g_rlMenu[frameName]
             if f ~= nil and f.onRemoteFilterChange ~= nil then
@@ -155,17 +139,14 @@ function RLFilterUpdateEvent:run(connection)
         end
     end
 
-    -- Refresh the Settings frame if it is currently open on this machine.
-    -- Nil-guarded: g_rlMenu may not exist during early lifecycle,
-    -- settingsFrame may be nil if the menu was never opened.
+    -- Refresh an open Settings frame; nil-guarded for early lifecycle / never opened.
     if g_rlMenu ~= nil and g_rlMenu.settingsFrame ~= nil
        and g_rlMenu.settingsFrame.refreshIfOpen ~= nil then
         g_rlMenu.settingsFrame:refreshIfOpen()
     end
 
-    -- F7: a remote filter rename can change rule filter-summaries, so an open Herdsman menu
-    -- frame is a filter consumer that needs the same full reload (NOT the id-gated
-    -- onRemoteFilterChange fanout above). Same nil-guards as the settingsFrame block.
+    -- A remote rename can change rule filter-summaries, so an open Herdsman frame needs the
+    -- full reload rather than the id-gated onRemoteFilterChange fanout above.
     if g_rlMenu ~= nil and g_rlMenu.herdsmanFrame ~= nil
        and g_rlMenu.herdsmanFrame.refreshIfOpen ~= nil then
         g_rlMenu.herdsmanFrame:refreshIfOpen()

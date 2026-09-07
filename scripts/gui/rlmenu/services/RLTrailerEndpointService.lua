@@ -1,35 +1,17 @@
 --[[
     RLTrailerEndpointService.lua
-    Read-only query service: reads a base-game livestock trailer as an
-    animal-collection endpoint for the RL Tabbed Menu transfer slices
-    (pen / dealer / world).
+    Read-only query service: reads a base-game livestock trailer as an animal-collection
+    endpoint for the transfer frame's pen / dealer / world slices.
 
-    Wraps the LivestockTrailer getters into plain shapes - numbers, booleans,
-    strings, and live Animal-ref arrays - that every later slice consumes.
-    Stateless module table, no .new; the trailer is passed in as a parameter, so
-    nothing reaches g_*, GUI, or XML at load OR call time (project-context Rule
-    A/C) - that is what makes the primitives dual-runnable against a mock trailer.
-
-    Contract (each primitive is nil-safe and returns the per-row default rather
-    than crashing - see the spec I/O matrix):
-      * getContents(trailer)                              -> array of live Animal refs (engine order)
-      * getCurrentType(trailer)                           -> animal-type table | nil  (lock concept)
-      * supportsType(trailer, typeIndex)                  -> boolean                  (structural support)
-      * trailerHasFreeSlot(trailer, subTypeIndex, queued) -> boolean                  (free > queued)
-      * getDisplayData(trailer)                           -> { name, used, total }
-      * isEmpty(trailer) / isFull(trailer)                -> boolean
-      * hasRoom(freeSlots, alreadyQueued)                 -> boolean                  (pure predicate, shared with M2+)
+    Wraps the LivestockTrailer getters into plain shapes - numbers, booleans, strings and
+    live Animal-ref arrays. Stateless module table, no .new; the trailer is passed in, so
+    nothing reaches g_*, GUI or XML at load or call time, which is what makes the
+    primitives dual-runnable against a mock trailer. Every primitive is nil-safe and
+    returns its per-row default rather than crashing.
 
     Structural support (getSupportsAnimalType) and the current-load lock
-    (getCurrentAnimalType) are kept as two DISTINCT concepts: a trailer can
-    structurally support a type it is not currently locked to. The fit predicate
-    mirrors legacy applySourceBulk exactly (reject when free <= queued).
-
-    Transfer keystone: trailer-scoped, no GUI / events /
-    routing, zero behavior change. Loaded by main.lua but invoked by no shipped
-    path until the M2 transfer frame consumes it.
-    Mirrors the pcall-per-getter + level-logging house pattern of
-    RLAnimalInfoService.getHusbandryDisplay.
+    (getCurrentAnimalType) stay DISTINCT: a trailer can structurally support a type it is
+    not currently locked to. The fit predicate mirrors legacy applySourceBulk exactly.
 ]]
 
 RLTrailerEndpointService = {}
@@ -40,12 +22,9 @@ local Log = RmLogging.getLogger("RLRM")
 -- Internal helper
 -- =============================================================================
 
---- Call a single engine getter on the trailer under pcall, mirroring the
---- per-getter guard in RLAnimalInfoService.getHusbandryDisplay. Returns
---- `(true, value)` on a clean call and `(false, nil)` when the trailer is nil,
---- the method is absent or not callable, or the call itself errors. The caller
---- type-checks `value` and maps to its own default - one malformed getter never
---- propagates a crash through the service.
+--- Call a single engine getter under pcall, returning `(true, value)` on a clean call and
+--- `(false, nil)` when the trailer is nil, the method is absent, or the call errors. The
+--- caller type-checks `value`, so one malformed getter never propagates a crash.
 --- @param trailer table|nil
 --- @param methodName string
 --- @param arg any|nil  single optional argument (every wrapped getter takes 0 or 1)
@@ -62,14 +41,12 @@ local function callGetter(trailer, methodName, arg)
 end
 
 -- =============================================================================
--- Pure predicate (shared with the M2+ husbandry side)
+-- Pure predicate (shared with the husbandry side)
 -- =============================================================================
 
---- Capacity predicate: room exists when free slots strictly exceed the
---- already-queued running count. The operator is `>` (NOT `>=`): legacy
---- AnimalScreenTrailerFarm:applySourceBulk rejects when `free <= queued`, so the
---- slot a queued item will occupy is not offered to the next item. Endpoint-agnostic
---- by design - the pen (husbandry) side reuses this with its own free-slot read.
+--- Capacity predicate: room exists when free slots strictly exceed the already-queued
+--- count. The operator is `>` and not `>=` because legacy applySourceBulk rejects when
+--- `free <= queued`, so the slot a queued item will occupy is not offered to the next one.
 --- @param freeSlots number
 --- @param alreadyQueued number
 --- @return boolean room
@@ -82,10 +59,10 @@ end
 -- =============================================================================
 
 --- The trailer's live contents as an array of Animal refs in engine order.
---- In RLRM each element of `getClusters()` IS a live Animal (legacy wraps each
---- straight into AnimalItemStock); the M2+ mutation events need those raw refs,
---- so this does not project to a display descriptor. Consumers must NOT assume
---- positional stability across reads.
+---
+--- Each element of `getClusters()` IS a live Animal in RLRM, and the mutation events need
+--- those raw refs, so this returns them rather than a display descriptor. Consumers must
+--- not assume positional stability across reads.
 --- @param trailer table|nil
 --- @return table animals  array of Animal refs ({} when empty / unreadable)
 function RLTrailerEndpointService.getContents(trailer)
@@ -112,9 +89,8 @@ function RLTrailerEndpointService.getContents(trailer)
     return contents
 end
 
---- The trailer's current-load type lock, or nil when empty / unlocked. This is
---- the LOCK concept (what is aboard now), distinct from structural support
---- (supportsType). The lock follows the type of the first loaded cluster.
+--- The trailer's current-load type lock, or nil when empty / unlocked. The lock follows
+--- the type of the first loaded cluster.
 --- @param trailer table|nil
 --- @return table|nil animalType  type table (`.typeIndex` guaranteed) or nil
 function RLTrailerEndpointService.getCurrentType(trailer)
@@ -141,10 +117,9 @@ function RLTrailerEndpointService.getCurrentType(trailer)
     return animalType
 end
 
---- Whether the trailer STRUCTURALLY supports a type (its store config has a
---- place for it), independent of what is currently aboard. Support != lock: a
---- multi-capable empty trailer supports several types; once loaded it stays
---- structurally supporting them all while getCurrentType locks to one.
+--- Whether the trailer STRUCTURALLY supports a type, independent of what is aboard: a
+--- multi-capable trailer keeps supporting every type it was built for once loaded, while
+--- getCurrentType narrows to one.
 --- @param trailer table|nil
 --- @param typeIndex number
 --- @return boolean supported
@@ -164,11 +139,8 @@ function RLTrailerEndpointService.supportsType(trailer, typeIndex)
     return supported
 end
 
---- Whether a subtype can still be added given a running queued count. Wraps
---- `getNumOfFreeAnimalSlots(subTypeIndex)` (the trailer returns a number - 0 for
---- an unsupported subtype, never nil) through the pure hasRoom predicate, so
---- this is exact legacy applySourceBulk parity. `alreadyQueued` is the
---- cumulative-ledger hook the M3 mutation slice drives per subtype.
+--- Whether a subtype can still be added given a running queued count, wrapping
+--- `getNumOfFreeAnimalSlots(subTypeIndex)` through hasRoom for legacy parity.
 --- @param trailer table|nil
 --- @param subTypeIndex number
 --- @param alreadyQueued number|nil  running count already committed this transfer (default 0)
@@ -194,11 +166,9 @@ function RLTrailerEndpointService.trailerHasFreeSlot(trailer, subTypeIndex, alre
     return room
 end
 
---- Display payload for a trailer row: name plus the used / total slot counts.
---- `total` is `getMaxNumOfAnimals(getCurrentType())`, which is the engine truth
---- of 0 for an empty / unlocked trailer (capacity is per-type and there is no
---- single global slot count) - NOT a bug; how an empty trailer renders is the
---- frame's call.
+--- Display payload for a trailer row: name plus used / total slot counts. Capacity is
+--- per-type, so `total` is 0 for an empty or unlocked trailer - engine truth, not a bug;
+--- how that renders is the frame's call.
 --- @param trailer table|nil
 --- @return table display  { name = string, used = number, total = number }
 function RLTrailerEndpointService.getDisplayData(trailer)
@@ -225,8 +195,7 @@ function RLTrailerEndpointService.getDisplayData(trailer)
     return { name = name, used = used, total = total }
 end
 
---- Whether the trailer holds zero animals. A nil / unreadable trailer reads as
---- empty (the safe default for callers gating on contents).
+--- Whether the trailer holds zero animals; a nil or unreadable trailer reads as empty.
 --- @param trailer table|nil
 --- @return boolean empty
 function RLTrailerEndpointService.isEmpty(trailer)
@@ -238,12 +207,10 @@ function RLTrailerEndpointService.isEmpty(trailer)
     return used == 0
 end
 
---- Whether the trailer is at capacity for its current load. An empty / unlocked
---- trailer is never full (no current type to measure against). For the locked
---- type, free = total - used, so `free <= 0` is exactly `used >= total`; this
---- computes the same result as `getNumOfFreeAnimalSlots(currentSubType) <= 0`
---- without needing a current-subtype handle (which would require reaching the
---- animalSystem this service deliberately never touches).
+--- Whether the trailer is at capacity for its current load; an empty or unlocked trailer
+--- is never full. `used >= total` is exactly `getNumOfFreeAnimalSlots(currentSubType) <= 0`
+--- without needing a subtype handle, which would mean reaching the animalSystem this
+--- service deliberately never touches.
 --- @param trailer table|nil
 --- @return boolean full
 function RLTrailerEndpointService.isFull(trailer)

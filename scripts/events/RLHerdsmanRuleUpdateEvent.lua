@@ -2,31 +2,13 @@
     RLHerdsmanRuleUpdateEvent.lua
     Network event for whole-object replacement of a Herdsman rule record.
 
-    Pattern A (caller-mutates-first + rebroadcast-from-run with ignoreConnection=sender).
-    The caller (RLHerdsmanRuleService:update) MUST mutate local state BEFORE calling
-    sendEvent. This event's run() applies the mutation on every receiver that is NOT the
-    original sender.
+    Pattern A: the caller (RLHerdsmanRuleService:update) MUST mutate local state BEFORE
+    calling sendEvent; run() applies the mutation on every receiver that is not the
+    original sender, and the server rebroadcasts with ignoreConnection=sender.
 
-    Codec: REUSES S3's whole-object rule codec UNCHANGED -- writeStream ->
-    RLHerdsmanRuleWire.writeRule, readStream -> RLHerdsmanRuleWire.readRule. No new wire
-    format; Update sends the same flat record Create does.
-
-    Server-side validation (server receiving from a remote client) mirrors the CONTROL
-    FLOW of RLFilterUpdateEvent:run (granular, with distinct :warning per failure mode):
-      1. tradeAnimals permission for the sending connection.
-      2. The rule id must already exist (unknown id -> reject, no rebroadcast).
-      3. IMMUTABILITY guard: payload.farmId / payload.version must equal the stored
-         record (id is immutable by construction -- it is the lookup key). A divergence
-         is a tamper attempt -> reject BEFORE rebroadcast.
-      4. Farm scope: the sender's farm must equal the stored rule's owning farmId.
-    The pure isAuthorized predicate collapses permission + farm-match for unit testing in
-    isolation; run() itself keeps the filter's granular checks so each failure mode logs a
-    distinct :warning (permission vs no-farm-lookup vs farm-mismatch), matching the I/O
-    matrix rows. The predicate is fed the STORED rule's farmId (the rule already exists).
-
-    Like RLHerdsmanRuleCreateEvent, run() applies the mutation on every receiver that is NOT
-    the sender, then refreshes an open Herdsman menu frame via g_rlMenu.herdsmanFrame. Paired
-    with the state-sync event for late joiners; ship the delta events + state together.
+    Codec: RLHerdsmanRuleWire.writeRule / readRule -- the same flat record Create sends.
+    farmId and version are immutable across an update; the server rejects a divergence
+    before it rebroadcasts.
 ]]
 
 RLHerdsmanRuleUpdateEvent = {}
@@ -55,11 +37,7 @@ function RLHerdsmanRuleUpdateEvent.new(rule)
     return self
 end
 
---- Pure authorization predicate. A remote update is authorized iff the sender holds the
---- trade permission AND the sender's farm matches the rule's owning farm. No `g_*` access
---- -- the caller resolves the inputs and feeds them in, so the decision is unit-testable
---- in isolation. Identical body to RLHerdsmanRuleCreateEvent.isAuthorized; kept per-event
---- (self-contained) rather than shared so each event stays independently testable.
+--- Authorized iff the sender holds the trade permission and is on the rule's owning farm.
 ---@param hasTradePermission boolean sender holds the tradeAnimals permission
 ---@param senderFarmId number|nil the sending player's resolved farm id
 ---@param ruleFarmId number|nil the STORED rule's owning farm id
@@ -71,7 +49,7 @@ function RLHerdsmanRuleUpdateEvent.isAuthorized(hasTradePermission, senderFarmId
         and senderFarmId == ruleFarmId
 end
 
---- Serialize via the shared rule wire codec (REUSED from S3, unchanged).
+--- Serialize via the shared rule wire codec.
 function RLHerdsmanRuleUpdateEvent:writeStream(streamId, connection)
     if self.rule == nil then
         Log:warning("RLHerdsmanRuleUpdateEvent:writeStream: nil rule payload (nothing to write)")
@@ -98,19 +76,7 @@ local function getUserContext(connection)
     return userName, userId
 end
 
---- Execute the event on the receiver (Pattern A).
----
---- Flow (mirrors RLFilterUpdateEvent:run granular control flow, minus the UI fanout):
----   1. Guard against a malformed payload (nil rule or nil/empty id).
----   2. If server receiving from a remote client:
----        a. reject on missing tradeAnimals permission,
----        b. reject an unknown id (no record to replace),
----        c. reject any farmId/version divergence from the stored record (immutability),
----        d. reject a farm-scope mismatch (sender's farm != stored rule's farm),
----      logging a distinct :warning per failure and dropping (no rebroadcast/apply).
----      On success, rebroadcast with ignoreConnection=sender.
----   3. Apply the update on this receiver (server-received-from-remote or a client
----      receiving the rebroadcast). The sender never enters run() (ignoreConnection).
+--- Validate a remote client's payload, rebroadcast to the other peers, then apply here.
 function RLHerdsmanRuleUpdateEvent:run(connection)
     local rule = self.rule
     if rule == nil or rule.id == nil or rule.id == "" then
@@ -142,9 +108,6 @@ function RLHerdsmanRuleUpdateEvent:run(connection)
             return
         end
 
-        -- Immutability guard: reject divergence on farmId/version before rebroadcast.
-        -- A legitimate client never sends a divergent payload (RLHerdsmanRuleService:update
-        -- re-pins these); the only vector is a hand-crafted packet -> tamper attempt.
         if rule.farmId ~= stored.farmId then
             Log:warning("RLHerdsmanRuleUpdateEvent:run: farmId tamper attempt on id=%s (payload=%s stored=%s) user='%s' (userId=%s)",
                 tostring(rule.id), tostring(rule.farmId), tostring(stored.farmId), tostring(userName), tostring(userId))
@@ -156,9 +119,6 @@ function RLHerdsmanRuleUpdateEvent:run(connection)
             return
         end
 
-        -- Farm-scope: a rule is always farm-scoped (integer farmId per the S1 floor), so
-        -- the sender must be on the stored rule's farm. Using stored.farmId (equal to
-        -- payload.farmId post-immutability check) is the defense-in-depth read.
         if stored.farmId ~= nil then
             local userFarm = g_farmManager:getFarmForUniqueUserId(userId)
             if userFarm == nil or userFarm.farmId == nil then
@@ -174,8 +134,7 @@ function RLHerdsmanRuleUpdateEvent:run(connection)
             end
         end
 
-        -- Rebroadcast to everyone except the sender (sender already mutated locally before
-        -- sendEvent and must not receive an echo).
+        -- Everyone except the sender: it already mutated locally before sendEvent.
         g_server:broadcastEvent(
             RLHerdsmanRuleUpdateEvent.new(rule),
             nil, connection, nil)
@@ -184,19 +143,14 @@ function RLHerdsmanRuleUpdateEvent:run(connection)
             tostring(userName), tostring(userId), tostring(rule.id))
     end
 
-    -- Apply the update on this receiver. applyIncomingUpdate re-validates against the S1
-    -- field floor, so a crafted payload that passed the codec cannot bypass the rule
-    -- invariants (MP must not bypass the field floor; same posture as applyIncomingCreate).
     if g_rlHerdsmanRuleService == nil then
         Log:warning("RLHerdsmanRuleUpdateEvent:run: g_rlHerdsmanRuleService is nil; skipping apply for id=%s",
             tostring(rule.id))
         return
     end
 
-    -- Branch the apply log on the receiver's verdict so a :debug "applied" line only appears
-    -- when applyIncomingUpdate actually stored the record. A floor-invalid payload (rejected +
-    -- :warning by the receiver, storing nothing) downgrades to :trace - mirroring the delete
-    -- event's applied/no-op split - so the logs accurately explain WHY state did not change.
+    -- applyIncomingUpdate re-validates against the field floor and stores nothing when the
+    -- record fails it, so the verdict decides whether state actually changed.
     local applied = g_rlHerdsmanRuleService:applyIncomingUpdate(rule)
     if applied then
         Log:debug("RLHerdsmanRuleUpdateEvent:run: applied update id=%s name=%s",
@@ -206,18 +160,14 @@ function RLHerdsmanRuleUpdateEvent:run(connection)
             tostring(rule.id))
     end
 
-    -- F7: refresh an open Herdsman menu frame on this machine after the remote update.
-    -- Nil-guarded (g_rlMenu / herdsmanFrame absent during early lifecycle or if the menu was
-    -- never opened). Idempotent: Pattern A keeps the originator out of its own run().
+    -- Refresh an open Herdsman menu frame; nil-guarded for early lifecycle / never opened.
     if g_rlMenu ~= nil and g_rlMenu.herdsmanFrame ~= nil
        and g_rlMenu.herdsmanFrame.refreshIfOpen ~= nil then
         g_rlMenu.herdsmanFrame:refreshIfOpen()
     end
 end
 
---- Thin dispatch: broadcast to clients if we are the server, otherwise upload to the
---- server. Caller (service) MUST have already mutated local state before calling this.
---- Guards on `g_server` / `g_client` so offline or early-lifecycle paths stay safe.
+--- Broadcast to clients if we are the server, otherwise upload to the server.
 ---@param rule table rule record (post-update snapshot, with id populated)
 function RLHerdsmanRuleUpdateEvent.sendEvent(rule)
     if rule == nil or rule.id == nil or rule.id == "" then

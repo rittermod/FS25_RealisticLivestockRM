@@ -1,20 +1,16 @@
 --[[
     RLPenFeedForecast.lua
-    Read-only pen feed forecast: month-by-month simulation of the current
-    herd's feed consumption to estimate how many full game-months a pen's
-    food stock will last before depletion.
+    Read-only pen feed forecast: a month-by-month simulation of the current herd's feed
+    consumption, estimating how many full game-months a pen's food stock lasts.
 
-    Single source of truth for the daily-food formula is Animal._computeDailyFood;
-    this module operates only on scratch state and never mutates live Animal
-    entities. Scheduled births during the projection respect free pen slots
-    (excess offspring auto-sell and contribute zero feed demand).
-    Newborn metabolism is the deterministic midparent value so re-rendering
-    the same pen yields the same monthsRemaining.
+    The daily-food formula's single source of truth is Animal._computeDailyFood; this
+    module works only on scratch state and never mutates live Animal entities. Scheduled
+    births respect free pen slots (excess offspring auto-sell and add no feed demand), and
+    newborn metabolism is the deterministic midparent value, so re-rendering the same pen
+    yields the same monthsRemaining.
 
-    Bounds: returns integer in [0, MAX_MONTHS]. The UI renders the value as a
-    range "~M-(M+1)m" to express forecast uncertainty (the sim proves M full
-    months survive and busts mid-(M+1)). Edge cases: M=0 -> "<1m"; M=MAX_MONTHS
-    -> "~12+m".
+    Returns an integer in [0, MAX_MONTHS], rendered by the UI as a range "~M-(M+1)m" since
+    the sim proves M full months survive and busts mid-(M+1); 0 renders "<1m", MAX "~12+m".
 ]]
 
 RLPenFeedForecast = {}
