@@ -1,17 +1,13 @@
 --[[
     AnimalHorse.lua
-    Horse-specific logic extracted from Animal.lua.
+    Horse riding, fitness, dirt, sell price, info display, HUD display and XML
+    save. Animal.lua holds one-liner delegates that route here, and must be
+    sourced AFTER this module.
 
-    Provides helper functions for horse riding, fitness, dirt, sell price,
-    info display, HUD display, and XML save. Animal.lua retains one-liner
-    delegates that route to this module.
-
-    Sourced BEFORE RealisticLivestock_Animal.lua (same pattern as BreedingMath).
-
-    NOTE: Serialization (writeStream/readStream) and XML load (loadFromXMLFile) remain
-    in Animal.lua. dirt/fitness/riding are initialized in the constructor and
-    serialized unconditionally for ALL animal types - they are part of the MP protocol
-    and must not be changed without a protocol version bump.
+    Serialization and XML load stay in Animal.lua: dirt/fitness/riding are
+    initialized in the constructor and serialized unconditionally for ALL animal
+    types, so they are part of the MP protocol and must not change without a
+    protocol version bump.
 ]]
 
 AnimalHorse = {}

@@ -1,20 +1,13 @@
 --[[
     AnimalHealth.lua
-    Health, death, and death evaluation logic extracted from Animal.lua.
+    Health updates, death processing, and the monthly death evaluations - low
+    health, old age, random accidents. Animal.lua holds one-liner delegates that
+    route here, and must be sourced AFTER this module.
 
-    Provides helper functions for health updates, death processing, and
-    monthly death evaluations (low health, old age, random accidents).
-    Animal.lua retains one-liner delegates that route to this module.
-
-    Sourced BEFORE RealisticLivestock_Animal.lua (same pattern as AnimalHorse,
-    AnimalReproduction).
-
-    NOTE: Serialization (writeStream/readStream) and XML load/save remain
-    in Animal.lua. Health state fields (health, isDead, numAnimals) are
-    initialized in the constructor and serialized as part of the MP protocol.
-    Class-level settings (deathEnabled, accidentsChance) are managed by
-    RLSettings via Animal.onSettingChanged - AnimalHealth reads but does
-    not manage them.
+    Serialization and XML load/save stay in Animal.lua: health, isDead and
+    numAnimals are initialized in the constructor and serialized as part of the
+    MP protocol. deathEnabled and accidentsChance are class-level settings owned
+    by RLSettings via Animal.onSettingChanged - read here, never managed here.
 ]]
 
 AnimalHealth = {}

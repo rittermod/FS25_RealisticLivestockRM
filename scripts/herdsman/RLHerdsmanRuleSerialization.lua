@@ -10,43 +10,21 @@
 --     .targetHusbandries.target(k)     -- @uniqueId per target string; none when empty
 --     .params                          -- operation-specific subtree (PARAMS_CODECS)
 --
--- A param-free operation (horseCare) emits NO `.params` node at all - its codec writes
--- nothing and reads back an empty table. The codec entry still has to exist: `writeRule`
--- resolves it before emitting any XML and skips the whole record when there is none, so a
--- missing entry silently drops the rule at save time rather than failing loudly.
+-- A param-free operation (horseCare) emits NO `.params` node at all. Its codec entry still has to
+-- exist: `writeRule` resolves the codec before emitting any XML and skips the whole record when
+-- there is none, so a missing entry silently drops the rule at save time.
 --
--- Structural sibling of RLFilterSerialization (TYPE_CODECS -> PARAMS_CODECS,
--- writeFilter/readFilter -> writeRule/readRule) MINUS the recursive group/AST:
--- rule records are flat (scalars + a target list + an operation-keyed params
--- table), so there is no nested-group recursion here.
+-- Structural sibling of RLFilterSerialization minus the recursive group/AST - rule records are flat.
+-- The rule keeps ONLY the operation params; the age/gender/disease/genetics selection block lives
+-- in the rule's saved filter, so it is intentionally absent here.
 --
--- Per-operation params types are grounded in the legacy AI-animal job save/load
--- behavior. The rule keeps ONLY the operation params; the legacy
--- age/gender/disease/genetics selection block now lives in the rule's saved
--- filter, so it is intentionally absent here.
---
--- Defensive contracts (fail-closed; mirrors RLFilterSerialization skipping a
--- filter whose mandatory .group subtree is absent):
---  * readRule returns nil + :warning (the record is SKIPPED) when @id is
---    missing/empty, @operation is not a known operation, @farmId is absent,
---    @filterId violates the operation (present-but-empty/whitespace for non-naming,
---    or present at all for naming - the read-side twin of the service write floor;
---    an absent non-naming @filterId is a legal nil draft, NOT a skip), or ANY
---    required params field for the operation is absent. Required fields are
---    read with NO default: a nil read signals corruption, NOT a silent default
---    (diverges from legacy, which read params with defaults). A skipped record
---    never aborts the surrounding load.
---  * naming @previous is written ONLY when convention=="alphabetical" AND it is
---    a non-empty string (legacy parity); it is OPTIONAL
---    on read (absent -> nil).
---  * move @maxAnimals and @mark are required fields (nil on read -> record skipped); move
---    @destinationHusbandry mirrors @filterId - written ONLY when a non-empty/non-whitespace
---    string (absent -> an inert draft), an absent value reads back nil, and a present-but-
---    empty/whitespace value makes the codec read return nil so the WHOLE record is dropped
---    (the params-internal twin of the @filterId skip; enforced on write too via validate).
---  * a target whose @uniqueId is nil/empty is skipped on read (:trace), keeping
---    order and the non-empty strings. Duplicate-target dedup, uniqueId validity
---    and placeable resolution stay M-Tick (the S1 contract).
+-- Fail-closed contracts. readRule returns nil plus a warning - the record is SKIPPED, never the
+-- surrounding load - when @id is missing/empty, @operation is not a known operation, @farmId is
+-- absent, @filterId violates the operation (present-but-empty/whitespace for non-naming, or present
+-- at all for naming; an absent non-naming @filterId is a legal nil draft), or any required params
+-- field is absent. Required fields are read with NO default: a nil read signals corruption rather
+-- than a silent default. A target whose @uniqueId is nil/empty is skipped on read, keeping order and
+-- the non-empty strings; duplicate dedup and placeable resolution belong to the day-tick.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -56,23 +34,16 @@ RLHerdsmanRuleSerialization = {}
 -- Per-operation params codecs
 -- =============================================================================
 
---- Per-operation params read/write functions, keyed by a rule's `operation`.
---- The set of keys IS the canonical operation whitelist used by `readRule` to
---- fail-closed on an unknown `@operation` (no codec -> skip the record), so it
---- stays in lockstep with `RLHerdsmanRuleService.OPERATIONS` without coupling
---- the serializer to the service at source time (serializer loads first).
+--- Per-operation params read/write functions, keyed by a rule's `operation`. The key set IS the
+--- canonical operation whitelist `readRule` fails closed on, kept in lockstep with
+--- `RLHerdsmanRuleService.OPERATIONS` without coupling the serializer to the service, which loads
+--- later.
 ---
---- `validate(params)` returns true iff `params` carries every REQUIRED field for
---- the operation (the same set `read` rejects a nil on). The service's validity
---- floor deliberately accepts ANY table-shaped `params` (per-op shape is an
---- M-Frame concern), so a structurally-incomplete record (e.g. `buy` with
---- `params={}`) can reach `writeRule`. `validate` lets `writeRule` fail-closed
---- BEFORE emitting any XML instead of dereferencing a nil sub-table (which would
---- crash the whole `RLSettings.saveToXMLFile`). Symmetric with `read`'s
---- required-field set; NOT value validation (that stays the picker's job).
---- `write(xmlFile, paramsKey, params)` emits the op's params under `paramsKey`.
---- `read(xmlFile, paramsKey)` returns the params table, or nil when a REQUIRED
---- field is absent (nil = corruption; the caller skips the whole record).
+--- `validate(params)` returns true iff `params` carries every REQUIRED field for the operation - the
+--- same set `read` rejects a nil on. The service's validity floor accepts ANY table-shaped params,
+--- so a structurally-incomplete record can reach `writeRule`; validate lets it fail closed BEFORE
+--- emitting XML instead of dereferencing a nil sub-table and crashing the whole save. It is not
+--- value validation, which stays the picker's job.
 ---@type table<string, { validate: fun(p:table):boolean, write: fun(x:table, k:string, p:table), read: fun(x:table, k:string):table|nil }>
 local PARAMS_CODECS = {
     sell = {
@@ -89,13 +60,11 @@ local PARAMS_CODECS = {
         end,
     },
     move = {
-        -- `maxAnimals` and `mark` are required fields. `maxAnimals` is required because the
-        -- planner caps a move on it; a move that round-trips with no cap would silently no-op
-        -- (the persistence gap this slice closes). `destinationHusbandry` mirrors the serializer's
-        -- `filterId` floor: OPTIONAL (absent = an inert draft), but when present it must be a
-        -- non-empty (non-whitespace) string - enforced at BOTH ends so an invalid in-memory dest
-        -- is never silently laundered to disk (validate fails -> writeRule skips + :warning) and a
-        -- present-but-empty/whitespace dest on load returns nil so readRule drops the WHOLE record.
+        -- `maxAnimals` is required because the planner caps a move on it: one that round-tripped
+        -- with no cap would silently no-op. `destinationHusbandry` mirrors the `filterId` floor -
+        -- optional, but when present a non-empty (non-whitespace) string, enforced at BOTH ends so
+        -- an invalid in-memory dest is never laundered to disk and a corrupt one on load drops the
+        -- whole record.
         validate = function(p)
             return p.maxAnimals ~= nil and p.mark ~= nil
                 and (p.destinationHusbandry == nil
@@ -104,9 +73,8 @@ local PARAMS_CODECS = {
         write = function(x, k, p)
             x:setInt(k .. "#maxAnimals", p.maxAnimals)
             x:setBool(k .. "#mark", p.mark)
-            -- Emit the dest only when a non-empty/non-whitespace string (absent -> draft, no attr).
             -- validate already blocks an invalid in-memory dest, so this guard's live job is the
-            -- absent/draft case; it also keeps write defensive on its own.
+            -- absent/draft case.
             if type(p.destinationHusbandry) == "string" and p.destinationHusbandry:gsub("%s", "") ~= "" then
                 x:setString(k .. "#destinationHusbandry", p.destinationHusbandry)
             end
@@ -115,10 +83,8 @@ local PARAMS_CODECS = {
             local maxAnimals = x:getInt(k .. "#maxAnimals")
             local mark = x:getBool(k .. "#mark")
             if maxAnimals == nil or mark == nil then return nil end
-            -- dest: absent -> nil (legal inert draft); present-but-empty/whitespace -> nil return so
-            -- the whole record is dropped (params-internal twin of readRule's #filterId skip - the
-            -- top-level #filterId is floored in readRule, but dest lives inside params so the skip
-            -- must originate here).
+            -- The dest lives inside params, so its skip must originate here rather than in
+            -- readRule's top-level #filterId floor.
             local dest = x:getString(k .. "#destinationHusbandry")
             if dest ~= nil and dest:gsub("%s", "") == "" then return nil end
             return { maxAnimals = maxAnimals, mark = mark, destinationHusbandry = dest }
@@ -164,9 +130,8 @@ local PARAMS_CODECS = {
         validate = function(p) return p.convention ~= nil end,
         write = function(x, k, p)
             x:setString(k .. "#convention", p.convention)
-            -- Legacy parity: persist the cursor only
-            -- for alphabetical naming and only when non-empty, so a random rule
-            -- (or a fresh alphabetical one) reloads with previous=nil.
+            -- The cursor persists only for alphabetical naming and only when non-empty, so a random
+            -- rule (or a fresh alphabetical one) reloads with previous=nil.
             if p.convention == "alphabetical" and type(p.previous) == "string" and p.previous ~= "" then
                 x:setString(k .. "#previous", p.previous)
             end
@@ -175,8 +140,8 @@ local PARAMS_CODECS = {
             local convention = x:getString(k .. "#convention")
             if convention == nil then return nil end
             local params = { convention = convention }
-            -- previous is OPTIONAL: absent -> nil (the alphabetical sequence
-            -- restarts at "A" rather than skipping the record).
+            -- Optional: absent -> nil, and the alphabetical sequence restarts at "A" rather than the
+            -- record being skipped.
             local previous = x:getString(k .. "#previous")
             if previous ~= nil then params.previous = previous end
             return params
@@ -198,30 +163,26 @@ local PARAMS_CODECS = {
         end,
     },
     horseCare = {
-        -- ZERO params: the operation is enabled or it is not. The entry is NOT optional even
-        -- though it emits nothing - `writeRule` looks the codec up BEFORE writing any XML and
-        -- returns false when there is none, so an absent entry would make every horseCare rule
-        -- work for a whole session and then vanish on save, with no error a player could see.
-        -- The three halves are symmetric: nothing required, nothing written, an EMPTY table read
-        -- back. `read` must return `{}` and never nil - a nil read means "a required field is
-        -- missing" and makes `readRule` drop the whole record.
+        -- ZERO params, and the entry is NOT optional even though it emits nothing: `writeRule` looks
+        -- the codec up before writing any XML and returns false when there is none, so an absent
+        -- entry would make every horseCare rule work for a session and then vanish on save. `read`
+        -- must return `{}` and never nil - nil means a required field is missing and drops the
+        -- record.
         validate = function(_p) return true end,
         write = function(_x, _k, _p) end,
         read = function(_x, _k) return {} end,
     },
 }
 
---- Exposed read-only for tests + future callers that want to assert the
---- canonical operation whitelist without reaching into RLHerdsmanRuleService.
+--- Exposed read-only for tests that assert the canonical operation whitelist.
 RLHerdsmanRuleSerialization._PARAMS_CODECS = PARAMS_CODECS
 
 -- =============================================================================
 -- targetHusbandries (flat string list) IO
 -- =============================================================================
 
---- Write the rule's target husbandry uniqueIds as `target(k)#uniqueId` siblings
---- under `ruleKey .. ".targetHusbandries"`. An empty list writes nothing (the
---- rule reloads with `targetHusbandries = {}` -> inert, no targets).
+--- Write the rule's target husbandry uniqueIds as `target(k)#uniqueId` siblings. An empty list
+--- writes nothing, and the rule reloads inert with `targetHusbandries = {}`.
 ---@param xmlFile table XMLFile handle
 ---@param ruleKey string path prefix for this rule
 ---@param targets string[] uniqueId strings (dense array)
@@ -233,9 +194,7 @@ local function writeTargets(xmlFile, ruleKey, targets)
     end
 end
 
---- Read the rule's target husbandry uniqueIds, preserving order. A `target(k)`
---- whose `#uniqueId` is nil/empty is skipped (:trace) rather than stored as an
---- empty string; uniqueId validity + placeable resolution stay M-Tick.
+--- Read the rule's target husbandry uniqueIds, preserving order and skipping a nil/empty entry.
 ---@param xmlFile table XMLFile handle
 ---@param ruleKey string path prefix for this rule
 ---@return string[] targets non-empty uniqueId strings in document order
@@ -256,27 +215,15 @@ end
 -- Rule record IO (public)
 -- =============================================================================
 
---- Write one rule record at `ruleKey`. Returns `true` when the record was
---- written, `false` when it was skipped (nothing emitted). `@filterId` is
---- omitted when nil so the XML cleanly reflects a naming rule (no filter)
---- without a sentinel; every other scalar is always written. Dispatches the
---- operation's `params` codec for the `.params` subtree.
----
---- Fail-closed BEFORE emitting any XML (mirrors RLFilterSerialization's
---- "validate shape before writing" lesson in `writeCondition`):
---- an unknown `operation` (no codec) or structurally-incomplete `params` (the
---- service floor accepts any table-shaped params, so e.g. `buy` with `params={}`
---- can arrive) returns `false` with a `:warning` and writes nothing - so a
---- malformed record never leaves orphan scalars on disk and never crashes the
---- surrounding `RLSettings.saveToXMLFile` by dereferencing a nil sub-table. The
---- caller (`saveToXMLFile`) advances its on-disk `rule(i)` index only on `true`,
---- keeping the indexed sequence gap-free.
+--- Write one rule record at `ruleKey`, dispatching the operation's params codec for the `.params`
+--- subtree. Validation runs BEFORE any XML is emitted, so a skipped record leaves no orphan scalars
+--- and cannot crash the surrounding save. The caller advances its on-disk `rule(i)` index only on
+--- `true`, keeping the indexed sequence gap-free.
 ---@param xmlFile table XMLFile handle
 ---@param ruleKey string path prefix for this rule, e.g. `"...herdsmanRules.rule(0)"`
 ---@param rule table rule record (id/name/farmId/version/operation/enabled/filterId/targetHusbandries/params)
 ---@return boolean wrote
 function RLHerdsmanRuleSerialization.writeRule(xmlFile, ruleKey, rule)
-    -- Validate FIRST (no XML emitted yet) so a skip leaves no orphan node.
     local codec = PARAMS_CODECS[rule.operation]
     if codec == nil then
         Log:warning("RLHerdsmanRuleSerialization.writeRule: rule id=%s has unknown operation '%s'; skipping (no XML written)",
@@ -296,11 +243,8 @@ function RLHerdsmanRuleSerialization.writeRule(xmlFile, ruleKey, rule)
     xmlFile:setString(ruleKey .. "#operation", rule.operation)
     xmlFile:setBool(ruleKey .. "#enabled", rule.enabled)
 
-    -- Omit @filterId when nil (naming, or an unfiltered non-naming draft). A valid
-    -- non-naming filterId round-trips verbatim; a present-but-empty/whitespace
-    -- non-naming filterId (or a stray naming filterId) is fail-closed on READ (in
-    -- readRule), not here - the write-side floor already blocks creating one, so
-    -- writeRule never emits a bad filterId.
+    -- Omitted when nil, so the XML reflects a naming rule or an unfiltered draft without a sentinel.
+    -- A bad filterId is fail-closed on READ; the write-side floor already blocks creating one.
     if rule.filterId ~= nil then
         xmlFile:setString(ruleKey .. "#filterId", rule.filterId)
     end
@@ -315,16 +259,10 @@ function RLHerdsmanRuleSerialization.writeRule(xmlFile, ruleKey, rule)
     return true
 end
 
---- Read one rule record from `ruleKey`. Returns the record on success, or nil +
---- `:warning` (the record is SKIPPED) when fail-closed: missing/empty `@id`, an
---- unknown `@operation` (no params codec), an absent `@farmId`, a `@filterId` that
---- violates the operation (present-but-empty/whitespace for non-naming, or present
---- at all for naming - the read-side twin of the service write floor; an absent
---- non-naming `@filterId` reads back as a legal nil draft), or any required
---- params field absent (read with no default; nil = corruption). `name`,
---- `enabled` and `version` carry defaults (`""` / `false` / `1`); `filterId` is
---- nil for a (valid) naming rule OR an unfiltered non-naming draft. The caller
---- stores the returned record (the service preserves id/farmId/version, never reassigns).
+--- Read one rule record from `ruleKey`, or nil when the fail-closed contract above rejects it.
+--- `name`, `enabled` and `version` carry defaults (`""` / `false` / `1`); `filterId` is nil for a
+--- naming rule or an unfiltered draft. The caller stores the record as returned - the service
+--- preserves id/farmId/version and never reassigns them.
 ---@param xmlFile table XMLFile handle
 ---@param ruleKey string path prefix for this rule
 ---@return table|nil rule
@@ -343,8 +281,7 @@ function RLHerdsmanRuleSerialization.readRule(xmlFile, ruleKey)
         return nil
     end
 
-    -- farmId is fail-closed (no default): a rule without an owning farm is
-    -- corrupt, not a global rule.
+    -- A rule without an owning farm is corrupt, not a global rule.
     local farmId = xmlFile:getInt(ruleKey .. "#farmId")
     if farmId == nil then
         Log:warning("RLHerdsmanRuleSerialization.readRule: rule id=%s at %s missing #farmId; skipping", tostring(id), tostring(ruleKey))
@@ -352,20 +289,13 @@ function RLHerdsmanRuleSerialization.readRule(xmlFile, ruleKey)
     end
 
     local name = xmlFile:getString(ruleKey .. "#name", "")
-    -- enabled is always written on a well-formed record; the default only
-    -- applies to a truncated record (which is not fail-closed on enabled) and is
-    -- conservatively false so a corrupt rule never silently runs an operation.
+    -- The default applies only to a truncated record, and is conservatively false so a corrupt rule
+    -- never silently runs an operation.
     local enabled = xmlFile:getBool(ruleKey .. "#enabled", false)
     local version = xmlFile:getInt(ruleKey .. "#version", 1)
-    -- filterId: read raw, then floored against the operation just below.
     local filterId = xmlFile:getString(ruleKey .. "#filterId")
 
-    -- Load-time floor: read-side twin of validateRuleFields' filterId-vs-operation
-    -- rule. naming carries no filter; a non-naming rule binds at most one (D6) -
-    -- an absent #filterId reads back nil (a legal incomplete draft), but a
-    -- present-but-empty/whitespace non-naming filterId, or any filterId on a naming
-    -- rule, is corruption -> skip (fail-closed, like the missing-id / unknown-op /
-    -- missing-param guards above). writeRule already omits a nil #filterId.
+    -- Load-time floor: the read-side twin of validateRuleFields' filterId-vs-operation rule.
     if operation == "naming" then
         if filterId ~= nil then
             Log:warning("RLHerdsmanRuleSerialization.readRule: naming rule id=%s at %s carries a #filterId (naming has no filter); skipping",

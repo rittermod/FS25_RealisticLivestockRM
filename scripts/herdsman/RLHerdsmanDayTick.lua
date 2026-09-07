@@ -1,38 +1,26 @@
 -- RLHerdsmanDayTick.lua
--- M-Tick T4 - the day-tick wiring that makes the new herdsman actually run.
--- T1/T2 give a tested RLHerdsmanPlanner.planActions; T3 gives a tested
--- RLHerdsmanExecutor.executeActions - but nothing fires them. This module is the missing
--- tick: a MessageType.DAY_CHANGED subscriber (mirroring RLMessageAggregator.initialize) that,
--- once per day server-side, runs planActions -> executeActions per farm and surfaces the wage.
+-- The day-tick that runs the herdsman: a MessageType.DAY_CHANGED subscriber that,
+-- once per day server-side, runs RLHerdsmanPlanner.planActions -> RLHerdsmanExecutor.executeActions
+-- per farm and surfaces the wage.
 --
--- Split into a thin in-game glue layer and a fully dual-run orchestration layer (Rule C):
---   * subscribe()/buildEnv() READ g_* - the only in-game wiring. Registered once from
---     RealisticLivestock_FSBaseMission:onStartMission, beside RLMessageAggregator.initialize.
---   * run(env)/clearStaleMarks/buildPlannerCtx/buildExecutorCtx read NO g_*; they take the
---     injected `env` and return plain data, so the whole orchestration (per-farm loop, clear-
---     stale-marks, ctx shaping, wage readout) is unit-tested on REAL Animals headless. Prod and
---     tests differ ONLY in how `env` is built (live globals vs injected fakes). clearStaleMarks
---     also broadcasts AnimalMarkEvent (active=false) per cleared animal through env.server (caller-
---     mutates-first, no sendLocal) so mark REMOVALS sync to MP clients - the CLEAR-direction mirror
---     of the executor's SET-direction AnimalMarkEvent broadcast.
+-- Two layers. subscribe()/buildEnv() READ g_* and are the only in-game wiring, registered once
+-- from RealisticLivestock_FSBaseMission:onStartMission. run(env) and the ctx builders read NO
+-- g_*: they take the injected `env` and return plain data, so the orchestration is unit-tested
+-- on real Animals headless, and production differs only in how `env` is built.
 --
--- Server-only via the in-handler g_server guard (the fix), exactly as
--- RLMessageAggregator does: onStartMission registers on ALL peers, so server-only-ness comes
--- from the handler's `if g_server == nil then return end` early-return. A dedicated server has
--- g_server, so dedis ARE ticked; clients register an inert listener.
+-- Server-only via the in-handler g_server guard, mirroring RLMessageAggregator: onStartMission
+-- registers on ALL peers, so a dedicated server ticks and a client registers an inert listener.
 --
--- There is no legacy per-pen herdsman tick and no separate wage hook, so this tick is the only
--- herdsman automation and the only path that charges for it.
--- T3 OWNS the MoneyType.HERDSMAN_WAGES deduction (one addMoney per farm); T4 NEVER
--- re-deducts - it only LOGS summary.wageByFarm at DEBUG. Player/GUI wage surfacing is T5.
+-- The executor OWNS the MoneyType.HERDSMAN_WAGES deduction; this module only logs
+-- summary.wageByFarm at DEBUG and never re-deducts.
 --
--- env contract (subscriber builds it from g_*; tests inject fakes - RAW engine shapes in,
--- buildPlannerCtx/buildExecutorCtx reshape into the FROZEN planner/executor ctx):
+-- env contract (raw engine shapes in; buildPlannerCtx/buildExecutorCtx reshape them into the
+-- frozen planner/executor ctx):
 --   env = {
 --     farms                  = { farmRecord, ... },                 -- g_farmManager:getFarms() (SPECTATOR skipped in run)
 --     rulesForFarm(farmId)   -> { rule, ... },                      -- ruleService:listForFarm (NOT enabled-filtered; run filters)
 --     husbandriesForFarm(id) -> { placeable, ... },                 -- husbandrySystem:getPlaceablesByFarm(EXPLICIT id)
---     rawDealerAnimals(idx)  -> { Animal, ... },                    -- animalSystem:getSaleAnimalsByTypeIndex (live, reserved-INCLUSIVE; per-farm re-read)
+--     rawDealerAnimals(idx)  -> { Animal, ... },                    -- animalSystem:getSaleAnimalsByTypeIndex (live, reserved-INCLUSIVE)
 --     filtersById            = { [filterId] = filter },             -- g_rlFilterService:list keyed by id (farm-independent)
 --     balanceForFarm(farmId) -> number|nil,                         -- g_farmManager:getFarmById(id):getBalance()
 --     dewarsForFarm(farmId)  -> { [typeIndex] = { <dewar OBJECT>, ... } }|nil,  -- g_dewarManager:getDewarsByFarm (RAW objects)
@@ -41,16 +29,10 @@
 --     defer(fn)              -> nil,                            -- run fn after the current DAY_CHANGED chain (horse care only)
 --     server, mission, ruleService, animalSystem, animalNameSystem,
 --   }
--- `defer` is forwarded verbatim into the executor ctx, where it is a STRUCTURAL dep: the horse-care
--- leg is the only consumer, and a missing seam would leave it silently never writing while the wage
--- is still charged. See buildEnv for why the real implementation is a zero-delay timer.
--- `buyMarkup` is resolved ONCE per tick in buildEnv and forwarded verbatim into the planner ctx.
--- It lives in env rather than being read where it is used because buildEnv is this module's only
--- g_*-reading layer: resolving it further in would make the dual-run layer env-dependent and would
--- pin every headless assert to the default preset, with no way to exercise another one.
+-- `defer` and `buyMarkup` are forwarded verbatim into the executor / planner ctx, where each is a
+-- STRUCTURAL dep. Both are resolved here because buildEnv is this module's only g_*-reading layer.
 --
--- readout contract (run's return value; surfaced at DEBUG, consumed by no caller yet - T5
--- reads the executor summary directly. Defined so tests + LuaDoc have a concrete shape):
+-- readout contract (run's return value; surfaced at DEBUG):
 --   readout = {
 --     farmsProcessed = number,                  -- farms that ran plan/execute (SPECTATOR + no-enabled-rule farms skipped)
 --     byFarm = { [farmId] = {                   -- one row per processed farm with enabled rules
@@ -59,11 +41,6 @@
 --       dispatched     = number,                -- executor result rows with dispatched == true
 --     } },
 --   }
---
--- Parity anchors in AIAnimalManager:onDayChanged (removed 1.3.2.0): the per-operation clear-stale-marks legs (sell /
--- castrate / ai) + their enabled/maxAnimals op gates; the dealer pool + its reserved exclusion; the
--- dewar source. Wage + farm loop now live in this tick and RLHerdsmanExecutor. The spectator
--- farm (FarmManager.SPECTATOR_FARM_ID) is skipped before any gather.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -73,12 +50,11 @@ RLHerdsmanDayTick = {}
 -- Constants
 -- =============================================================================
 
---- Greppable prefix on every day-tick log line (the entry / per-farm / no-op lines are the
---- verification surface; mutation-parity tracing is the executor's [executeActions] rows).
+--- Greppable prefix on every day-tick log line.
 local LOG_PREFIX = "[herdsmanTick]"
 
---- operation -> the AI_MANAGER_* mark the clear-stale pass clears (mirrors AIAnimalManager's
---- per-operation clear-stale legs, removed 1.3.2.0). buy + naming carry no clearable op mark.
+--- operation -> the AI_MANAGER_* mark the clear-stale pass clears. buy + naming carry no
+--- clearable op mark.
 local MARK_BY_OPERATION = {
     sell     = "AI_MANAGER_SELL",
     castrate = "AI_MANAGER_CASTRATE",
@@ -87,13 +63,13 @@ local MARK_BY_OPERATION = {
 }
 
 -- =============================================================================
--- Internal helpers (pure - no g_*; build/reshape the injected env into the
--- FROZEN planner/executor ctx, which T1/T2/T3 own. Add nothing to those ctx.)
+-- Internal helpers (pure - no g_*; reshape the injected env into the FROZEN
+-- planner/executor ctx, which those modules own. Add nothing to those ctx.)
 -- =============================================================================
 
---- Index a farm's live husbandry placeables by their uniqueId (the key space the rules'
---- targetHusbandries + the executor's husbandryPlaceablesById both use). A duplicate uniqueId
---- across live placeables WARNs and keeps the last (deterministic, never raises).
+--- Index a farm's live husbandry placeables by their uniqueId - the key space the rules'
+--- targetHusbandries and the executor's husbandryPlaceablesById both use. A duplicate uniqueId
+--- WARNs and keeps the last, deterministically, rather than raising.
 ---@param husbandries table array of husbandry placeables (env.husbandriesForFarm result)
 ---@return table husbandriesById { [uniqueId] = placeable }
 local function indexHusbandriesByUniqueId(husbandries)
@@ -109,12 +85,9 @@ local function indexHusbandriesByUniqueId(husbandries)
     return byId
 end
 
---- Index a farm's live owner EPP (butcher) placeables by their uniqueId - the SAME key space the
---- rules' move destinationHusbandry uses (RLHusbandryTargetKey.keyFor = getUniqueId() on the
---- server, and the tick is server-only), so the executor's _doMove dest fall-through resolves an
---- EPP dest key to its placeable. Nil-tolerant (EPP is an optional mod - an empty / nil input
---- yields an empty map, the always-set-possibly-empty contract). A duplicate uniqueId WARNs and
---- keeps the last (deterministic, never raises), mirroring indexHusbandriesByUniqueId.
+--- Index a farm's live owner EPP (butcher) placeables by uniqueId - the SAME key space a move
+--- rule's destinationHusbandry uses, so the executor's dest fall-through can resolve one.
+--- Nil-tolerant, because EPP is an optional mod: an absent input yields an empty map, never nil.
 ---@param epps table|nil array of EPP placeables (env.eppsForFarm result)
 ---@return table eppsById { [uniqueId] = placeable }
 local function indexEPPsByUniqueId(epps)
@@ -131,23 +104,16 @@ local function indexEPPsByUniqueId(epps)
 end
 
 --- Clear each enabled sell/castrate/ai rule's op mark on EVERY animal of its target husbandries,
---- BEFORE the executor runs (decision 1b): executeActions re-SETS the mark for mark-mode actions,
---- so clearing afterwards would wipe a freshly-set mark. Each animal actually cleared ALSO
---- broadcasts AnimalMarkEvent (active=false) through the injected server (caller-mutates-first, no
---- sendLocal) so the REMOVAL syncs to MP clients - the CLEAR-direction mirror of the executor's
---- SET-direction broadcast (@see RLHerdsmanExecutor setMarkOnAll) and the player path
---- (@see RLAnimalInfoService.markAnimal). Full legacy parity incl. zero-selection passes (the mark
---- clears even when no candidate matches this tick). Owns its own unresolvable-target guard (it runs
---- before the planner): a target absent from the live placeables is skipped + WARNed. Every
---- per-animal mutation + broadcast is wrapped in RmSafeUtils.safeAnimalCall so one malformed animal
---- cannot abort the loop or leave a half-applied state (project mandate). markKey is always a
---- non-nil AI_MANAGER_* key here (the MARK_BY_OPERATION gate), so AnimalMarkEvent's destructive
---- clear-all mode (key=nil) is structurally unreachable - no nil-key guard needed.
+--- BEFORE the executor runs: executeActions re-SETS the mark for mark-mode actions, so clearing
+--- afterwards would wipe a freshly-set one. Each animal cleared also broadcasts AnimalMarkEvent
+--- (active=false) through the injected server, caller-mutates-first and no sendLocal, so removals
+--- reach MP clients - the CLEAR-direction mirror of @see RLHerdsmanExecutor setMarkOnAll. Clears
+--- even when no candidate matches this tick. A target absent from the live placeables is skipped
+--- and WARNed. markKey is always a non-nil AI_MANAGER_* key here, so AnimalMarkEvent's destructive
+--- clear-all mode is unreachable.
 ---@param enabledRules table array of ENABLED rules for the farm (run applies the enabled filter)
 ---@param husbandriesById table { [uniqueId] = placeable }
----@param server any injected server (env.server); broadcast only when non-nil. The live tick is
----  server-gated by run(), so a nil server is a defensive unit-call path that still clears but does
----  not broadcast.
+---@param server any injected server (env.server); broadcast only when non-nil
 local function clearStaleMarks(enabledRules, husbandriesById, server)
     for _, rule in ipairs(enabledRules) do
         local markKey = MARK_BY_OPERATION[rule.operation]
@@ -160,14 +126,11 @@ local function clearStaleMarks(enabledRules, husbandriesById, server)
                 else
                     for _, animal in pairs(placeable:getClusters()) do
                         RmSafeUtils.safeAnimalCall(animal, "RLHerdsmanDayTick:clearStaleMark", function()
-                            -- Mirror legacy's gate (AIAnimalManager's clear-stale legs, removed 1.3.2.0): only clear a set mark.
+                            -- Only clear a mark that is set.
                             if animal:getMarked(markKey) then
                                 animal:setMarked(markKey, false)
-                                -- MP sync: broadcast WITHOUT sendLocal. AnimalMarkEvent:run applies setMarked on
-                                -- server AND client, so the server already cleared above; sendLocal would re-run
-                                -- run() locally (redundant re-clear, possible double broadcast). Scoped inside the
-                                -- getMarked gate + safeAnimalCall, so the broadcast is exactly as scoped as the
-                                -- mutation and shares its isolation boundary.
+                                -- Broadcast WITHOUT sendLocal: AnimalMarkEvent:run applies setMarked
+                                -- on server and client alike, and the server already cleared above.
                                 if server ~= nil then
                                     server:broadcastEvent(AnimalMarkEvent.new(placeable, animal, markKey, false))
                                     Log:debug("%s clearStaleMarks: broadcast AnimalMarkEvent uniqueId=%s key=%s active=false",
@@ -182,13 +145,10 @@ local function clearStaleMarks(enabledRules, husbandriesById, server)
     end
 end
 
---- Shape the FROZEN planner ctx (T1 + T2a/b/c) for ONE farm: husbandries keyed by uniqueId with
---- their type + live clusters + free animal-slot count (the planner's Buy space cap), the
---- reserved-excluded dealer pool (built once per type, re-read
---- freshly per farm), the farm-scoped balance ledger seed, and the materialized dewar pool
---- (raw dewar OBJECT -> { animal, straws, uniqueId } - the planner's per-T2c nil-guards filter,
---- T4 materializes faithfully). filtersById + the service refs pass straight through from env, as
---- does buyMarkup - a farm-independent scalar, so every farm this tick prices at the same markup.
+--- Shape the FROZEN planner ctx for ONE farm: husbandries keyed by uniqueId with their type, live
+--- clusters and free animal-slot count, the reserved-excluded dealer pool, the farm-scoped balance
+--- seed, and the materialized dewar pool. filtersById, the service refs and buyMarkup pass straight
+--- through from env.
 ---@param farm table the farm record (carries farm.farmId)
 ---@param husbandriesById table { [uniqueId] = placeable } (already deduped by run)
 ---@param env table the run(env) seam
@@ -203,16 +163,13 @@ local function buildPlannerCtx(farm, husbandriesById, env)
         husbandries[uid] = {
             animalTypeIndex = typeIndex,
             animals = placeable:getClusters(),
-            -- The planner's Buy slot cap: total free animal slots (no-arg, mirrors
-            -- AIAnimalBuyEvent.validate's space gate). Unguarded spec-method call, same posture as
-            -- getAnimalTypeIndex/getClusters above; the subscriber's safeCall wrap is the isolation boundary.
+            -- The planner's Buy slot cap: total free animal slots, mirroring
+            -- AIAnimalBuyEvent.validate's space gate.
             freeSlots = placeable:getNumOfFreeAnimalSlots(),
         }
-        -- Reserved-exclusion: nothing sets `animal.reserved` TRUE any more, so this filter
-        -- removes nothing. `AnimalSystem:onDayChanged` still clears it to false on every dealer
-        -- animal daily, which is the only remaining writer - do not read that as a producer.
-        -- Kept as a cheap guard in case a reservation producer returns; removing it is a
-        -- deliberate call, not a tidy-up. Memoized across same-type husbandries on this farm.
+        -- Reserved-exclusion: nothing sets `animal.reserved` TRUE any more, so this filter removes
+        -- nothing today - `AnimalSystem:onDayChanged` only clears it. Kept as a cheap guard in case
+        -- a reservation producer returns; removing it is a deliberate call, not a tidy-up.
         if dealerAnimalsByType[typeIndex] == nil then
             local pool = {}
             for _, animal in pairs(env.rawDealerAnimals(typeIndex)) do
@@ -243,18 +200,15 @@ local function buildPlannerCtx(farm, husbandriesById, env)
         animalNameSystem    = env.animalNameSystem,
         farmBalanceByFarmId = { [farmId] = env.balanceForFarm(farmId) },
         dewarsByFarmId      = { [farmId] = dewarsByType },
-        -- Forwarded verbatim - farm-independent, so it is the same scalar for every farm this
-        -- tick. Deliberately NOT defaulted here: the planner treats it as a structural dep and
-        -- must raise on a ctx that lacks it rather than price at a stale markup.
+        -- Deliberately NOT defaulted here: the planner treats it as a structural dep and must
+        -- raise on a ctx that lacks it rather than price at a stale markup.
         buyMarkup           = env.buyMarkup,
     }
 end
 
---- Shape the FROZEN executor ctx (T3): the same uniqueId->placeable map the planner keyed off, the
---- owner-farm EPP placeable map for the move-dest fall-through, plus the dispatch
---- boundary (server/mission) + the service refs. `eppPlaceablesById` is ALWAYS set (possibly an empty
---- table - EPP is an optional mod), the always-set contract the executor relies on (a nil map would be
---- treated as empty anyway - the missing-dest skip - but the day-tick never hands it nil).
+--- Shape the FROZEN executor ctx: the same uniqueId->placeable map the planner keyed off, the
+--- owner-farm EPP placeable map for the move-dest fall-through, the dispatch boundary and the
+--- service refs. `eppPlaceablesById` is ALWAYS set, possibly empty, never nil.
 ---@param husbandriesById table { [uniqueId] = placeable }
 ---@param eppPlaceablesById table { [uniqueId] = EPP placeable } (possibly empty; never nil)
 ---@param env table the run(env) seam
@@ -267,26 +221,23 @@ local function buildExecutorCtx(husbandriesById, eppPlaceablesById, env)
         eppPlaceablesById       = eppPlaceablesById or {},
         ruleService             = env.ruleService,
         animalNameSystem        = env.animalNameSystem,
-        -- Forwarded verbatim, like buyMarkup: deliberately NOT defaulted here, because the
-        -- executor treats it as a structural dep and must fail loud on a ctx that lacks it
-        -- rather than skip the care write while still charging for it.
+        -- Deliberately NOT defaulted, like buyMarkup: the executor treats it as a structural dep
+        -- and must fail loud rather than skip the care write while still charging for it.
         defer                   = env.defer,
     }
 end
 
---- Server-only gate (the fix): the tick runs only where there is a server (a dedicated
---- server has g_server, so dedis ARE included; a pure client's g_server is nil). Pulled out as a
---- pure predicate so the dual-run suite proves the gate WITHOUT nil-ing the root global g_server
---- (which in-game rlTest cannot do safely); the handler applies it to the live g_server.
+--- Server-only gate: the tick runs only where there is a server (a dedicated server has g_server;
+--- a pure client's is nil). A pure predicate, so the dual-run suite can prove the gate without
+--- nil-ing the root global.
 ---@param server any g_server (or the injected server handle)
 ---@return boolean
 function RLHerdsmanDayTick._shouldTick(server)
     return server ~= nil
 end
 
--- The pure helpers above are local for run()'s fast path AND exposed here so the dual-run suite
--- (RLHerdsmanDayTickTests) can unit-test each in isolation on real Animals - the same "internal
--- function on the module table" testing seam RLHerdsmanExecutor._executeOne uses.
+-- The pure helpers above stay local for run()'s fast path and are exposed here as the unit-test
+-- seam, the same shape RLHerdsmanExecutor._executeOne uses.
 RLHerdsmanDayTick._indexHusbandriesByUniqueId = indexHusbandriesByUniqueId
 RLHerdsmanDayTick._indexEPPsByUniqueId        = indexEPPsByUniqueId
 RLHerdsmanDayTick._clearStaleMarks            = clearStaleMarks
@@ -294,24 +245,22 @@ RLHerdsmanDayTick._buildPlannerCtx            = buildPlannerCtx
 RLHerdsmanDayTick._buildExecutorCtx           = buildExecutorCtx
 
 -- =============================================================================
--- Orchestration (pure - no g_*; THE dual-run seam, decision 3a)
+-- Orchestration (pure - no g_*; the dual-run seam)
 -- =============================================================================
 
---- Run the new herdsman day-tick over every farm in `env`. Per farm (SPECTATOR skipped): filter
---- to enabled rules, and on a no-enabled-rules farm log a graceful no-op exit (a
---- diagnostic, distinguishing "tick ran, nothing matched" from "tick never ran"). Otherwise clear
---- stale op marks, shape the planner + executor ctx, run planActions -> executeActions, and LOG
---- the executor's per-farm wage at DEBUG (surface only - T3 already deducted it; T4 NEVER calls
---- addMoney). Reads no g_*; the engine boundary is the injected env. Returns a readout (above).
+--- Run the herdsman day-tick over every farm in `env`. Per farm, SPECTATOR skipped: filter to
+--- enabled rules, clear stale op marks, shape both ctx, run planActions -> executeActions, and log
+--- the executor's per-farm wage at DEBUG. A farm with no enabled rules and a farm with an empty
+--- plan each log a distinct no-op line, so "tick ran, nothing matched" reads apart from "tick
+--- never ran". Reads no g_*; the engine boundary is the injected env.
 ---@param env table the run(env) seam (subscriber builds it from g_*; tests inject fakes)
 ---@return table readout { farmsProcessed, byFarm = { [farmId] = { wage, plannedActions, dispatched } } }
 function RLHerdsmanDayTick.run(env)
     local readout = { farmsProcessed = 0, byFarm = {} }
     local farms = env.farms or {}
 
-    -- A server-side entry line (dedi included) proves the tick fired at all. Count
-    -- only the farms that will actually run (SPECTATOR is skipped below), so the diagnostic count
-    -- is honest rather than overstating by the spectator slot.
+    -- Entry line: proves the tick fired at all. Counts only farms that will actually run, so the
+    -- diagnostic does not overstate by the spectator slot.
     local farmCount = 0
     for _, farm in pairs(farms) do
         if farm.farmId ~= FarmManager.SPECTATOR_FARM_ID then farmCount = farmCount + 1 end
@@ -319,15 +268,10 @@ function RLHerdsmanDayTick.run(env)
     Log:debug("%s day-tick entry: %d farm(s) to process", LOG_PREFIX, farmCount)
 
     -- The markup this tick prices buys at, read off the injected env so the line is assertable
-    -- under the dual-run harness (a line at the buildEnv seam would be in-game only). This is the
-    -- ONLY markup line on a tick where no buy reaches the planner's deepest branch; when one does,
-    -- the per-buy [planActions] line reports the same value again.
-    -- Guarded because RmLogging pcall-wraps string.format and falls back to printing the RAW
-    -- template: an unusable markup would otherwise emit `markup=%.3f` verbatim, losing the one
-    -- diagnostic that names it, in exactly the case someone would be reading for it. This does NOT
-    -- gate the tick - the fail-loud placement is the planner's buy arithmetic, and this WARNING
-    -- only makes a wiring bug legible before a buy rule gets there (it may never, if no candidate
-    -- reaches pricing).
+    -- under the dual-run harness. Guarded because RmLogging pcall-wraps string.format and falls
+    -- back to the RAW template, so an unusable markup would emit `markup=%.3f` verbatim and lose
+    -- the one diagnostic that names it. This does not gate the tick - the fail-loud placement is
+    -- the planner's buy arithmetic.
     if type(env.buyMarkup) ~= "number" then
         Log:warning("%s dealer-quality buy markup is %s, not a number - a T4 wiring bug; buy rules will fail loud once one prices a candidate",
             LOG_PREFIX, tostring(env.buyMarkup))
@@ -340,54 +284,41 @@ function RLHerdsmanDayTick.run(env)
         local farmId = farm.farmId
 
         if farmId == FarmManager.SPECTATOR_FARM_ID then
-            -- Skip the spectator farm before any gather (FarmManager.SPECTATOR_FARM_ID).
             Log:trace("%s farm=%s is SPECTATOR - skipped", LOG_PREFIX, tostring(farmId))
         else
-            -- listForFarm does NOT filter enabled; the enabled filter lives here (drives both the
-            -- no-op gate and what clearStaleMarks + planActions act on).
+            -- listForFarm does NOT filter enabled; the enabled filter lives here and drives both
+            -- the no-op gate and what clearStaleMarks + planActions act on.
             local enabledRules = {}
             for _, rule in ipairs(env.rulesForFarm(farmId) or {}) do
                 if rule.enabled then enabledRules[#enabledRules + 1] = rule end
             end
 
             if #enabledRules == 0 then
-                -- Graceful no-op exit - no plan, no execute, no money.
                 Log:debug("%s farm=%s: 0 enabled rules - no-op", LOG_PREFIX, tostring(farmId))
             else
                 local husbandriesById = indexHusbandriesByUniqueId(env.husbandriesForFarm(farmId) or {})
 
-                -- Clear BEFORE execute (decision 1b): the executor re-sets marks for mark-mode actions.
-                -- env.server threads the dispatch boundary so cleared marks broadcast to MP clients.
+                -- Clear BEFORE execute: the executor re-sets marks for mark-mode actions.
                 clearStaleMarks(enabledRules, husbandriesById, env.server)
 
                 local plan = RLHerdsmanPlanner.planActions(enabledRules, buildPlannerCtx(farm, husbandriesById, env))
 
-                -- An empty plan is the OTHER graceful no-op exit (enabled rules, but
-                -- nothing matched this tick) - log it distinctly so a dedi reviewer reads "tick ran,
-                -- nothing to do" rather than inferring it from a planned=0 metrics line.
                 if #plan == 0 then
                     Log:debug("%s farm=%s: %d enabled rule(s) but empty plan - no-op",
                         LOG_PREFIX, tostring(farmId), #enabledRules)
                 end
 
-                -- Owner-farm EPP (butcher) placeables for the move-dest fall-through. ALWAYS
-                -- built (possibly empty - EPP is an optional mod, and a test env may omit eppsForFarm):
-                -- keyed by uniqueId, the same key space the rule's move destinationHusbandry uses.
                 local eppPlaceablesById = indexEPPsByUniqueId(env.eppsForFarm ~= nil and env.eppsForFarm(farmId) or {})
 
                 local execCtx = buildExecutorCtx(husbandriesById, eppPlaceablesById, env)
                 local summary = RLHerdsmanExecutor.executeActions(plan, execCtx)
                 local wageByFarm = summary.wageByFarm or {}
 
-                -- Wage readout (DEBUG, surface only - T3 already deducted it; T4 never re-deducts).
+                -- Surface only: the executor already deducted it.
                 for fid, wage in pairs(wageByFarm) do
                     Log:debug("%s wage readout: farm=%s wage=%s (deducted by executor)", LOG_PREFIX, tostring(fid), tostring(wage))
                 end
 
-                -- T5 OWNS this hook: surface the executed/marked ops as player messages -
-                -- the parity readout legacy AIAnimalManager:onDayChanged (removed 1.3.2.0) emitted. T4's frozen contract
-                -- had no message seam; execCtx (carrying husbandryPlaceablesById - the SAME placeable
-                -- handles T3 dispatched its events against) is in scope right here, after executeActions.
                 RLHerdsmanMessages.emit(summary, execCtx)
 
                 local dispatched = 0
@@ -415,10 +346,9 @@ end
 -- In-game glue (reads g_* - the ONLY non-dual-run layer)
 -- =============================================================================
 
---- Assemble the run(env) seam from live g_* globals. RAW engine shapes + service refs in;
---- buildPlannerCtx/buildExecutorCtx reshape them into the frozen ctx. Every closure passes its
---- farmId EXPLICITLY to the engine read - a nil farmId to getPlaceablesByFarm defaults to
---- g_localPlayer.farmId, which is nil on a dedicated server -> crash (the context).
+--- Assemble the run(env) seam from live g_* globals. Every closure passes its farmId EXPLICITLY:
+--- a nil farmId to getPlaceablesByFarm defaults to g_localPlayer.farmId, which is nil on a
+--- dedicated server and crashes.
 ---@return table env
 function RLHerdsmanDayTick.buildEnv()
     local mission = g_currentMission
@@ -438,9 +368,9 @@ function RLHerdsmanDayTick.buildEnv()
         farms              = g_farmManager:getFarms(),
         rulesForFarm       = function(farmId) return ruleService:listForFarm(farmId) end,
         husbandriesForFarm = function(farmId) return husbandrySystem:getPlaceablesByFarm(farmId) end,
-        -- Owner-farm EPP (butcher) placeables for the move-dest fall-through. Scans the
-        -- placeableSystem for spec_extendedProductionPoint, mirroring RLMoveDestinationHelper.getValidDestinations' scan;
-        -- nil-guarded so an absent EPP mod (no such spec on any placeable) yields an empty list.
+        -- Owner-farm EPP (butcher) placeables for the move-dest fall-through, scanned the same way
+        -- @see RLMoveDestinationHelper.getValidDestinations does. Nil-guarded, so an absent EPP mod
+        -- yields an empty list.
         eppsForFarm        = function(farmId)
             local out = {}
             local ps = mission.placeableSystem
@@ -462,34 +392,19 @@ function RLHerdsmanDayTick.buildEnv()
             return farm ~= nil and farm:getBalance() or nil
         end,
         dewarsForFarm      = function(farmId) return g_dewarManager:getDewarsByFarm(farmId) end,
-        -- The active dealer-quality markup, resolved fresh per tick. A VALUE, not a closure: it is
-        -- farm-independent, and buildEnv itself re-runs inside the DAY_CHANGED handler, so a value
-        -- is exactly as current as a closure would be (filtersById is the same precedent).
-        -- Called at RUNTIME only - main.lua sources RLDealerQualityResolver AFTER this module, so a
-        -- file-scope reference here would read nil. The index rides along for the readout line in
-        -- run(); resolving it there instead would make that layer env-dependent.
+        -- A VALUE, not a closure: farm-independent, and buildEnv re-runs inside the DAY_CHANGED
+        -- handler. Called at RUNTIME only - main.lua sources RLDealerQualityResolver AFTER this
+        -- module, so a file-scope reference here would read nil.
         buyMarkup          = RLDealerQualityResolver.getMarkup(),
         dealerQualityIndex = RLDealerQualityResolver.getActiveIndex(),
-        -- The horse-care deferral seam, and the ONLY Timer.createOneshot in scripts/herdsman/.
-        --
-        -- WHY it exists (do not inline the leg's write back into the executor): the care write sets
-        -- riding = 100, and Animal:onDayChanged -> AnimalHorse.processRidingUpdate grades fitness
-        -- from riding and then ZEROES it for the day. Both run off MessageType.DAY_CHANGED, and the
-        -- order between this tick and a given husbandry placeable is NOT fixed - it depends on
-        -- whether the barn was preplaced, savegame-loaded, or bought mid-session, and the same barn
-        -- can change sides across a save/reload. Writing inline is therefore correct on one barn and
-        -- silently zeroed on another. A zero-delay oneshot re-queues the write behind every
-        -- DAY_CHANGED subscriber AND still lands in the same frame: the publish drains inside the
-        -- environment update, and the mission's updateables walk - where a zero-duration timer has
-        -- already registered itself - runs immediately after it. So the write is last, on this day
-        -- tick, whatever order the barns subscribed in.
-        --
-        -- This is the established fix for placement-dependent DAY_CHANGED order, not a new idea
-        -- here: @see RLMessageAggregator.initialize for the same seam, and the wiki pattern
-        -- [[message-center-subscription]] for the mechanism and its residuals.
-        --
-        -- Injected rather than read directly inside the executor because that module documents
-        -- "no g_* reads" and its whole decision layer is dual-run on that basis.
+        -- The horse-care deferral seam. The care write sets riding = 100, and
+        -- @see AnimalHorse.processRidingUpdate grades fitness from riding and then zeroes it for
+        -- the day. Both run off DAY_CHANGED and the order between this tick and a given husbandry
+        -- placeable is placement-dependent, so an inline write is correct on one barn and silently
+        -- zeroed on another. A zero-delay oneshot re-queues the write behind every DAY_CHANGED
+        -- subscriber and still lands in the same frame. Same seam as
+        -- @see RLMessageAggregator.initialize. Injected rather than read inside the executor,
+        -- which documents no g_* reads.
         defer              = function(fn) Timer.createOneshot(0, fn) end,
         server             = g_server,
         mission            = mission,
@@ -499,13 +414,10 @@ function RLHerdsmanDayTick.buildEnv()
     }
 end
 
---- Register the day-tick. A single anonymous MessageType.DAY_CHANGED subscriber mirroring
---- RLMessageAggregator.initialize: subscribed on ALL peers (onStartMission runs on all peers),
---- server-only via the in-handler g_server guard (dedis included; clients register an inert
---- listener). The handler body is wrapped in RmSafeUtils.safeCall so an unhandled error cannot
---- break the DAY_CHANGED publish chain. Subscribe ONCE (one day-change -> one run); the shared
---- onStartMission-registered DAY_CHANGED shape is exactly RLMessageAggregator's. Called from
---- RealisticLivestock_FSBaseMission:onStartMission, beside RLMessageAggregator.initialize.
+--- Register the day-tick: a single anonymous MessageType.DAY_CHANGED subscriber, subscribed on ALL
+--- peers and server-only via the in-handler g_server guard. The handler body is wrapped in
+--- RmSafeUtils.safeCall so an unhandled error cannot break the DAY_CHANGED publish chain. Called
+--- once from RealisticLivestock_FSBaseMission:onStartMission.
 function RLHerdsmanDayTick.subscribe()
     g_messageCenter:subscribe(MessageType.DAY_CHANGED, function()
         RmSafeUtils.safeCall("RLHerdsmanDayTick:onDayChanged", function()
