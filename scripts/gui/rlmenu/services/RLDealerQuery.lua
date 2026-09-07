@@ -56,13 +56,8 @@ end
 -- Animal list for a dealer type
 -- =============================================================================
 
---- Wrap a dealer sale Animal into an AnimalItemStock - the same wrapper
---- RLAnimalQuery._wrapCluster uses for Sell/Move/Info. Gives us
---- `getFilename()` (animal portrait), `title`, `cachedAvgGenetics`, and
---- `.visual` for free. AnimalItemStock is the generic Animal wrapper (no
---- dealer-specific markup or breeder-quality fields) so it is safe to reuse
---- on the dealer-Buy path.
---- Exposed as a field so tests can swap in a lightweight stub.
+--- Wrap a dealer sale Animal in the SAME generic wrapper the other tabs use - it carries
+--- no dealer-specific fields, so reusing it here is safe. A swappable field, for tests.
 --- @param animal table  Animal object from animalSystem:getSaleAnimalsByTypeIndex
 --- @return table|nil item
 function RLDealerQuery._wrapSaleAnimal(animal)
@@ -103,12 +98,8 @@ function RLDealerQuery.listDealerAnimalsForType(typeIndex)
         end
     end
 
-    -- Reuse RLRM's shared animal sort comparator so Buy matches Sell / Move /
-    -- Info behavior exactly: disease-first, then subtype ascending, then
-    -- (optional) genetics descending when RLSettings.sortByGenetics is
-    -- enabled, then age ascending (see RLAnimalDisplayHelper.sortAnimals).
-    -- AnimalItemStock.new (overridden by RealisticLivestock_AnimalItemStock)
-    -- already populates `cachedAvgGenetics` on each item.
+    -- The shared comparator, so Buy orders exactly as the other tabs do. The wrapper
+    -- already populates the cached genetics average each item is sorted on.
     if RLAnimalDisplayHelper ~= nil and RLAnimalDisplayHelper.sortAnimals ~= nil then
         table.sort(items, RLAnimalDisplayHelper.sortAnimals)
     else
@@ -124,27 +115,9 @@ end
 -- Section grouping (SmoothList multi-section data source)
 -- =============================================================================
 
---- Group dealer items into sections.
----
---- Sections are created in the order they are encountered during iteration,
---- so the caller must pre-sort items disease-first for the __diseased__
---- section to appear first. `listDealerAnimalsForType` guarantees this
---- (disease-first, then subtype, then age). If a non-pipeline caller passes
---- unsorted items, section order reflects input order.
----
---- Sections produced:
----   1. Diseased Animals (only when at least one diseased item is present;
----      fresh dealer stock is typically healthy so this section is usually
----      omitted entirely)
----   2. One section per distinct subType, in first-seen order
----
---- Parallel tables:
----   sectionOrder[]   : opaque section keys in display order
----   itemsBySection   : key -> items array
----   titlesBySection  : key -> localized title
----
---- Empty items -> all three tables empty. Drives the empty-animals text.
---- Pure function on the items array.
+--- Group dealer items into sections: diseased first when any are present, then one per
+--- distinct subType. Sections appear in ENCOUNTER order, so the caller must pre-sort
+--- disease-first - the standard list path does; an unsorted caller gets input order.
 --- @param items table
 --- @return table sectionOrder, table itemsBySection, table titlesBySection
 function RLDealerQuery.buildDealerSections(items)

@@ -157,11 +157,8 @@ function RLAnimalSellService.sellAnimals(husbandry, animals, totalPrice, totalFe
         tostring(husbandry and husbandry.getName and husbandry:getName()),
         totalPrice, totalFee)
 
-    -- Route the subscribe + dispatch through the shared request helper: one in-flight
-    -- request per event CLASS, a cancellable watchdog, and a single-consume completion.
-    -- The helper owns unsubscribe + cleanup; onSellResponse keeps the caller-callback shape.
-    -- errorCode may be RLAnimalEventRequest.TIMEOUT_CODE on watchdog expiry (!= SELL_SUCCESS,
-    -- so it surfaces as a failure and getErrorText maps it to the timeout text).
+    -- The shared request helper owns the subscribe, the watchdog and the cleanup. The code
+    -- may be the TIMEOUT one on watchdog expiry, which surfaces as an ordinary failure.
     local function onSellResponse(errorCode)
         Log:trace("RLAnimalSellService.onSellResponse: errorCode=%s", tostring(errorCode))
         if errorCode ~= AnimalSellEvent.SELL_SUCCESS then
@@ -191,23 +188,10 @@ function RLAnimalSellService.sellAnimals(husbandry, animals, totalPrice, totalFe
 end
 
 
---- Partition a sell batch into the survivors that pass a per-animal verdict and
---- the rejects, for the trailer-at-dealer Sell flow.
---- Contract: the survivor SHAPE of RLAnimalBuyService.filterBuyableAnimals
---- (`{ valid, rejected, firstErrorCode }`), reproducing legacy
---- AnimalScreenDealerTrailer:applyTargetBulk's per-item skip-invalid-sell-the-rest
---- behaviour - but with NO running-count capacity ledger: selling fills no
---- destination, and the server AnimalSellEvent:run gate is per-animal-independent
---- (it blocks on the first non-sellable animal; there is no cumulative dimension
---- to track). This is a per-animal survivor partition only.
----
---- Pure / dual-run: takes the source + the verdict function as parameters and
---- does NO price math, NO g_*, NO capacity counter - it only partitions by the
---- injected per-animal verdict. The in-game caller injects an adapter that gates
---- on `animal:getCanBeSold()` (returning AnimalSellEvent.SELL_ERROR_CANNOT_BE_SOLD),
---- which is exact parity with the authoritative server leg (AnimalSellEvent:run
---- gates per-animal on getCanBeSold + permission only). A headless test injects a
---- mock validate returning plain sentinel codes, so this loads no AnimalSellEvent.
+--- Partition a sell batch into survivors and rejects by a per-animal verdict, in the same
+--- shape the buy filter returns. NO capacity ledger, unlike the buy side: selling fills no
+--- destination and the server gate is per-animal independent, so there is no cumulative
+--- dimension to track. Purely a partition - no price math and no capacity counter.
 --- @param source table The sell SOURCE object (the held trailer); passed through to validate
 --- @param animals table|nil Array of Animal/cluster refs to sell (nil -> empty result)
 --- @param validate function (source, animal) -> errorCode|nil per-animal verdict

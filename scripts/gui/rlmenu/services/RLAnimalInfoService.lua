@@ -65,19 +65,10 @@ local function buildChildrenRow(animal)
     }
 end
 
---- Build disease rows for read-only display. Reads the display name off the record's model
---- entry, which the definition parser has already localized. Empty list when the animal has
---- no diseases.
----
---- Gated on `diseasesEnabled` like the card icons and the HUD box: with diseases off a
---- frozen record must not render here either, or the pane claims an animal is sick while
---- every other surface says otherwise.
----
---- The nil-manager arm is this gate's own, not shared: `Disease:modifyOutput` and the HUD box
---- both dereference `g_diseaseManager.diseasesEnabled` bare, so the parity above is about the
---- SETTING and not about a nil manager. That state has one producer - a parse raise leaving the
---- global nil for the session - and it already takes the mission down, so this is cheap
---- symmetry with the other gates in this slice rather than a claim the tree is nil-safe.
+--- Disease rows for read-only display, named from the record's already-localized model
+--- entry. Gated on `diseasesEnabled` like the card icons and the HUD box: with diseases
+--- off, a frozen record here would claim an animal is sick while every other surface
+--- disagrees. The nil-manager arm is cheap symmetry, not a claim the tree is nil-safe.
 --- @param animal table
 --- @return table rows
 local function buildDiseaseRows(animal)
@@ -87,14 +78,9 @@ local function buildDiseaseRows(animal)
         return rows
     end
     if animal == nil or type(animal.diseases) ~= "table" then return rows end
-    -- EVERY record, unfiltered, exactly as before. Repointing the field this reads is this
-    -- slice's whole job here: hiding a state is the display slice's contract, and no record of
-    -- any state exists in this build for a filter to act on anyway.
-    --
-    -- The presence guard moves with the field it guards. Note what it and the `getStatus` guard
-    -- below it actually cover: a hand-built test fixture. Against production records both are
-    -- always true, so an assert added here against the neutral "" is measuring the fallback
-    -- rather than the row - bind the real function onto the fixture instead.
+    -- EVERY record, unfiltered: hiding a state is the display layer's job. This guard and
+    -- the getStatus one below only ever cover a hand-built fixture, so an assert against
+    -- their fallback measures the fallback rather than the row.
     for _, disease in ipairs(animal.diseases) do
         if disease ~= nil and disease.model ~= nil then
             local status = ""
@@ -343,26 +329,17 @@ function RLAnimalInfoService.getAnimalDisplay(animal, husbandry)
         if ok and customName ~= nil and customName ~= "" then typeName = customName end
     end
 
-    -- Per-animal stat rows from husbandry:getAnimalInfos. Row shape:
-    -- { {title, valueText, ratio, invertedBar, disabled}, ... }. Variable
-    -- length depending on monitor state, gender, husbandry capability.
-    -- Walks Animal:addInfos which RL extends with Health, Weight, Target
-    -- Weight, Reproduction, Pregnant, Expecting, Expected, Lactating,
-    -- Can Reproduce, etc.
+    -- Per-animal stat rows, shaped { title, valueText, ratio, invertedBar, disabled }.
+    -- Variable length: it depends on monitor state, gender and husbandry capability.
     local statRows = {}
     if husbandry ~= nil and husbandry.getAnimalInfos ~= nil then
         local ok, result = pcall(function() return husbandry:getAnimalInfos(animal) end)
         if ok and type(result) == "table" then statRows = result end
     elseif animal.addInfos ~= nil then
-        -- Nil-husbandry fallback for the Buy tab (dealer animals have no source
-        -- husbandry). Animal:addInfos mutates the table with animal-intrinsic
-        -- rows (health, weight, reproduction, etc.) that do not need a
-        -- husbandry context. Pass `forceShowAll=true` so monitor-gated rows
-        -- (Health, Weight, Lactation) are included - dealer animals carry no
-        -- monitor but players need full visibility at purchase time.
-        -- pcall-guarded because some Animal:addInfos branches reference
-        -- self.clusterSystem which may be nil on a fresh sale animal;
-        -- degrading to age-only is acceptable.
+        -- Nil-husbandry fallback for the Buy tab, where dealer animals have no source pen.
+        -- forceShowAll includes the monitor-gated rows: a dealer animal carries no monitor,
+        -- but the player needs full visibility at purchase time. pcall-guarded, because
+        -- some branches reach a cluster system a fresh sale animal has not got.
         local ok, err = pcall(function() animal:addInfos(statRows, true) end)
         if not ok then
             Log:trace("RLAnimalInfoService.getAnimalDisplay: animal:addInfos failed for dealer animal, age-only fallback: %s", tostring(err))

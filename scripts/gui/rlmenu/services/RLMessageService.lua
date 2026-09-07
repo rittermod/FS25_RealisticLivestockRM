@@ -38,13 +38,10 @@ function RLMessageService.parseDate(dateStr)
     return tonumber(y), tonumber(m), tonumber(d)
 end
 
---- Substitute %s and '%s' tokens in a localized message template with values
---- from message.args, resolving any rl_*-prefixed arg via g_i18n first.
----
---- This is a verbatim port of the legacy substitution logic. The space-split
---- approach is fragile for punctuation-heavy templates but every existing
---- rl_message_* translation in 17 language files was authored against this
---- exact behavior. Diverging now would silently break translated text.
+--- Substitute the tokens in a localized message template from message.args, resolving an
+--- rl_*-prefixed arg through g_i18n first. The space-split approach is fragile for
+--- punctuation-heavy templates, but every existing translation was authored against this
+--- exact behaviour, so diverging would silently break translated text.
 --- TODO: rework the substitution once translations can be regenerated.
 --- @param template string Localized template string (output of g_i18n:getText)
 --- @param args table|nil Argument list from the raw message record
@@ -79,8 +76,8 @@ local function substituteTokens(template, args)
     return table.concat(tokens, " ")
 end
 
---- Format a single message record into a display-ready row table.
---- Unknown ids fall back to a sentinel row plus a single warning.
+--- Format one message record into a display-ready row; an unknown id falls back to a
+--- sentinel row plus a single warning.
 ---
 --- Row schema (contract for the frame layer):
 ---   importanceSlice  : "realistic_livestock.importance_<1|2|3>"
@@ -135,18 +132,10 @@ function RLMessageService.formatMessage(message, husbandry, husbandryIndex, inse
     }
 end
 
---- Sort comparator: returns true when row a should appear before row b
---- under the newest-first ordering. Compares the sortKey tuple component-wise
---- in descending order: year, month, day, husbandryIndex, insertionIndex.
----
---- The cross-husbandry tie-break (husbandryIndex) is heuristic and may
---- visually drift between host and client because getPlaceablesByFarm
---- iteration order is not guaranteed identical. Content is identical;
---- only same-day order across husbandries can differ.
----
---- Deliberately NOT logged: `table.sort` invokes this O(n log n) times per
---- refresh, so even a trace-level call would emit thousands of entries on
---- a large message list. The caller logs row count and timing instead.
+--- Newest-first comparator over the sortKey tuple. The cross-husbandry tie-break is
+--- heuristic and can drift between host and client, since placeable iteration order is
+--- not guaranteed identical - the content matches, only same-day ordering differs.
+--- Deliberately NOT logged: table.sort calls this thousands of times per refresh.
 --- @param a table Row a (must have sortKey)
 --- @param b table Row b (must have sortKey)
 --- @return boolean
@@ -161,17 +150,10 @@ function RLMessageService.compareRows(a, b)
     return false
 end
 
---- Resolve the placeables list for a farm, applying the standard guard chain
---- (nil/0 farmId, missing g_currentMission.husbandrySystem, nil
---- getPlaceablesByFarm result). Returns nil on any guard miss so callers can
---- early-out with a single `if placeables == nil then` check.
----
---- Tests can swap this field (RLMessageService._resolvePlaceables = stub) to
---- inject deterministic placeable arrays without standing up g_currentMission
---- or husbandrySystem fakes - mirrors the existing _sendDeleteEvent
---- swappable-hook pattern further down this file. Both the read path
---- (getMessagesForFarm) and the clear path (markAllReadForFarm) consume this
---- single resolver, so guard logic cannot drift between them.
+--- Resolve a farm's placeables through the standard guard chain, returning nil on any
+--- miss so callers early-out on one check. A swappable field, so a test can inject a
+--- deterministic array without standing up the mission fakes. Both the read and the clear
+--- path consume this one resolver, so their guards cannot drift.
 --- @type function
 --- @param farmId number|nil Farm id (typically g_currentMission:getFarmId())
 --- @return table|nil placeables Array of placeables on the farm, or nil if any guard fired
@@ -237,18 +219,9 @@ end
 -- Unread-flag clear
 -- =============================================================================
 
---- Clear the per-husbandry unreadMessages flag on every flagged placeable in
---- the given array. Pure helper - no farm resolution, no logging at the
---- per-placeable level (caller logs the aggregate). Defensive against mixed
---- placeable types: skips entries that lack getHasUnreadRLMessages /
---- setHasUnreadRLMessages, mirroring the read-path guard
---- `if placeable.getRLMessages ~= nil` used in getMessagesForFarm above.
----
---- Mutation parity: setHasUnreadRLMessages(false) is the same setter the
---- legacy AnimalScreen log tab calls when the user opens the log, so
---- semantics match the prior "user opened the log" acknowledgement path
---- exactly. Only the scope (farm-wide vs per-pen) differs because the new
---- menu's Messages tab is a unioned farm view.
+--- Clear the unread flag on every flagged placeable in the array. A pure helper: no farm
+--- resolution and no per-placeable logging, since the caller logs the aggregate. Skips an
+--- entry lacking the flag accessors, matching the read path's own guard.
 --- @param placeables table|nil Array of placeables; nil-safe
 --- @return number count Number of placeables whose flag was cleared this call
 --- @return table names Display names (placeable:getName()) of the cleared placeables, in iteration order
@@ -274,18 +247,10 @@ function RLMessageService._clearUnreadFlagsForPlaceables(placeables)
     return count, names
 end
 
---- Public entry point for "user opened the Messages tab - treat every
---- husbandry on this farm as acknowledged". Resolves the farm's placeables
---- via the shared _resolvePlaceables hook, then delegates to
---- _clearUnreadFlagsForPlaceables. Logs farmId + cleared count + cleared
---- names at debug.
----
---- Permissionless by design: matches the legacy AnimalScreen log tab,
---- which clears without a permission check. The flag is informational
---- acknowledgement, not destructive content removal - message deletion is
---- permissioned, flag clear is not. MP scope: clears the local placeable
---- replicas only; server-authoritative unread-state sync is intentionally
---- out of scope.
+--- Treat every husbandry on the farm as acknowledged, for a Messages tab open.
+--- PERMISSIONLESS by design: the flag is informational acknowledgement, not destructive
+--- content removal, so deletion is permissioned and this is not. Clears the LOCAL
+--- placeable replicas only - server-authoritative unread sync is out of scope.
 --- @param farmId number|nil Farm id (typically g_currentMission:getFarmId())
 function RLMessageService.markAllReadForFarm(farmId)
     Log:debug("RLMessageService.markAllReadForFarm: farmId=%s", tostring(farmId))
@@ -312,17 +277,9 @@ RLMessageService._sendDeleteEvent = function(husbandry, uniqueIds)
     HusbandryMessageDeleteEvent.sendEvent(husbandry, uniqueIds)
 end
 
---- Delete one or more messages from a husbandry.
----
---- Pattern A (caller-mutates-first + rebroadcast-from-run):
----   1. This service mutates local state immediately via placeable:deleteRLMessage
----      (SP, host, and client originator all take this path).
----   2. Then it dispatches the event, which broadcasts to remote clients or
----      uploads to the server depending on g_server state.
----   3. On remote receivers, the event's run() applies the mutation via
----      its own deleteRLMessage loop.
----
---- Idempotent: unknown uniqueIds are silently skipped by deleteRLMessage.
+--- Delete one or more messages from a husbandry. Caller-mutates-first: local state changes
+--- immediately on every originator, then the event dispatches and remote receivers apply
+--- the same mutation in run(). Idempotent - an unknown uniqueId is silently skipped.
 --- @param husbandry table Target husbandry placeable (must have spec_husbandryAnimals)
 --- @param uniqueIds table Array of uniqueIds to delete (non-empty)
 function RLMessageService.deleteMessages(husbandry, uniqueIds)
@@ -348,12 +305,8 @@ function RLMessageService.deleteMessages(husbandry, uniqueIds)
     RLMessageService._sendDeleteEvent(husbandry, uniqueIds)
 end
 
---- Group an array of display rows by their source husbandry so a bulk delete
---- can fire one event per husbandry (minimizes event count).
----
---- Returns an ordered array (not a map) so the dispatch order is deterministic.
---- The first row seen for a given husbandry defines that husbandry's position
---- in the result. Rows without `husbandryRef` or `uniqueId` are skipped.
+--- Group display rows by source husbandry, so a bulk delete fires one event per husbandry.
+--- Returns an ORDERED ARRAY rather than a map, so the dispatch order is deterministic.
 --- @param rows table Array of display rows with `husbandryRef` + `uniqueId`
 --- @return table groups Array of `{ husbandry = <placeable>, uniqueIds = {...} }`
 function RLMessageService.groupRowsByHusbandry(rows)

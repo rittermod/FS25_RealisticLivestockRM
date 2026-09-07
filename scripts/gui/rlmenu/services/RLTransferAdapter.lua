@@ -55,11 +55,8 @@ RLTransferAdapter.MOVE_TO_SPAWN_PLACE_KEY = "shop_moveToSpawnPlace"
 -- returns an engine string; this constant just names the key in one place.
 RLTransferAdapter.WORLD_NAME_KEY = "rl_menu_transfer_world"
 
--- The EPP (butcher) counterpart's footer action-label key. The butcher is a pure
--- sink - the only real action is delivering OUT of the trailer to it - so this key
--- reads "Deliver" rather than the pen's "move to farm" / world's "move to spawn
--- place". A NEW translation key (the deliver verb has no base-game analog), seeded
--- in every locale.
+-- The butcher is a pure sink, so this reads "Deliver" rather than the pen's or world's
+-- label. A NEW translation key - the verb has no base-game analog - seeded in every locale.
 RLTransferAdapter.DELIVER_LABEL_KEY = "rl_menu_transfer_deliver"
 
 -- =============================================================================
@@ -119,14 +116,9 @@ function RLTransferAdapter.formatCapacityLabel(name, used, total)
     return string.format("%s (%d/%d)", name, safeUsed, safeTotal)
 end
 
---- Resolve the move plan - which side is source/target and the AnimalMoveEvent
---- moveType string - for a transfer direction. This carries the parity-critical
---- SOURCE/TARGET routing the legacy trailer-at-pen controller hard-coded: loading
---- the trailer fires moveType "SOURCE" (counterpart -> trailer); unloading fires
---- "TARGET" (trailer -> counterpart). A concrete adapter maps sourceSide /
---- targetSide onto its real objects and hands them to RLAnimalMoveService.
---- Fail-closed: any unknown / nil direction returns nil (the caller treats nil as
---- a no-op and never guesses an endpoint). Pure: dual-run boundary.
+--- The move plan for a direction: which side is source, which target, and the event's
+--- moveType. Loading the trailer fires "SOURCE", unloading fires "TARGET". FAIL-CLOSED:
+--- an unknown direction returns nil, and the caller no-ops rather than guess an endpoint.
 --- @param direction string  DIR_INTO_TRAILER | DIR_OUT_OF_TRAILER
 --- @return table|nil plan  { sourceSide, targetSide, moveType } or nil
 function RLTransferAdapter.resolveMovePlan(direction)
@@ -159,11 +151,8 @@ function RLTransferAdapter.penActionLabelKey(direction)
     return RLTransferAdapter.MOVE_TO_TRAILER_KEY
 end
 
---- The legacy-parity i18n KEY for a WORLD transfer's footer action label. Loading
---- the trailer reads "move to trailer"; unloading reads "move to spawn place" (the
---- base-game rideable-unload label, distinct from the pen's "move to farm"). Returns
---- the KEY (the frame resolves it); an unknown / nil direction defaults to the
---- move-to-trailer key (mirrors actionLabelKey / penActionLabelKey). Pure: dual-run.
+--- Footer action-label KEY for a WORLD transfer. Unloading reads "move to spawn place",
+--- distinct from the pen's "move to farm"; an unknown direction defaults to loading.
 --- @param direction string  DIR_INTO_TRAILER | DIR_OUT_OF_TRAILER
 --- @return string i18nKey
 function RLTransferAdapter.worldActionLabelKey(direction)
@@ -173,14 +162,9 @@ function RLTransferAdapter.worldActionLabelKey(direction)
     return RLTransferAdapter.MOVE_TO_TRAILER_KEY
 end
 
---- The footer action-label i18n KEY for an EPP (butcher) transfer. The butcher is
---- a pure SINK: the only real action is delivering OUT of the trailer, which reads
---- "Deliver" (DELIVER_LABEL_KEY) - deliberately NOT a mirror of penActionLabelKey's
---- OUT (move-to-farm) / worldActionLabelKey's OUT (move-to-spawn-place). The reverse
---- (IN) direction is dead here (the counterpart enumerate is {}, so the butcher side
---- never has a live selection), but still returns the same valid key so a stray
---- layout read never getTexts nil. Returns the KEY (the frame resolves it). Pure:
---- dual-run boundary.
+--- Footer action-label KEY for an EPP transfer. The butcher is a pure SINK, so the only
+--- real action reads "Deliver" rather than mirroring the pen or world labels. The reverse
+--- direction is dead here, but still returns a valid key so a stray read never resolves nil.
 --- @param direction string  DIR_INTO_TRAILER | DIR_OUT_OF_TRAILER
 --- @return string i18nKey
 function RLTransferAdapter.eppActionLabelKey(direction)

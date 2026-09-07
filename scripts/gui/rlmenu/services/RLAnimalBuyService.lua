@@ -91,13 +91,8 @@ function RLAnimalBuyService.buildBulkConfirmationText(count, totalPrice, totalFe
 end
 
 
---- Build the partial-confirmation text for a destination that cannot accept every
---- selected animal (capacity or EPP age rejection). The dialog text uses
---- validCount + totalCount + total-price only (existing key
---- `rl_ui_buyPartialConfirmation`). The `rejected` array (full {animal, reason}
---- tuples from RLMoveDestinationHelper.buildMoveValidationResult) is accepted for
---- future UX enhancement; today it is iterated for grouped TRACE
---- logging only.
+--- Confirmation text for a destination that cannot accept every selected animal. The
+--- dialog uses only the counts and the price; `rejected` is iterated for grouped logging.
 --- @param validCount number Number of animals that passed validation
 --- @param totalCount number Number of animals originally selected
 --- @param rejected table Array of { animal, reason } rejection tuples
@@ -130,14 +125,9 @@ function RLAnimalBuyService.buildPartialConfirmationText(validCount, totalCount,
 end
 
 
---- Send the buy event to the server and subscribe to the response.
---- Mirrors RLAnimalSellService.sellAnimals subscription pattern.
---- The callback fires once with (target, errorCode) when the server responds.
----
---- CRITICAL SIGN CONVENTION: AnimalBuyEvent:run server-side does
----   g_currentMission:addMoney(buyPrice + transportPrice, ...)
---- so BOTH values are dispatched as NEGATIVE numbers (matches legacy
---- AnimalScreenDealer). A positive dispatch credits the farm.
+--- Send the buy event and subscribe to the response, which fires the callback once.
+--- CRITICAL SIGN CONVENTION: the server ADDS both values to the farm balance, so both are
+--- dispatched NEGATIVE. A positive dispatch credits the farm instead of charging it.
 --- @param destination table The destination placeable (entry.placeable from getValidDestinations)
 --- @param animals table Array of Animal/cluster objects to buy
 --- @param totalPrice number Sum of buy prices (POSITIVE input; negated on dispatch)
@@ -172,13 +162,9 @@ function RLAnimalBuyService.buyAnimals(destination, animals, totalPrice, totalFe
         if errorCode == AnimalBuyEvent.BUY_SUCCESS then
             Log:info("RLAnimalBuyService.onBuyResponse: buy succeeded (%d animals)", #animals)
 
-            -- MP client-side sale-list mirror. Server did the authoritative
-            -- removal (in AnimalBuyEvent:run) before firing this response,
-            -- but in MP the client's local g_currentMission.animalSystem.animals
-            -- list is never auto-synced - so the buying client would see the
-            -- just-bought animals reappear on reloadAnimalList until some
-            -- other sync. Legacy mirrors this exact loop in
-            -- RL_AnimalScreenDealerFarm:onAnimalBought.
+            -- MP client-side mirror of the server's authoritative removal: the client's
+            -- own animal list is never auto-synced, so without this the buying client
+            -- sees the just-bought animals reappear on the next list reload.
             if g_currentMission ~= nil
                 and g_currentMission.animalSystem ~= nil
                 and g_currentMission.animalSystem.removeSaleAnimal ~= nil then
@@ -230,36 +216,13 @@ function RLAnimalBuyService.buyAnimals(destination, animals, totalPrice, totalFe
 end
 
 
---- Filter a dealer-buy batch to the survivors a trailer destination can accept.
---- Contract: reproduces the legacy AnimalScreenDealerTrailer:applySourceBulk pre-filter
---- (per-animal base-game validate, numAnimals = 1, fee 0) AND adds the running-count
---- capacity ledger the legacy controller lacks (the over-queue gap the legacy bulk
---- pre-filter has for the dealer-trailer leg). The client filter is advisory: the injected validate is the
---- authoritative base-game gate and the server AnimalBuyEvent:run re-validates the whole
---- batch, so this caps the survivors at the trailer's free slots before dispatch, it does
---- not predict the server verdict.
----
---- For each animal, in order: skip a nil subTypeIndex (warn; counted in neither result);
---- run validate(destination, subTypeIndex, age, 1, -computeBuyPrice, 0, ownerFarmId) and on a
---- non-nil error record { animal, reason = errorCode } (capturing the FIRST code); then a
---- running-count capacity check that rejects { animal, reason = "NO_CAPACITY" } when the
---- destination's per-(sub)type free slots do NOT strictly exceed the survivors queued so far.
---- A single #valid counter against the per-(sub)type free read is correct for the trailer's
---- per-TYPE capacity (getNumOfFreeAnimalSlots is per-type total-used; a per-subtype
---- counter would over-fill a shared per-type place).
----
---- Returns the { valid, rejected } shape of RLMoveDestinationHelper.buildMoveValidationResult so
---- the frame's shared partial-confirm + dispatch path binds unchanged, PLUS firstErrorCode for
---- the all-rejected error surface (the LEDGER MECHANISM mirrors RLAnimalMoveService.filterMovableAnimals,
---- which returns a tuple - a different shape, deliberately not copied here).
----
---- Pure / dual-run: takes the destination + validate as parameters. computeBuyPrice reads
---- animal:getSellPrice AND, since the dealer-quality preset landed, two module globals
---- (RLDealerQualityResolver -> RLDealerQualityModel) which in turn read RLSettings behind a
---- nil guard; it stays dual-runnable because the resolver degrades to DEFAULT_INDEX when no
---- settings global is present, which is exactly the headless state. The only call onto the
---- destination is getNumOfFreeAnimalSlots, so a headless test drives it with a mock
---- destination and an injected validator.
+--- Filter a dealer-buy batch to the survivors a trailer can accept: the per-animal
+--- validate, plus a RUNNING-COUNT capacity ledger that caps survivors at the free slots
+--- before dispatch. The filter is ADVISORY - the server re-validates the whole batch, so
+--- this does not predict its verdict. A single survivor counter against the per-type free
+--- read is correct here, because the capacity read is per-type: a per-subtype counter
+--- would over-fill a shared place. Returns the same { valid, rejected } shape the shared
+--- partial-confirm path expects, plus firstErrorCode for the all-rejected surface.
 --- @param destination table Buy destination (the held trailer); capacity read via getNumOfFreeAnimalSlots
 --- @param animals table|nil Array of Animal/cluster refs to buy (nil -> empty result)
 --- @param ownerFarmId number Owning farm id passed to the validator (trailer:getOwnerFarmId())
@@ -312,16 +275,10 @@ function RLAnimalBuyService.filterBuyableAnimals(destination, animals, ownerFarm
 end
 
 
---- Filter a stock-type list to the subset a trailer can hold for the Buy sidebar.
---- Contract: mirrors legacy AnimalScreenDealerTrailer:getSourceAnimalTypes. When the trailer
---- is LOCKED to a current type (non-empty), keep ONLY that type's entry, UNCONDITIONALLY - the
---- current type is structurally aboard, so never re-test supportsType (a degenerate / mixed-type
---- trailer could fail it and collapse the sidebar to empty). When UNLOCKED (empty), keep each
---- entry the trailer structurally supports.
----
---- Pure / dual-run: takes the trailer as a parameter and routes both reads through the nil-safe
---- RLTrailerEndpointService getters (getCurrentType / supportsType), which reach no g_*, so a
---- headless test drives it with a mock trailer.
+--- Filter a stock-type list to what the trailer can hold. A LOADED trailer keeps ONLY its
+--- current type's entry, UNCONDITIONALLY: that type is structurally aboard already, and
+--- re-testing support could fail on a mixed-type trailer and collapse the sidebar to
+--- empty. An empty trailer keeps every entry it structurally supports.
 --- @param types table|nil Array of type entries (each carries .typeIndex; from RLDealerQuery.listDealerTypes)
 --- @param trailer table The held livestock trailer
 --- @return table kept Subset of `types` the trailer can hold (the single locked type, or all supported)

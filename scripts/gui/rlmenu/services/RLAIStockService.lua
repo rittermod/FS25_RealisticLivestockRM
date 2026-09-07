@@ -33,18 +33,9 @@ end
 -- Species enumeration
 -- =============================================================================
 
---- Return every registered animal species (cow / pig / sheep & goats / horse /
---- chicken), sorted ascending by typeIndex for deterministic ordering.
----
---- The legacy AI screen uses a `pairs()` loop which
---- does NOT guarantee order across Lua versions - Lua 5.1's pairs happens to
---- iterate integer-keyed tables in insertion order for this specific table
---- shape, so legacy's output happens to match typeIndex-ascending in practice.
---- This service is explicit: collect + table.sort by typeIndex.
----
---- Does NOT filter by current stock - zero-stock species still appear in the
---- cycler with an empty list body (matches how the rest of the RL Menu frames
---- handle empty-stock / empty-husbandry states).
+--- Every registered species, SORTED by typeIndex rather than left to `pairs`, whose order
+--- is not guaranteed. Does NOT filter by stock: a zero-stock species still appears in the
+--- cycler with an empty body, as every other frame handles its empty state.
 --- @return table types  Array of animal type entries from animalSystem:getTypes()
 function RLAIStockService.listSpecies()
     if g_currentMission == nil or g_currentMission.animalSystem == nil then
@@ -148,24 +139,9 @@ end
 -- Section grouping (SmoothList multi-section data source)
 -- =============================================================================
 
---- Group bull items into sections, one section per distinct subTypeIndex.
----
---- No "Diseased" section: AI stock bulls are fresh dealer-generated animals
---- with no disease state in normal play. (If that assumption ever breaks,
---- diseased AI bulls would end up in whichever subtype section they belong
---- to, which is acceptable degradation.)
----
---- Sections are created in the order they are encountered during iteration,
---- so listBullsForSpecies guarantees they appear in ascending subTypeIndex
---- order (via its comparator).
----
---- Parallel tables:
----   sectionOrder[]   : opaque section keys in display order
----   itemsBySection   : key -> items array
----   titlesBySection  : key -> localized title (via g_fillTypeManager)
----
---- Empty items -> all three tables empty. Drives the empty-animals text.
---- Pure function on the items array.
+--- Group bull items into one section per distinct subTypeIndex, in encounter order - which
+--- the caller's own comparator makes ascending. No "Diseased" section: AI stock bulls
+--- carry no disease state, and one that somehow did would just sort into its subtype.
 --- @param items table
 --- @return table sectionOrder, table itemsBySection, table titlesBySection
 function RLAIStockService.buildSections(items)
@@ -212,10 +188,7 @@ end
 -- Overall-quality label (row "price" slot)
 -- =============================================================================
 
---- Compute the overall-quality i18n key for a bull based on its average
---- genetics. Thresholds and label strings mirror legacy exactly - the same
---- computation legacy writes into the row's "price" cell via
---- `cell:getAttribute("price"):setText(...)`.
+--- The overall-quality i18n key for a bull, from its average genetics:
 ---
 ---   avgGenetics >= 1.65 -> extremelyGood
 ---   avgGenetics >= 1.35 -> veryGood
@@ -225,8 +198,7 @@ end
 ---   avgGenetics >= 0.35 -> veryBad
 ---   else                 -> extremelyBad
 ---
---- Returned string is the full i18n key (e.g. "rl_ui_genetics_veryGood") so
---- callers can pass it straight to `g_i18n:getText`.
+--- The return is the FULL key, ready to pass straight to g_i18n:getText.
 --- @param animal table  Raw Animal (not wrapped) - needs `animal.genetics` table
 --- @return string i18nKey
 function RLAIStockService.getQualityLabel(animal)
@@ -268,9 +240,8 @@ end
 -- Semen price (middle-column total-price display)
 -- =============================================================================
 
---- Compute the total semen purchase price for the given bull and straw
---- quantity. Returns the FINAL price including PRICE_PER_STRAW - not an
---- intermediate. Matches the legacy price-formula ordering verbatim:
+--- The total semen price for a bull and straw quantity. Returns the FINAL price including
+--- PRICE_PER_STRAW, not an intermediate the caller must finish:
 ---
 ---   price = getFarmSemenPrice(country, farmId)
 ---         * quantity
@@ -279,9 +250,6 @@ end
 ---         * 2.25
 ---         * product(animal.genetics)
 ---
---- Legacy has a second display-side computation that splits PRICE_PER_STRAW
---- into the `setText` call; math is equivalent,
---- but this service returns the complete price for clarity. The quantity stepper calls with any DEWAR_QUANTITIES value.
 --- @param animal table  Raw Animal with `.birthday.country`, `.farmId`, `.success`, `.genetics`
 --- @param quantity number  Positive integer straw count
 --- @return number price
@@ -328,18 +296,9 @@ end
 -- Favourite toggle (local-only; mirrors the legacy favourite handler)
 -- =============================================================================
 
---- Toggle the local player's favourite mark on an AI-stock bull.
----
---- Legacy parity: the favourite bit is stored on
---- animal.favouritedBy[uid] and never network-synced, so a rejoining client
---- loses its favourites. MP persistence gap tracked separately; it is OUT
---- OF SCOPE for this release.
----
---- Return contract:
----   nil   -> failure (g_localPlayer unavailable). Distinct from false so
----            the caller can tell "unfavourited" apart from "couldn't run."
----   true  -> bull is now favourited
----   false -> bull is now un-favourited
+--- Toggle the local player's favourite mark on a bull. The bit is stored per player and
+--- never network-synced, so a rejoining client loses its favourites. A nil return means
+--- FAILURE, distinct from false, so the caller can tell it apart from "unfavourited".
 --- @param animal table  Raw Animal with a `favouritedBy` table (lazily created)
 --- @return boolean|nil isFavourite
 function RLAIStockService.toggleFavourite(animal)

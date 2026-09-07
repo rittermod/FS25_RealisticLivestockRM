@@ -36,13 +36,10 @@ local function resolveTrailerSubTypeIndex(trailer)
     return nil
 end
 
---- Display data for the butcher counterpart sidebar entry: the owning placeable's
---- engine name and its free-slot count for the trailer's subtype. `used` is 0 (a
---- butcher exposes no meaningful current-animal count - deliveries are consumed) and
---- `total` is the free slots, so a FULL butcher renders (0/0) and a confirmed deliver
---- then surfaces the capacity error. The name is an ENGINE STRING used verbatim by the
---- frame (the frame getTexts only the NULL adapter's KEY). Nil pp / missing getters ->
---- (0/0) defensively (the redirect always supplies a live pp).
+--- Sidebar display data for the butcher: its engine name and free slots for the trailer's
+--- subtype. `used` is 0, because a butcher consumes deliveries and exposes no meaningful
+--- current count, so a FULL butcher renders (0/0) and the capacity error surfaces on the
+--- confirmed deliver. The name is an ENGINE STRING, used verbatim by the frame.
 --- @param context table  { counterpartHandle = <production point>, trailer = <trailer>, ... }
 --- @return table display  { name, used, total }
 function RLTransferEppAdapter:getDisplayData(context)
@@ -84,18 +81,11 @@ function RLTransferEppAdapter:actionLabel(direction)
     return RLTransferAdapter.eppActionLabelKey(direction)
 end
 
---- Deliver the selected trailer animals to the butcher production point. ONE-WAY:
---- the reverse (DIR_INTO_TRAILER - pulling FROM the butcher) is refused BEFORE any
---- plan resolution or moveAnimals call, so the sink can never mutate the trailer from
---- the butcher side. For the deliver direction, routes to
---- RLAnimalMoveService.moveAnimals(trailer, pp, animals, "TARGET") - the SAME
---- AnimalMoveEvent EPP leg the vanilla EPP screen fires (whose _dispatchTargetDelivery
---- primitive the herdsman AIAnimalMoveEvent path also reuses); mutation
---- parity. The move-service errorCode result (incl. the all-rejected firstErrorCode,
---- fired synchronously) is wrapped here into the frame's uniform (success, errorText)
---- completion contract; the accept/reject bool propagates so the frame releases
---- movePending on a false return. Returns false WITHOUT dispatching on the reverse
---- guard, a nil plan, or a missing pp / trailer (fail-closed).
+--- Deliver the selected animals to the butcher. ONE-WAY: pulling FROM the butcher is
+--- refused BEFORE any plan resolution or dispatch, so the sink can never mutate the
+--- trailer. The deliver direction routes to the SAME move event the vanilla EPP screen
+--- fires. The result is wrapped into the frame's uniform completion contract, and the
+--- accept flag propagates so the frame releases its lock on a false return.
 --- @param direction string  DIR_INTO_TRAILER | DIR_OUT_OF_TRAILER
 --- @param animals table  the selected trailer animals (clusters)
 --- @param context table  { trailer, counterpartHandle = <pp>, onComplete, ... }
@@ -118,12 +108,9 @@ function RLTransferEppAdapter:dispatch(direction, animals, context)
         return false
     end
 
-    -- Deliver: source is the trailer, target is the production point (pp). moveAnimals
-    -- auto-detects the pp target via its animalsTypeData and age/type-filters
-    -- CLIENT-side before dispatch (server rechecks); ONE request dispatches only when
-    -- survivors exist; the callback fires exactly once (may be synchronous when all
-    -- selected are rejected). Wrap that errorCode into the frame's (success, errorText)
-    -- contract - mutation parity holds (still routes to moveAnimals).
+    -- Source is the trailer, target the production point. The move service filters
+    -- CLIENT-side before dispatch and the server rechecks; one request goes out only if
+    -- survivors exist, and the callback fires exactly once, synchronously if none do.
     Log:debug("RLTransferEppAdapter:dispatch: deliver %d animal(s) trailer -> butcher '%s' (moveType=%s)",
         animals ~= nil and #animals or 0,
         tostring(pp.owningPlaceable ~= nil and pp.owningPlaceable.getName ~= nil and pp.owningPlaceable:getName()),

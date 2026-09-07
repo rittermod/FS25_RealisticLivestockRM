@@ -20,15 +20,9 @@ local Log = RmLogging.getLogger("RLRM")
 -- =============================================================================
 -- Error-code -> i18n KEY mapping (mirrors base-game AnimalScreenTrailer)
 -- =============================================================================
--- Built at load from the real base-game AnimalLoadEvent.LOAD_* / AnimalUnloadEvent
--- .UNLOAD_* constants (NOT magic numbers), mirroring AnimalScreenTrailer's
--- LOAD_ERROR_CODE_MAPPING / UNLOAD_ERROR_CODE_MAPPING .text fields. The SUCCESS code
--- is DELIBERATELY OMITTED from both tables: a successful reply must yield NO error
--- text (errorKey returns nil), so we never surface base-game's success string as an
--- error. The two tables MUST stay separate - code 4 means LOAD_ERROR_INVALID_CLUSTER
--- on load but UNLOAD_ERROR_DOES_NOT_SUPPORT_UNLOADING on unload. UNLOAD code 5
--- (TRAILER_DOES_NOT_EXIST) is absent from base-game's table too -> nil here (no crash;
--- the dispatcher guards a nil trailer before it can be reported).
+-- Built at load from the real event constants, never magic numbers. The SUCCESS code is
+-- DELIBERATELY OMITTED from both tables, so a successful reply yields no error text. The
+-- two MUST stay separate: code 4 means one thing on load and another on unload.
 
 RLTrailerWorldService.LOAD_ERROR_KEYS = {
     [AnimalLoadEvent.LOAD_ERROR_NO_PERMISSION]           = "shop_messageNoPermissionToTradeAnimals",
@@ -77,29 +71,13 @@ end
 -- Vanilla-cluster -> RLRM Animal conversion (the dual-run leaf)
 -- =============================================================================
 
---- Resolve a single trigger rideable to the cluster the Transfer list should show,
---- converting a vanilla AnimalCluster into a real RLRM Animal in place. Ported
---- verbatim from legacy RL_AnimalScreenTrailer:initSourceItems so the subsequent
---- AnimalLoadEvent loads the converted identity:
----   * nil cluster -> nil (skip).
----   * numAnimals < 1 (riding-mission props) -> nil (skip).
----   * already-individual (cluster.isIndividual ~= nil) -> the cluster AS-IS
----     (idempotent: a re-enumerate after conversion does not re-convert). The
----     unknown-subtype skip is INSIDE the conversion branch (legacy parity), so an
----     already-Animal whose subtype later became unknown is listed and fails at
----     AnimalLoadEvent.validate (server authority), not pre-skipped here.
----   * vanilla cluster (isIndividual == nil) with an unknown subType -> nil (warn +
----     skip); otherwise convert: resolve farmHerdId (farm.stats.statistics.farmId or
----     ownerFarmId, with the legacy math.random fallback persisted back), rawId
----     (farm.stats:getNextAnimalId(typeIndex) or the math.random fallback), uniqueId
----     via RLAnimalUtil.generateUniqueId, capture canBeSold with an explicit if
----     (Lua and/or fails on a false true-branch), build the Animal, and write it back
----     onto the rideable via setCluster.
----
---- Takes animalSystem + farmManager as parameters (not g_*) so it dual-runs under
---- animal_env against a real Animal + a fixture farm. MUTATES the rideable
---- (setCluster) and may persist a farmHerdId fallback into farm.stats - the
---- documented legacy side effect, idempotent for already-individual clusters.
+--- Resolve a trigger rideable to the cluster the Transfer list shows, converting a
+--- vanilla cluster into a real Animal IN PLACE so the subsequent load event carries the
+--- converted identity. Idempotent: an already-individual cluster is returned as-is. The
+--- unknown-subtype skip sits INSIDE the conversion branch, so an already-converted animal
+--- whose subtype later vanished is listed and fails at server validation rather than being
+--- pre-skipped. The registries are parameters, not globals, so this dual-runs headless.
+--- MUTATES the rideable and may persist a herd-id fallback.
 --- @param rideable table        engine rideable (getCluster / getOwnerFarmId / setCluster)
 --- @param animalSystem table    g_currentMission.animalSystem (subtype/type resolution)
 --- @param farmManager table     g_farmManager (farmIdToFarm)
@@ -172,15 +150,10 @@ end
 -- Source-item build over the trigger rideables (in-game)
 -- =============================================================================
 
---- Build the world source list: convert each trigger rideable, wrap the survivors
---- in AnimalItemStock (the SAME wrapper the legacy + Move/pen frames use, each
---- exposing .cluster), and return them in a STABLE order grouped by animalTypeIndex
---- (ascending) then getRideablesInTrigger() iteration order within a type. The frame
---- groups items into sections but does NOT sort the counterpart side, so this builder
---- MUST impose the order. Also returns the cluster -> rideable map so dispatch can
---- recover each rideable; the caller stores it on the open context REPLACING any prior
---- map, keeping selection (current-build .cluster refs) and the map in lockstep.
---- Nil trailer / nil-or-empty trigger -> ({}, {}).
+--- Build the world source list in a STABLE order, grouped by animal type then trigger
+--- order: the frame sections the items but does NOT sort this side, so the order must be
+--- imposed here. Also returns the cluster -> rideable map so dispatch can recover each
+--- rideable; the caller REPLACES any prior map, keeping it in lockstep with the selection.
 --- @param trailer table|nil  the livestock trailer (getRideablesInTrigger)
 --- @return table items              array of AnimalItemStock
 --- @return table clusterToVehicle   cluster -> rideable for the current build
@@ -204,14 +177,9 @@ function RLTrailerWorldService.buildSourceItems(trailer)
     for _, rideable in ipairs(rideables) do
         local cluster = RLTrailerWorldService.convertRideableCluster(rideable, animalSystem, g_farmManager)
         if cluster ~= nil then
-            -- Bucket by animal type (ascending, for a stable flat order). A vanilla
-            -- cluster with an unknown subtype was already skipped during conversion; an
-            -- already-individual cluster whose subtype later became unknown (a
-            -- near-impossible state - a subtype removed mid-save for a rideable Animal)
-            -- crashes here at getTypeIndexBySubTypeIndex, exactly as legacy
-            -- RL_AnimalScreenTrailer:initSourceItems does - inherited parity, not a new
-            -- failure mode. getTypeIndexBySubTypeIndex never returns nil (it derefs the
-            -- subType), so no sentinel guard is reachable.
+            -- Bucket by animal type for a stable flat order. An already-converted animal
+            -- whose subtype later vanished crashes here rather than being skipped -
+            -- inherited behaviour, and the lookup never returns a sentinel to guard on.
             local animalTypeIndex = animalSystem:getTypeIndexBySubTypeIndex(cluster.subTypeIndex)
             if byType[animalTypeIndex] == nil then
                 byType[animalTypeIndex] = {}
@@ -248,16 +216,11 @@ end
 -- Sequential single-item dispatch (in-game)
 -- =============================================================================
 
---- Process `items` one at a time through `EventClass`, advancing on each reply, and
---- call onComplete(success, errorText) EXACTLY ONCE after the last. validateItem
---- pre-checks the current item (an error there is recorded as the first error and the
---- item is skipped WITHOUT sending); makeEvent builds the single-item event to send.
---- The reply code (0 = SUCCESS for both events, NOT nil) is checked against
---- successCode; the first error (pre-validation or reply) wins. Trailer validity is
---- guarded before each deref so a trailer deleted mid-sequence (MP) aborts the
---- remaining sends and completes with the captured state. Mirrors base-game's
---- per-item subscribe -> send -> reply -> unsubscribe; the multi-item aggregation is
---- the RLMenu enhancement.
+--- Process `items` one at a time, advancing on each reply, and call onComplete EXACTLY
+--- ONCE after the last. A pre-validation error is recorded as the first error and its
+--- item is skipped WITHOUT sending; the first error, from either source, wins. Trailer
+--- validity is re-checked before each deref, so one deleted mid-sequence aborts the
+--- remaining sends and completes with the state captured so far.
 --- @param trailer table
 --- @param items table          rideables (load) or clusterIds (unload)
 --- @param onComplete function|nil  fired once with (success, errorText)

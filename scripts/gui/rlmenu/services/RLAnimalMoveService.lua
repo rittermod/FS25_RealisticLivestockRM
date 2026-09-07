@@ -113,12 +113,9 @@ function RLAnimalMoveService.resolveBroadcastPlan(moveType, survivorCount)
 end
 
 
---- Whether the client leg should add the MOVED_ANIMALS_* message itself.
----
---- The deliberate mirror-image of AnimalMoveEvent:run's pure-SP early return (run
---- broadcasts only when `g_server ~= nil and g_server.netIsRunning`), so the move
---- broadcasts exactly once across SP / host / dedi. A nil `netIsRunning` coerces to
---- not-running, matching :run. Pure, so it dual-runs.
+--- Whether the client leg adds the moved-animals message itself. The deliberate
+--- MIRROR-IMAGE of the event's own pure-SP early return, so the move broadcasts exactly
+--- once across single-player, host and dedicated server alike.
 --- @param serverExists boolean g_server ~= nil
 --- @param netIsRunning boolean|nil g_server.netIsRunning (nil treated as not-running)
 --- @return boolean broadcast True when the client leg is the sole broadcaster (pure SP)
@@ -127,14 +124,9 @@ function RLAnimalMoveService.shouldClientBroadcast(serverExists, netIsRunning)
 end
 
 
---- Filter a single-type animal list to the subset that may move, mirroring the legacy
---- AnimalScreenTrailerFarm bulk pipeline verbatim: skip a nil subTypeIndex, run the
---- per-animal validator, apply the destination EPP age-gate when eppTypeData is non-nil,
---- then a running-count capacity check that rejects unless the target's free slots for the
---- subtype STRICTLY exceed the survivors queued so far.
----
---- Pure / dual-run: the validator and both endpoints are parameters, and the only calls
---- onto the endpoints are that validator and `target:getNumOfFreeAnimalSlots`.
+--- Filter a single-type animal list to the subset that may move: skip a nil subtype, run
+--- the validator, apply the destination age-gate for an EPP, then a running-count capacity
+--- check that rejects unless free slots STRICTLY exceed the survivors queued so far.
 --- @param source table Move source endpoint (pen/trailer/EPP placeable)
 --- @param target table Move destination endpoint (pen/trailer/EPP placeable); capacity is read from it
 --- @param animals table Array of Animal refs for a single animalType (caller segments by type)
@@ -225,9 +217,8 @@ function RLAnimalMoveService.applyClientBroadcast(plan, husbandryEndpoint, nameE
 end
 
 
---- Filter animals through the legacy-parity pipeline, dispatch the survivors via the SAME
---- AnimalMoveEvent the legacy controller fires, and in pure SP add the one MOVED_ANIMALS_*
---- message.
+--- Filter animals, dispatch the survivors through the move event, and in pure SP add the
+--- one moved-animals message.
 --- @param source table The move source endpoint (husbandry / trailer)
 --- @param target table The move destination endpoint (husbandry / trailer / EPP)
 --- @param animals table Array of Animal/cluster objects to move (one animalType)
