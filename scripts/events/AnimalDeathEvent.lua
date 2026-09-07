@@ -45,11 +45,10 @@ function AnimalDeathEvent:writeStream(streamId, connection)
 end
 
 
---- Remove dead animal from herd. Uses findAndRemove for non-cluster path (animalSystem,
---- runs on every machine) or addPendingRemoveCluster + updateNow for cluster path
---- (server-only; clients sync via the AnimalClusterUpdateEvent broadcast
---- that fires from the server's flush). Without the server guard, addPendingRemoveCluster
---- would assert(self.isServer) and crash clients on every animal death.
+--- Remove a dead animal from the herd: `findAndRemove` on the non-cluster path, which runs
+--- on every machine, or `addPendingRemoveCluster` + `updateNow` server-side, clients syncing
+--- through the flush broadcast. Without the server guard, addPendingRemoveCluster asserts
+--- and crashes clients on every animal death.
 function AnimalDeathEvent:run(connection)
 
     local identifiers = self.animal

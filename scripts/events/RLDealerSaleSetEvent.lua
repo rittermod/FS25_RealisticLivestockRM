@@ -49,11 +49,10 @@ function RLDealerSaleSetEvent.isServer()
     return g_server ~= nil
 end
 
---- Encode one reconcile op as a wire record, or nil plus a reason when it is not encodable.
----
---- A `set` passes its value through VERBATIM -- `isSet and value or false` would collapse
---- a nil into a valid `false` and silently request "not buyable" for a stage the caller
---- gave no value for. Only a `clear`, whose value slot is inert, is filled with `false`.
+--- Encode one reconcile op as a wire record, or nil plus a reason. A `set` passes its value
+--- through VERBATIM: `isSet and value or false` would collapse a nil into a valid `false`
+--- and request "not buyable" for a stage the caller gave no value for. Only a `clear`,
+--- whose value slot is inert, is filled with `false`.
 ---@param op any
 ---@return table|nil rec
 ---@return string|nil reason
@@ -169,10 +168,8 @@ function RLDealerSaleSetEvent:run(connection)
 end
 
 --- The single server mutation funnel: apply the ops, and only when at least one landed,
---- broadcast the resulting authoritative set and regenerate the dealer.
----
---- The broadcast precedes the repopulate so a client holds the new flags before the
---- regenerated stock arrives via AnimalSystemStateEvent.
+--- broadcast the authoritative set and regenerate the dealer. The broadcast PRECEDES the
+--- repopulate so a client holds the new flags before the regenerated stock arrives.
 ---@param ops table[] ops shaped like `RLDealerSaleReconcile.diff` returns
 function RLDealerSaleSetEvent.executeOnServer(ops)
     if type(ops) ~= "table" then
@@ -211,10 +208,9 @@ function RLDealerSaleSetEvent.executeOnServer(ops)
 
         elseif op.action == ACTION_SET then
 
-            -- Count the CHANGE, not the call: `set` is an unconditional upsert that returns
-            -- true even when the value is unchanged, and a stale admin snapshot really does
-            -- emit an op the server already applied. Reading the previous value first keeps
-            -- this branch symmetric with the clear branch above.
+            -- Count the CHANGE, not the call: `set` is an unconditional upsert returning
+            -- true even when the value is unchanged, and a stale admin snapshot does emit
+            -- an op the server already applied.
             local previous = g_rlDealerSaleRegistry:get(op.subTypeName, op.minAge)
 
             if g_rlDealerSaleRegistry:set(op.subTypeName, op.minAge, op.canBeBought) then

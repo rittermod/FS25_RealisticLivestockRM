@@ -53,10 +53,8 @@ function RL_ResetDealerEvent:readStream(streamId, connection)
 end
 
 
---- Server receives reset request from a remote client.
---- Validates masterUser permission, executes the reset, and broadcasts
---- the new dealer state via AnimalSystemStateEvent. The server never
---- rebroadcasts this event itself.
+--- Server receives a reset request from a remote client: validate masterUser permission,
+--- execute, and broadcast the new state. This event itself is never rebroadcast.
 function RL_ResetDealerEvent:run(connection)
     local userName = "unknown"
     local user = g_currentMission.userManager:getUserByConnection(connection)
@@ -80,9 +78,8 @@ function RL_ResetDealerEvent:run(connection)
 end
 
 
---- Execute the reset on the server and broadcast the new state.
---- Called directly by sendEvent on host/SP, or by run() after
---- validating a remote client's request.
+--- Execute the reset on the server and broadcast the new state. Called by sendEvent on
+--- host/SP, or by run() after validating a remote client's request.
 function RL_ResetDealerEvent.executeOnServer(resetType)
     local animalSystem = g_currentMission.animalSystem
 

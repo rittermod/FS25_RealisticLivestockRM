@@ -40,10 +40,8 @@ end
 --- spinning the reader through the up-to-65535 records a desynced stream can present.
 RLFilterStateEvent.MAX_FILTER_COUNT = 10000
 
---- Serialize via the shared RLFilterWire codec with a UInt16 count prefix.
----
---- Counts contiguous 1..N entries via `ipairs` rather than `#self.filters` so a sparse or
---- map-shaped list surfaces as :warning rather than a silent under-count on the wire.
+--- Serialize via the shared RLFilterWire codec with a UInt16 count prefix. Counts contiguous
+--- entries via `ipairs`, so a sparse list warns rather than under-counting.
 function RLFilterStateEvent:writeStream(streamId, connection)
     local filters = self.filters or {}
 
@@ -84,8 +82,8 @@ function RLFilterStateEvent:readStream(streamId, connection)
     self:run(connection)
 end
 
---- Clear the client's registry and re-apply the received snapshot through applyIncomingCreate,
---- which dispatches no further events and deep-clones each payload before storing it.
+--- Clear the client's registry and re-apply the snapshot through applyIncomingCreate, which
+--- dispatches nothing further and deep-clones each payload.
 function RLFilterStateEvent:run(connection)
     local filters = self.filters or {}
     local count = #filters

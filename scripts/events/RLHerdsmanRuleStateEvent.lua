@@ -40,10 +40,8 @@ end
 --- spinning the reader through the up-to-65535 records a desynced stream can present.
 RLHerdsmanRuleStateEvent.MAX_RULE_COUNT = 10000
 
---- Serialize via the shared RLHerdsmanRuleWire codec with a UInt16 count prefix.
----
---- Counts contiguous 1..N entries via `ipairs` rather than `#self.rules` so a sparse or
---- map-shaped list surfaces as :warning rather than a silent under-count on the wire.
+--- Serialize via the shared RLHerdsmanRuleWire codec with a UInt16 count prefix. Counts
+--- contiguous entries via `ipairs`, so a sparse list warns rather than under-counting.
 function RLHerdsmanRuleStateEvent:writeStream(streamId, connection)
     local rules = self.rules or {}
 
@@ -84,8 +82,8 @@ function RLHerdsmanRuleStateEvent:readStream(streamId, connection)
     self:run(connection)
 end
 
---- Clear the client's registry and re-apply the received snapshot through applyIncomingCreate,
---- which re-enforces the field floor per record and deep-clones the payload before storing.
+--- Clear the client's registry and re-apply the snapshot through applyIncomingCreate, which
+--- re-enforces the field floor and deep-clones each payload.
 function RLHerdsmanRuleStateEvent:run(connection)
     local rules = self.rules or {}
 

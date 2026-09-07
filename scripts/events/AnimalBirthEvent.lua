@@ -64,9 +64,9 @@ function AnimalBirthEvent:writeStream(streamId, connection)
 end
 
 
---- Process birth on receiving end: add children to herd, update parent state (clear pregnancy,
---- set lactating for cows/goats), and optionally remove parent if she died during birth.
---- Handles both cluster path (husbandry) and non-cluster path (animalSystem) independently.
+--- Process birth on the receiving end: add the children, clear pregnancy, set lactating for
+--- cows and goats, and remove the parent if she died. Cluster and non-cluster paths are
+--- handled independently.
 function AnimalBirthEvent:run(connection)
 
     local identifiers = self.animal

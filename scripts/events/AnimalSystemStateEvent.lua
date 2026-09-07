@@ -225,26 +225,15 @@ function AnimalSystemStateEvent:run(connection)
     animalSystem.animals = self.animals
     animalSystem.aiAnimals = self.aiAnimals
 
-    -- The pools just changed, so an open Buy tab may be holding items that no
-    -- longer exist. Rebind it in place rather than making the player reopen the
-    -- menu. This fires for ALL THREE senders of this event, not only the two the
-    -- dealer-quality work was scoped around:
-    --   RL_ResetDealerEvent      - preset change and the Reset Animal Dealer button
-    --   AnimalSystem:onHourChanged - the hourly stock churn, whenever it changed anything
-    --   FSBaseMission            - the join snapshot
-    -- The hourly churn is the frequent one: it removes aged stock and tops back
-    -- up, so a browsing player's list rebuilds about once an in-game hour.
-    -- That is deliberate - a list still offering animals the churn removed is
-    -- worse than a rebuild - and reloadAnimalList restores selection by identity,
-    -- though not scroll position.
+    -- The pools just changed, so an open Buy tab may hold items that no longer exist;
+    -- rebind it in place rather than making the player reopen the menu. All three senders
+    -- reach here - the dealer reset, the hourly stock churn and the join snapshot. The
+    -- churn is the frequent one, so a browsing list rebuilds about once an in-game hour;
+    -- that is deliberate, and reloadAnimalList restores selection by identity but not
+    -- scroll position.
     --
-    -- Receiver-side only: the server broadcasts without sendLocal, so this never
-    -- runs on the sending machine. On a listen host that leaves one case
-    -- uncovered - an admin CLIENT changing the preset while the HOST has the Buy
-    -- tab open - where the host's list is not rebound.
-    --
-    -- Nil-guarded: g_rlMenu may not exist during early lifecycle, and buyFrame
-    -- is nil until the menu has been built.
+    -- RECEIVER-SIDE ONLY: the server broadcasts without sendLocal, so on a listen host an
+    -- admin CLIENT changing the preset leaves the HOST's open list unrebound.
     if g_rlMenu ~= nil and g_rlMenu.buyFrame ~= nil
        and g_rlMenu.buyFrame.refreshIfOpen ~= nil then
         Log:debug("AnimalSystemStateEvent:run: dealer pools replaced, refreshing an open Buy tab")

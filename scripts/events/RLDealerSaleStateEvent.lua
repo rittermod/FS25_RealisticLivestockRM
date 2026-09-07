@@ -28,13 +28,10 @@ function RLDealerSaleStateEvent.emptyNew()
     return self
 end
 
---- Construct a new event carrying the authoritative override set.
----
---- Registry records are NORMALISED to the wire record shape here, so `self.records`
---- carries exactly ONE shape no matter which path produced it - this constructor
---- (from `enumerate()`, which has no `isSet` field) or `readStream` (from the codec,
---- which always does). Without that, `run()` would have to tolerate an absent `isSet`,
---- and the obvious later "tidy-up" of its protocol check to `not rec.isSet` would
+--- Construct a new event carrying the authoritative override set. Registry records are
+--- NORMALISED to the wire shape here, so `self.records` carries ONE shape whichever path
+--- produced it - `enumerate()` has no `isSet`, the codec always does. Otherwise `run()`
+--- would have to tolerate an absent `isSet`, and tidying its check to `not rec.isSet` would
 --- silently turn the join push and every broadcast into a no-op.
 ---@param records table[]|nil records shaped like `RLDealerSaleRegistry:enumerate()`
 ---@return table self
@@ -48,10 +45,9 @@ function RLDealerSaleStateEvent.new(records)
             Log:warning("RLDealerSaleStateEvent.new: skipping a non-table record at index %d (%s); that stage is not carried to the client",
                 i, type(rec))
         else
-            -- A snapshot carries overrides, so a record with no `isSet` IS one. An
-            -- explicit value is preserved verbatim (never `rec.isSet or true`, which
-            -- would rewrite a false into a true) so `run()` can still reject it as the
-            -- protocol error it is.
+            -- A snapshot carries overrides, so a record with no `isSet` IS one. An explicit
+            -- value is preserved verbatim - never `rec.isSet or true`, which would rewrite a
+            -- false and hide the protocol error `run()` must reject.
             local isSet = true
             if rec.isSet ~= nil then isSet = rec.isSet end
 
@@ -69,19 +65,15 @@ function RLDealerSaleStateEvent.new(records)
     return self
 end
 
---- Server-context check, factored out so the in-game rlTest can swap it without mutating the root
---- g_server global (rlTest cannot reassign a root g_*, only a level below it - so the
---- server-vs-pure-client branches in run() and in BOTH dispatchers are driven through this
---- function). Production reads g_server.
+--- Server-context check, factored out so the in-game rlTest can swap it - rlTest cannot
+--- reassign a root `g_*`, only a level below it. Production reads g_server.
 ---@return boolean true if this process is the authoritative server
 function RLDealerSaleStateEvent.isServer()
     return g_server ~= nil
 end
 
---- Serialize the override set. `self.records` is already in the wire record shape
---- (the constructor normalises, the codec produces it directly), so this hands the
---- list straight to the codec - which owns per-record validation and the count/cap
---- framing, and drops anything malformed with the key named.
+--- Serialize the override set. `self.records` is already in the wire shape, so this hands
+--- the list straight to the codec, which owns per-record validation and count/cap framing.
 function RLDealerSaleStateEvent:writeStream(streamId, connection)
     local records = self.records or {}
     Log:trace("RLDealerSaleStateEvent:writeStream: #records=%d", #records)
@@ -144,10 +136,9 @@ function RLDealerSaleStateEvent:run(connection)
 
     g_rlDealerSaleRegistry = registry
 
-    -- Same load-order failure class as the registry guard above, and it matters more
-    -- here: the swap has already happened, so a throw would leave this peer holding
-    -- the new registry with un-applied flags, and on the join path it would land
-    -- inside the initial-state handshake.
+    -- Same load-order failure class as the registry guard above, and it matters more here:
+    -- the swap has already happened, so a throw leaves this peer holding the new registry
+    -- with un-applied flags, and on the join path it lands inside the handshake.
     if RLDealerSaleApply == nil then
         Log:warning("RLDealerSaleStateEvent:run: RLDealerSaleApply is nil (load-order regression); the %d override(s) are stored but the live flags are NOT folded, so this peer's dealer keeps its shipped defaults until the next apply",
             applied)
@@ -171,11 +162,9 @@ function RLDealerSaleStateEvent.sendEvent(records, connection)
         return
     end
 
-    -- Type-guard BEFORE any `#`. A non-table here throws inside the prepended
-    -- sendInitialClientState, which aborts that whole hook and leaves the joining
-    -- client with NO initial state at all - not merely no dealer state. The request
-    -- event's entry point carries the same guard; these two dispatchers are the only
-    -- send paths, so the guards genuinely live on one code path each.
+    -- Type-guard BEFORE any `#`. A non-table throws inside the prepended
+    -- sendInitialClientState, aborting that whole hook and leaving the joining client with
+    -- NO initial state at all - not merely no dealer state.
     if type(records) ~= "table" then
         Log:warning("RLDealerSaleStateEvent.sendEvent: records is not a table (%s); dropping, so that client will not receive the dealer overrides",
             type(records))
