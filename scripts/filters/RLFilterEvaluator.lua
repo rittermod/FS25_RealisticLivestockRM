@@ -14,8 +14,6 @@
 --   - type-mismatch      -> false; :trace once per (field, outer-call) via ctx
 --   - monitor-gated off  -> false; :trace
 --   - getter returns nil for any reason -> false (graceful)
---
--- Logging precedence: leaf :trace, outer :debug, warnings deduped.
 
 local Log = RmLogging.getLogger("RLRM")
 

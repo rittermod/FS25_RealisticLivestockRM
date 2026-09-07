@@ -2,9 +2,8 @@
 -- Sparse override map for dealer sale-availability, plus the effective-state resolver that
 -- folds an override over a loaded baseline.
 --
--- Each override records a desired `canBeBought` boolean for one animal stage, keyed by
--- (subTypeName, minAge). The toggle works both directions - an override can turn a base-locked
--- stage on OR a shipped-on stage off.
+-- An override records a desired `canBeBought` for one stage, keyed by (subTypeName, minAge),
+-- and toggles BOTH directions - a base-locked stage on, or a shipped-on stage off.
 --
 -- Contract:
 --   RLDealerSaleRegistry.new() -> instance
@@ -14,13 +13,11 @@
 --   reg:enumerate() -> array<{subTypeName=, minAge=, canBeBought=}> -- keyed records, sorted, clone-isolated
 --   RLDealerSaleRegistry.effective(override, baseline) -> boolean|nil
 --
--- `subTypeName` is a non-empty string used VERBATIM, with no case or whitespace normalization -
--- callers pass the canonical `subType.name`. `minAge` is an integer in [0, MAX_MIN_AGE]. Both
--- are validated identically on set/get/clear, so an invalid key never reaches key-encoding.
+-- `subTypeName` is used VERBATIM (no case or whitespace normalization); `minAge` is an integer
+-- in [0, MAX_MIN_AGE]. Both are validated identically on set/get/clear.
 --
--- Data in / data out only: this layer stores and resolves overrides. It does NOT persist them,
--- apply them to any live store, check whether a subtype is currently loaded, or sync across the
--- network - an override for a temporarily absent subtype is stored and enumerated normally.
+-- Data in, data out: this layer does NOT persist, apply to a live store, check whether a
+-- subtype is loaded, or sync - an override for an absent subtype is stored and enumerated.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -34,17 +31,15 @@ local RLDealerSaleRegistry_mt = { __index = RLDealerSaleRegistry }
 --- render `-0.0` as "-0".
 local KEY_SEPARATOR = "@"
 
---- Widest `minAge` this registry will store: the MP wire's UInt16 ceiling, living here rather
---- than in the codec so storage and transport share ONE domain. A key the registry accepted but
---- the wire could not carry would be held and applied on the server while every client snapshot
---- silently dropped it, diverging the two permanently with only a server-side warning. Well
---- above any real animal stage, so it refuses only values that were never valid stage keys.
+--- Widest `minAge` this registry stores: the MP wire's UInt16 ceiling, living here so storage
+--- and transport share ONE domain. A key the registry accepted but the wire could not carry
+--- would apply on the server and vanish from every client snapshot, diverging them
+--- permanently. Well above any real stage, so it refuses only never-valid keys.
 RLDealerSaleRegistry.MAX_MIN_AGE = 65535
 
---- True when `minAge` is an integer in [0, MAX_MIN_AGE]. The infinity tests are explicit
---- because `math.floor(inf) == inf` passes the integer check and `inf >= 0` is true, so the
---- range and integer checks alone would let it through. A NaN key would also break
---- `enumerate`'s `table.sort`, so it is refused at the boundary.
+--- True when `minAge` is an integer in [0, MAX_MIN_AGE]. The infinity tests are explicit:
+--- `math.floor(inf) == inf` passes the integer check and `inf >= 0` is true. NaN is refused
+--- at the boundary too - it would break `enumerate`'s `table.sort`.
 ---@param minAge any
 ---@return boolean
 local function isValidMinAge(minAge)
@@ -188,11 +183,10 @@ end
 -- Effective-state resolver (pure static selector)
 -- =============================================================================
 
---- Resolve the effective sale-availability by PRESENCE - the override when it is present, else
---- the baseline verbatim. Never `override or baseline`, which would silently drop a `false`
---- override that must win over a `true` baseline. As a pure selector `effective(nil, nil)` is
---- nil; callers guarantee a boolean baseline. Unlogged: a hot-path selector whose inputs and
---- result are observable at the caller.
+--- Resolve the effective sale-availability by PRESENCE - the override when present, else the
+--- baseline verbatim. Never `override or baseline`, which would drop a `false` override that
+--- must win over a `true` baseline. `effective(nil, nil)` is nil; callers guarantee a boolean
+--- baseline.
 ---@param override boolean|nil
 ---@param baseline boolean|nil
 ---@return boolean|nil effective

@@ -1,27 +1,20 @@
 -- RLFilterService.lua
 -- Singleton CRUD service for saveable filter records.
 --
--- Owns the in-memory registry `self.filtersById`, assigns stable ids on create via
--- `Utils.getUniqueId`, and handles the XML round-trip into `rm_RlSettings.xml` under the
--- `<filters>` block. The RLSettings save/load hooks call `:saveToXMLFile` / `:loadFromXMLFile`
--- with the canonical base key `rm_RlSettings.filters`.
+-- Owns the in-memory registry, assigns stable ids on create, and handles the XML
+-- round-trip under the settings file's `<filters>` block.
 --
--- Immutability: `id`, `farmId` and `version` are frozen after create; `name`, `animalType`,
--- `expression` and `usage` are mutable via `update`. A violation is rejected with a warning and
--- leaves state unchanged.
+-- Immutability: `id`, `farmId` and `version` are frozen after create; the rest are mutable
+-- through `update`. A violation is rejected and leaves state unchanged.
 --
--- Scope matching in `listAvailable` is `nil-or-equal` on `animalType`, `farmId` AND `usage`, so a
--- filter with `farmId = nil` is global, one with `animalType = nil` covers every type, and one
--- with `usage = ANY` appears on every consumer frame whichever bucket is queried.
+-- Scope matching is NIL-OR-EQUAL on animalType, farmId AND usage, so a nil farmId is
+-- global, a nil animalType covers every type, and usage ANY appears on every frame.
 --
--- MP: `create`/`update`/`delete` dispatch their event AFTER the local mutation, and the events
--- land back through `applyIncoming*`, which bypass dispatch so `run()` never re-fires. The
--- `_send*Event` fields are swappable hooks so tests can capture payloads without a network.
+-- MP: the mutators dispatch AFTER the local mutation, and the events land back through the
+-- applyIncoming path, which bypasses dispatch so `run()` never re-fires.
 --
--- Ownership contract: every boundary into or out of the registry deep-copies the record - a
--- top-level shallow copy plus a recursive clone of the `expression` AST - so a caller cannot
--- mutate stored state by retaining a returned reference. Internal calls that need the live
--- reference use `_rawGetById`.
+-- OWNERSHIP: every boundary deep-copies the record, so a caller cannot mutate stored state
+-- by retaining a returned reference. Internal callers needing the live one use _rawGetById.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -39,10 +32,8 @@ RLFilterService.XML_BASE_KEY = "rm_RlSettings.filters"
 -- Deep copy
 -- =============================================================================
 
---- Recursively clone an AST node. Any node with a non-nil `op` is treated as a group, with
---- `children` defaulting to empty - that protects a degenerate `{op="AND", children=nil}` from
---- being mis-classified as a condition and silently destroyed. A condition's list `value` is
---- shallow-copied; scalars pass by value.
+--- Recursively clone an AST node. A non-nil `op` means group, `children` defaulting to empty
+--- so a degenerate group is not mis-classified as a condition and destroyed.
 ---@param node any
 ---@return any clone
 local function cloneNode(node)
@@ -114,9 +105,8 @@ end
 -- CRUD
 -- =============================================================================
 
---- Create a new filter, assigning a unique `id` and defaulting `version` to 1. The caller's
---- table is not stored - a defensive clone goes into the registry - and the Create event is
---- dispatched after the local mutation, with the hook nil-guarding the offline path.
+--- Create a filter, assigning a unique `id` and defaulting `version` to 1. A clone is stored,
+--- never the caller's table.
 ---@param filter table filter record (without id)
 ---@return table|nil filter cloned snapshot of the stored record
 function RLFilterService:create(filter)
@@ -160,11 +150,9 @@ function RLFilterService:getById(id)
 end
 
 --- Apply a whole-object update, mutating only `name`, `animalType`, `expression` and `usage`.
---- Rejected when the id is unknown, when `payload.id` differs, or when `farmId` / `version`
---- differ from the stored record. A missing `name`, `expression` or `usage` is also rejected: a
---- partial payload would nil those fields and collapse the filter into a nameless,
---- match-everything record on the next evaluate. `animalType` may be nil - that is a
---- global-scope filter.
+--- Rejected on an unknown or mismatched id, a differing `farmId`/`version`, or a missing
+--- `name`/`expression`/`usage` - a partial payload would collapse the filter into a nameless
+--- match-everything record. A nil `animalType` is legal: that is a global-scope filter.
 ---@param id string lookup id
 ---@param payload table whole-object replacement payload
 ---@return table|nil updated cloned snapshot of the stored record
@@ -265,11 +253,9 @@ function RLFilterService:list()
     return out
 end
 
---- Filters matching the given scope by nil-or-equal on `animalType`, `farmId` and `usage`.
---- Passing nil for a scope parameter means "I don't care" on that axis. The `f.usage == nil` arm
---- is defensive against an un-normalised record - legacy load, the serializer's coerce and
---- `create`'s defaulting all normalise to ANY - and pairs with the `ANY` arm so both shapes match
---- the same set.
+--- Filters matching the scope by nil-or-equal on `animalType`, `farmId` and `usage`; a nil
+--- argument means "any" on that axis. The `f.usage == nil` arm covers an un-normalised record
+--- and pairs with the `ANY` arm so both shapes match the same set.
 ---@param animalType integer|nil AnimalType int index to match against
 ---@param farmId integer|nil farm id to match against
 ---@param usage string|nil canonical usage string (ANY/OWNED/DEALER) or nil for "any bucket"
@@ -293,14 +279,12 @@ end
 -- Incoming-event apply paths
 -- =============================================================================
 --
--- These land wire-decoded payloads into the registry WITHOUT firing another event, and each
--- defensive-copies the payload so the event object's reference cannot mutate stored state after
--- apply. Contrast `:create` / `:update` / `:delete`, which take a TRUSTED caller path, mutate
--- locally AND dispatch.
+-- These land wire-decoded payloads WITHOUT firing another event, each defensive-copying so the
+-- event object cannot mutate stored state after apply. Contrast create/update/delete, which
+-- take a TRUSTED caller path and both mutate and dispatch.
 
---- Store a wire-decoded filter record. The server validates permission, farm scope and
---- duplicate ids before this is called; client receivers apply blindly, because the server's
---- rebroadcast is authoritative.
+--- Store a wire-decoded filter record. The server validates permission, scope and duplicate
+--- ids first; clients apply blindly, the rebroadcast being authoritative.
 ---@param filter table wire-decoded filter record
 ---@return boolean applied
 function RLFilterService:applyIncomingCreate(filter)
@@ -417,10 +401,8 @@ function RLFilterService:saveToXMLFile(xmlFile, baseKey)
     Log:debug("RLFilterService:saveToXMLFile: baseKey=%s wrote=%d filters (sorted by id)", baseKey, #filters)
 end
 
---- Clear existing state, then deserialize every filter under `baseKey`. A filter missing its id
---- is skipped by the serializer, which logs it. The iterate is wrapped in `pcall` so a malformed
---- filter that crashes deep in the serializer cannot abort the surrounding settings load;
---- partial state is kept.
+--- Clear existing state, then deserialize every filter under `baseKey`. The iterate is wrapped
+--- in `pcall` so a malformed filter cannot abort the surrounding settings load.
 ---@param xmlFile table XMLFile handle
 ---@param baseKey string e.g. `"rm_RlSettings.filters"`
 function RLFilterService:loadFromXMLFile(xmlFile, baseKey)
@@ -485,11 +467,10 @@ RLFilterService._sendDeleteEvent = function(id)
     RLFilterDeleteEvent.sendEvent(id)
 end
 
--- Eager source-time singleton. The filter SAVE path runs from RLSettings.saveToXMLFile, which
--- can fire on a settings change early in the mission lifecycle, so constructing here means every
--- consumer sees a live registry regardless of load-hook order. The on-disk LOAD is invoked
--- separately, after AnimalType is populated, so the serializer can resolve animalType strings to
--- indices. RealisticLivestock.loadMap keeps an idempotent fallback.
+-- Eager source-time singleton: the SAVE path can fire on a settings change early in the mission
+-- lifecycle, so constructing here gives every consumer a live registry whatever the hook order.
+-- The on-disk LOAD runs separately, after AnimalType is populated, so animalType strings can
+-- resolve to indices.
 g_rlFilterService = RLFilterService.new()
 
 Log:trace("RLFilterService: loaded")

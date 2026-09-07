@@ -18,8 +18,7 @@ local Log = RmLogging.getLogger("RLRM")
 
 RLDealerSaleApply = {}
 
---- Per-session captured defaults: sessionBaseline[subTypeName][minAge] = boolean. A plain
---- literal, so there is no game read at source time.
+--- Per-session captured defaults: sessionBaseline[subTypeName][minAge] = boolean.
 RLDealerSaleApply.sessionBaseline = {}
 
 -- =============================================================================
@@ -28,16 +27,11 @@ RLDealerSaleApply.sessionBaseline = {}
 
 --- Fold `registry` over `subTypes`, writing the effective sale-availability onto each
 --- overridden visual's `store.canBeBought` and lazily capturing its default into `baseline`.
---- Mutates `subTypes` store flags and `baseline` in place; no `g_*`, XML or GUI.
+--- Both are mutated in place; no engine access.
 ---
---- Phase 1 captures each override's gate-equivalent default, but only the FIRST time the key is
---- seen, so the snapshot survives set -> clear -> set toggles within a session. Phase 2 writes
---- `effective(override, default)` for every baseline-tracked visual. Iterating the BASELINE
---- rather than the registry is what makes un-marking restore: a cleared key has
---- `registry:get -> nil`, so `effective(nil, default)` is the default.
----
---- `minAge` is unique and ascending per subtype (the base loader enforces it), so Phase 1's
---- break-on-first-match and Phase 2's write-all-matching are equivalent.
+--- Phase 1 captures a default only the FIRST time a key is seen, so the snapshot survives
+--- set -> clear -> set within a session. Phase 2 iterates the BASELINE, not the registry,
+--- which is what makes un-marking restore: a cleared key gets `effective(nil, default)`.
 ---@param subTypes table[] animalSystem.subTypes: array of { name=, visuals={ { minAge=, store={ canBeBought= } }, ... } }
 ---@param registry table an RLDealerSaleRegistry instance
 ---@param baseline table captured-default map: baseline[subTypeName][minAge] = boolean
@@ -113,16 +107,14 @@ end
 -- In-game shell (peer-agnostic apply + on-change repopulate)
 -- =============================================================================
 
---- Reset the per-session baseline so the next apply re-derives it from the freshly-reloaded
---- live values. Called at each savegame-load apply.
+--- Reset the per-session baseline so the next apply re-derives it from the reloaded values.
 function RLDealerSaleApply.resetBaseline()
     RLDealerSaleApply.sessionBaseline = {}
     Log:debug("RLDealerSaleApply.resetBaseline: session baseline cleared")
 end
 
---- Apply the registry to the live subTypes. Peer-agnostic - writing local store flags is safe
---- on any peer, so there is no `g_server` guard - and every dependency is guarded, no-opping
---- with a warning on a miss.
+--- Apply the registry to the live subTypes. Peer-agnostic: writing local store flags is safe
+--- on any peer, so there is no `g_server` guard.
 function RLDealerSaleApply.applyToLiveSubTypes()
     if g_currentMission == nil then
         Log:warning("RLDealerSaleApply.applyToLiveSubTypes: g_currentMission is nil; skipping")
@@ -159,11 +151,9 @@ function RLDealerSaleApply.applyToLiveSubTypes()
     end
 end
 
---- On-change entry: apply the overrides to the live flags, then regenerate the dealer so the new
---- stock reflects them, reusing the exact path the "Reset animal dealer" button takes -
---- host/SP routes to executeOnServer plus a broadcast, a client to a server request. Must NOT
---- call `executeOnServer` directly, which dereferences `g_server` unconditionally and would
---- crash on a client.
+--- On-change entry: apply the overrides, then regenerate the dealer through the same path the
+--- "Reset animal dealer" button takes. Must NOT call `executeOnServer` directly, which
+--- dereferences `g_server` unconditionally and would crash on a client.
 function RLDealerSaleApply.applyAndRepopulate()
     Log:debug("RLDealerSaleApply.applyAndRepopulate: apply then full dealer reset")
     RLDealerSaleApply.applyToLiveSubTypes()

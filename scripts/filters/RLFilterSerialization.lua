@@ -18,15 +18,13 @@
 --   enum   -> setString/getString
 --   string -> setString/getString (same codec as enum; semantic split only)
 --
--- animalType is stored as the STABLE STRING NAME, not the runtime int index, matching the
--- persistence contract `AnimalPersistence` uses for subType: it survives AnimalType reordering
--- across game versions or mod sets. The MP wire format still carries the int index.
+-- animalType is stored as the STABLE STRING NAME, not the runtime int index, so it survives
+-- AnimalType reordering across game versions or mod sets. The MP wire still carries the index.
 --
--- Fail-closed on both directions. A failed animalType name<->index resolution warns, so a silent
--- scope drop on reload is diagnosable. A missing `.group` subtree on read warns and skips the
--- filter rather than fabricating an empty AND that would match every animal. A scalar condition
--- with a nil `value` is rejected at write time instead of passing nil to the XML C bindings. And
--- `cmp` is validated against the catalog field's whitelist on read and write alike.
+-- FAIL-CLOSED both directions: a failed animalType resolution warns, a missing `.group` on
+-- read skips the filter rather than fabricating an empty AND that matches every animal, a
+-- scalar with a nil `value` is rejected at write time before it reaches the XML bindings, and
+-- `cmp` is validated against the catalog whitelist on read and write alike.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -61,19 +59,14 @@ local TYPE_CODECS = {
 -- AnimalType int <-> stable name (warn on silent drops)
 -- =============================================================================
 
---- Per-process dedup for type-name / type-index resolution warnings. Emitting
---- once per distinct bad input keeps a corrupt save from spamming the log
---- while still surfacing every distinct failure.
+--- Per-process dedup for type resolution warnings: one per distinct bad input.
 local _warnedTypeIndex = {}
 local _warnedTypeName  = {}
 
---- Resolve an AnimalType int index back to its stable string name
---- ("COW", "PIG", ...). Returns nil if the global is missing or the
---- index is not registered (e.g. map bridge not yet loaded).
+--- Resolve an AnimalType int index back to its stable string name, or nil.
 ---
---- When the caller supplied a non-nil idx but resolution fails, emit a
---- one-shot `:warning` keyed on that idx. Silent nil returns would let
---- a typed filter silently demote to global scope on re-save.
+--- A failed resolution warns once per idx: a silent nil would demote a typed
+--- filter to global scope on re-save.
 ---@param idx integer|nil
 ---@return string|nil name
 local function animalTypeIndexToName(idx)
@@ -97,13 +90,10 @@ local function animalTypeIndexToName(idx)
     return nil
 end
 
---- Resolve a stable AnimalType name back to its runtime int index.
---- Returns nil when the name isn't registered.
+--- Resolve a stable AnimalType name back to its runtime int index, or nil.
 ---
---- Emits a one-shot `:warning` when a non-nil name fails to resolve
---- (e.g. the mod that registered a custom type was uninstalled between
---- save cycles). Without this warning a COW-scoped filter would silently
---- become global on reload.
+--- A failed resolution warns once per name: without it a scoped filter would
+--- silently become global on reload.
 ---@param name string|nil
 ---@return integer|nil index
 local function animalTypeNameToIndex(name)
@@ -129,10 +119,8 @@ end
 -- cmp validation (whitelist against catalog field.cmps)
 -- =============================================================================
 
---- True when `cmp` appears in `field.cmps`. Used to fail-closed on invalid
---- comparators at the I/O boundary rather than deferring the error to the
---- evaluator where it'd silently return false for every animal with no
---- diagnostic trail.
+--- True when `cmp` appears in `field.cmps`, so an invalid comparator fails
+--- closed at the I/O boundary rather than silently in the evaluator.
 ---@param field table catalog entry
 ---@param cmp string
 ---@return boolean
@@ -148,10 +136,8 @@ end
 -- Condition (leaf) IO
 -- =============================================================================
 
---- Write a single condition node into `condKey`. Returns true on success,
---- false when the field or codec is unknown, the value is missing, or the
---- comparator is not allowed for this field type (all fail-closed: skip
---- the condition, log a warning; mirrors evaluator's unknown-field policy).
+--- Write a single condition node into `condKey`. False on an unknown field or
+--- codec, a missing value, or a disallowed comparator - each skips and warns.
 ---@param xmlFile table XMLFile handle
 ---@param condKey string path prefix for this condition
 ---@param cond table { field, cmp, value }
@@ -185,14 +171,10 @@ local function writeCondition(xmlFile, condKey, cond)
         return false
     end
 
-    -- Validate value shape BEFORE emitting any XML.
-    -- Previous ordering wrote @field and @cmp first, and only then checked
-    -- the value - if the value was malformed, the @field/@cmp attrs were
-    -- already on disk. When this happened to the *trailing* condition of
-    -- a group, writeGroup's index-reuse only overwrites on a successful
-    -- subsequent write - the orphan attrs survived and reloaded as a
-    -- `notin []` (matches every animal) or a nil-valued scalar. Validate
-    -- first, write nothing if the shape is bad.
+    -- Validate the value shape BEFORE emitting any XML. Writing @field/@cmp first
+    -- would leave orphan attrs on disk for a bad value, and writeGroup's index-reuse
+    -- only overwrites on a later successful write - the orphan would reload as a
+    -- `notin []` matching every animal, or a nil-valued scalar.
     if cond.cmp == "in" or cond.cmp == "notin" then
         if type(cond.value) ~= "table" then
             Log:warning("RLFilterSerialization.writeCondition: cmp=%s expects list value, got %s at %s; skipping (no XML written)",
@@ -230,8 +212,7 @@ local function writeCondition(xmlFile, condKey, cond)
     return true
 end
 
---- Read a single condition from `condKey`. Returns the condition table
---- on success or nil when the field/codec/cmp is unknown (fail-closed).
+--- Read a condition from `condKey`, or nil when field/codec/cmp is unknown.
 ---@param xmlFile table XMLFile handle
 ---@param condKey string path prefix for this condition
 ---@return table|nil condition
@@ -290,18 +271,15 @@ end
 -- Group (recursive) IO
 -- =============================================================================
 
---- True when a node is shaped like a group. Bare conditions should be
---- wrapped by callers before reaching this point.
+--- True when a node is shaped like a group; callers wrap bare conditions first.
 ---@param node table|nil
 ---@return boolean
 local function isGroup(node)
     return node ~= nil and node.op ~= nil and node.children ~= nil
 end
 
---- Write a group node (recursive).
---- Children are serialized conditions-first then groups, matching the
---- "collapse-ordering" rule: cross-type order is not preserved
---- because AND/OR are commutative/associative.
+--- Write a group node (recursive). Children serialize conditions-first then
+--- groups; cross-type order is not preserved, AND/OR being associative.
 ---@param xmlFile table
 ---@param groupKey string
 ---@param group table { op, children }
@@ -335,8 +313,7 @@ local function writeGroup(xmlFile, groupKey, group)
         groupKey, tostring(group.op), condIdx, groupIdx)
 end
 
---- Read a group node (recursive). Children ordering on load is
---- `conditions[] ++ groups[]` per the contract.
+--- Read a group node (recursive). Load order is `conditions[] ++ groups[]`.
 ---@param xmlFile table
 ---@param groupKey string
 ---@return table group { op, children }
@@ -362,16 +339,12 @@ end
 -- Filter record IO (public)
 -- =============================================================================
 
---- Write one filter record at `filterKey`. Optional scope attributes
---- (`animalType`, `farmId`) are omitted when nil so the XML cleanly
---- reflects "global" / "any type" without sentinel values.
+--- Write one filter record at `filterKey`. A nil scope attribute is OMITTED,
+--- so "global" / "any type" needs no sentinel value.
 ---
---- Callers that supply a bare-condition `expression` (no `op`) are
---- transparently wrapped into a single-child AND group so the XML key
---- contract ("root group, exactly one") is always satisfied. Contract:
---- the write-then-read round-trip yields a structurally equal filter
---- when the expression was already a group; bare-condition inputs come
---- back wrapped, which matches how the service/evaluator see them anyway.
+--- A bare-condition `expression` is wrapped into a single-child AND group to
+--- satisfy the "root group, exactly one" key contract, so the round-trip is
+--- structurally equal for a group input and wrapped for a bare one.
 ---@param xmlFile table
 ---@param filterKey string
 ---@param filter table filter record
@@ -388,11 +361,9 @@ function RLFilterSerialization.writeFilter(xmlFile, filterKey, filter)
         xmlFile:setInt(filterKey .. "#farmId", filter.farmId)
     end
 
-    -- usage axis is always written when present in-memory. Service-side
-    -- normalisation (create-default + update-coerce) means stored records
-    -- carry a canonical string. We still defensively check for nil so a
-    -- service-bypass call site (tests, future direct callers) cannot blow
-    -- up the writer.
+    -- Service-side normalisation means a stored record always carries a canonical
+    -- usage string; the nil check keeps a service-bypassing caller from blowing up
+    -- the writer.
     if filter.usage ~= nil then
         xmlFile:setString(filterKey .. "#usage", filter.usage)
     end
@@ -417,12 +388,10 @@ function RLFilterSerialization.writeFilter(xmlFile, filterKey, filter)
         tostring(typeName), tostring(filter.farmId), tostring(filter.usage), tostring(filter.version))
 end
 
---- Read one filter record from `filterKey`. Returns nil when the record
---- is missing required identity (id) or when the mandatory `.group`
---- subtree is absent: fabricating a match-all filter from
---- a truncated save is worse than skipping the record, because on the
---- next save the empty-AND would be written back and silently persist.
---- Caller is responsible for storing the returned record.
+--- Read one filter record from `filterKey`, or nil when `id` or the mandatory
+--- `.group` subtree is absent: an empty-AND fabricated from a truncated save
+--- matches every animal and would be written back on the next save. The caller
+--- stores the returned record.
 ---@param xmlFile table
 ---@param filterKey string
 ---@return table|nil filter

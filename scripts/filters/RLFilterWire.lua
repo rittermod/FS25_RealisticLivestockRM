@@ -31,13 +31,12 @@
 --     streamWriteUInt16 f.version      (widened from UInt8 to survive long-lived filters)
 --     writeGroup(streamId, f.expression)
 --
--- Sentinel -1 for optional ints avoids an extra bool per field. A malformed condition is
--- emitted as two empty strings, the empty field being the reader's sentinel marker.
+-- Sentinel -1 for an optional int avoids an extra bool per field. A malformed condition is
+-- emitted as two empty strings, the empty field being the reader's sentinel.
 --
--- Fail-closed on read. An unknown catalog field warns and returns nil, and the surrounding
--- group reader will likely desync from there - accepted, because the receiver then drops the
--- event and logs it. A cmp outside `field.cmps` warns, drains the scalar or listN elements so
--- the stream stays aligned, and returns nil.
+-- FAIL-CLOSED on read: an unknown catalog field warns and returns nil, and the group reader
+-- will likely desync from there - accepted, since the receiver then drops the event. An
+-- out-of-set cmp warns, DRAINS its elements so the stream stays aligned, and returns nil.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -90,9 +89,8 @@ end
 -- Count / cmp helpers
 -- =============================================================================
 
---- Clamp + warn when a count exceeds UInt8 range. Writer-side only; keeps the
---- stream aligned by silently truncating to 255 with a :warning rather than
---- passing an out-of-range value to streamWriteUInt8 (undefined behavior).
+--- Clamp + warn when a count exceeds UInt8 range. Writer-side only: truncating to 255
+--- keeps the stream aligned, where an out-of-range streamWriteUInt8 is undefined.
 ---@param n integer
 ---@param what string descriptor for log
 ---@return integer clamped
@@ -108,10 +106,8 @@ local function clampU8(n, what)
     return n
 end
 
---- TRACE-log helper: serialize a list of scalar values (numbers / bools /
---- strings / enums) into a comma-joined string. `tostring` per element so
---- booleans render as `true`/`false` rather than triggering a `table.concat`
---- type error on mixed-type or bool lists.
+--- TRACE-log helper: comma-join a list of scalars. `tostring` per element, since
+--- `table.concat` raises on a bool or mixed-type list.
 ---@param list table
 ---@param n integer number of elements to serialize
 ---@return string
@@ -148,11 +144,8 @@ end
 -- Condition (leaf) IO
 -- =============================================================================
 
---- Write a single condition. Trusts caller validation of catalog/cmp/value
---- shape -- the service rejects malformed conditions before dispatch.
----
---- Malformed-input sentinel: writes two empty strings (empty field marks
---- the sentinel for the reader) and no payload bytes.
+--- Write a single condition, trusting the service's pre-dispatch validation. A malformed
+--- input writes the two-empty-string sentinel and no payload bytes.
 ---@param streamId number
 ---@param cond table { field, cmp, value }
 ---@return boolean wrote true on success
@@ -225,10 +218,8 @@ local function writeCondition(streamId, cond)
     return true
 end
 
---- Read a single condition. Returns a condition table on success, nil on
---- sentinel / unknown field / rejected cmp. On rejected cmp the reader
---- drains the scalar or listN payload so the surrounding group stream
---- stays aligned.
+--- Read a single condition, or nil on sentinel, unknown field or rejected cmp. A rejected
+--- cmp still DRAINS its payload so the surrounding group stream stays aligned.
 ---@param streamId number
 ---@return table|nil cond
 local function readCondition(streamId)

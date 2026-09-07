@@ -2,31 +2,25 @@
 -- Turns a selector-dialog result into the minimal set of override-registry operations, resolved
 -- against the animal's SHIPPED default.
 --
--- The override registry is a SPARSE store of non-default entries only, so a toggle that lands
--- back on the shipped default must CLEAR its override rather than pin the current value: a
--- cleared stage keeps tracking future default changes - a map, DLC or game update moving that
--- flag - where a pinned one would not.
+-- The registry is a SPARSE store of non-default entries, so a toggle landing back on the
+-- shipped default must CLEAR its override rather than pin the current value: a cleared stage
+-- keeps tracking future default changes (a map, DLC or update moving that flag).
 --
 -- Two comparisons drive one op:
 --   desired vs `visual.buyable`    -> is this row a real CHANGE at all?
 --   desired vs the shipped default -> is that change a `set` or a `clear`?
 --
--- `baseline` supplies the shipped default as plain data. A key absent from it has no override,
--- so its LIVE value IS its shipped default and `visual.buyable` is the exact fallback.
---
--- Only CHANGED rows are emitted, so every returned op is a real effective change and the caller
--- can gate its dealer re-roll on "any op applied". Data in / data out: no `g_*`, GUI, XML or
--- engine natives.
+-- A key absent from `baseline` has no override, so its LIVE value IS its shipped default and
+-- `visual.buyable` is the exact fallback. Only CHANGED rows are emitted, so the caller can
+-- gate its dealer re-roll on "any op applied". Data in, data out: no engine access.
 
 local Log = RmLogging.getLogger("RLRM")
 
 RLDealerSaleReconcile = {}
 
---- True when `minAge` can key a stage: a number that is not NaN. NaN is refused explicitly
---- because `minAge` is used as a TABLE KEY below and `t[0/0] = v` raises "table index is NaN".
---- The registry's stricter finite-integer rule is enforced at `set`/`clear`, not here: a
---- fractional catalog `minAge` must still be matched against the result, or the row would be
---- silently treated as unchecked.
+--- True when `minAge` can key a stage: a non-NaN number. NaN is refused because `minAge` is a
+--- TABLE KEY below and `t[0/0] = v` raises. The registry's stricter finite-integer rule is not
+--- applied here - a fractional catalog `minAge` must still match, or its row reads unchecked.
 ---@param minAge any
 ---@return boolean
 local function isKeyableMinAge(minAge)
@@ -41,9 +35,8 @@ local function isKeyableName(subTypeName)
 end
 
 --- Collect the dialog result into a nested lookup `set[subTypeName][minAge] = true`. Nested
---- tables rather than an encoded string key keep the match EXACT for any numeric `minAge`: a
---- `%d`-rendered key would alias a fractional stage onto its truncated neighbour, and a
---- `tostring` key would alias large doubles through `%.14g`.
+--- tables, not an encoded string key, keep the match EXACT for any numeric `minAge` - a
+--- rendered key would alias a fractional stage onto its neighbour.
 ---@param result any dialog result: array of { subTypeName=, minAge= }
 ---@return table lookup
 local function checkedSet(result)
@@ -70,9 +63,8 @@ local function checkedSet(result)
     return set
 end
 
---- Shipped default for one stage: the `baseline` entry when it carries a boolean, else the
---- stage's live value. The fallback is exact rather than approximate - a key with no baseline
---- entry has no override, so its live flag IS its default.
+--- Shipped default for one stage: the `baseline` entry when boolean, else the live value - a
+--- key with no baseline entry has no override, so its live flag IS its default.
 ---@param baseline table|nil captured-default map: baseline[subTypeName][minAge] = boolean
 ---@param subTypeName string
 ---@param minAge number
@@ -92,15 +84,12 @@ local function shippedDefault(baseline, subTypeName, minAge, liveBuyable)
 end
 
 --- Diff a selector result against the catalog it was opened over, emitting one registry op per
---- CHANGED stage. When `desired` equals the visual's current `buyable` the row emits nothing;
---- otherwise the shipped default decides the op - matching it emits `clear` to unmanage the
---- stage, anything else emits `set` with the desired value.
+--- CHANGED stage: `desired` equal to the visual's `buyable` emits nothing, else matching the
+--- shipped default emits `clear` and anything else emits `set`.
 ---
---- A duplicate `subTypeName` is dropped at ENTRY granularity, matching the selector model, which
---- skips a repeated section key BEFORE building its rows: that entry contributed no rows to the
---- dialog, so diffing it would read its unrendered stages as deliberately unchecked and turn
---- them off - a change the player never made. Whatever the dialog did not show is not its
---- answer. Malformed entries and visuals are each skipped with a trace.
+--- A duplicate `subTypeName` is dropped at ENTRY granularity, matching the selector model,
+--- which skips a repeated section key BEFORE building rows: whatever the dialog did not show
+--- is not its answer, so diffing it would turn off stages the player never touched.
 ---@param result any dialog result: array of { subTypeName=, minAge= }; nil-safe
 ---@param catalog any catalog view-model: array of { subTypeName=, visuals={ { minAge=, buyable= }, ... } }
 ---@param baseline any captured-default map: baseline[subTypeName][minAge] = boolean; may be empty/nil

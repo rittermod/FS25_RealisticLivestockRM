@@ -11,31 +11,25 @@
 --     @canBeBought(bool)  -- either polarity is a valid override
 --     @version(int)       -- migration seam (writes/reads 1)
 --
--- An override is a flat scalar record, so there is none of the nested-group machinery the
--- filter and herdsman codecs carry. Because the dealer state holder is the pure
--- RLDealerSaleRegistry, which owns no XML, this module also hosts the iteration wrappers that
--- live on the service in those siblings.
+-- A flat scalar record, so none of the nested-group machinery the sibling codecs carry. Since
+-- the state holder is the pure registry, which owns no XML, the iteration wrappers live here.
 --
--- Both seams take an ALREADY-OPEN XMLFile and do the whole encode/decode in memory. They never
--- open a file or touch disk - the disk transport lives only in the RLSettings save/load
--- wrappers, because an in-game disk round-trip inside a codec fails silently under the
--- engine's sandbox.
+-- Both seams take an ALREADY-OPEN XMLFile and encode/decode in memory - the disk transport
+-- lives only in the RLSettings wrappers, because an in-game disk round-trip inside a codec
+-- fails silently under the engine's sandbox.
 --
--- Fail-closed on read: the required attributes are read with NO default, so a nil read is
--- corruption rather than a silent default. @canBeBought is tested for PRESENCE, not
--- truthiness, so a stored `false` round-trips as false and only a genuinely absent attribute
--- counts as corrupt.
+-- FAIL-CLOSED on read: required attributes are read with NO default, so a nil read is
+-- corruption. @canBeBought is tested for PRESENCE, not truthiness, so a stored `false`
+-- round-trips and only a genuinely absent attribute counts as corrupt.
 
 local Log = RmLogging.getLogger("RLRM")
 
 RLDealerSaleSerialization = {}
 
---- Sub-tree root under RLSettings' save root, shared by both seams and the RLSettings
---- wrappers; the codec never hard-codes it internally.
+--- Sub-tree root under RLSettings' save root, shared by both seams and the wrappers.
 RLDealerSaleSerialization.XML_BASE_KEY = "rm_RlSettings.dealerSaleOverrides"
 
---- On-disk record schema version, named so a future override-shape change is one edit rather
---- than a scattered literal.
+--- On-disk record schema version.
 local RECORD_VERSION = 1
 
 -- =============================================================================
@@ -83,10 +77,8 @@ end
 -- Iteration wrappers (public seams)
 -- =============================================================================
 
---- Serialize every override in `registry` under `baseKey`, in `registry:enumerate()` order -
---- already sorted by (subTypeName, minAge) - so the indexed keys are deterministic across save
---- cycles. Nil-guarded, so a load-order regression warn-skips rather than crashing the
---- surrounding settings save.
+--- Serialize every override under `baseKey` in `registry:enumerate()` order, already sorted,
+--- so the indexed keys are deterministic across save cycles.
 ---@param xmlFile table XMLFile handle (already open)
 ---@param baseKey string e.g. `RLDealerSaleSerialization.XML_BASE_KEY`
 ---@param registry table an RLDealerSaleRegistry instance
@@ -109,12 +101,9 @@ function RLDealerSaleSerialization.saveToXMLFile(xmlFile, baseKey, registry)
 end
 
 --- Deserialize every override under `baseKey` into `registry`. ADDITIVE, set-only: the caller
---- reconstructs the singleton first, so there is no clear here. A corrupt record is skipped by
---- `readOverride` and a present-but-invalid value is rejected by `registry:set` with its own
---- warning; neither aborts the loop. Duplicate `(subType, minAge)` records upsert
---- last-write-wins, so `loaded` can exceed the deduped count on a hand-corrupted file. The
---- `iterate` is pcall-wrapped as a last-resort backstop for an unexpected engine throw -
---- expected corruption returns nil and never throws.
+--- reconstructs the singleton first. A corrupt or invalid record is skipped with a warning
+--- and never aborts the loop, and a duplicate key upserts last-write-wins, so `loaded` can
+--- exceed the deduped count on a hand-corrupted file.
 ---@param xmlFile table XMLFile handle (already open)
 ---@param baseKey string e.g. `RLDealerSaleSerialization.XML_BASE_KEY`
 ---@param registry table an RLDealerSaleRegistry instance (freshly reconstructed by the caller)

@@ -1,34 +1,25 @@
 -- RLFilterFieldCatalog.lua
--- Declarative registry of fields usable in saveable filters.
---
--- Single source of truth consumed by:
---   - RLFilterEvaluator: reads the field value off an animal via `getter(animal)`
---   - RLFilterSerialization / RLFilterWire: `type` drives XML and wire encoding
---   - the UI editor: `cmps`, `animalTypes` and `type` drive the field picker
+-- Declarative registry of the fields usable in saveable filters, read by the evaluator,
+-- both codecs and the editor's field picker.
 --
 -- Field entry shape:
 --   {
 --     key          = "<stable string, also stored in filters>",
 --     type         = "number" | "bool" | "enum" | "string",
 --     cmps         = { "<", "<=", "==", "!=", ">=", ">", "in", "notin", "contains", "notcontains" },
---     animalTypes  = "all" | { "COW", "SHEEP", ... },  -- stable string names;
---                                                       -- resolved at runtime via AnimalType[name]
---                                                       -- (AnimalType global is populated by AnimalSystem
---                                                       -- after our source-time load).
+--     animalTypes  = "all" | { "COW", "SHEEP", ... },  -- stable names, resolved at
+--                                                       -- runtime: the AnimalType global
+--                                                       -- is populated after this load
 --     getter       = function(animal) -> value | nil,
 --     monitorGated = true | false,   -- true means getter requires monitor.active
 --     scale        = "0-99" | nil,   -- presentation scale hint for UI
---     min          = number | nil,   -- inclusive lower bound, number fields only; nil is
---                                    -- unbounded on that side
---     max          = number | nil,   -- inclusive upper bound; see `min`
+--     min          = number | nil,   -- inclusive lower bound, number fields only
+--     max          = number | nil,   -- inclusive upper bound
 --   }
 --
 -- `min` / `max` are enforced by the EDITOR on OK and never by the evaluator, so an
--- out-of-range value still evaluates correctly.
---
--- Canonical genetics scale is 0-99 via RLScaleHelper.scaleToNinetyNine.
--- All enum values use STABLE INTERNAL KEYS (e.g. "male"/"female"), NOT
--- translated strings. UI translates at render time.
+-- out-of-range value still evaluates correctly. Enum values are STABLE INTERNAL KEYS,
+-- never translated strings - the UI translates at render time.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -38,26 +29,17 @@ RLFilterFieldCatalog = {}
 -- Comparator sets
 -- =============================================================================
 
--- Per-type comparator sets:
---   * `!=` kept for number + enum (leaf-level negation primitive since the
---     AST has no NOT operator yet); dropped for bool (redundant with `==`).
---   * `between` intentionally omitted - expressed as AND of two conditions.
---   * string: substring match only. `==`/`!=` deliberately excluded so the
---     op set stays disjoint from enum (both are strings at the Lua-type
---     level). Callers can use `contains <fullName>` for exact match if needed.
+-- Per-type comparator sets. `!=` is the leaf-level negation primitive, the AST having no NOT
+-- operator. String is substring-only, keeping its op set DISJOINT from enum's - both are Lua
+-- strings and would otherwise be indistinguishable.
 local NUMBER_CMPS = { "<", "<=", "==", "!=", ">=", ">", "in", "notin" }
 local BOOL_CMPS   = { "==" }
 local ENUM_CMPS   = { "==", "!=", "in", "notin" }
 local STRING_CMPS = { "contains", "notcontains" }
 
--- Per-type default comparator used by the conditions editor when adding a new
--- row or coercing the cmp on a field-type change. Picked to produce a row that
--- "matches every animal at the default value" so the user can tighten from
--- there: NUMBER -> `>=` (the naive cmps[1] is `<`, which would default to
--- `age < 0` matching nothing); BOOL -> `==` (the only sensible bool cmp);
--- ENUM -> `==` (the only single-value cmp the dialog exposes for scalar
--- enum; `in`/`notin` route through the value-set dialog); STRING -> `contains`
--- (the only positive-match cmp the dialog exposes).
+-- Per-type default comparator for a newly added row. Each is picked so the row MATCHES
+-- EVERY ANIMAL at its default value and the user tightens from there - taking cmps[1]
+-- for a number would default to `age < 0`, which matches nothing.
 local DEFAULT_CMP_BY_TYPE = {
     number = ">=",
     bool   = "==",
@@ -170,19 +152,12 @@ RLFilterFieldCatalog.FIELDS = {
         type        = "bool",
         cmps        = BOOL_CMPS,
         animalTypes = "all",
-        -- Both branches implement the SAME symptomatic-record rule as
-        -- Animal:getHasAnyDisease: only a record at INFECTIOUS counts as disease,
-        -- so an incubating or a recovered-and-immune animal reads healthy here
-        -- exactly as it does through the accessor. The fallback is a second
-        -- implementation of that predicate for plain-table animals - keep the two
-        -- in lockstep, including the diseasesEnabled gate. Both branches return a
-        -- strict boolean by construction (the evaluator type-gates, so a nil return
-        -- silently matches nothing): the accessor's answer is coerced here so a
-        -- foreign animal shape cannot leak nil through this field.
+        -- Both branches implement the SAME symptomatic rule - only an INFECTIOUS record
+        -- counts - and both return a strict boolean, the evaluator type-gating a nil into
+        -- a silent no-match. Keep the plain-table fallback in lockstep, gate included.
         --
-        -- RLDiseaseRecord is read INSIDE the closure, and that is what keeps this
-        -- file's loader position free: the catalog is sourced hundreds of lines
-        -- before the record module, so a file-scope alias would capture a nil.
+        -- RLDiseaseRecord is read INSIDE the closure, which frees this file's load
+        -- position: a file-scope alias would capture a nil.
         getter      = function(animal)
             if animal.getHasAnyDisease ~= nil then return animal:getHasAnyDisease() == true end
             if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled
@@ -220,14 +195,10 @@ RLFilterFieldCatalog.FIELDS = {
         type        = "string",
         cmps        = STRING_CMPS,
         animalTypes = "all",
-        -- Free-text animal name. Returns "" (not nil) for unset / empty-string
-        -- names so notcontains gets the right semantic for unnamed animals:
-        -- an empty name vacuously does not contain any needle -> notcontains
-        -- is true. If we returned nil, the evaluator's blanket nil-guard would
-        -- collapse notcontains to false, which silently excludes every
-        -- unnamed animal from a "name notcontains X" filter (the symptom that
-        -- turned up when testing chicken/sheep butcher filters where most
-        -- animals are unnamed).
+        -- Returns "" and NEVER nil for an unset name: an empty name vacuously does
+        -- not contain any needle, so notcontains is true. A nil would hit the
+        -- evaluator's blanket guard and collapse notcontains to false, silently
+        -- excluding every unnamed animal from such a filter.
         getter      = function(animal)
             if animal.name == nil then return "" end
             return animal.name
@@ -246,11 +217,8 @@ RLFilterFieldCatalog.FIELDS = {
             if not monitorActive(animal) then return nil end
             return animal.weight
         end,
-        -- Only the floor is knowable. Per-species target weights are derived
-        -- at runtime from model dimensions and vary across map mods, so the
-        -- realistic ceiling isn't a fixed constant. `min=0` rejects nonsensical
-        -- negatives without imposing a guessed cap; per-species caps tracked
-        -- separately if data warrants.
+        -- Only the FLOOR is knowable: target weights are derived at runtime and vary
+        -- by map mod, so there is no fixed ceiling to impose without guessing.
         min          = 0,
     },
     {
@@ -391,16 +359,8 @@ function RLFilterFieldCatalog.get(key)
     return RLFilterFieldCatalog._BY_KEY[key]
 end
 
---- Pure-data inclusive-range check for editor commits. The dialog calls
---- this after the NaN/Inf reject in onClickOk so absurd-but-finite numbers
---- (e.g. age >= 1e+30) refuse to commit instead of silently producing a
---- no-op filter.
----
---- The check is type-aware: non-number fields and number fields without
---- bounds short-circuit to `true, nil`. The evaluator never consults
---- min/max - out-of-range values still evaluate correctly; this is
---- editor-only UX polish.
----
+--- Inclusive-range check for editor commits, run after the NaN reject. EDITOR-ONLY: the
+--- evaluator never consults min/max, and an out-of-range value still evaluates correctly.
 ---@param field table|nil entry from FIELDS (nil-tolerant; treated as in-range)
 ---@param num number value to check
 ---@return boolean ok true when in range, false otherwise
@@ -438,11 +398,9 @@ end
 --- reported independently.
 local _warnedAnimalTypeMissing = false
 
---- True when the given field is valid for a given animalTypeIndex.
---- Missing animalTypeIndex is treated as "all types" for tooling.
---- `field.animalTypes` holds stable string names ("COW", "SHEEP", ...)
---- which we resolve via `AnimalType[name]` at call time, since the global
---- is populated by `AnimalSystem:loadAnimals` AFTER our source-time load.
+--- True when a field is valid for an animal type; a missing index means all types. The
+--- declared NAMES resolve at CALL time, because the registry global is populated after
+--- this file loads.
 ---@param field table entry from FIELDS
 ---@param animalTypeIndex number|nil
 ---@return boolean
@@ -463,13 +421,9 @@ function RLFilterFieldCatalog.isAvailableForType(field, animalTypeIndex)
     return false
 end
 
---- Return the ordered subset of FIELDS that pass `isAvailableForType` for
---- `animalTypeIndex` and (optionally) match `typeFilter` against `field.type`.
----
---- `typeFilter` is either nil (no type filter), a string ("number"), or a set
---- table `{ number = true, bool = true }`. Ordering follows the canonical
---- FIELDS array (declaration order), which the editor relies on to keep the
---- field picker stable across re-renders.
+--- The ordered subset of FIELDS available for an animal type, optionally narrowed by
+--- `typeFilter` - nil, a type string, or a set table. Ordering follows DECLARATION order,
+--- which is what keeps the editor's field picker stable across re-renders.
 ---@param animalTypeIndex number|nil
 ---@param typeFilter string|table|nil
 ---@return table[] filtered ordered field entries
@@ -492,14 +446,8 @@ function RLFilterFieldCatalog.getAllForAnimalType(animalTypeIndex, typeFilter)
     return out
 end
 
---- Return the per-type default value used when seeding a new condition row or
---- coercing on a field-type change. NUMBER -> 0, BOOL -> false, STRING -> ""
---- (empty needle; the dialog's empty-string reject prevents committing as-is
---- but the seed has to be safe to render). ENUM defaults are domain-driven
---- (subType is per-animal-type, gender is fixed but still lives in
---- RLFilterFieldDisplay to keep the catalog free of UI coupling); the catalog
---- returns nil and the dialog patches in domain[1] after coercion. Unknown
---- types fall back to nil and the caller's defensive-default branch.
+--- Per-type default for a newly seeded row: 0, false or the empty needle. ENUM returns NIL -
+--- its domains live with the display layer, and the dialog patches in domain[1] after coercion.
 ---@param fieldType string|nil
 ---@return any default value (nil for enum and unknown types)
 function RLFilterFieldCatalog.getDefaultValueForType(fieldType)
@@ -510,12 +458,8 @@ function RLFilterFieldCatalog.getDefaultValueForType(fieldType)
     return nil
 end
 
---- Return the default cmp for the given field. Consults
---- `DEFAULT_CMP_BY_TYPE` first; on miss falls back to `field.cmps[1]` so a
---- future field type still gets a deterministic default when added later
---- still gets a deterministic default. Returns nil only when the field has
---- neither a default-by-type entry nor any cmps configured (treated as a
---- catalog defect; logged at TRACE).
+--- The default cmp for a field, falling back to its first cmp so a future type still gets
+--- a deterministic default. Returns nil only for a field with neither - a catalog defect.
 ---@param field table entry from FIELDS
 ---@return string|nil cmp
 function RLFilterFieldCatalog.getDefaultCmpForField(field)
@@ -535,24 +479,10 @@ end
 -- Exposed for tests that need to inspect the default table directly.
 RLFilterFieldCatalog._DEFAULT_CMP_BY_TYPE = DEFAULT_CMP_BY_TYPE
 
---- Coerce a condition row when the field has just changed. Pure data; no GUI
---- or state side effects. Encodes the legacy invariants from the inline-widget
---- editor's onConditionFieldChanged (RLMenuSettingsFrame.lua pre-v2-modal):
----   1. The cmp survives if the new field still accepts it; otherwise it
----      resets to getDefaultCmpForField(newField).
----   2. When the field's type diverges (number <-> bool, etc.), the value
----      resets to getDefaultValueForType(newField.type) AND the stale
----      `rawText` (the in-flight TextInput buffer for number rows) is added
----      to the clearKeys list. F2 lesson: nil-valued keys in a table literal
----      vanish during construction, so callers MUST explicitly clear rather
----      than rely on `patch.rawText = nil`.
----   3. Number -> Number (or bool -> bool) preserves value + rawText.
----
---- Caller decides what "editable" means for cmp validity: the editor strips
---- multi-value cmps (`in`, `notin`) for field types without a multi-value widget,
---- so the caller passes its filtered list via `editableCmps`. When nil, the
---- helper falls back to newField.cmps (all catalog cmps).
----
+--- Coerce a condition row after a field change. The cmp survives if the new field accepts it,
+--- else resets; a diverging TYPE also resets the value and names the stale rawText in
+--- clearKeys, a nil-valued key vanishing from a table literal. The CALLER decides which cmps
+--- are editable.
 ---@param oldCond table {field=string, cmp=string, value=any, rawText=string?}
 ---@param newFieldKey string the field the user just selected
 ---@param editableCmps string[]|nil whitelist of cmps the caller's editor renders
@@ -592,13 +522,10 @@ function RLFilterFieldCatalog.coerceConditionOnFieldChange(oldCond, newFieldKey,
     if typesDiverge then
         local defaultValue = RLFilterFieldCatalog.getDefaultValueForType(newField.type)
         if defaultValue == nil then
-            -- F2 lesson generalised: enum's default value is domain-driven
-            -- (subType is per-animal-type, gender lives in RLFilterFieldDisplay
-            -- to keep the catalog free of UI coupling). The catalog can't seed
-            -- it, so we flag `value` for explicit clearing and let the dialog
-            -- patch in domain[1] after coercion. Without this the stale enum
-            -- value from oldCond would survive the type swap (the patch
-            -- merge guards on `~= nil`).
+            -- Enum's default is domain-driven and the catalog cannot seed it, so flag
+            -- `value` for explicit clearing and let the dialog patch in domain[1].
+            -- Without this the stale enum value survives the type swap, the patch merge
+            -- guarding on `~= nil`.
             clearKeys = { "rawText", "value" }
         else
             patch.value = defaultValue
@@ -630,20 +557,9 @@ local function cmpShape(cmp)
     return nil
 end
 
---- Coerce a condition row when the cmp changes within the same field. Handles
---- scalar<->list shape changes by wrapping / unwrapping the value:
----   * scalar -> list: wrap in singleton list when non-nil; nil stays nil
----     (the dialog seeds defaults on refresh).
----   * list -> scalar: take value[1] (first element in the stored list -
----     the order the user committed; drifted values are NOT stripped here,
----     the dialog's drift check at refresh time catches them).
----   * scalar -> scalar (and list -> list): value preserved verbatim.
----   * substring <-> list / substring <-> scalar (other-than-string-scalar):
----     illegal transition for ENUM/STRING/etc.; clear value + rawText.
----
---- Catalog-side and pure-data; the dialog handles the carry-over of
---- `valueDrifted` (an editor-state flag, not a catalog concern).
----
+--- Coerce a condition row when the cmp changes within one field, wrapping or unwrapping the
+--- value across a scalar/list shape change. A list narrowing to a scalar takes the FIRST
+--- element; an illegal transition clears both the value and the raw text.
 ---@param oldCond table {field, cmp, value, rawText?}
 ---@param newCmp string the cmp the user just picked
 ---@param fieldEntry table the active catalog field (cmp set must include newCmp)

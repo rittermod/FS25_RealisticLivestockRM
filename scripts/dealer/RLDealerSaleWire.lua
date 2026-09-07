@@ -14,39 +14,29 @@
 --     streamWriteUInt16(count)      -- count = validated-then-clamped survivors
 --     for i = 1, count do writeRecord(streamId, survivors[i]) end
 --
--- All four fields are ALWAYS written, in that order. `isSet = true` is a registry override
--- carrying its desired value; `isSet = false` is a clear op, whose `canBeBought` slot is
--- written `false` and ignored on read. Set-level framing lives here rather than on the state
--- event because two events share this payload, and duplicating count, cap and loop per event
--- would invite a one-sided drift.
+-- All four fields are ALWAYS written, in that order. `isSet = true` carries a desired value;
+-- `isSet = false` is a clear op, whose `canBeBought` slot is written `false` and ignored.
 --
--- Writer validates and CLAMPS; reader validates and SKIPS. `writeList` drops an invalid record
--- with a warning naming the key, clamps the survivors to MAX_RECORD_COUNT, and only then writes
--- the count. `readList` refuses the WHOLE payload when the count breaches the cap.
--- `readRecord` always consumes all four fields BEFORE judging, so a skipped record never
--- disturbs framing. A `minAge` is never truncated into range - that would re-key the override
--- onto a different animal stage.
+-- Writer validates and CLAMPS; reader validates and SKIPS. `readRecord` consumes all four
+-- fields BEFORE judging, so a skipped record never disturbs framing, and `readList` refuses
+-- the WHOLE payload when the count breaches the cap. A `minAge` is never truncated into
+-- range - that would re-key the override onto a different animal stage.
 --
--- Writer and reader share ONE predicate per key field, so the writer can never emit a name or
--- age the reader rejects. The two boolean slots are not re-checked on read, because
--- streamReadBool cannot return a non-boolean.
+-- Writer and reader share ONE predicate per key field, so the writer can never emit a key the
+-- reader rejects. The boolean slots are not re-checked, streamReadBool being total.
 
 local Log = RmLogging.getLogger("RLRM")
 
 RLDealerSaleWire = {}
 
---- Upper sanity bound on the wire-side record count. Any registry accumulating 10,000 stage
---- overrides is pathological; the cap's real purpose is to keep a desynced upstream stream -
---- which could produce a count up to 65535 - from spinning the reader into a session-timing-out
---- crash. A desync defense, NOT an authorization control: a tighter domain-sized bound would
---- risk refusing a legitimately large modded subtype set.
+--- Upper sanity bound on the wire-side record count: a DESYNC defense, not an authorization
+--- control. It keeps a desynced stream, whose count can reach 65535, from spinning the reader
+--- into a session-timing-out crash, while staying wide enough for a large modded subtype set.
 RLDealerSaleWire.MAX_RECORD_COUNT = 10000
 
 --- Widest value the UInt16 minAge slot carries, taken from the registry so storage and
---- transport share ONE domain: a key the registry accepted but this codec could not carry would
---- be applied on the server and dropped from every client snapshot, diverging them permanently.
---- Out-of-range is a DROP, never a clamp - streamWriteUInt16 throws above this, and truncating
---- would silently re-key the override onto a different animal stage.
+--- transport share ONE domain. Out-of-range is a DROP, never a clamp - streamWriteUInt16
+--- throws above this, and truncating would re-key the override onto a different stage.
 local MAX_MIN_AGE = RLDealerSaleRegistry.MAX_MIN_AGE
 
 --- True when `subTypeName` can key a stage, matching the registry's own key rule so writer and
@@ -97,9 +87,8 @@ end
 -- Record IO
 -- =============================================================================
 
---- Write one four-field record. Trusts caller validation: `writeList` is the single production
---- entry and rejects a bad record BEFORE the count is written, because a record refused
---- mid-list would leave the count disagreeing with the payload.
+--- Write one four-field record. Trusts caller validation - `writeList` rejects a bad record
+--- BEFORE the count is written, a mid-list refusal leaving count and payload disagreeing.
 ---@param streamId number
 ---@param rec table { subTypeName=, minAge=, isSet=, canBeBought= }
 function RLDealerSaleWire.writeRecord(streamId, rec)

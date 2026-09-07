@@ -2,18 +2,15 @@
 -- Resolves which dealer-quality preset is ACTIVE, and the markup that follows from it, for
 -- every consumer that prices or generates a dealer animal.
 --
--- Split in two: `indexFrom(settings)` is ENV-FREE - data in, data out, no global reads and no
--- mutation of the argument - so it dual-runs headless against a literal table, and
--- `getActiveIndex()` is the adapter that reads the real RLSettings.
+-- Split in two: `indexFrom(settings)` is ENV-FREE so it dual-runs headless against a literal
+-- table, and `getActiveIndex()` is the adapter that reads the real RLSettings.
 --
--- The active preset comes from `RLSettings.SETTINGS.dealerQuality.state` rather than a mirror
--- field on AnimalSystem: the markup is read on CLIENTS too, a mirror only exists where the
--- settings callback has fired, and `state` is what the wire actually carries.
+-- The active preset comes from `RLSettings.SETTINGS.dealerQuality.state`, not a mirror field
+-- on AnimalSystem: the markup is read on CLIENTS too, where no settings callback has fired.
 --
--- Guard asymmetry, deliberate: RLSettings is nil-guarded because its absence is a LEGITIMATE
--- state (headless, or very early load). RLDealerQualityModel is guarded nowhere, because its
--- absence is always a packaging or load-order error, and failing loud at the first dereference
--- catches that before shipping instead of silently pricing at a fallback.
+-- Guard asymmetry, deliberate: RLSettings is nil-guarded because its absence is LEGITIMATE
+-- (headless, or very early load); RLDealerQualityModel is guarded nowhere, because its absence
+-- is always a packaging error and must fail loud rather than price at a fallback.
 
 RLDealerQualityResolver = {}
 
@@ -32,9 +29,8 @@ local loggedAbsentSettings = false
 local lastMarkupIndex = RLDealerQualityModel.DEFAULT_INDEX
 
 
---- Resolve a validated preset index from a settings table. Env-free, and any shape that is not
---- a valid 1..PRESET_COUNT index resolves to DEFAULT_INDEX, so callers never validate the
---- result.
+--- Resolve a validated preset index from a settings table. Env-free, and anything that is not
+--- a valid index resolves to DEFAULT_INDEX, so callers never validate the result.
 --- @param settings table|nil The RLSettings.SETTINGS table, or any literal table
 --- @return number presetIndex A valid preset index, never nil
 function RLDealerQualityResolver.indexFrom(settings)
@@ -48,9 +44,8 @@ function RLDealerQualityResolver.indexFrom(settings)
     end
 
     -- The type test is load-bearing on this per-row price path: a scalar entry, from a
-    -- hand-edited save or a migration writing the index directly, would raise on the index. An
-    -- explicit assignment rather than the `and/or` idiom, which collapses a `false` state to
-    -- nil and would skip the warning below.
+    -- hand-edited save, would raise on the index. Explicit assignment rather than `and/or`,
+    -- which collapses a `false` state to nil and would skip the warning below.
     local entry = settings.dealerQuality
     local state = nil
 
@@ -74,19 +69,17 @@ function RLDealerQualityResolver.indexFrom(settings)
 end
 
 
---- The active preset index for this machine, read from live settings. Reading an undefined
---- global yields nil in Lua, so the RLSettings guard is what lets the pricing path load
---- headless rather than ceremony.
+--- The active preset index for this machine, read from live settings. The RLSettings guard is
+--- what lets the pricing path load headless.
 --- @return number presetIndex A valid preset index, never nil
 function RLDealerQualityResolver.getActiveIndex()
     return RLDealerQualityResolver.indexFrom(RLSettings ~= nil and RLSettings.SETTINGS or nil)
 end
 
 
---- The buy-side markup for the active preset - THE markup accessor for every live pricing path.
---- The herdsman reaches it indirectly, because RLHerdsmanPlanner must stay pure:
---- RLHerdsmanDayTick.buildEnv calls this once per tick and injects the result as ctx.buyMarkup.
---- Logs only when the resolved preset CHANGES, since this sits on the dealer-row render path.
+--- The buy-side markup for the active preset - THE markup accessor for every live pricing
+--- path. The herdsman reaches it indirectly through `ctx.buyMarkup`, RLHerdsmanPlanner having
+--- to stay pure. Logs only when the resolved preset CHANGES; this is a render path.
 --- @return number markup Multiplier applied to an animal's sell price
 function RLDealerQualityResolver.getMarkup()
     local presetIndex = RLDealerQualityResolver.getActiveIndex()
