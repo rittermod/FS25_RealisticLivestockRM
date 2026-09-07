@@ -110,11 +110,9 @@ function RLMenuInfoFrame.setupGui()
     Log:debug("RLMenuInfoFrame.setupGui: registered")
 end
 
---- Bind the SmoothList datasource/delegate. Must not mutate the element
---- tree here: this hook fires on both the frame-only load instance AND
---- the clone resolveFrameReference creates, and tree mutation on the
---- first instance leaves the clone without what it needs. Tree mutation
---- lives in `initialize()` below, called by the host menu on the clone.
+--- Bind the SmoothList datasource and delegate. Must NOT mutate the element tree: this
+--- fires on both the original and the clone, and mutating the first leaves the clone
+--- without what it needs. Tree mutation lives in initialize() instead.
 function RLMenuInfoFrame:onGuiSetupFinished()
     RLMenuInfoFrame:superClass().onGuiSetupFinished(self)
 
@@ -167,33 +165,24 @@ function RLMenuInfoFrame:onFrameOpen()
             tostring(shared.animalIdentity and shared.animalIdentity.uniqueId))
     end
 
-    -- Reset SmoothList's selection sentinels to 0 (the "no selection"
-    -- sentinel value) so the chained captureCurrentSelection during
-    -- refreshHusbandries -> reloadAnimalList short-circuits via its
-    -- sectionOrder guard instead of overwriting the just-imported
-    -- selectedIdentity. Must be 0, not nil - SmoothList expects numeric
-    -- indices and crashes on nil.
+    -- Reset the selection sentinels so the chained capture short-circuits instead of
+    -- overwriting the just-imported identity. Must be 0, not nil: SmoothList expects
+    -- numeric indices and crashes on nil.
     if self.animalList ~= nil then
         self.animalList.selectedSectionIndex = 0
         self.animalList.selectedIndex = 0
     end
 
-    -- refreshHusbandries owns chrome state for both populated and empty
-    -- husbandry cases. Do NOT clearDetail here: refreshHusbandries auto-
-    -- selects state 1, which fires onHusbandryChanged -> updatePenDisplay,
-    -- and a trailing clearDetail would wipe the pen we just rendered.
+    -- Do NOT clearDetail here: refreshHusbandries auto-selects state 1, which renders
+    -- the pen, and a trailing clear would wipe what it just drew.
     self:refreshHusbandries()
 
-    -- Subscribe to MONEY_CHANGED so the header balance refreshes whenever
-    -- any code path credits/debits the farm while this frame is open. Info
-    -- does not mutate the balance itself but displays it and would drift
-    -- under external credits (other players, production events) in MP.
+    -- Info never moves money itself, but it displays the balance, which would drift
+    -- under an external credit while the frame is open.
     g_messageCenter:subscribe(MessageType.MONEY_CHANGED, self.onMoneyChanged, self)
 
-    -- Explicit focus links for keyboard navigation (Fresh RmSettingsFrame
-    -- pattern). Required because multiple frames share the same sidebar +
-    -- SmoothList structure, and FocusManager auto-layout resolves to
-    -- elements in other frames when element positions/IDs overlap.
+    -- Explicit focus links: several frames share this sidebar and list structure, so
+    -- FocusManager auto-layout can otherwise resolve into another frame's elements.
     if self.subCategorySelector ~= nil and self.animalList ~= nil then
         FocusManager:linkElements(self.subCategorySelector, FocusManager.BOTTOM, self.animalList)
         FocusManager:linkElements(self.animalList, FocusManager.TOP, self.subCategorySelector)
@@ -242,10 +231,7 @@ function RLMenuInfoFrame:onFrameClose()
 end
 
 
----MessageType.MONEY_CHANGED handler. Delegates to the existing
----updateMoneyDisplay wrapper to keep the refresh path consistent with
----other Info-tab call sites. No farmId gating needed because
----updateMoneyDisplay reads the current player's farm internally.
+---MONEY_CHANGED handler, routed through the same wrapper as every other call site.
 function RLMenuInfoFrame:onMoneyChanged()
     if not self.isFrameOpen then return end
     Log:trace("RLMenuInfoFrame:onMoneyChanged: refreshing money display")
@@ -265,10 +251,8 @@ function RLMenuInfoFrame:refreshHusbandries()
     Log:debug("RLMenuInfoFrame:refreshHusbandries: farmId=%s husbandries=%d",
         tostring(farmId), #self.sortedHusbandries)
 
-    -- Capture-and-consume the one-shot MODE_FULL husbandry anchor into a local and
-    -- clear the shared field NOW - before the empty-list guard below - so every path
-    -- (empty, selector-nil, populated) consumes it exactly once and none leaks it to
-    -- a later open. resolveIndex (below) prefers this anchor over the shared selection.
+    -- Consume the one-shot anchor NOW, before the empty-list guard below, so every path
+    -- consumes it exactly once and none leaks it into a later open.
     local anchorHusbandry = nil
     if g_rlMenu ~= nil then
         anchorHusbandry = g_rlMenu.anchoredHusbandry
@@ -381,10 +365,8 @@ function RLMenuInfoFrame:onHusbandryChanged(state)
     self:reloadAnimalList()
     self:updatePenDisplay()
     self:updateMoneyDisplay()
-    -- Do NOT clearAnimalDetail() here. reloadAnimalList -> restoreSelection
-    -- now actively seeds the animal column for the auto-selected first row
-    -- A trailing clear would wipe what restoreSelection just rendered.
-    -- The empty-husbandry case is handled inside restoreSelection itself.
+    -- Do NOT clearAnimalDetail here: restoreSelection seeds the animal column for the
+    -- auto-selected row, and handles the empty-husbandry case itself.
 end
 
 ---SmoothList delegate: fired when the user picks a different row.
@@ -420,11 +402,8 @@ end
 -- Animal list
 -- =============================================================================
 
---- Build the dialog source list for the Quick filter dialog.
---- Mirrors reloadAnimalList's universe construction MINUS the Quick filter,
---- so the dialog's slider min/max derivation sees the full pen (or saved-
---- filter-narrowed pen) instead of the already-Quick-filtered subset.
---- Parity with reloadAnimalList is enforceable by eye (the two are stacked).
+--- The Quick filter dialog's source list: reloadAnimalList's universe MINUS the Quick
+--- filter, so the slider ranges see the full pen rather than the filtered subset.
 ---@return table base   full unfiltered husbandry universe
 ---@return table narrowed base after saved-filter layer (== base when none)
 function RLMenuInfoFrame:buildDialogSourceList()
@@ -608,14 +587,10 @@ function RLMenuInfoFrame:updateButtonVisibility()
         -- Rename - always shown
         table.insert(self.menuButtonInfo, self.renameButtonInfo)
 
-        -- Diseases - always shown, disabled without trade permission. Opening the
-        -- dialog commits the farm to a recurring per-period treatment fee, which is
-        -- why this button gates on a permission at all while its neighbours here
-        -- disable only on per-animal state (already castrated, monitor removed).
-        -- Written unconditionally within this block: the buttonInfo table is reused
-        -- across calls, so a stale `true` would survive a permission grant.
-        -- Also disabled while the disease engine is off: there is nothing to treat, and
-        -- the dialog's own refusal would otherwise be the player's first feedback.
+        -- Diseases gates on a PERMISSION where its neighbours gate on per-animal state,
+        -- because opening it commits the farm to a recurring treatment fee. Written
+        -- unconditionally: the buttonInfo table is reused, so a stale `true` would
+        -- survive a permission grant.
         local diseasesOff = g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled
         self.diseasesButtonInfo.disabled = diseasesOff or not RLPermissionHelper.hasLocalPermission("tradeAnimals")
         table.insert(self.menuButtonInfo, self.diseasesButtonInfo)
@@ -674,10 +649,8 @@ end
 -- Filter button
 -- =============================================================================
 
----Open AnimalFilterDialog for the current husbandry's animals.
----Source list is built from the render universe MINUS the Quick filter so
----slider ranges always reflect the full pen (or saved-filter-narrowed pen),
----never the already-Quick-filtered subset.
+---Open the Quick filter dialog. Its source excludes the Quick filter, so the slider
+---ranges reflect the full pen rather than the already-filtered subset.
 function RLMenuInfoFrame:onClickFilter()
     if self.selectedHusbandry == nil then return end
     if AnimalFilterDialog == nil or AnimalFilterDialog.show == nil then
@@ -1012,10 +985,8 @@ end
 -- Saved-filter cycle + chip
 -- =============================================================================
 
---- Cycle the active saved filter (F key). Reads current animalType from the
---- selected husbandry and the farm from self.farmId; resolves the next id via
---- RLFilterCycleHelper. Zero-availability hits a TRACE no-op branch so the
---- button can stay visible even with no filters configured.
+--- Cycle the active saved filter, scoped to the selected husbandry's type and farm.
+--- With no filters configured this is a no-op, so the button can stay visible.
 function RLMenuInfoFrame:onCycleFilter()
     if self.farmId == nil or self.farmId == 0 then
         Log:trace("RLMenuInfoFrame:onCycleFilter: no farm, aborting")
@@ -1052,10 +1023,8 @@ function RLMenuInfoFrame:onCycleFilter()
     self:reloadAnimalList()
 end
 
---- Render the filterChip Text element to reflect the combined Quick filter
---- + saved filter state. Delegates branch resolution to the
---- shared RLFilterChipHelper so all four RL Menu frames render consistently.
---- No-op + WARNING if the XML element is missing.
+--- Render the filter chip from the combined Quick and saved filter state, through the
+--- shared helper so every frame renders it the same way.
 function RLMenuInfoFrame:updateFilterChip()
     local chip = self.filterChip
     if chip == nil then
@@ -1097,10 +1066,8 @@ function RLMenuInfoFrame:updateFilterChip()
     end
 end
 
---- Revalidate activeFilterId against the current scope. Clears when the
---- cached id is no longer in listAvailable (farm swap, husbandry type change,
---- remote delete via future Spec B). Refreshes the cached snapshot when
---- still in scope so name / expression changes are picked up.
+--- Revalidate the active filter against the current scope: clears the cached id once it
+--- leaves listAvailable, and refreshes the snapshot while it is still in scope.
 function RLMenuInfoFrame:revalidateActiveFilter()
     if self.activeFilterId == nil then return end
 
@@ -1139,10 +1106,9 @@ function RLMenuInfoFrame:revalidateActiveFilter()
     end
 end
 
---- Remote-change fanout hook fired from RLFilter{Create,Update,Delete}Event:run
---- when a peer mutates a saved filter. Id-match gate short-circuits when the
---- changed filter is not this frame's active filter, preserving user selection
---- and detail-pane state. Otherwise re-runs revalidateActiveFilter +
+--- Remote-change hook for a peer mutating a saved filter. The id-match gate
+--- short-circuits for any filter but this frame's active one, preserving the selection
+--- and the detail pane. Otherwise re-runs revalidateActiveFilter +
 --- updateFilterChip + reloadAnimalList so the displayed list reflects the
 --- new active-filter state. Clears g_rlMenu.sharedSelection.activeFilterId
 --- when revalidate cleared the active filter (Info participates in shared

@@ -46,26 +46,20 @@ function RLMenuTransferFrame.new()
     -- switch (the two sides are different animal universes).
     self.selectedAnimals   = {}
 
-    -- In-flight lock: a transfer is a server round-trip in MP, so the action
-    -- button (selection-gated, not request-gated) is locked between dispatch and
-    -- onTransferComplete to block a duplicate submit. Re-initialized on every open.
+    -- In-flight lock between dispatch and completion: the action button is
+    -- selection-gated, not request-gated, so nothing else blocks a duplicate submit.
     self.movePending       = false
 
-    -- World-counterpart refresh hook (Bug A). The world redirect skips the legacy
-    -- controller set, so the trailer's animalScreenController slot is nil and nothing
-    -- refreshes the world list when its trigger contents change. On open we claim that
-    -- slot (world only) so the trailer drives onAnimalsChanged on this frame after a
-    -- load; on close we restore the prior owner. Capture-once + restore-if-self keep it
-    -- ownership-safe.
+    -- World-counterpart refresh hook. The world redirect skips the legacy controller
+    -- set, so the trailer's controller slot is nil and nothing refreshes the world list
+    -- when its trigger contents change; this frame claims the slot while open.
     self.worldRefreshHookInstalled  = false
     self.priorAnimalScreenController = nil
 
     self.isFrameOpen = false
     self.hasCustomMenuButtons = true
 
-    -- Footer buttons. Back is always present; Select / SelectAll show when the
-    -- side has rows. The action splits into two like Move/Buy/Sell: X (EXTRA_1)
-    -- transfers the highlighted single row, C (EXTRA_2) transfers the checked set.
+    -- Footer buttons. Back always; Select and SelectAll once the side has rows.
     self.backButtonInfo = { inputAction = InputAction.MENU_BACK }
     self.selectButtonInfo = {
         inputAction = InputAction.RL_SELECT,
@@ -77,11 +71,9 @@ function RLMenuTransferFrame.new()
         text = g_i18n:getText("rl_ui_selectAll"),
         callback = function() self:onClickSelectAll() end,
     }
-    -- Single action (X) on EXTRA_1 - the highlighted row - matching the slot the
-    -- sibling tabs reserve for the single action. Selected action (C) on EXTRA_2 -
-    -- the checked set. Both route through the same dispatchTransfer; the seed text
-    -- is the generic load key and updateButtonVisibility overwrites it with the
-    -- adapter's dynamic verb per direction.
+    -- EXTRA_1 transfers the highlighted row, EXTRA_2 the checked set; both route
+    -- through dispatchTransfer. updateButtonVisibility overwrites the seed text with
+    -- the adapter's verb for the current direction.
     self.actionSingleButtonInfo = {
         inputAction = InputAction.MENU_EXTRA_1,
         text = g_i18n:getText(RLTransferAdapter.LOAD_LABEL_KEY),
@@ -112,8 +104,8 @@ function RLMenuTransferFrame.setupGui()
 end
 
 
---- Bind the SmoothList datasource/delegate. Fires on both the initial load
---- instance and the FrameReference clone; tree mutation lives in initialize().
+--- Bind the SmoothList datasource and delegate. Fires on both the original and the clone,
+--- so tree mutation lives in initialize().
 function RLMenuTransferFrame:onGuiSetupFinished()
     RLMenuTransferFrame:superClass().onGuiSetupFinished(self)
 
@@ -149,20 +141,17 @@ function RLMenuTransferFrame:onFrameOpen()
     RLMenuTransferFrame:superClass().onFrameOpen(self)
     self.isFrameOpen = true
 
-    -- Per-session reset of the world-refresh hook state. The frame is a reused
-    -- singleton; if a prior session's onFrameClose was skipped (RLMenu:onClose wraps
-    -- super in pcall, and super is what fires onFrameClose - so a throw before it skips
-    -- our uninstall), a stale installed flag would make installWorldRefreshHook below a
-    -- no-op and strand the prior capture. Clear (do NOT restore): a leftover self in some
-    -- other trailer's slot is harmless - onAnimalsChanged is gated on obj == self.trailer.
+    -- Reset the hook state per session: the frame is a reused singleton, and a prior
+    -- close skipped by a throw would leave a stale flag that makes the install below a
+    -- no-op. Clear rather than restore - a leftover self in another trailer's slot is
+    -- harmless, since onAnimalsChanged is gated on the trailer matching.
     self.worldRefreshHookInstalled  = false
     self.priorAnimalScreenController = nil
 
     if g_rlMenu ~= nil then
         self.trailer     = g_rlMenu.trailerVehicle
         self.counterpart = g_rlMenu.trailerCounterpart
-        -- counterpartHandle is the engine ref a concrete adapter enumerates; the
-        -- trigger-redirect slices populate it. nil here (the shell ignores it).
+        -- counterpartHandle is the engine ref a concrete adapter enumerates.
         self.context = {
             trailer           = self.trailer,
             counterpart       = self.counterpart,
@@ -177,13 +166,9 @@ function RLMenuTransferFrame:onFrameOpen()
     self.selectedAnimals = {}
     self.movePending = false
 
-    -- Completion callback handed to the move service via the adapter. The closure
-    -- captures BOTH the trailer and the counterpart (pen) at open time - the
-    -- stale-callback guard: if the frame is closed, OR reopened on a different
-    -- trailer, OR reopened on the SAME trailer at a different pen before the server
-    -- responds, onTransferComplete drops the callback (no repaint of a reopened
-    -- session - the counterpart handle is what varies per session, like the Move
-    -- frame's selectedHusbandry identity).
+    -- The closure captures BOTH the trailer and the counterpart at open time, so a
+    -- reply arriving after a close - or after a reopen on a different trailer or pen -
+    -- is dropped rather than repainting the new session.
     local dispatchedTrailer = self.trailer
     local dispatchedCounterpart = self.context.counterpartHandle
     self.context.onComplete = function(success, errorText)
@@ -194,8 +179,7 @@ function RLMenuTransferFrame:onFrameOpen()
     Log:info("RLMenuTransferFrame:onFrameOpen: counterpart=%s trailer='%s'",
         tostring(self.counterpart), tostring(trailerName))
 
-    -- Reset SmoothList selection sentinels to 0 (the "no selection" sentinel) so
-    -- a stale focus index does not leak into the first reload.
+    -- Reset the selection sentinels so a stale focus index cannot leak into the reload.
     if self.animalList ~= nil then
         self.animalList.selectedSectionIndex = 0
         self.animalList.selectedIndex = 0
@@ -203,8 +187,8 @@ function RLMenuTransferFrame:onFrameOpen()
 
     self:refreshSources()
 
-    -- Explicit focus links for keyboard navigation (shared sidebar/list structure
-    -- across frames; FocusManager auto-layout otherwise resolves to other frames).
+    -- Explicit focus links: several frames share this sidebar and list structure, so
+    -- FocusManager auto-layout can otherwise resolve into another frame's elements.
     if self.subCategorySelector ~= nil and self.animalList ~= nil then
         FocusManager:linkElements(self.subCategorySelector, FocusManager.BOTTOM, self.animalList)
         FocusManager:linkElements(self.animalList, FocusManager.TOP, self.subCategorySelector)
@@ -213,16 +197,13 @@ function RLMenuTransferFrame:onFrameOpen()
         FocusManager:setFocus(self.animalList)
     end
 
-    -- Claim the trailer's controller slot (world counterpart only) so the trailer
-    -- refreshes the loose-rideable list after a load. Runs after self.trailer/
-    -- self.counterpart are set; no-op otherwise.
+    -- Runs after trailer and counterpart are set; a no-op for any other counterpart.
     self:installWorldRefreshHook()
 end
 
 
---- Called by the Paging element when this tab is deactivated. Transfer has no
---- sibling tab in MODE_TRAILER, so there is no shared-selection export. Releases
---- the world-refresh controller hook (restore-if-self) before the frame goes idle.
+--- Deactivation hook: releases the world-refresh controller slot. There is no
+--- shared-selection export, since Transfer has no sibling tab in trailer mode.
 function RLMenuTransferFrame:onFrameClose()
     RLMenuTransferFrame:superClass().onFrameClose(self)
     self.isFrameOpen = false
@@ -234,10 +215,9 @@ end
 -- World-counterpart refresh hook (Bug A)
 -- =============================================================================
 
---- Whether self.trailer is a live, controller-capable livestock trailer. Guards
---- every trailer/spec deref in the world-refresh lifecycle (install, restore,
---- onAnimalsChanged) so a sold/deleted trailer no-ops instead of dereferencing a
---- torn-down spec. GUI-free (reads self.trailer fields only) so it is unit-testable.
+--- Whether self.trailer is a live, controller-capable livestock trailer. Guards every
+--- deref in the world-refresh lifecycle, so a sold trailer no-ops rather than
+--- dereferencing a torn-down spec.
 --- @return boolean live
 function RLMenuTransferFrame:isTrailerLive()
     return self.trailer ~= nil
@@ -247,16 +227,10 @@ function RLMenuTransferFrame:isTrailerLive()
 end
 
 
---- Register this frame as the trailer's animalScreenController (via the public
---- setAnimalScreenController setter) so the trailer drives onAnimalsChanged on this
---- frame when its trigger contents change - the world refresh after a load. WORLD
---- counterpart only: the world redirect skips the legacy controller set, so the slot is
---- otherwise nil and the loose-rideable list never refreshes after a load. Ownership-
---- safe: captures the prior controller EXACTLY ONCE (skipped if already installed, or if
---- the slot already holds self) by reading the slot, then installs self through the
---- public setter (never poke the slot to set). No-op for a non-world counterpart or a
---- dead/stale trailer. GUI-free (operates on self.trailer + self.counterpart only) so it
---- is unit-testable.
+--- Register this frame as the trailer's animalScreenController, so the trailer drives
+--- onAnimalsChanged here when its trigger contents change. World counterpart only.
+--- Ownership-safe: the prior controller is captured EXACTLY ONCE, and self is installed
+--- through the public setter rather than by poking the slot.
 function RLMenuTransferFrame:installWorldRefreshHook()
     if self.counterpart ~= RLMenu.TRAILER_WORLD then return end
     if not self:isTrailerLive() then
@@ -265,14 +239,11 @@ function RLMenuTransferFrame:installWorldRefreshHook()
     end
 
     local spec = self.trailer.spec_livestockTrailer
-    -- Capture-once within a session: already installed -> nothing to do.
     if self.worldRefreshHookInstalled then return end
 
     if spec.animalScreenController == self then
-        -- The slot already holds self (e.g. a prior cycle left it and the open-time
-        -- reset cleared the flag). Adopt it WITHOUT capturing self as the prior - the
-        -- paired uninstall reclaims it - so the flag and the slot cannot desync.
-        -- (Spec: "skip re-capture if the current controller is already self".)
+        -- The slot already holds self. Adopt it WITHOUT capturing self as the prior,
+        -- so the flag and the slot cannot desync.
         self.worldRefreshHookInstalled = true
         self.priorAnimalScreenController = nil
         Log:debug("RLMenuTransferFrame:installWorldRefreshHook: adopted existing self in controller slot")
@@ -287,12 +258,10 @@ function RLMenuTransferFrame:installWorldRefreshHook()
 end
 
 
---- Release the controller slot this frame claimed on open. No-op unless installed.
---- Reads the FRAME's captured self.trailer, NEVER g_rlMenu (RLMenu:onClose nils the
---- g_rlMenu trailer fields before super onClose fires onFrameClose). Ownership-safe:
---- restores the captured prior controller ONLY IF the trailer's current controller is
---- still self (a newer owner that claimed the slot while the frame was open is left
---- alone); always clears the frame's own installed flag + prior capture. GUI-free.
+--- Release the controller slot this frame claimed on open. Reads the FRAME's captured
+--- trailer, never g_rlMenu, whose trailer fields are nilled before onFrameClose fires.
+--- Restores the prior controller ONLY IF the slot still holds self, so a newer owner
+--- that claimed it while the frame was open is left alone.
 function RLMenuTransferFrame:uninstallWorldRefreshHook()
     if not self.worldRefreshHookInstalled then return end
 
@@ -314,13 +283,9 @@ function RLMenuTransferFrame:uninstallWorldRefreshHook()
 end
 
 
---- Controller callback the trailer invokes (via setAnimalScreenController) when its
---- trigger contents change: a loaded rideable leaving (the world LOAD case - the loaded
---- animal is removed end-of-frame, then this fires), or a rideable entering/leaving the
---- trigger. Re-enumerates the world source from now-fresh engine state so the list + both
---- (n/n) headers self-correct with no manual flip; prunes any checked identity the
---- mutation removed so the Action button stays honest. Guarded by isFrameOpen +
---- obj == self.trailer + trailer-liveness (our frame outlives a single screen).
+--- Controller callback the trailer fires when its trigger contents change. Re-enumerates
+--- the world source from fresh engine state so the list and both headers self-correct,
+--- and prunes any checked identity the mutation removed.
 --- @param obj table  the trailer firing the callback (must match self.trailer)
 --- @param clusters table|nil  deliberately unused: the callback re-enumerates from scratch (passed nil)
 function RLMenuTransferFrame:onAnimalsChanged(obj, clusters)
@@ -340,11 +305,8 @@ function RLMenuTransferFrame:onAnimalsChanged(obj, clusters)
 end
 
 
---- Drop any checked identity no longer present in the freshly rebuilt list. A live
---- trigger mutation (the loaded rideable's deferred delete, or an animal leaving the
---- trigger) can remove a checked animal; pruning keeps updateButtonVisibility honest so
---- the Action button hides when nothing valid remains. Collect-then-delete avoids
---- mutating self.selectedAnimals mid-iteration.
+--- Drop any checked identity the rebuilt list no longer carries, so the Action button
+--- hides when nothing valid remains. Collect-then-delete avoids mutating mid-iteration.
 function RLMenuTransferFrame:pruneSelectionToList()
     local live = {}
     for _, item in ipairs(self.items) do
@@ -373,12 +335,9 @@ end
 -- Source picker (two fixed entries: counterpart, trailer)
 -- =============================================================================
 
---- Recompute the two sidebar entry labels (counterpart + trailer) as
---- `name (used/total)` and push them to the selector WITHOUT re-seeding the side.
---- Keeps the NULL discrimination: a concrete adapter's display NAME is an engine
---- string used verbatim, while the NULL adapter returns an i18n KEY the frame must
---- resolve. Called on open (via refreshSources) and after a transfer completes
---- (counts refresh in place; the active side is preserved - no heuristic re-seed).
+--- Recompute both sidebar labels as `name (used/total)` WITHOUT re-seeding the side. A
+--- concrete adapter's name is an engine string used verbatim, while the NULL adapter
+--- returns an i18n KEY this frame must resolve.
 --- @return string cpLabel, string trLabel  the composed labels (for logging)
 function RLMenuTransferFrame:updateSourceLabels()
     -- Counterpart entry. context-aware getDisplayData so a concrete adapter knows
@@ -444,11 +403,8 @@ function RLMenuTransferFrame:refreshSources()
         cpLabel, trLabel, tostring(trailerEmpty), side, seedIndex)
 
     if self.subCategorySelector ~= nil then
-        -- setState(_, true) fires the onClick (onSourceChanged) UNCONDITIONALLY:
-        -- the forced-event flag raises the callback whether or not the index
-        -- changed, so this seeds the side in one call for both the index-1 and
-        -- index-2 cases (mirrors the Info/Move husbandry seed, which likewise rely
-        -- on the forced event and add no no-change branch).
+        -- The forced-event flag raises onSourceChanged whether or not the index
+        -- changed, so one call seeds the side for either index.
         self.subCategorySelector:setState(seedIndex, true)
     else
         self:onSourceChanged(seedIndex)
@@ -473,9 +429,7 @@ function RLMenuTransferFrame:onSourceChanged(state)
         state, self.currentSide)
 
     self:reloadAnimalList()
-    -- Recompute BOTH (n/n) sidebar headers on a side flip (Bug B). Label counts are
-    -- capacity-based and selection-independent, so order vs the selection clear is
-    -- cosmetic; it belongs with the refresh trio, not above the side assignment.
+    -- Recompute BOTH sidebar headers on a side flip; the counts are capacity-based.
     self:updateSourceLabels()
     self:updatePenDisplay()
     self:updateButtonVisibility()
@@ -596,11 +550,8 @@ function RLMenuTransferFrame:seedDetailForFirstRow()
 end
 
 
---- The husbandry to pass to the detail-pane animal renderer. Side-aware: the
---- counterpart (pen) side returns context.counterpartHandle so the pen detail
---- column populates; the trailer side returns nil (the trailer has no husbandry,
---- so the pen column stays hidden - the invariant). getAnimalDisplay /
---- updatePenDisplay both tolerate nil.
+--- The husbandry for the detail pane. The trailer side returns nil - a trailer has no
+--- husbandry, so the pen column stays hidden - and both consumers tolerate nil.
 --- @return table|nil
 function RLMenuTransferFrame:detailHusbandry()
     if self.currentSide == RLTransferAdapter.SIDE_COUNTERPART then
@@ -635,10 +586,8 @@ end
 -- Empty state / detail pane
 -- =============================================================================
 
---- Toggle the empty-state text when the active side has no rows. Both sides
---- always have a sidebar entry, so the text gates on rows alone. The list itself
---- stays visible (an empty SmoothList renders no rows but remains a valid focus
---- target, which onFrameOpen sets focus to) - mirrors RLMenuMoveFrame.
+--- Toggle the empty-state text when the active side has no rows. The list stays visible:
+--- an empty SmoothList renders nothing but is still the valid focus target.
 function RLMenuTransferFrame:updateEmptyState()
     local hasItems = #self.items > 0
     if self.noAnimalsText ~= nil then
@@ -783,13 +732,10 @@ end
 -- Footer action (Load / Unload)
 -- =============================================================================
 
---- Rebuild the footer button info (Hybrid B visibility). Back always;
---- Select/SelectAll when the side has rows. The two action buttons share the
---- adapter's dynamic verb: the single (X / EXTRA_1) is shown whenever rows exist,
---- disabled with no focused row; the selected (C / EXTRA_2) stays selection-gated -
---- shown only when something is checked, labelled `verb (N)`. (Deliberate divergence
---- from the always-shown-disabled Move/Buy/Sell siblings: the dynamic verb would
---- render two identical buttons at 0 checked.)
+--- Rebuild the footer buttons. Both action buttons share the adapter's verb: the single
+--- shows whenever rows exist, the selected one only once something is checked. That
+--- divergence from the always-shown siblings is deliberate - a shared verb would
+--- otherwise render two identical buttons at zero checked.
 function RLMenuTransferFrame:updateButtonVisibility()
     self.menuButtonInfo = { self.backButtonInfo }
 
@@ -856,13 +802,9 @@ function RLMenuTransferFrame:onClickActionSelected()
 end
 
 
---- Shared dispatch path for single + bulk (mirrors RLMenuMoveFrame:startMoveFlow).
---- Owns the WHOLE mutation sequence so neither handler touches movePending directly:
---- the in-flight guard, the empty-check, then movePending=true -> adapter:dispatch ->
---- false-return release, in that order. A concrete adapter routes to the move service /
---- load-unload events (async in MP); completion (onTransferComplete) owns the refresh +
---- lock release. The shell NULL adapter logs + returns false, so the frame leaves all
---- state unchanged (no event, no list change).
+--- Shared dispatch path for single and bulk. Owns the WHOLE mutation sequence so neither
+--- handler touches movePending directly; the completion callback owns the refresh and
+--- the lock release.
 --- @param animals table  the clusters to transfer (a 1-element array for the single case)
 function RLMenuTransferFrame:dispatchTransfer(animals)
     -- Duplicate-submit guard: the action buttons are selection/focus-gated, not
@@ -882,11 +824,9 @@ function RLMenuTransferFrame:dispatchTransfer(animals)
         return
     end
 
-    -- Set the in-flight lock BEFORE dispatch: in SP the move service fires
-    -- onTransferComplete SYNCHRONOUSLY inside dispatch (clearing the lock), so
-    -- setting it afterwards would strand it true. A `false` return (NULL/world
-    -- shell, or a fail-closed guard) means NO completion callback will fire, so
-    -- release the lock here.
+    -- Lock BEFORE dispatch: in SP the completion fires synchronously inside dispatch and
+    -- clears it, so setting it afterwards would strand it true. A false return means no
+    -- completion will fire at all, so the lock is released here.
     self.movePending = true
     local handled = self.adapter:dispatch(direction, animals, self.context)
     if not handled then
@@ -902,22 +842,11 @@ function RLMenuTransferFrame:dispatchTransfer(animals)
 end
 
 
---- Completion callback for an async transfer (mirrors RLMenuMoveFrame:onMoveComplete).
---- The transfer is a server round-trip in MP, so error surfacing + the refresh MUST
---- happen here, not synchronously after dispatch. Guarded against a stale callback on
---- the FULL dispatch context: ignored when the frame is closed, the trailer changed,
---- OR the same trailer reopened on a different counterpart (the counterpart handle is
---- the per-session identity, like the Move frame's selectedHusbandry) - a delayed
---- callback from session A must not repaint a reopened session B. The active adapter
---- resolves its result into a uniform (success, errorText) pair, so this frame is
---- adapter-agnostic: the pen adapter maps its AnimalMoveEvent result and the world
---- service its load/unload result through the SAME contract (the frame references
---- neither result space directly). On failure with text it shows an InfoDialog; either
---- way it releases the in-flight lock, refreshes the (used/total) labels in place (active
---- side preserved - no heuristic re-seed), reloads the list + pen column + buttons, and
---- prunes the selection to the rebuilt list - a successful transfer drops the moved rows
---- while any un-transferred checked rows survive; a failure (list unchanged) leaves the
---- selection intact for a retry.
+--- Completion callback for an async transfer. In MP this is a server round-trip, so the
+--- error surfacing and the refresh MUST happen here rather than after dispatch. Guarded
+--- on the FULL dispatch context - trailer AND counterpart - so a delayed callback from
+--- one session cannot repaint a reopened one. The adapter resolves its own result space
+--- into the uniform (success, errorText) pair, keeping this frame adapter-agnostic.
 --- @param success boolean  whether the transfer succeeded
 --- @param errorText string|nil  localized error text on failure (nil on success)
 --- @param dispatchedTrailer table  the trailer captured at dispatch time (stale guard)
@@ -937,11 +866,9 @@ function RLMenuTransferFrame:onTransferComplete(success, errorText, dispatchedTr
     end
 
     if not success then
-        -- Branch on success FIRST so a failure with NO mapped error text (an unmapped
-        -- load/unload code - getErrorText returns nil for those) is still logged as a
-        -- failure rather than misclassified as success. The dialog only shows when text
-        -- exists (the spec's surface contract); a text-less failure stays silent to the
-        -- player but is recorded in the log.
+        -- Branch on success FIRST, so a failure carrying no mapped error text is still
+        -- logged as a failure rather than misclassified. The dialog needs text, so a
+        -- text-less failure stays silent to the player but is recorded.
         if errorText ~= nil then
             InfoDialog.show(errorText)
         end
@@ -952,11 +879,9 @@ function RLMenuTransferFrame:onTransferComplete(success, errorText, dispatchedTr
 
     self:updateSourceLabels()
     self:reloadAnimalList()
-    -- Cardinality-aware selection clear (reuses pruneSelectionToList): the rebuilt list
-    -- drops the just-transferred animals, so pruning removes exactly those checked
-    -- identities and keeps any un-transferred checked rows (single keeps the rest;
-    -- bulk empties). On failure the list is unchanged, so prune is a no-op and the
-    -- selection survives for a retry.
+    -- The rebuilt list has dropped the transferred animals, so pruning removes exactly
+    -- those checked identities. On failure the list is unchanged, so this is a no-op and
+    -- the selection survives for a retry.
     self:pruneSelectionToList()
     self:updatePenDisplay()
     self:updateButtonVisibility()

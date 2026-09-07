@@ -27,11 +27,8 @@ function RLMenuMessagesFrame.new()
     self.farmId = nil
     self.isFrameOpen = false
 
-    -- Custom footer buttons: back + delete + delete-all.
-    -- Setting hasCustomMenuButtons=true here so the first page-switch uses
-    -- self.menuButtonInfo instead of RLMenu's default Back-only button set.
-    -- Without this, the Delete buttons only appear one frame after the tab
-    -- opens, causing a visible flicker.
+    -- hasCustomMenuButtons makes the first page switch use self.menuButtonInfo, or the
+    -- Delete buttons appear a frame late and flicker.
     self.hasCustomMenuButtons = true
 
     self.backButtonInfo = {
@@ -81,17 +78,9 @@ function RLMenuMessagesFrame:onGuiSetupFinished()
     end
 end
 
---- Called by the Paging element when this tab becomes active.
---- Refreshes data from the service every time the tab opens so the user
---- always sees the latest messages without needing to close + reopen the menu.
----
---- After the refresh, clears the per-husbandry unreadMessages flag farm-wide
---- via RLMessageService.markAllReadForFarm. Mirrors the legacy AnimalScreen
---- log-tab clear (per-pen there because that screen is per-pen; farm-wide
---- here because the Messages tab is a unioned farm view). Without this,
---- the per-husbandry INGAME_NOTIFICATION_CRITICAL "<pen> has unread
---- messages" notification keeps re-firing on every onDayChanged after the
---- player has read or cleared the list.
+--- Called by the Paging element when this tab becomes active. Refreshes on every open,
+--- then clears the unread flag FARM-WIDE, because this tab is a unioned farm view -
+--- without it the per-husbandry unread notification re-fires on every day change.
 function RLMenuMessagesFrame:onFrameOpen()
     RLMenuMessagesFrame:superClass().onFrameOpen(self)
     self.isFrameOpen = true
@@ -211,10 +200,7 @@ function RLMenuMessagesFrame:updateSummaryText()
         g_i18n:getText("rl_menu_messages_summary"), tostring(#self.rows)))
 end
 
---- Does the local player have permission to delete messages on their own farm?
---- This is a UX helper; the authoritative check lives server-side in
---- HusbandryMessageDeleteEvent:run. Returning true here only controls button
---- visibility; the server revalidates every event.
+--- UX-side delete permission gate; the server revalidates every event.
 --- @return boolean
 function RLMenuMessagesFrame:hasDeletePermission()
     if g_currentMission == nil or g_currentMission.getHasPlayerPermission == nil then
@@ -245,16 +231,10 @@ end
 -- Delete handlers
 -- =============================================================================
 
---- Delete the currently-focused row. No confirmation dialog - messages are
---- low-stakes and bulk delete covers the destructive path.
---- Early-out on no selection, out-of-range index, or missing permission.
---- The permission re-check here is belt-and-suspenders; server will revalidate.
----
---- Runs synchronously within a single Lua tick. The selectedIndex is
---- resolved to (row.husbandryRef, row.uniqueId) IMMEDIATELY, before any
---- network dispatch. Those identifiers are data-level (placeable node id
---- + per-husbandry uniqueId) and stable across the wire. Row indexes
---- themselves NEVER leave this function.
+--- Delete the focused row, with no confirmation - messages are low-stakes and bulk
+--- delete covers the destructive path. The index is resolved to (husbandryRef, uniqueId)
+--- BEFORE any dispatch: those are stable across the wire, and a row index never leaves
+--- this function.
 function RLMenuMessagesFrame:onClickDelete()
     if self.messagesList == nil then
         Log:trace("RLMenuMessagesFrame:onClickDelete: no messagesList, aborting")
@@ -285,19 +265,10 @@ function RLMenuMessagesFrame:onClickDelete()
     self:refreshData()
 end
 
---- Delete ALL rows currently displayed, grouped by husbandry so we fire one
---- event per distinct husbandry. Confirmed via YesNoDialog with the total
---- count. Early-out if no rows, no permission, or a dialog is already open
---- (guard against KEY_x re-entry while the confirm dialog is visible).
----
---- The rows snapshot is captured at click time and passed through the
---- confirmation callback, NOT read fresh from self.rows at confirm time.
---- This keeps the deletion set consistent with the count shown in the
---- dialog if another player's delete event arrives between click and
---- confirm. Stale uniqueIds in the snapshot are idempotent at the server
---- via placeable:deleteRLMessage's linear scan no-op.
---- Identifiers passed on the wire are (husbandry node id, uniqueId) which
---- are data-level and stable - row indexes never cross the network.
+--- Delete every displayed row, grouped so one event fires per husbandry. The snapshot is
+--- captured at CLICK time and carried through the confirmation, so the deletion set
+--- still matches the count the dialog showed if a peer's delete lands in between; a
+--- stale uniqueId is idempotent server-side.
 function RLMenuMessagesFrame:onClickDeleteAll()
     if #self.rows == 0 then
         Log:trace("RLMenuMessagesFrame:onClickDeleteAll: no rows, aborting")
@@ -358,10 +329,8 @@ end
 -- =============================================================================
 -- SmoothList data source / delegate protocol
 --
--- The methods below are deliberately NOT logged. SmoothList calls these
--- at a high frequency during scroll/draw, so tracing them here would swamp
--- the log. The frame's refreshData / updateEmptyState / updateSummaryText
--- path is already logged at debug/trace and covers the render lifecycle.
+-- Deliberately NOT logged: SmoothList calls these at draw frequency and tracing them
+-- would swamp the log.
 -- =============================================================================
 
 --- Return how many items the SmoothList should render in the given section.

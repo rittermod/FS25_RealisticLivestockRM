@@ -41,20 +41,13 @@ function RLMenuAIFrame.new()
 
     self.activeSpeciesTypeIndex = nil
 
-    -- Selection-identity dedupe cache. Set after each successful
-    -- onBullSelectionChanged run; checked on entry to early-return when the
-    -- same bull re-selects (e.g. when a Favourite reloadData re-fires the
-    -- SmoothList selection callback). Prevents stepper state + price from
-    -- resetting on spurious re-fires. Cache key is 4-field (farmId, uniqueId,
-    -- country, speciesTypeIndex) so cross-species identity collisions do not
-    -- suppress render. Cleared on frame open and on post-buy reload.
+    -- Dedupe cache: a re-selection of the same bull early-returns, so a spurious
+    -- selection re-fire cannot reset the stepper and the price. The key carries the
+    -- species index too, so a cross-species id collision does not suppress a render.
     self.lastSelectedBullIdentity = nil
 
-    -- Reentrancy flag for Buy. Set when the handler commits to opening a
-    -- result InfoDialog; cleared when the dialog callback runs (or on frame
-    -- open / no-spawn-slot early-return). Prevents a rapid second Enter
-    -- press from double-dispatching SemenBuyEvent + double-consuming spawn
-    -- slots while the modal dialog is pending.
+    -- Reentrancy flag for Buy: without it a rapid second Enter double-dispatches the
+    -- event and double-consumes spawn slots while the modal dialog is pending.
     self.buyInFlight = false
 
     -- Back button (always present, required with hasCustomMenuButtons)
@@ -106,13 +99,8 @@ function RLMenuAIFrame:onGuiSetupFinished()
 end
 
 
---- One-time per-clone setup. Unlinks the dot template from the element tree
---- so it can be cloned at runtime, hides pen-info elements (inherited from
---- buyFrame.xml for XML-parity but AI has no pen concept), populates the
---- quantity stepper labels from RLConstants.DEWAR_QUANTITIES, and hides the
---- aiPurchasePanel until a bull is selected.
----
---- Called by RLMenu:setupMenuPages.
+--- One-time per-clone setup: unlink the dot template so it can be cloned, hide the
+--- inherited pen-info elements, seed the quantity stepper, and hide the purchase panel.
 function RLMenuAIFrame:initialize()
     if self.subCategoryDotTemplate ~= nil then
         self.subCategoryDotTemplate:unlinkElement()
@@ -220,10 +208,8 @@ end
 --- Shows every registered species, not only species with stock (species with
 --- zero stock render the empty-animals text).
 function RLMenuAIFrame:refreshSpecies()
-    -- Cache the current farm id so RLDetailPaneHelper.updateMoneyDisplay
-    -- can resolve the balance via frame.farmId. Mirrors RLMenuBuyFrame's
-    -- refreshTypes farmId-cache pattern. Without this, the helper sees nil
-    -- farmId -> nil balance -> hides the moneyBox entirely.
+    -- Cache the farm id for the money display: without it the helper sees a nil farmId,
+    -- resolves a nil balance, and hides the money box entirely.
     self.farmId = RLAnimalInfoService.getCurrentFarmId()
 
     self.sortedSpecies = RLAIStockService.listSpecies()
@@ -411,15 +397,9 @@ end
 -- Bull selection change: updates detail pane + middle column + Favourite label
 -- =============================================================================
 
---- Refresh dependent UI for the currently-focused bull. Central entry point
---- called from onListSelectionChanged, restoreSelection, refreshSpecies.
----
---- Selection-identity dedupe cache prevents spurious stepper resets.
---- onClickFavourite calls animalList:reloadData to refresh the orange tint
---- (legacy parity). Bare reloadData usually preserves
---- the highlight without refiring the selection callback, but if it ever
---- does, the cache check here early-returns before touching the stepper or
---- the detail pane. Also covers the class of spurious re-fires.
+--- Refresh dependent UI for the focused bull - the central entry point for every
+--- selection path. The identity cache early-returns before the stepper or detail pane is
+--- touched, so a reloadData that re-fires the selection callback cannot reset them.
 function RLMenuAIFrame:onBullSelectionChanged()
     local animal = self:getSelectedAnimal()
 
@@ -461,10 +441,8 @@ function RLMenuAIFrame:onBullSelectionChanged()
 
     self:updateButtonVisibility()
 
-    -- Cache the identity for the next call's dedupe check. 4-field key
-    -- (farmId, uniqueId, country, speciesTypeIndex) so an AI bull in one
-    -- species sharing id fields with a bull in another species does not
-    -- suppress render when the species cycler moves between them.
+    -- The key carries the species index, so two bulls in different species sharing id
+    -- fields cannot suppress a render when the cycler moves between them.
     self.lastSelectedBullIdentity = {
         farmId           = animal.farmId,
         uniqueId         = animal.uniqueId,
@@ -474,10 +452,8 @@ function RLMenuAIFrame:onBullSelectionChanged()
 end
 
 
---- Populate the middle-column elements for the given bull. Resets the stepper
---- to position 1 (legacy parity) and routes the
---- price display through onQuantityStateChanged so bull change and stepper
---- click share a single render path.
+--- Populate the middle column for a bull. The price display routes through
+--- onQuantityStateChanged, so a bull change and a stepper click share one render path.
 --- @param animal table Raw Animal
 function RLMenuAIFrame:updateMiddleColumn(animal)
     if animal == nil then return end
@@ -486,11 +462,8 @@ function RLMenuAIFrame:updateMiddleColumn(animal)
         self.aiPurchasePanel:setVisible(true)
     end
 
-    -- Reset stepper to position 1 on every bull-selection change. `setState`
-    -- called without the second `forceEvent` arg silently updates state
-    -- without firing the onClick callback, so we invoke onQuantityStateChanged
-    -- explicitly below to recompute the price for the newly-selected bull.
-    -- Matches the legacy stepper-reset-on-selection behaviour.
+    -- setState without the forceEvent arg updates silently, so onQuantityStateChanged
+    -- is invoked explicitly below to reprice for the newly selected bull.
     if self.aiQuantitySelector ~= nil and self.aiQuantitySelector.setState ~= nil then
         self.aiQuantitySelector:setState(1)
     end
@@ -508,10 +481,8 @@ function RLMenuAIFrame:updateMiddleColumn(animal)
 end
 
 
---- Set the Favourite button label from the bull's current favourite state.
---- Called on selection change (read-only). Routes through the service's
---- getFavouriteButtonText so selection-change and toggle-site (this frame's
---- onClickFavourite) share one i18n-key mapping.
+--- Set the Favourite button label from the bull's state, through the service's own
+--- text helper so the read site and the toggle site share one key mapping.
 --- @param animal table Raw Animal
 function RLMenuAIFrame:refreshFavouriteButtonLabel(animal)
     if animal == nil or self.favouriteButtonInfo == nil then return end
@@ -560,14 +531,9 @@ function RLMenuAIFrame:getSelectedAnimal()
 end
 
 
---- Rebuild the footer button info. Back always; Favourite + Buy ALWAYS
---- present in the footer. Favourite disables on no-bull only. Buy disables
---- on no-bull OR no tradeAnimals permission.
----
---- Legacy parity gates both buttons SOLELY on selection. Intentional UX
---- divergence: this frame adds a client-side tradeAnimals gate for Buy so MP
---- clients never see an active Buy button they cannot actually use. Legacy's
---- click-time permission check stays in place as defense in depth.
+--- Rebuild the footer buttons. Favourite disables on no-bull; Buy additionally needs the
+--- tradeAnimals permission, so an MP client never sees an active button it cannot use.
+--- The click-time permission check stays in place behind it.
 function RLMenuAIFrame:updateButtonVisibility()
     self.menuButtonInfo = { self.backButtonInfo }
 
@@ -596,11 +562,8 @@ end
 -- Quantity stepper: recompute displayed total price for current state
 -- =============================================================================
 
---- MultiTextOption onClick callback for aiQuantitySelector. Mirrors the legacy
---- onClickChangeAIQuantity handler: read quantity for the new state, compute
---- total price, format as money, update aiQuantityPrice.
---- Also invoked from updateMiddleColumn(animal) on bull-selection change with
---- state=1 so the canonical price render path is shared.
+--- Quantity selector callback: reprice for the new state. Also invoked directly on a
+--- bull-selection change, so both paths share one price render.
 --- @param state number 1-based DEWAR_QUANTITIES index
 function RLMenuAIFrame:onQuantityStateChanged(state)
     if state == nil then
@@ -637,14 +600,8 @@ end
 -- Favourite + Buy handlers
 -- =============================================================================
 
---- Favourite footer action. Delegates to RLAIStockService.toggleFavourite
---- (local-only; no network event; MP persistence gap tracked separately)
---- and refreshes the row tint + button label on success.
----
---- Mirrors the legacy onClickFavouriteAnimal handler. Binds the post-toggle
---- button label from the fresh return value, NOT from the latent-bug
---- `uniqueUserId` global (always nil in legacy, so legacy's button always read
---- "Favourite" regardless of state).
+--- Favourite footer action: toggles locally, with no network event, then refreshes the
+--- row tint and the button label from the toggle's own return value.
 function RLMenuAIFrame:onClickFavourite()
     local animal = self:getSelectedAnimal()
     if animal == nil then
@@ -660,11 +617,8 @@ function RLMenuAIFrame:onClickFavourite()
         return
     end
 
-    -- Refresh the row tint via reloadData (legacy parity). Bare reloadData
-    -- usually preserves the selection
-    -- highlight without re-firing the SmoothList selection callback; if it
-    -- ever does re-fire, the lastSelectedBullIdentity dedupe in
-    -- onBullSelectionChanged catches it.
+    -- Refresh the row tint. A bare reloadData usually preserves the highlight without
+    -- re-firing the selection callback, and the identity dedupe catches it if it does.
     if self.animalList ~= nil then
         self.animalList:reloadData()
     end
@@ -682,17 +636,10 @@ function RLMenuAIFrame:onClickFavourite()
 end
 
 
---- Buy footer action for the AI / semen dealer tab.
---- Reserves a store spawn lane (markPlaceUsed) ONLY on the dispatch path -
---- inside the BUY_SUCCESS branch, immediately before sendEvent - so a rejected
---- pre-flight (no permission / no money) leaves the lane cursor untouched and
---- a failed click never leaks lane space. getPlace only READS the lane usage -
---- it does not advance the cursor - so looking the slot up before the checks
---- is safe.
----
---- No-spawn-slot UX: when no lane is free this shows a `shop_messageNoSpace`
---- warning dialog and dispatches nothing, closing the "why did nothing
---- happen?" gap.
+--- Buy footer action. Reserves a store spawn lane ONLY on the dispatch path, so a
+--- rejected pre-flight leaves the lane cursor untouched and a failed click leaks no lane
+--- space; looking the slot up beforehand is safe, because that only reads the usage.
+--- With no free lane it shows a warning dialog and dispatches nothing.
 function RLMenuAIFrame:onClickBuy()
     -- Reentrancy guard: InfoDialog is async, so a second Enter press between
     -- dispatch and dialog-dismiss would double-fire SemenBuyEvent and
@@ -708,10 +655,7 @@ function RLMenuAIFrame:onClickBuy()
         return
     end
 
-    -- farmId sanity. Guard BEFORE markPlaceUsed so a spectator / no-farm click
-    -- does not leak a store spawn slot. Legacy reads g_localPlayer.farmId
-    -- unconditionally (crashes on nil); this frame declines
-    -- gracefully with a WARNING.
+    -- Guard BEFORE markPlaceUsed, so a no-farm click cannot leak a store spawn slot.
     if g_localPlayer == nil
         or g_localPlayer.farmId == nil
         or g_localPlayer.farmId == 0 then
@@ -788,14 +732,8 @@ function RLMenuAIFrame:onClickBuy()
 end
 
 
---- Client-side pre-flight completion handler. Mirrors the legacy onSemenBought
---- handler - maps the pre-flight errorCode to a text +
---- dialog type and opens an InfoDialog.
----
---- NAME NOTE: "onBuyComplete" refers to client-side pre-flight branching
---- having chosen an errorCode, NOT to server-confirmed completion. A
---- BUY_SUCCESS here means the event was DISPATCHED, not that the dewar
---- spawned. See Design Notes in the spec for the asymmetry.
+--- Client-side pre-flight handler: maps the error code to a dialog. The name is
+--- misleading - success here means the event was DISPATCHED, not that the dewar spawned.
 --- @param errorCode number  One of AnimalBuyEvent.BUY_* constants
 function RLMenuAIFrame:onBuyComplete(errorCode)
     local dialogType = DialogElement.TYPE_INFO
@@ -815,25 +753,16 @@ function RLMenuAIFrame:onBuyComplete(errorCode)
     Log:debug("RLMenuAIFrame:onBuyComplete: errorCode=%s text=%s",
         tostring(errorCode), text)
 
-    -- Full positional InfoDialog.show signature mirrored from the legacy
-    -- onSemenBought handler. The trailing `true` is a legacy positional
-    -- artifact - the callback functions declare no params and ignore it.
-    -- Kept verbatim per MUTATION PARITY rule.
+    -- Full positional InfoDialog.show signature. The trailing `true` is a positional
+    -- artifact the callbacks declare no parameter for and ignore.
     InfoDialog.show(g_i18n:getText(text), self.onPostSemenBuy, self,
         dialogType, nil, nil, true)
 end
 
 
---- InfoDialog dismissal callback. Mirrors the legacy postSemenBought handler
---- which calls `self.aiList:reloadData()`. This frame reloads
---- the whole bull list so stock changes reflect immediately.
----
---- Stale-frame guard mirrors Buy/Sell/Info's pattern: the
---- InfoDialog is modal but survives frame teardown, so the user can press
---- Buy -> close the menu -> dismiss the dialog and we would otherwise call
---- reloadBullList on a torn-down frame. `activeSpeciesTypeIndex` is set in
---- onSpeciesChanged and intentionally NOT cleared in onFrameClose (matches
---- Buy/Sell's activeAnimalTypeIndex lifecycle).
+--- InfoDialog dismissal callback: reloads the bull list so a stock change shows at once.
+--- The dialog survives frame teardown, so the player can buy, close the menu and then
+--- dismiss it - hence the stale-frame guard before the reload.
 function RLMenuAIFrame:onPostSemenBuy()
     -- Always clear the reentrancy flag regardless of frame state, so a stale
     -- callback on a torn-down frame does not leave Buy permanently disabled
@@ -846,9 +775,8 @@ function RLMenuAIFrame:onPostSemenBuy()
         return
     end
 
-    -- Invalidate the dedupe cache before reloadBullList. Without this the
-    -- same-identity focused bull would hit the dedupe check after reload and
-    -- skip re-rendering, leaving stale stock/price in the middle column.
+    -- Invalidate the dedupe cache first, or the same-identity bull skips its re-render
+    -- after the reload and the middle column keeps stale stock and price.
     self.lastSelectedBullIdentity = nil
 
     Log:debug("RLMenuAIFrame:onPostSemenBuy: reloading bull list")
@@ -887,12 +815,8 @@ function RLMenuAIFrame:getNumberOfItemsInSection(list, section)
     return items ~= nil and #items or 0
 end
 
---- Populate one data cell. Differs from Buy/Sell's populate in two ways:
----   1. The "price" cell text is the overall-quality label (legacy parity),
----      NOT a money amount.
----   2. Favourited bulls tint the cell background orange (1, 0.2, 0);
----      mirrors the legacy populateCellForItemInSection tint.
---- No checkbox column (single-bull selection only in the AI tab).
+--- Populate one data cell. The "price" cell carries the overall-quality label rather
+--- than a money amount, and a favourited bull tints the row orange.
 --- @param list table
 --- @param section number
 --- @param index number
@@ -910,13 +834,10 @@ function RLMenuAIFrame:populateCellForItemInSection(list, section, index, cell)
     local cluster = item.cluster
     if cluster == nil then return end
 
-    -- Row fields mirror the general Animal row format; reuse the shared
-    -- formatter for id / name / icon so layout matches Buy/Sell/Info rows.
+    -- The shared formatter, so the layout matches the other frames' rows.
     local row = RLAnimalQuery.formatAnimalRow(item)
 
-    -- Cell tint. Favourite (orange) takes priority over the default.
-    -- AI bulls are never diseased or marked in normal play, but we respect
-    -- those tints defensively.
+    -- Favourite (orange) takes priority over the default tint.
     local uniqueUserId = g_localPlayer ~= nil and g_localPlayer:getUniqueId() or nil
     local isFavourite = uniqueUserId ~= nil
         and type(cluster.favouritedBy) == "table"

@@ -44,9 +44,7 @@ function RLMenuBuyFrame.new()
     self.isFrameOpen = false
     self.hasCustomMenuButtons = true
 
-    -- In-flight UI lock for a dispatched buy (mirrors RLMenuTransferFrame.movePending):
-    -- set before dispatch, released on the service's false return or on completion, and
-    -- reset on frame open so a stranded lock self-heals.
+    -- In-flight UI lock for a dispatched buy, reset on frame open so a stranded lock heals.
     self.buyPending = false
 
     self.activeAnimalTypeIndex = nil
@@ -110,8 +108,8 @@ function RLMenuBuyFrame.setupGui()
 end
 
 
---- Bind the SmoothList datasource/delegate. Fires on both the initial load
---- instance and the FrameReference clone; tree mutation lives in initialize().
+--- Bind the SmoothList datasource and delegate. Fires on both the original and the clone,
+--- so tree mutation lives in initialize().
 function RLMenuBuyFrame:onGuiSetupFinished()
     RLMenuBuyFrame:superClass().onGuiSetupFinished(self)
 
@@ -124,13 +122,8 @@ function RLMenuBuyFrame:onGuiSetupFinished()
 end
 
 
---- One-time per-clone setup. Unlinks the dot template from the element tree
---- so it can be cloned at runtime. Also permanently hides the pen-info row
---- (inherited from sellFrame.xml) because the Buy tab views the dealer, not
---- a pen - "Pen Information: Name / Count / Icon" is semantically meaningless
---- here and no dealer-icon asset is provided to substitute. Hiding once in
---- initialize is cheaper than toggling in every frame-open / reload path.
---- Called by RLMenu:setupMenuPages.
+--- One-time per-clone setup: unlink the dot template so it can be cloned at runtime, and
+--- hide the inherited pen-info row, which has no meaning on the dealer side.
 function RLMenuBuyFrame:initialize()
     if self.subCategoryDotTemplate ~= nil then
         self.subCategoryDotTemplate:unlinkElement()
@@ -163,16 +156,12 @@ function RLMenuBuyFrame:onFrameOpen()
 
     self:refreshTypes()
 
-    -- Subscribe to MONEY_CHANGED so the header balance refreshes when a
-    -- post-buy balance update arrives asynchronously (MP) or when any other
-    -- code path credits/debits the farm while this frame is open. SP is
-    -- unaffected because the change is synchronous there.
+    -- MONEY_CHANGED keeps the header balance current when an MP balance update arrives
+    -- asynchronously; in SP the change is synchronous and this is inert.
     g_messageCenter:subscribe(MessageType.MONEY_CHANGED, self.onMoneyChanged, self)
 
-    -- Explicit focus links for keyboard navigation. Required because multiple
-    -- frames share the same sidebar + SmoothList structure, and FocusManager
-    -- auto-layout resolves to elements in other frames when element
-    -- positions/IDs overlap.
+    -- Explicit focus links: several frames share this sidebar and list structure, so
+    -- FocusManager auto-layout can otherwise resolve into another frame's elements.
     if self.subCategorySelector ~= nil and self.animalList ~= nil then
         FocusManager:linkElements(self.subCategorySelector, FocusManager.BOTTOM, self.animalList)
         FocusManager:linkElements(self.animalList, FocusManager.TOP, self.subCategorySelector)
@@ -192,9 +181,7 @@ end
 function RLMenuBuyFrame:onFrameClose()
     Log:debug("RLMenuBuyFrame:onFrameClose")
 
-    -- Quick filter is a per-frame session affordance;
-    -- clear it on tab close so a sibling tab open starts clean. Log only
-    -- when something was actually cleared to keep tab-switch traffic quiet.
+    -- Quick filter is per-frame session state, so a sibling tab opens clean.
     if next(self.filters) ~= nil then
         local count = 0
         for _ in pairs(self.filters) do count = count + 1 end
@@ -208,12 +195,8 @@ function RLMenuBuyFrame:onFrameClose()
 end
 
 
---- MessageType.MONEY_CHANGED handler. Fires on both server and client
---- contexts: on clients, the message is published locally after the farm
---- balance is updated from a server stream, so subscribing lets the Buy
---- frame refresh its header balance in MP without polling. No farmId
---- gating here because updateMoneyDisplay reads the current player's farm
---- internally.
+--- MONEY_CHANGED handler. Clients publish it locally once the balance arrives from the
+--- server, so the header refreshes in MP without polling.
 function RLMenuBuyFrame:onMoneyChanged()
     if not self.isFrameOpen then return end
     Log:trace("RLMenuBuyFrame:onMoneyChanged: refreshing money display")
@@ -225,10 +208,8 @@ end
 -- Dealer type selector
 -- =============================================================================
 
---- Repopulate the type selector + dot indicators from RLDealerQuery.
---- Shows every registered type, not only types with stock (types with zero
---- stock render the empty-animals text, matching how Sell handles husbandries
---- with zero animals - keeps the sidebar layout stable across restocks).
+--- Repopulate the type selector and dot indicators. Every registered type is shown, not
+--- only stocked ones, so the sidebar layout stays stable across restocks.
 function RLMenuBuyFrame:refreshTypes()
     local farmId = RLAnimalInfoService.getCurrentFarmId()
     self.farmId = farmId
@@ -237,9 +218,8 @@ function RLMenuBuyFrame:refreshTypes()
     Log:debug("RLMenuBuyFrame:refreshTypes: farmId=%s types=%d",
         tostring(farmId), #self.sortedTypes)
 
-    -- Trailer-dealer: scope the sidebar to trailer-supported types (locked to the current
-    -- type once the trailer is non-empty). An empty result falls through to the zero-types
-    -- empty-state path below. The non-trailer Buy keeps every registered type (probe nil).
+    -- Trailer-dealer: scope the sidebar to trailer-supported types, locked to the current
+    -- type once the trailer is non-empty. A non-trailer Buy keeps every registered type.
     local trailer = self:getTrailerDealerContext()
     if trailer ~= nil then
         local before = #self.sortedTypes
@@ -378,11 +358,8 @@ end
 -- Animal list
 -- =============================================================================
 
---- Build the dialog source list for the Quick filter dialog.
---- Mirrors reloadAnimalList's universe construction MINUS the Quick filter,
---- so the dialog's slider min/max derivation sees the full dealer pool (or
---- saved-filter-narrowed pool) instead of the already-Quick-filtered subset.
---- Parity with reloadAnimalList is enforceable by eye (the two are stacked).
+--- The Quick filter dialog's source list: reloadAnimalList's universe MINUS the Quick
+--- filter, so the slider ranges see the full pool rather than the filtered subset.
 ---@return table base   full dealer-pool universe for active animal type
 ---@return table narrowed base after saved-filter layer (== base when none)
 function RLMenuBuyFrame:buildDialogSourceList()
@@ -393,11 +370,8 @@ function RLMenuBuyFrame:buildDialogSourceList()
 end
 
 
---- Refresh only when the frame is currently open. Called by
---- AnimalSystemStateEvent:run so a wholesale dealer-pool replacement - from a
---- dealer-quality preset change or the Reset Animal Dealer button - rebinds an
---- open list instead of leaving it holding items that no longer exist.
---- Delegates to reloadAnimalList, which already owns selection capture/restore.
+--- Refresh only when the frame is open, so a wholesale dealer-pool replacement rebinds the
+--- list instead of leaving it holding items that no longer exist.
 function RLMenuBuyFrame:refreshIfOpen()
     if self.isFrameOpen then
         Log:debug("RLMenuBuyFrame:refreshIfOpen: refreshing")
@@ -408,21 +382,10 @@ function RLMenuBuyFrame:refreshIfOpen()
 end
 
 
---- Requery dealer stock for the active type, group into sections, refresh
---- the SmoothList, restore selection by identity.
---- No canBeSold filter: dealer animals are freshly generated and always
---- saleable by the dealer; the buy-side filter is server-validated.
----
---- DELIBERATELY does NOT clear the pendingBuy* trio, even though this can run
---- while the confirmation dialog is up (isFrameOpen stays true under a modal, so
---- refreshIfOpen delegates here on any repopulate - hourly churn, dealer-preset
---- change, Reset, join snapshot). A pending buy is a RESERVATION: the player has
---- put those animals in the cart, and a restock replaces the shelf, not the cart.
---- The purchase completes with the animals they chose, priced at the till.
---- Clearing the trio here would cancel a confirmed purchase out from under the
---- player - it looks like the tidy thing to do and is the wrong behaviour.
---- This is a deliberate design call, not an oversight; its one open consequence
---- is tracked separately.
+--- Requery dealer stock for the active type, section it, and restore selection by identity.
+--- DELIBERATELY does not clear the pendingBuy trio, even though this can run under the
+--- confirmation dialog: a pending buy is a RESERVATION, and a restock replaces the shelf,
+--- not the cart. Clearing it here would cancel a confirmed purchase out from under the player.
 function RLMenuBuyFrame:reloadAnimalList()
     Log:trace("RLMenuBuyFrame:reloadAnimalList: begin")
     self:captureCurrentSelection()
@@ -434,9 +397,8 @@ function RLMenuBuyFrame:reloadAnimalList()
 
         if self.filters ~= nil and next(self.filters) ~= nil
             and AnimalFilterDialog ~= nil and AnimalFilterDialog.applyFilters ~= nil then
-            -- Buy frame is buy-mode by definition. Match the dialog-open path
-            -- (onClickFilter passes isBuyMode=true) so the list-rebuild filter
-            -- evaluates Value with the active dealer-quality markup, not raw sell-price.
+            -- Buy-mode, matching the dialog-open path, so Value is evaluated with the
+            -- active dealer markup rather than the raw sell price.
             self.items = AnimalFilterDialog.applyFilters(self.items, self.filters, true)
         end
 
@@ -459,12 +421,9 @@ function RLMenuBuyFrame:reloadAnimalList()
     self:updateButtonVisibility()
     self:updateCartDisplay()
 
-    -- ONE dealer-list digest per population - never per row. This is the
-    -- walkthrough oracle for the dealer-quality GUI seams: it carries the
-    -- active preset, the resolved markup and the per-row buy prices, so the
-    -- named B2 steps can predict prices offline and assert them against a log
-    -- line instead of eyeballing the screen. Guarded on the level because the
-    -- per-row digest is built eagerly and would otherwise be paid at every level.
+    -- ONE digest per population, never per row: it carries the active preset, the resolved
+    -- markup and the per-row prices, so they can be predicted offline and asserted against
+    -- a log line. Level-guarded because the digest is built eagerly.
     if Log.level >= RmLogging.LOG_LEVEL.TRACE then
         local presetIndex = RLDealerQualityResolver.getActiveIndex()
         local parts = {}
@@ -592,11 +551,8 @@ function RLMenuBuyFrame:getSelectedCount()
 end
 
 
---- Rebuild the footer button info. Back + Filter always; Buy/BuySelected/Select/SelectAll
---- conditional on state. Buy requires a focused animal; Buy Selected requires at
---- least one checked animal; both require `tradeAnimals` farm permission
---- (client-side gate - server has matching defense-in-depth in the
---- corresponding event handler).
+--- Rebuild the footer buttons. Buy needs a focused animal, Buy Selected at least one
+--- checked; both need the tradeAnimals permission, which the server also enforces.
 function RLMenuBuyFrame:updateButtonVisibility()
     self.menuButtonInfo = { self.backButtonInfo }
 
@@ -660,8 +616,7 @@ function RLMenuBuyFrame:onClickBuy()
     end
 
     local price = RLAnimalBuyService.computeBuyPrice(animal)
-    -- Trailer-dealer buys carry no transport fee (legacy AnimalScreenDealerTrailer:getSourcePrice
-    -- returns fee 0, and startTrailerBuyFlow dispatches fee 0), so the confirmation is price-only.
+    -- A trailer-dealer buy has no transport leg, so its confirmation is price-only.
     local fee = 0
     if self:getTrailerDealerContext() == nil then
         fee = (animal.getTranportationFee and animal:getTranportationFee(1)) or 0
@@ -739,12 +694,8 @@ function RLMenuBuyFrame:onBuyConfirmed(clickYes)
 end
 
 
---- Resolve the held livestock trailer when the Buy tab is open in MODE_TRAILER + dealer
---- counterpart, else nil. Fail-closed (preserves the trailer-mode safe-default contract): returns
---- the trailer ONLY when g_rlMenu is live, the open mode is MODE_TRAILER, the counterpart is
---- TRAILER_DEALER, and trailerVehicle is a live livestock trailer (the same liveness gate
---- RLMenu.openTrailerFromBridge uses). A torn-down / externally-deleted / non-trailer ref
---- never reaches the raw getNumOfFreeAnimalSlots / getOwnerFarmId reads downstream.
+--- The held livestock trailer in trailer-dealer context, else nil. Fail-closed, so a torn
+--- down or non-trailer reference never reaches the raw capacity reads downstream.
 --- @return table|nil trailer The held livestock trailer in trailer-dealer context, or nil
 function RLMenuBuyFrame:getTrailerDealerContext()
     if g_rlMenu == nil
@@ -765,14 +716,9 @@ function RLMenuBuyFrame:getTrailerDealerContext()
 end
 
 
---- Open the destination picker for the confirmed purchase.
---- EPPs are filtered: AnimalBuyEvent:run dispatches via
---- `self.object:addAnimals(self.animals)`, and RLRM
---- has no `addAnimals(animals)` override for ExtendedProductionPoint - only
---- for PlaceableHusbandryAnimals and LivestockTrailer. Dispatching Buy to an
---- EPP would crash the server. Future enhancement may add EPP support.
---- In trailer-dealer context the trailer IS the destination: route to
---- startTrailerBuyFlow and RETURN before any destination query / dialog.
+--- Open the destination picker for the confirmed purchase. EPPs are filtered out: there is
+--- no addAnimals override for ExtendedProductionPoint, so dispatching a Buy to one would
+--- crash the server. In trailer-dealer context the trailer IS the destination.
 --- @param animals table Array of cluster objects (same subType)
 --- @param price number Positive total buy price (pre-sign-flip)
 --- @param fee number Positive total transport fee (pre-sign-flip)
@@ -782,9 +728,7 @@ function RLMenuBuyFrame:startBuyFlow(animals, price, fee)
         return
     end
 
-    -- Trailer-dealer: the trailer is the destination, so skip the destination
-    -- dialog and route to the trailer-scoped flow. Absent (FULL/DEALER/husbandry)
-    -- the existing destination-dialog path below runs unchanged.
+    -- The trailer is the destination, so skip the dialog entirely.
     if self:getTrailerDealerContext() ~= nil then
         Log:debug("RLMenuBuyFrame:startBuyFlow: trailer-dealer context, routing to startTrailerBuyFlow (%d animals)",
             #animals)
@@ -807,9 +751,8 @@ function RLMenuBuyFrame:startBuyFlow(animals, price, fee)
         return
     end
 
-    -- Dealer-buy path: nil source. RLAnimalMoveService passes nil through to
-    -- the delegate; the `placeable ~= sourceHusbandry` exclusion becomes a
-    -- no-op so every farm-owned placeable supporting the subtype is returned.
+    -- A nil source makes the source-exclusion a no-op, so every farm-owned placeable
+    -- supporting the subtype is returned.
     local rawEntries = RLAnimalMoveService.getValidDestinations(nil, farmId, subTypeIndex)
 
     -- EPP filter (see function doc comment for rationale)
@@ -841,13 +784,9 @@ function RLMenuBuyFrame:startBuyFlow(animals, price, fee)
 end
 
 
---- Buy the confirmed batch straight INTO the held trailer (no destination dialog).
---- Mutation parity with legacy AnimalScreenDealerTrailer:applySource/applySourceBulk: the
---- destination is the trailer, the owner farm is trailer:getOwnerFarmId() (NOT self.farmId),
---- the transport fee is 0 (a trailer buy has no transport leg). Runs the cumulative-capacity
---- survivor ledger (RLAnimalBuyService.filterBuyableAnimals); when nothing fits it surfaces the
---- SPECIFIC firstErrorCode (legacy parity) or the generic all-capacity-skip message; otherwise
---- it reuses the shared partial-confirm + dispatch path with the fee forced to 0.
+--- Buy the confirmed batch straight into the held trailer. The owner farm is the TRAILER's,
+--- not self.farmId, and the transport fee is 0. When nothing fits it surfaces the specific
+--- first error code, else the generic all-skipped message.
 --- @param animals table Array of cluster objects (same subType) the user confirmed
 --- @param _price number Positive pre-validation total (unused; price is recomputed for survivors)
 function RLMenuBuyFrame:startTrailerBuyFlow(animals, _price)
@@ -871,8 +810,7 @@ function RLMenuBuyFrame:startTrailerBuyFlow(animals, _price)
         validCount, rejectedCount, originalCount, tostring(result.firstErrorCode))
 
     if validCount == 0 then
-        -- Specific error when a validate gate fired (legacy AnimalScreenDealerTrailer parity);
-        -- generic message when every animal was a capacity skip.
+        -- Specific error when a validate gate fired; generic on a pure capacity skip.
         if result.firstErrorCode ~= nil then
             InfoDialog.show(RLAnimalBuyService.getErrorText(result.firstErrorCode))
         else
@@ -887,8 +825,7 @@ function RLMenuBuyFrame:startTrailerBuyFlow(animals, _price)
             rejectedCount, totalCount, tostring(result.firstErrorCode))
     end
 
-    -- Recompute price for the VALID subset (priced through RLAnimalBuyService). A trailer
-    -- buy carries NO transport fee: legacy fires AnimalBuyEvent.new(trailer, ..., 0).
+    -- Reprice for the VALID subset only; a trailer buy carries no transport fee.
     local validPrice = RLAnimalBuyService.computeBulkTotal(result.valid)
     local validFee   = 0
 
@@ -897,11 +834,8 @@ function RLMenuBuyFrame:startTrailerBuyFlow(animals, _price)
     self.pendingBuyPrice       = validPrice
     self.pendingBuyFee         = validFee
 
-    -- Selection clearing is DEFERRED to dispatch (no pre-dialog clear): on a successful trailer
-    -- buy onBuyComplete re-runs refreshTypes, whose onTypeChanged resets self.selectedAnimals = {}
-    -- AFTER the server confirms, so rejected animals never linger; and cancelling the partial-
-    -- confirm below preserves the selection (husbandry-path parity). dispatchPendingBuy still
-    -- clears the survivors at dispatch as usual.
+    -- Selection clearing is DEFERRED to dispatch, so cancelling the partial confirm below
+    -- preserves the selection.
 
     if rejectedCount > 0 then
         local text = RLAnimalBuyService.buildPartialConfirmationText(
@@ -953,8 +887,7 @@ function RLMenuBuyFrame:onBuyDestinationSelected(entry)
         return
     end
 
-    -- Recompute price + fee for the VALID subset via the service helper
-    -- (priced through RLAnimalBuyService.computeBuyPrice).
+    -- Reprice for the VALID subset only.
     local validPrice, validFee = RLAnimalBuyService.computeBulkTotal(result.valid)
 
     self.pendingBuyDestination = entry.placeable
@@ -986,9 +919,7 @@ function RLMenuBuyFrame:onBuyPartialConfirmed(clickYes)
 end
 
 
---- Common dispatch path for both full-acceptance and post-partial-confirm buys.
---- Clears selectedAnimals before dispatching (matches Sell post-dispatch pattern
---- at RLMenuSellFrame:onSellConfirmed).
+--- Common dispatch path for full-acceptance and post-partial-confirm buys alike.
 function RLMenuBuyFrame:dispatchPendingBuy()
     local destination = self.pendingBuyDestination
     local animals     = self.pendingBuyAnimals
@@ -1001,8 +932,7 @@ function RLMenuBuyFrame:dispatchPendingBuy()
         return
     end
 
-    -- In-flight guard: a buy is already awaiting a server reply. Keep the selection +
-    -- surface "in progress"; do NOT dispatch a second same-class request.
+    -- A buy is already awaiting a server reply: keep the selection, dispatch nothing.
     if self.buyPending then
         Log:debug("RLMenuBuyFrame:dispatchPendingBuy: a buy is already in flight, ignoring (selection kept)")
         InfoDialog.show(g_i18n:getText("rl_ui_tradeRequestInProgress"))
@@ -1018,9 +948,8 @@ function RLMenuBuyFrame:dispatchPendingBuy()
     self.pendingBuyPrice = nil
     self.pendingBuyFee = nil
 
-    -- Set the in-flight lock BEFORE dispatch (SP fires onBuyComplete synchronously inside
-    -- buyAnimals, clearing the lock). Read the service's accept/reject: a false return means
-    -- no request is pending - release the lock and KEEP the selection so the player can retry.
+    -- Lock BEFORE dispatch: in SP the completion fires synchronously inside buyAnimals. A
+    -- false return means nothing is pending, so release and keep the selection for a retry.
     self.buyPending = true
     local accepted = RLAnimalBuyService.buyAnimals(destination, animals, price, fee,
         self.onBuyComplete, self)
@@ -1045,33 +974,19 @@ function RLMenuBuyFrame:dispatchPendingBuy()
         end
     end
 
-    -- Re-run the selection-derived refresh AFTER the clear: in SP the completion (onBuyComplete)
-    -- already fired synchronously inside buyAnimals and repainted the cart/buttons from the
-    -- PRE-clear selection, so recompute them against the now-cleared set. The bought rows were
-    -- already dropped by the completion's list reload; only these aggregates were stale.
+    -- Recompute AFTER the clear: in SP the completion already repainted these from the
+    -- PRE-clear selection, leaving the aggregates stale.
     self:updateCartDisplay()
     self:updateButtonVisibility()
 end
 
 
---- Callback from RLAnimalBuyService after the server responds.
---- Stale-frame guard: skips refresh if the frame has closed (tab-switch /
---- menu-close mid-dispatch) OR if the type context was cleared. `isFrameOpen`
---- is set in onFrameOpen and cleared in onFrameClose; `activeAnimalTypeIndex`
---- guards against a type-less state. Either condition means the response
---- arrived too late to safely drive dialogs / list refreshes.
---- Post-buy refresh: reloadAnimalList + updateCartDisplay +
---- RLDetailPaneHelper.updateMoneyDisplay. The pen-info row is permanently hidden
---- by initialize(), so no updateTypeHeader. For the NON-trailer Buy the sidebar
---- types do NOT change - empty types render the empty-animals text. TRAILER-DEALER
---- EXCEPTION: a successful buy into a previously-EMPTY trailer now LOCKS its type,
---- so re-run refreshTypes (which re-applies filterTrailerSupportedTypes) to collapse
---- the sidebar to the locked type; refreshTypes itself reloads list / cart / money,
---- so that branch returns early.
+--- Post-response callback. A closed frame or a cleared type means the reply arrived too
+--- late to drive dialogs safely, so the refresh is skipped. Trailer-dealer exception: a buy
+--- into a previously empty trailer LOCKS its type, so the sidebar has to be rebuilt.
 --- @param errorCode number
 function RLMenuBuyFrame:onBuyComplete(errorCode)
-    -- The dispatched request has completed (reply or watchdog timeout) - always release
-    -- the in-flight lock so the frame isn't stranded, even when the refresh is skipped as stale.
+    -- Always release the lock, even when the refresh below is skipped as stale.
     self.buyPending = false
 
     if not self.isFrameOpen or self.activeAnimalTypeIndex == nil then
@@ -1111,10 +1026,8 @@ end
 -- Cart
 -- =============================================================================
 
---- Compute cart totals from checked animals.
---- Iterates visible items (O(V)) and skips orphan keys silently after restock.
---- Sign convention: getTranportationFee(1) returns positive; for Buy the fee is
---- additive (player pays it on top of price), opposite of Sell which negates it.
+--- Cart totals from the checked animals. The transport fee is ADDITIVE here - the player
+--- pays it on top of the price - the opposite sign to Sell.
 --- @return number totalPrice Sum of RLAnimalBuyService.computeBuyPrice for checked animals
 --- @return number totalFee Sum of getTranportationFee(1) for checked animals (positive cost)
 --- @return number count Number of checked animals
@@ -1134,9 +1047,8 @@ function RLMenuBuyFrame:computeCartTotals()
                     local identityKey = RLSelectionKey.build(cluster.farmId, cluster.uniqueId,
                         cluster.birthday and cluster.birthday.country)
                     if identityKey ~= nil and self.selectedAnimals[identityKey] then
-                        -- Priced through the buy service, which is the SAME call
-                        -- dispatchPendingBuy hands to AnimalBuyEvent - so the cart
-                        -- total and the charged amount cannot disagree.
+                        -- The SAME call dispatch hands to the event, so the cart total
+                        -- and the charged amount cannot disagree.
                         totalPrice = totalPrice + RLAnimalBuyService.computeBuyPrice(cluster)
                         if includeFee then
                             totalFee = totalFee + (cluster:getTranportationFee(1) or 0)
@@ -1154,8 +1066,7 @@ function RLMenuBuyFrame:computeCartTotals()
 end
 
 
---- Update the cart display elements with current totals. Buy adds fee to
---- price (player pays both), opposite of Sell which subtracts.
+--- Update the cart display: Buy ADDS the fee to the price, where Sell subtracts it.
 function RLMenuBuyFrame:updateCartDisplay()
     local totalPrice, totalFee, count = self:computeCartTotals()
 
@@ -1209,9 +1120,8 @@ function RLMenuBuyFrame:onClickSelect()
     self.selectedAnimals[key] = not self.selectedAnimals[key]
     Log:trace("RLMenuBuyFrame:onClickSelect: key=%s -> %s", key, tostring(self.selectedAnimals[key]))
 
-    -- Reload to re-render checkmarks. Do NOT restoreSelection - SmoothList
-    -- preserves focus across reloadData. Calling restoreSelection would
-    -- reset the highlight to (1,1) via setSelectedItem.
+    -- Reload to re-render the checkmarks. Do NOT restoreSelection: SmoothList already
+    -- preserves focus across reloadData, and it would reset the highlight to (1,1).
     if self.animalList ~= nil then
         self.animalList:reloadData()
     end
@@ -1267,12 +1177,8 @@ end
 -- Filter
 -- =============================================================================
 
---- Open AnimalFilterDialog for the current type's sale animals.
---- Source list is built from the dealer pool MINUS the Quick filter so
---- slider ranges always reflect the full dealer pool (or saved-filter-
---- narrowed pool), never the already-Quick-filtered subset.
---- isBuyMode=true so the Value slider applies the active buy-markup matching
---- AnimalFilterDialog.applyFilters.
+--- Open the Quick filter dialog. The source list excludes the Quick filter, so the slider
+--- ranges reflect the full pool; buy-mode makes the Value slider apply the buy markup.
 function RLMenuBuyFrame:onClickFilter()
     if self.activeAnimalTypeIndex == nil then return end
     if AnimalFilterDialog == nil or AnimalFilterDialog.show == nil then
@@ -1334,14 +1240,9 @@ function RLMenuBuyFrame:getNumberOfItemsInSection(list, section)
     return items ~= nil and #items or 0
 end
 
---- Populate one data cell. Mirrors Sell's populateCellForItemInSection.
---- The inherited `price` cell shows the dealer-marked-up buy price; the
---- inline checkbox callback toggles selectedAnimals and updates the cart
---- totals. The markup math lives in RLAnimalBuyService.computeBuyPrice - this
---- cell calls it rather than multiplying inline, so the row price, the cart
---- total and the amount AnimalBuyEvent charges all come from one place.
---- Deliberately NO log line here: this runs per row per refresh. The
---- once-per-population TRACE digest at the end of reloadAnimalList carries it.
+--- Populate one data cell. The price comes from the buy service rather than an inline
+--- multiply, so the row, the cart and the charged amount share one source. Deliberately
+--- UNLOGGED: this runs per row per refresh, and reloadAnimalList carries the digest.
 --- @param list table
 --- @param section number
 --- @param index number
@@ -1567,14 +1468,9 @@ function RLMenuBuyFrame:revalidateActiveFilter()
     end
 end
 
---- Remote-change fanout hook fired from RLFilter{Create,Update,Delete}Event:run
---- when a peer mutates a saved filter. Id-match gate short-circuits when the
---- changed filter is not this frame's active filter, preserving user selection
---- and detail-pane state. Otherwise re-runs revalidateActiveFilter +
---- updateFilterChip + reloadAnimalList so the displayed list reflects the
---- new active-filter state. BuyFrame is the isolated island in Cycle-A's
---- shared-selection model (dealer context); it does NOT clear
---- g_rlMenu.sharedSelection.activeFilterId on active-cleared.
+--- Remote-change hook for a peer mutating a saved filter. The id-match gate short-circuits
+--- for any filter but this frame's active one, preserving the selection and detail pane.
+--- This frame's selection is isolated, so it never clears the shared active filter id.
 ---@param filterId string  -- id of the filter that was created/updated/deleted on the network
 ---@param changeType string  -- "create" | "update" | "delete"
 function RLMenuBuyFrame:onRemoteFilterChange(filterId, changeType)

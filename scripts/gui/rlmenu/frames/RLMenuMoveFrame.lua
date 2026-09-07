@@ -170,12 +170,9 @@ function RLMenuMoveFrame:onFrameOpen()
             tostring(shared.animalIdentity and shared.animalIdentity.uniqueId))
     end
 
-    -- Reset SmoothList's selection sentinels to 0 (the "no selection"
-    -- sentinel value) so the chained captureCurrentSelection during
-    -- refreshHusbandries -> reloadAnimalList short-circuits via its
-    -- sectionOrder guard instead of overwriting the just-imported
-    -- selectedIdentity. Must be 0, not nil - SmoothList expects numeric
-    -- indices and crashes on nil.
+    -- Reset the selection sentinels so the chained capture short-circuits instead of
+    -- overwriting the just-imported identity. Must be 0, not nil: SmoothList expects
+    -- numeric indices and crashes on nil.
     if self.animalList ~= nil then
         self.animalList.selectedSectionIndex = 0
         self.animalList.selectedIndex = 0
@@ -183,10 +180,8 @@ function RLMenuMoveFrame:onFrameOpen()
 
     self:refreshHusbandries()
 
-    -- Explicit focus links for keyboard navigation (Fresh RmSettingsFrame
-    -- pattern). Required because multiple frames share the same sidebar +
-    -- SmoothList structure, and FocusManager auto-layout resolves to
-    -- elements in other frames when element positions/IDs overlap.
+    -- Explicit focus links: several frames share this sidebar and list structure, so
+    -- FocusManager auto-layout can otherwise resolve into another frame's elements.
     if self.subCategorySelector ~= nil and self.animalList ~= nil then
         FocusManager:linkElements(self.subCategorySelector, FocusManager.BOTTOM, self.animalList)
         FocusManager:linkElements(self.animalList, FocusManager.TOP, self.subCategorySelector)
@@ -246,10 +241,8 @@ function RLMenuMoveFrame:refreshHusbandries()
     Log:debug("RLMenuMoveFrame:refreshHusbandries: farmId=%s husbandries=%d",
         tostring(farmId), #self.sortedHusbandries)
 
-    -- Capture-and-consume the one-shot MODE_FULL husbandry anchor into a local and
-    -- clear the shared field NOW - before the empty-list guard below - so every path
-    -- (empty, selector-nil, populated) consumes it exactly once and none leaks it to
-    -- a later open. resolveIndex (below) prefers this anchor over the shared selection.
+    -- Consume the one-shot anchor NOW, before the empty-list guard below, so every path
+    -- consumes it exactly once and none leaks it into a later open.
     local anchorHusbandry = nil
     if g_rlMenu ~= nil then
         anchorHusbandry = g_rlMenu.anchoredHusbandry
@@ -399,11 +392,8 @@ end
 -- Animal list
 -- =============================================================================
 
---- Build the dialog source list for the Quick filter dialog.
---- Mirrors reloadAnimalList's universe construction MINUS the Quick filter,
---- so the dialog's slider min/max derivation sees the full pen (or saved-
---- filter-narrowed pen) instead of the already-Quick-filtered subset.
---- Parity with reloadAnimalList is enforceable by eye (the two are stacked).
+--- The Quick filter dialog's source list: reloadAnimalList's universe MINUS the Quick
+--- filter, so the slider ranges see the full pen rather than the filtered subset.
 ---@return table base   full unfiltered husbandry universe
 ---@return table narrowed base after saved-filter layer (== base when none)
 function RLMenuMoveFrame:buildDialogSourceList()
@@ -687,10 +677,8 @@ end
 -- Filter
 -- =============================================================================
 
---- Open AnimalFilterDialog for the current husbandry's animals.
---- Source list is built from the render universe MINUS the Quick filter so
---- slider ranges always reflect the full pen (or saved-filter-narrowed pen),
---- never the already-Quick-filtered subset.
+--- Open the Quick filter dialog. Its source excludes the Quick filter, so the slider
+--- ranges reflect the full pen rather than the already-filtered subset.
 function RLMenuMoveFrame:onClickFilter()
     if self.selectedHusbandry == nil then return end
     if AnimalFilterDialog == nil or AnimalFilterDialog.show == nil then
@@ -1065,10 +1053,9 @@ function RLMenuMoveFrame:onMoveConfirmed(clickYes)
         end
     end
 
-    -- Set the in-flight lock BEFORE dispatch: in SP moveAnimals fires onMoveComplete
-    -- synchronously inside the call (clearing the lock). Read the service's accept/reject:
-    -- a false return (a same-class move already in flight, or nothing dispatched) means no
-    -- request is pending - release the lock and KEEP the selection so the player can retry.
+    -- Lock BEFORE dispatch: in SP the completion fires synchronously inside the call and
+    -- clears it. A false return means nothing is pending, so release the lock and keep
+    -- the selection for a retry.
     self.movePending = true
     local accepted = RLAnimalMoveService.moveAnimals(
         self.selectedHusbandry, destination, animals, "SOURCE",
@@ -1172,10 +1159,8 @@ function RLMenuMoveFrame:onCycleFilter()
     self:reloadAnimalList()
 end
 
---- Render the filterChip Text element to reflect the combined Quick filter
---- + saved filter state. Delegates branch resolution to the
---- shared RLFilterChipHelper so all four RL Menu frames render consistently.
---- No-op + WARNING if the XML element is missing.
+--- Render the filter chip from the combined Quick and saved filter state, through the
+--- shared helper so every frame renders it the same way.
 function RLMenuMoveFrame:updateFilterChip()
     local chip = self.filterChip
     if chip == nil then
@@ -1251,14 +1236,9 @@ function RLMenuMoveFrame:revalidateActiveFilter()
     end
 end
 
---- Remote-change fanout hook fired from RLFilter{Create,Update,Delete}Event:run
---- when a peer mutates a saved filter. Id-match gate short-circuits when the
---- changed filter is not this frame's active filter, preserving user selection
---- and detail-pane state. Otherwise re-runs revalidateActiveFilter +
---- updateFilterChip + reloadAnimalList so the displayed list reflects the
---- new active-filter state. Clears g_rlMenu.sharedSelection.activeFilterId
---- when revalidate cleared the active filter (Move participates in shared
---- selection alongside Info + Sell; Buy is isolated).
+--- Remote-change hook for a peer mutating a saved filter. The id-match gate
+--- short-circuits for any filter but this frame's active one, preserving the selection.
+--- This frame shares selection state, so a cleared active filter clears the shared id too.
 ---@param filterId string  -- id of the filter that was created/updated/deleted on the network
 ---@param changeType string  -- "create" | "update" | "delete"
 function RLMenuMoveFrame:onRemoteFilterChange(filterId, changeType)

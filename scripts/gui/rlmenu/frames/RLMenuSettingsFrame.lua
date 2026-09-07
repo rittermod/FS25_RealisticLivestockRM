@@ -27,40 +27,26 @@ RLMenuSettingsFrame.SUB_CATEGORY = {
     FILTERS = 2,
 }
 
---- Sentinel marking an explicit "clear to Any" in the pendingChanges overlay
---- for the animalType field. Lua removes nil values from tables, so
---- pendingChanges[id].animalType = nil is indistinguishable from "no pending
---- change". A unique-table marker lets overlayPending distinguish three states:
----   (a) no pending change          (overlay.animalType == nil)
----   (b) pending change to concrete (overlay.animalType is an integer typeIndex)
----   (c) pending change to Any      (overlay.animalType == ANIMAL_TYPE_ANY)
---- Flush converts the sentinel back to nil before service:update so storage
---- + wire never see it. Mirrors Fresh's MAXBENEFIT_CLEAR pattern.
+--- Marks an explicit "clear to Any" in pendingChanges; nil cannot express it,
+--- since Lua drops nil values. Flush restores nil before storage sees it.
 RLMenuSettingsFrame.ANIMAL_TYPE_ANY = {}
 
 --- Construct a new RLMenuSettingsFrame instance.
---- Called once by setupGui() during mod load.
 --- @return table self The new frame instance
 function RLMenuSettingsFrame.new()
     local self = RLMenuSettingsFrame:superClass().new(nil, RLMenuSettingsFrame_mt)
     self.name = "RLMenuSettingsFrame"
 
-    -- Filter list state. Rows are cloned snapshots from the service so
-    -- frame-side mutation stays contract-safe; selection is id-authoritative
-    -- (selectedFilterId is the source of truth, list.selectedIndex is
-    -- derived on every reload via resolveSelectionById).
+    -- Filter list state. Rows are cloned snapshots from the service; selection
+    -- is id-authoritative, with list.selectedIndex derived on every reload.
     self.rows              = {}
     self.farmId            = nil
     self.isFrameOpen       = false
     self.selectedFilterId  = nil
 
-    -- Guard flag: true while refreshData reconciles selection after a
-    -- reload. SmoothList:reloadData fires our onListSelectionChanged
-    -- delegate synchronously during its internal clamp. Without this
-    -- flag, that callback would overwrite self.selectedFilterId with
-    -- whatever row lands at the post-clamp index BEFORE resolveSelectionById
-    -- runs, silently breaking the id-authoritative contract.
-    -- onListSelectionChanged checks this flag and early-returns.
+    -- True while refreshData reconciles selection: SmoothList:reloadData fires
+    -- onListSelectionChanged synchronously during its clamp, which would
+    -- overwrite selectedFilterId with the post-clamp row before we resolve it.
     self.isReconciling     = false
 
     -- One-shot flag for the first-visibility measure log on [Filters]. Reset
@@ -72,30 +58,17 @@ function RLMenuSettingsFrame.new()
     -- pitch + per-cell geometry from the measurement log. Reset in onFrameOpen.
     self.didMeasureFilterCellCount = 0
 
-    -- Editor pane measure log flag. Once-per-process (NOT once-per-open):
-    -- RLMenuSettingsFrame.new() runs once at setupGui() time and the clone is
-    -- reused across every menu open. Pane geometry doesn't change after first
-    -- measurement so measuring once is sufficient.
+    -- Editor pane measure log flag. Once per process, not per open: new() runs
+    -- once at setupGui() time and the clone is reused across every menu open.
     self.didMeasureEditorPane = false
 
-    -- Conditions list one-shot measure flag. Same once-per-process
-    -- semantics as didMeasureEditorPane above. Fires from renderEditor when
-    -- the SmoothList becomes visible AND its size axes have settled.
+    -- Conditions list one-shot measure flag. Fires from renderEditor once the
+    -- SmoothList is visible and its size axes have settled.
     self.didMeasureConditionsList = false
 
-    -- Conditions editor working state. Filled in by renderEditor when a
-    -- filter is selected:
-    --   - supportedRows: array of {field, cmp, value, rawText?} representing
-    --     the editable (number / bool, non-`in`/`notin`) condition rows.
-    --     `rawText` lives only on number rows that received keystrokes since
-    --     the last flush.
-    --   - preservedChildren: array of expression-node clones that the editor
-    --     cannot render (enum / string conditions, in/notin cmps, nested
-    --     groups). Round-tripped verbatim through flush so saving never
-    --     destroys un-renderable nodes.
-    --   - lastRenderedFilterId: id of the filter whose rows are currently in
-    --     supportedRows / preservedChildren. Used to discard a stale render
-    --     state when selection switches.
+    -- Conditions editor working state, filled in by renderEditor. supportedRows
+    -- are the editable number/bool rows; preservedChildren are nodes the editor
+    -- cannot render, round-tripped verbatim so a save never destroys them.
     self.conditionEditState = {
         supportedRows         = {},
         preservedChildren     = {},
@@ -107,93 +80,66 @@ function RLMenuSettingsFrame.new()
     -- catalog change is reflected on the next render.
     self.conditionFieldOptionsCache = nil
 
-    -- Pending-changes overlay keyed by filter id. Each value is a partial
-    -- table {name?=string, animalType?=integer|ANIMAL_TYPE_ANY, op?="AND"|"OR",
-    -- usage?=string (canonical RLFilterUsage value)}. Widget callbacks write
-    -- into this; service:update is NOT called per keystroke.
-    -- flushPendingChanges drains the table on onFrameClose. The per-id
-    -- sub-table is created lazily on first write. Unlike animalType, the
-    -- usage axis is a 3-state enum where every state has a canonical string
-    -- value, so no sentinel is needed - absence-of-key means "no change",
-    -- presence means "change to this value".
+    -- Pending-changes overlay keyed by filter id: widget callbacks write here
+    -- and flushPendingChanges drains it on close, so service:update is not
+    -- called per keystroke. An absent key means "no change".
     self.pendingChanges = {}
 
-    -- AnimalType selector state cache. Populated by seedAnimalTypeStates on
-    -- every renderEditor call (cheap, ~5-10 types). Each entry is
-    -- {label=string, typeIndex=integer|nil}; index 1 is always the "Any" row
-    -- with typeIndex=nil.
+    -- AnimalType selector cache, repopulated on every renderEditor call. Index
+    -- 1 is always the "Any" row, with typeIndex=nil.
     self.animalTypeStates = {}
 
-    -- Custom footer buttons: Back always; New filter + Duplicate + Delete
-    -- conditionally appended by updateButtonVisibility.
-    -- hasCustomMenuButtons=true forces the first page-switch to use
-    -- self.menuButtonInfo rather than RLMenu's default back-only set,
-    -- preventing a one-frame flicker.
+    -- Custom footer buttons: Back always, the rest appended conditionally by
+    -- updateButtonVisibility. hasCustomMenuButtons makes the first page switch
+    -- use self.menuButtonInfo, avoiding a one-frame flicker.
     self.hasCustomMenuButtons = true
 
     self.backButtonInfo = {
         inputAction = InputAction.MENU_BACK,
     }
-    -- [New filter] unparked. Callback wired to the live handler
-    -- shipped (onClickNewFilter). Visibility gated by
-    -- updateButtonVisibility on tradeAnimals permission + farmId presence.
+    -- [New filter]: visibility gated by updateButtonVisibility on the
+    -- tradeAnimals permission and farmId presence.
     self.newFilterButtonInfo = {
         inputAction = InputAction.MENU_EXTRA_1,
         text = g_i18n:getText("rl_menu_filters_new_button"),
         callback = function() self:onClickNewFilter() end,
     }
-    -- [Duplicate] clones the currently selected filter (overlay-merged so
-    -- in-flight edits are duplicated too). MENU_EXTRA_2 is the conventional
-    -- second extra slot; mirrors RLMenuMessagesFrame's deleteAllButtonInfo
-    -- usage pattern.
+    -- [Duplicate] clones the selected filter, overlay-merged so in-flight edits
+    -- are duplicated too.
     self.duplicateButtonInfo = {
         inputAction = InputAction.MENU_EXTRA_2,
         text = g_i18n:getText("rl_menu_filters_duplicate_button"),
         callback = function() self:onClickDuplicate() end,
     }
     -- [Delete] prompts YesNoDialog then dispatches service:delete on Yes.
-    -- MENU_CANCEL keeps the destructive action on the cancel/red slot,
-    -- matching the RLMenuMessagesFrame convention.
+    -- MENU_CANCEL keeps the destructive action on the cancel slot.
     self.deleteButtonInfo = {
         inputAction = InputAction.MENU_CANCEL,
         text = g_i18n:getText("rl_menu_filters_delete_button"),
         callback = function() self:onClickDelete() end,
     }
-    -- v2 modal editor: three-tier action bar.
-    --
-    -- Tier 1 (filtersList focused): Back / New filter / Duplicate / Delete filter
-    -- Tier 2 (metadata or empty conditions list focused): Back / Add condition
-    -- Tier 3 (condition row focused): Back / Edit / Add condition / Add group (stub) / Delete condition
-    --
-    -- Slot collisions across tiers are intentional - only one tier is
-    -- active at a time. updateButtonVisibility rebuilds menuButtonInfo from
-    -- the active tier so MENU_EXTRA_1 means "New filter" in Tier 1 and
-    -- "Add condition" in Tier 2/3 without conflict.
-    --
-    -- Add condition moved from MENU_ACCEPT to MENU_EXTRA_1 to free
-    -- MENU_ACCEPT for "Edit condition" in Tier 3 (the primary positive
-    -- action when a row is selected).
+    -- Three-tier action bar. Slot collisions across tiers are intentional -
+    -- only one tier is active at a time, and updateButtonVisibility rebuilds
+    -- menuButtonInfo from the tier resolveActionBarTier returns.
     self.addConditionButtonInfo = {
         inputAction = InputAction.MENU_EXTRA_1,
         text = g_i18n:getText("rl_menu_filters_add_condition"),
         callback = function() self:onAddConditionClicked() end,
     }
-    -- Edit condition: Tier 3 only. MENU_ACCEPT slot since editing a focused
-    -- row is the canonical positive action.
+    -- Edit condition: Tier 3 only, on the MENU_ACCEPT slot.
     self.editConditionButtonInfo = {
         inputAction = InputAction.MENU_ACCEPT,
         text = g_i18n:getText("rl_menu_filters_edit_condition"),
         callback = function() self:onEditConditionClicked() end,
     }
-    -- Delete condition: Tier 3 only. MENU_CANCEL slot for destructive
-    -- action consistency with deleteButtonInfo (Tier 1).
+    -- Delete condition: Tier 3 only, on the MENU_CANCEL slot.
     self.deleteConditionButtonInfo = {
         inputAction = InputAction.MENU_CANCEL,
         text = g_i18n:getText("rl_menu_filters_delete_condition"),
         callback = function() self:onDeleteConditionClicked() end,
     }
-    -- Add group: Tier 3 only. MENU_EXTRA_2 slot. v2 stub - callback logs
-    -- and no-ops; the group-editing follow-up wires the actual sibling-group insertion.
+    -- Add group: Tier 3 only, on MENU_EXTRA_2. Stub - the callback logs and
+    -- no-ops; sibling-group insertion is not implemented.
     self.addGroupButtonInfo = {
         inputAction = InputAction.MENU_EXTRA_2,
         text = g_i18n:getText("rl_menu_filters_add_group_button"),
@@ -201,14 +147,9 @@ function RLMenuSettingsFrame.new()
     }
     self.menuButtonInfo = { self.backButtonInfo }
 
-    -- General subtab control registry. Keyed by RLSettings.SETTINGS name;
-    -- value is the BinaryOption/MultiTextOption/Button widget. Tooltip
-    -- child Text refs live in self.tooltips[name]. Both populated by
-    -- populateGeneralSubtab() during initialize() (per-clone, one-shot).
-    -- The page deliberately does NOT touch RLSettings.SETTINGS[*].element
-    -- - that ref stays nil (no pause-menu rows are built anymore); the
-    -- RL_BroadcastSettingsEvent path nil-guards it. Each page owns its
-    -- own widget refs.
+    -- General subtab control registry keyed by RLSettings.SETTINGS name, with
+    -- tooltip child Text refs in self.tooltips. The page deliberately leaves
+    -- RLSettings.SETTINGS[*].element nil; each page owns its own widget refs.
     self.controls          = {}
     self.tooltips          = {}
     self.didMeasureGeneralPane = false
@@ -217,9 +158,8 @@ function RLMenuSettingsFrame.new()
     return self
 end
 
---- Load the settings frame XML and register the frame with g_gui.
---- Called from RLMenu.setupGui() before the menu XML is loaded so that
---- rlMenu.xml's FrameReference ref="RLMenuSettingsFrame" resolves.
+--- Load the settings frame XML and register the frame with g_gui. Must run
+--- before the menu XML loads, so its FrameReference resolves.
 function RLMenuSettingsFrame.setupGui()
     local frame = RLMenuSettingsFrame.new()
     g_gui:loadGui(
@@ -231,14 +171,8 @@ function RLMenuSettingsFrame.setupGui()
     Log:debug("RLMenuSettingsFrame.setupGui: registered")
 end
 
---- Called by the GUI manager after all element references are wired.
---- Do NOT mutate the tree here (fires on both the original and the clone).
---- Closure binding + setTexts live in initializeSubCategoryPages() and are
---- invoked from onFrameOpen() to keep per-clone state fresh on every open.
----
---- Binds the filters SmoothList data source + delegate. Binding here is
---- safe (non-mutating) and necessary so both the original and the clone
---- resolve their own data paths.
+--- Called by the GUI manager once element references are wired. Must not mutate
+--- the tree: it fires on both the original and the clone.
 function RLMenuSettingsFrame:onGuiSetupFinished()
     RLMenuSettingsFrame:superClass().onGuiSetupFinished(self)
     Log:trace("RLMenuSettingsFrame:onGuiSetupFinished")
@@ -251,11 +185,8 @@ function RLMenuSettingsFrame:onGuiSetupFinished()
         Log:warning("RLMenuSettingsFrame:onGuiSetupFinished: filtersList missing from XML")
     end
 
-    -- Cache editor widget refs. getDescendantById walks the tree once
-    -- here so renderEditor / flushPendingChanges / widget callbacks can hit
-    -- direct field references without repeating the descend on every call.
-    -- Per-widget nil-guards downstream: any missing ref logs Log:warning and
-    -- skips that widget rather than crashing the frame.
+    -- Cache editor widget refs once so the render and flush paths hit direct
+    -- fields. A missing ref logs a warning and skips that widget downstream.
     self.filterEditorContainer  = self:getDescendantById("filterEditorContainer")
     self.filterEditorEmpty      = self:getDescendantById("filterEditorEmpty")
     self.filterEditorLayout     = self:getDescendantById("filterEditorLayout")
@@ -266,9 +197,8 @@ function RLMenuSettingsFrame:onGuiSetupFinished()
     self.filterOpSelector       = self:getDescendantById("filterOpSelector")
     self.filterUsageSelector    = self:getDescendantById("filterUsageSelector")
 
-    -- Conditions editor widget cache. Same nil-guard pattern as the
-    -- metadata widgets above; per-widget references downstream guard nil
-    -- individually so partial loads degrade rather than crash.
+    -- Conditions editor widget cache, nil-guarded per widget downstream so a
+    -- partial load degrades rather than crashes.
     self.filterConditionsBanner       = self:getDescendantById("filterConditionsBanner")
     self.filterConditionsListContainer = self:getDescendantById("filterConditionsListContainer")
     self.filterConditionsList         = self:getDescendantById("filterConditionsList")
@@ -296,22 +226,16 @@ function RLMenuSettingsFrame:onGuiSetupFinished()
         Log:trace("RLMenuSettingsFrame:onGuiSetupFinished: editor widgets cached (13/13)")
     end
 
-    -- Bind the conditions SmoothList to this frame as both data source and
-    -- delegate. The shared delegate dispatches by list reference
-    -- (`if list == self.filtersList ... elseif list == self.filterConditionsList`)
-    -- so the single `self` object can host both lists without confusion.
+    -- Bind the conditions SmoothList as data source and delegate. The shared
+    -- delegate dispatches by list reference, so one self hosts both lists.
     if self.filterConditionsList ~= nil then
         self.filterConditionsList:setDataSource(self)
         self.filterConditionsList:setDelegate(self)
         Log:trace("RLMenuSettingsFrame:onGuiSetupFinished: filterConditionsList bound")
     end
 
-    -- Seed the conditions match-logic selector texts once at setup (static,
-    -- locale-baked at l10n load time). AnimalType selector is reseeded per
-    -- renderEditor because it depends on animal-system state.
-    -- Display text is "Match ALL" / "Match ANY" (renamed
-    -- from AND/OR for clarity). Stored op string in serialisation/wire stays
-    -- "AND"/"OR" - keys preserved end-to-end; only the visible text changed.
+    -- Seed the match-logic selector texts once; they are static. The visible
+    -- text is "Match ALL"/"Match ANY" while the stored op stays "AND"/"OR".
     if self.filterOpSelector ~= nil then
         self.filterOpSelector:setTexts({
             g_i18n:getText("rl_menu_filters_op_and"),
@@ -320,24 +244,10 @@ function RLMenuSettingsFrame:onGuiSetupFinished()
         Log:trace("RLMenuSettingsFrame:onGuiSetupFinished: filterOpSelector texts set (Match ALL / Match ANY)")
     end
 
-    -- v2 modal editor: three-tier action bar focus triggers. Each anchor
-    -- element's onFocusEnter is wrapped (via Utils.appendedFunction, so the
-    -- inherited focus behavior is preserved) with a tier-refresh call. Without
-    -- these triggers the action bar would stay stale when focus moves between
-    -- filtersList / metadata / conditionsList via keyboard or gamepad.
-    --
-    -- Mouse-driven row-selection inside the conditions list is covered by
-    -- onListSelectionChanged (chunk C). These hooks cover the cross-section
-    -- focus transitions (e.g. arrow-key from filtersList into the editor).
-    -- Gotcha: a ScrollingLayoutElement captures each child's onFocusEnter into
-    -- scrollingFocusEnter_orig and replaces onFocusEnter with its own
-    -- scroll-to-visible wrapper, re-applying that wrapper on every layout
-    -- update - which CLOBBERS any wrap we put on onFocusEnter after the first
-    -- SL setup. The SL wrapper calls scrollingFocusEnter_orig on each focus
-    -- enter, so hooking THAT field survives SL invalidations. For elements not
-    -- inside an SL (filtersList, filterConditionsList live in different
-    -- containers in our layout), scrollingFocusEnter_orig is nil and the
-    -- normal onFocusEnter wrap works.
+    -- Action-bar focus triggers, so the bar cannot go stale when focus moves
+    -- between sections. A ScrollingLayoutElement re-replaces a child's
+    -- onFocusEnter on every layout update, so hook scrollingFocusEnter_orig
+    -- where it exists - a wrap on onFocusEnter is clobbered.
     local function makeFocusTrigger(frame)
         return function(_elem)
             frame:updateButtonVisibility()
@@ -351,14 +261,8 @@ function RLMenuSettingsFrame:onGuiSetupFinished()
         { name = "filterAnimalTypeSelector", elem = self.filterAnimalTypeSelector },
         { name = "filterOpSelector",         elem = self.filterOpSelector },
         { name = "filterUsageSelector",      elem = self.filterUsageSelector },
-        -- subCategoryPaging gets refresh-only treatment: focus on it is
-        -- never one of the editor tiers (it's outside the editor), but the
-        -- empty-conditions-list edge case can route focus here when the
-        -- BOTTOM link from filterUsageSelector falls through. Without this
-        -- wrap, the action bar stays stale at Tier 2 when focus has
-        -- actually escaped the editor. With it, resolveActionBarTier
-        -- returns nil -> Tier 1 fallback engages -> bar reverts to
-        -- filter-level actions, which is correct here.
+        -- Refresh-only: focus here means the editor was escaped, so
+        -- resolveActionBarTier returns nil and the Tier 1 fallback engages.
         { name = "subCategoryPaging",        elem = self.subCategoryPaging },
     }
     local wired = {}
@@ -378,25 +282,15 @@ function RLMenuSettingsFrame:onGuiSetupFinished()
         table.concat(wired, ","))
 end
 
---- Per-clone setup. Called explicitly by RLMenu:setupMenuPages() on the
---- live clone (not the original) after registerPage. Populates the
---- General subtab's settings rows (look up XML element refs, set option
---- texts, register controls). Tree mutation forbidden in onGuiSetupFinished
---- (fires on both original and clone) so we do it here.
----
---- Per-row state push (setState) and cascade run on every onFrameOpen via
---- refreshGeneralSubtab(); this initialize() handles the once-per-clone
---- bindings only.
+--- Per-clone setup: populates the General subtab. Tree mutation is forbidden
+--- in onGuiSetupFinished, so it happens here.
 function RLMenuSettingsFrame:initialize()
     Log:debug("RLMenuSettingsFrame:initialize")
     self:populateGeneralSubtab()
 end
 
---- Called by the Paging element when this tab becomes active.
---- Rebinds tab selection closures, seeds paging texts, resets to General,
---- and parks focus on the tab bar. Rebinding every open (rather than once
---- in onGuiSetupFinished) keeps closures captured against the live frame
---- instance and survives repeated opens.
+--- Called by the Paging element when this tab becomes active. Rebinding every
+--- open keeps closures captured against the live frame instance.
 function RLMenuSettingsFrame:onFrameOpen()
     RLMenuSettingsFrame:superClass().onFrameOpen(self)
     self.isFrameOpen = true
@@ -404,26 +298,20 @@ function RLMenuSettingsFrame:onFrameOpen()
 
     self:initializeSubCategoryPages()
 
-    -- Default to [General] on every open - deliberate, no persistence.
-    -- Reset the first-visibility measure flags so the runtime-measure logs
-    -- fire once per frame-open cycle (Filters one-shot in updateSubCategoryPages,
-    -- General one-shot below).
+    -- Default to [General] on every open - deliberate, no persistence. Reset
+    -- the measure flags so their logs fire once per frame-open cycle.
     self.subCategoryPaging:setState(RLMenuSettingsFrame.SUB_CATEGORY.GENERAL, true)
     self.didMeasureFiltersPane = false
     self.didMeasureGeneralPane = false
     self.didMeasureFilterCellCount = 0
 
-    -- Push current RLSettings state into General subtab widgets and run
-    -- the per-row admin gate + dependency cascade. State may have changed
-    -- between opens (MP broadcast); re-read every time.
+    -- Re-read RLSettings on every open: an MP broadcast can change state
+    -- between opens.
     self:refreshGeneralSubtab()
 
-    -- One-shot first-visibility measure log for the General layout. Mirrors
-    -- the Filters pane measure in updateSubCategoryPages - GUI
-    -- positioning is computed from profiles but VERIFIED with runtime
-    -- measurement before iterating (session rule 4). nil-guards on .size /
-    -- size[1] / size[2] cover the case where a stretched layout is briefly
-    -- present without committed axes until the next layout pass.
+    -- One-shot first-visibility measure log for the General layout. The size
+    -- nil-guards cover a stretched layout whose axes are not committed until
+    -- the next layout pass.
     local genLayout = self:getDescendantById("generalSettingsLayout")
     if genLayout ~= nil and genLayout.size ~= nil
        and genLayout.size[1] ~= nil and genLayout.size[2] ~= nil
@@ -431,10 +319,8 @@ function RLMenuSettingsFrame:onFrameOpen()
         Log:debug("RLMenuSettingsFrame: generalSettingsLayout measured: %.2fpx x %.2fpx",
             genLayout.size[1] * 1920, genLayout.size[2] * 1080)
 
-        -- Measurement: log subCategoryPages[1] (parent of
-        -- generalSettingsSliderBox) + the sliderBox itself + the layout, so
-        -- we can see the actual right-edge gap and pick a correct anchor /
-        -- parent reanchor instead of guessing magic +Npx offsets.
+        -- Log the page container, the slider box and the layout so the
+        -- right-edge gap is measured rather than guessed.
         local function _logBox(name, e)
             if e == nil then Log:debug("RLMenuSettingsFrame._geom: %s == nil", name); return end
             local ax = (e.absPosition and e.absPosition[1] or 0) * g_referenceScreenWidth
@@ -461,20 +347,14 @@ function RLMenuSettingsFrame:onFrameOpen()
         self.didMeasureGeneralPane = true
     end
 
-    -- Tint each visible row container with an alternating dark shade so the
-    -- light-cream row title text reads against a dark backing. Without this,
-    -- rows fall back to the default white tint of `gui.colorPreset` from the
-    -- baseReference profile and titles are invisible on the new menu chrome.
-    -- Runs AFTER refreshGeneralSubtab so the per-row disabled cascade has
-    -- settled.
+    -- Tint the rows so the cream title text reads; without it they fall back
+    -- to a white tint and the titles are invisible. Runs after
+    -- refreshGeneralSubtab so the disabled cascade has settled.
     self:updateAlternatingElements(genLayout)
 
-    -- Save-from-QF handshake: consume any pending-select id from RLMenu BEFORE
-    -- refreshData so resolveSelectionById picks the new row in the same pass.
-    -- Function-scope local so the trailing subCategoryPaging:setState at the end
-    -- of onFrameOpen can branch on it. AnimalFilterDialog:doCreateAndNavigate
-    -- stashes the id via g_rlMenu:openSettingsFilter; we clear it on consume
-    -- and RLMenu:onClose covers the ESC-during-handshake race.
+    -- Consume any pending-select id BEFORE refreshData, so resolveSelectionById
+    -- picks the new row in the same pass. Function-scope local so the trailing
+    -- setState can branch on it.
     local didPendingSelect = false
     if g_rlMenu ~= nil and g_rlMenu.pendingSelectedFilterId ~= nil then
         self.selectedFilterId = g_rlMenu.pendingSelectedFilterId
@@ -484,28 +364,20 @@ function RLMenuSettingsFrame:onFrameOpen()
             tostring(self.selectedFilterId))
     end
 
-    -- Pull filter rows + seed empty-state + footer buttons for whichever
-    -- subtab ends up active. Safe to call even though [General] is the
-    -- initial pane; rows are cached for when the user switches to [Filters].
+    -- Pull filter rows for whichever subtab ends up active; rows are cached
+    -- for the switch to [Filters].
     self:refreshData()
 
-    -- Explicit focus edges between the tab bar and the filters list so
-    -- DOWN from the tab bar reaches the list and UP from the list returns
-    -- to the tab bar. Mirrors the linkElements pattern used by Info/Buy/
-    -- Sell/Move/AI frames; without these, FocusManager auto-layout can
-    -- resolve arrow keys to elements in other frames.
+    -- Explicit focus edges between the tab bar and the filters list; without
+    -- them FocusManager auto-layout can resolve arrow keys into other frames.
     if self.subCategoryPaging ~= nil and self.filtersList ~= nil then
         FocusManager:linkElements(self.subCategoryPaging, FocusManager.BOTTOM, self.filtersList)
         FocusManager:linkElements(self.filtersList, FocusManager.TOP, self.subCategoryPaging)
     end
 
-    -- Editor focus chain: list <-> editor row 1 <-> row 2 <-> row 3.
-    -- RIGHT/LEFT crosses the list-editor boundary; DOWN/UP chains within
-    -- the editor AND falls through from list-bottom into the editor's
-    -- Name input (so the full path tab -> list -> name -> animalType -> op
-    -- works with DOWN arrow alone). Each link is nil-guarded so a missing
-    -- widget downgrades cleanly to the partial chain (warning already
-    -- logged in onGuiSetupFinished).
+    -- Editor focus chain: RIGHT/LEFT crosses the list-editor boundary, DOWN/UP
+    -- chains within the editor and falls through from list-bottom into Name.
+    -- Each link is nil-guarded so a missing widget degrades to a partial chain.
     if self.filtersList ~= nil and self.filterNameInput ~= nil then
         FocusManager:linkElements(self.filtersList,    FocusManager.RIGHT,  self.filterNameInput)
         FocusManager:linkElements(self.filterNameInput, FocusManager.LEFT,  self.filtersList)
@@ -516,12 +388,8 @@ function RLMenuSettingsFrame:onFrameOpen()
         FocusManager:linkElements(self.filterNameInput,         FocusManager.BOTTOM, self.filterAnimalTypeSelector)
         FocusManager:linkElements(self.filterAnimalTypeSelector, FocusManager.TOP,   self.filterNameInput)
     end
-    -- Visual row order is now Name -> AnimalType -> Usage
-    -- -> Op (filterOpSelector / "Conditions: Match ALL|ANY") -> ConditionsList.
-    -- Focus links MUST mirror that order so D-pad / keyboard nav does not
-    -- teleport over rows. Prior order (AnimalType -> Op -> Usage) was wired
-    -- here pre-reorder; if these links are missed the keyboard chain skips
-    -- whichever row was reordered.
+    -- Focus links must mirror the visual row order Name -> AnimalType -> Usage
+    -- -> Op -> ConditionsList, or keyboard nav teleports over a row.
     if self.filterAnimalTypeSelector ~= nil and self.filterUsageSelector ~= nil then
         FocusManager:linkElements(self.filterAnimalTypeSelector, FocusManager.BOTTOM, self.filterUsageSelector)
         FocusManager:linkElements(self.filterUsageSelector,      FocusManager.TOP,    self.filterAnimalTypeSelector)
@@ -531,52 +399,32 @@ function RLMenuSettingsFrame:onFrameOpen()
         FocusManager:linkElements(self.filterOpSelector,    FocusManager.TOP,    self.filterUsageSelector)
     end
 
-    -- Focus chain: last metadata row (filterOpSelector) -> conditionsList.
-    -- [+ condition] lives on the action bar, not in-pane, so the in-pane
-    -- focus chain skips it - DOWN from the last metadata row reaches the
-    -- conditions list directly; UP rises straight back.
+    -- [+ condition] lives on the action bar, not in-pane, so DOWN from the last
+    -- metadata row reaches the conditions list directly.
     if self.filterOpSelector ~= nil and self.filterConditionsList ~= nil then
         FocusManager:linkElements(self.filterOpSelector,     FocusManager.BOTTOM, self.filterConditionsList)
         FocusManager:linkElements(self.filterConditionsList, FocusManager.TOP,    self.filterOpSelector)
     end
     Log:trace("RLMenuSettingsFrame:onFrameOpen: editor focus chain linked")
 
-    -- Reset the once-per-process measure flag so the conditions-list
-    -- size logs on first visibility per frame-open cycle (the flag lives on
-    -- the instance for consistency with the other measure logs; the spec
-    -- bullet is one-shot per frame-open visibility, not once-per-process).
+    -- Reset the conditions-list measure flag so its size log fires once per
+    -- frame-open cycle.
     self.didMeasureConditionsList = false
 
-    -- Initial focus on the tab bar - [General] is the active pane and has
-    -- no content to focus. updateSubCategoryPages shifts focus to the list
-    -- when the user switches to [Filters].
+    -- Initial focus on the tab bar: [General] has no content to focus.
     FocusManager:setFocus(self.subCategoryPaging)
 
-    -- Save-from-QF handshake tail: when a pending-select fired earlier in this
-    -- onFrameOpen, flip the subcategory paging to [Filters]. setState(FILTERS, true)
-    -- re-fires updateSubCategoryPages which handles pane visibility, footer
-    -- rebuild, AND shifts focus to filtersList - leaving the new
-    -- row both visible and focused. The unconditional setState(GENERAL, true) at
-    -- the start of onFrameOpen runs first; this override is the final word so the
-    -- user lands on the editor for the just-created filter.
+    -- Pending-select tail: flip to [Filters] so the user lands on the editor
+    -- for the just-created filter. This overrides the setState(GENERAL) above,
+    -- which runs first on every open.
     if didPendingSelect then
         Log:debug("RLMenuSettingsFrame:onFrameOpen: pending-select tail; switching to FILTERS subtab")
         self.subCategoryPaging:setState(RLMenuSettingsFrame.SUB_CATEGORY.FILTERS, true)
     end
 end
 
---- Apply an alternating dark tint to each visible row container in the
---- given ScrollingLayout so the light-cream row title text reads against a
---- dark backing. Walks `layout.elements` in source order:
----   - elements named "sectionHeader" (our 20px gap spacers) reset the
----     alternation flag so each section restarts at the darker shade.
----   - other visible elements get tinted via setImageColor(nil, r, g, b, a)
----     with the rgba pulled at runtime from the
----     `InGameMenuSettingsFrame.COLOR_ALTERNATING` runtime global. The flag
----     toggles after each tint so adjacent rows alternate.
----   - hidden elements are skipped entirely (no toggle, no tint).
---- Disabled rows (e.g. dependency-cascade greyed) are still tinted; the
---- disabled-state styling is a separate channel layered on top.
+--- Alternately tint `layout`'s visible rows so the cream title text reads;
+--- "sectionHeader" spacers restart the alternation and hidden rows are skipped.
 --- @param layout table The ScrollingLayout whose child elements to tint
 function RLMenuSettingsFrame:updateAlternatingElements(layout)
     Log:debug("RLMenuSettingsFrame:updateAlternatingElements: enter")
@@ -599,8 +447,8 @@ function RLMenuSettingsFrame:updateAlternatingElements(layout)
     local tintedCount = 0
     local resetCount = 0
 
-    -- ipairs (not pairs) so traversal follows authored XML order strictly.
-    -- Section reset and parity toggle both depend on positional order.
+    -- ipairs, not pairs: the section reset and the parity toggle both depend
+    -- on authored XML order.
     for _, row in ipairs(layout.elements) do
         if row.name == "sectionHeader" then
             alternate = true
@@ -617,16 +465,8 @@ function RLMenuSettingsFrame:updateAlternatingElements(layout)
     Log:debug("RLMenuSettingsFrame:updateAlternatingElements: exit")
 end
 
---- Called by the Paging element when this tab is deactivated.
---- Clears isFrameOpen so refreshIfOpen becomes a no-op, then drains the
---- pendingChanges overlay to service:update.
----
---- Ordering invariant: isFrameOpen=false BEFORE flushPendingChanges. The
---- service dispatches RLFilterUpdateEvent on the server side after each
---- update; a remote rebroadcast arriving mid-flush would re-enter our
---- frame via refreshIfOpen and call refreshData() recursively, fighting
---- the flush loop. Clearing the flag first makes refreshIfOpen early-return
---- and closes the re-entry window.
+--- Deactivation hook: clears isFrameOpen BEFORE flushing, or a rebroadcast
+--- arriving mid-flush re-enters refreshData recursively.
 function RLMenuSettingsFrame:onFrameClose()
     RLMenuSettingsFrame:superClass().onFrameClose(self)
     self.isFrameOpen = false
@@ -634,14 +474,8 @@ function RLMenuSettingsFrame:onFrameClose()
     self:flushPendingChanges()
 end
 
---- Seed the subcategory tab bar: bind getIsSelected closures on each tab
---- Button and its background ThreePartBitmap, populate subCategoryPaging
---- texts with stringified indices, and size the pager to the tab box.
----
---- The closures resolve via `tonumber(self.subCategoryPaging.texts[state])`
---- rather than `subCategoryPaging:getState()` directly because `.texts`
---- is the authoritative visible-index-to-semantic-index map - needed so
---- highlight stays correct if tab visibility ever becomes dynamic.
+--- Seed the subcategory tab bar: getIsSelected closures, pager texts, and the
+--- pager size. The closures resolve through `.texts`, the authoritative map.
 function RLMenuSettingsFrame:initializeSubCategoryPages()
     Log:debug("RLMenuSettingsFrame:initializeSubCategoryPages: binding %d tab(s)",
         #self.subCategoryTabs)
@@ -673,15 +507,8 @@ function RLMenuSettingsFrame:initializeSubCategoryPages()
     self.subCategoryPaging:setSize(self.subCategoryBox.maxFlowSize + 140 * g_pixelSizeScaledX)
 end
 
---- Pager state-change callback (XML onClick on subCategoryPaging). Resolves
---- visible state to a semantic index via .texts and toggles pane visibility.
---- Nil-guards the .texts lookup - the map is briefly out-of-sync with the
---- state during setTexts, and an early return keeps the pane set stable.
----
---- Tails: one-shot first-visibility measure log for the Filters pane
---- (size is only reliable after the pane becomes visible and layout has
---- settled) + a footer rebuild so the New filter button appears/disappears
---- in lockstep with the active subtab.
+--- Pager state-change callback. `.texts` is briefly out of sync during
+--- setTexts, so a nil lookup returns early.
 --- @param state number The paging state index (1..#texts)
 function RLMenuSettingsFrame:updateSubCategoryPages(state)
     local idx = tonumber(self.subCategoryPaging.texts[state])
@@ -697,15 +524,9 @@ function RLMenuSettingsFrame:updateSubCategoryPages(state)
         page:setVisible(index == idx)
     end
 
-    -- GeneralSettingsSliderBox now lives at the GUI
-    -- root (sibling of the menu container) so its right edge lands at
-    -- the screen right edge instead of inside the menu chrome. Because
-    -- it's no longer nested inside subCategoryPages[1], it does not
-    -- inherit the per-page setVisible toggle above - we must hide it
-    -- explicitly when the Filters tab is active. dataElementId binds it
-    -- to generalSettingsLayout (still inside subCategoryPages[1]); when
-    -- that pane is hidden the slider has no scrollable target and should
-    -- not render.
+    -- The slider box lives at the GUI root, not inside subCategoryPages[1], so
+    -- it does not inherit the per-page setVisible above and must be hidden
+    -- explicitly when the Filters tab is active.
     local sliderBox = self.generalSettingsSliderBox or self:getDescendantById("generalSettingsSliderBox")
     if sliderBox ~= nil then
         self.generalSettingsSliderBox = sliderBox -- cache for next call
@@ -715,11 +536,9 @@ function RLMenuSettingsFrame:updateSubCategoryPages(state)
             tostring(visible), idx)
     end
 
-    -- First-visibility measure log. One-shot per frame-open cycle so the
-    -- log doesn't spam on every subtab click. Measures after the visibility
-    -- toggle above so the layout engine has settled the stretched size.
-    -- Guards on size[1] / size[2] nil: a profile-driven stretch can leave
-    -- the table present but component axes nil until the next layout pass.
+    -- First-visibility measure log, one-shot per frame-open cycle and taken
+    -- after the visibility toggle so the stretched size has settled. A stretch
+    -- can leave the size table present but its axes nil until the next pass.
     if idx == RLMenuSettingsFrame.SUB_CATEGORY.FILTERS
        and not self.didMeasureFiltersPane
        and self.filtersListContainer ~= nil
@@ -730,10 +549,8 @@ function RLMenuSettingsFrame:updateSubCategoryPages(state)
             self.filtersListContainer.size[1] * 1920,
             self.filtersListContainer.size[2] * 1080)
 
-        -- Measurement: log filterEditorContainer +
-        -- filterConditionsListContainer + filterConditionsBanner so the
-        -- banner can be anchored relative to the conditions-list TOP
-        -- without guessing the 290px reservation.
+        -- Log the editor container, conditions list and banner so the banner
+        -- anchor comes from a measurement rather than a guessed reservation.
         local function _logBox(name, e)
             if e == nil then Log:debug("RLMenuSettingsFrame._geom: %s == nil", name); return end
             local ax = (e.absPosition and e.absPosition[1] or 0) * g_referenceScreenWidth
@@ -761,13 +578,9 @@ function RLMenuSettingsFrame:updateSubCategoryPages(state)
         self.didMeasureFiltersPane = true
     end
 
-    -- Editor pane measure log. Once-per-process (NOT once-per-open) because
-    -- the frame instance is reused across reopens. Target dimensions
-    -- ~1088 x 783 px (parent pane width minus the 410px left list). If the
-    -- runtime measurement diverges materially from that target, the inline
-    -- size="100% 100%" absoluteSizeOffset="-410px 0px" override on the
-    -- filterEditorContainer is not producing the expected stretch and the
-    -- layout needs investigation.
+    -- Editor pane measure log, once per process since the frame instance is
+    -- reused across reopens. A material divergence from ~1088 x 783 px means
+    -- the container's size override is not producing the expected stretch.
     if idx == RLMenuSettingsFrame.SUB_CATEGORY.FILTERS
        and not self.didMeasureEditorPane
        and self.filterEditorContainer ~= nil
@@ -832,11 +645,8 @@ function RLMenuSettingsFrame:refreshData()
         self.rows = {}
     end
 
-    -- Alphabetical case-insensitive sort with stable id tie-break. Sort
-    -- runs on refreshData boundaries only; mid-edit name callbacks do NOT
-    -- re-sort (writes go to pendingChanges + reloadData reads the overlay
-    -- in populateCellForItemInSection, keeping row positions stable while
-    -- the user is typing).
+    -- Case-insensitive sort with a stable id tie-break, on refreshData
+    -- boundaries only, so row positions stay put while the user is typing.
     table.sort(self.rows, function(a, b)
         local an = (a.name or ""):lower()
         local bn = (b.name or ""):lower()
@@ -849,10 +659,8 @@ function RLMenuSettingsFrame:refreshData()
     Log:debug("RLMenuSettingsFrame:refreshData: farmId=%s rows=%d",
         tostring(farmId), #self.rows)
 
-    -- isReconciling gate: reloadData synchronously fires onListSelectionChanged
-    -- via SmoothList's setSelectedItem(..., true) after clamping; block the
-    -- delegate from overwriting selectedFilterId mid-flight. resolveSelectionById
-    -- also calls setSelectedIndex which re-enters the delegate; same gate.
+    -- isReconciling gate: reloadData fires onListSelectionChanged synchronously
+    -- after clamping, and resolveSelectionById re-enters it the same way.
     self.isReconciling = true
     if self.filtersList ~= nil then
         self.filtersList:reloadData()
@@ -863,16 +671,13 @@ function RLMenuSettingsFrame:refreshData()
     self:updateEmptyState()
     self:updateButtonVisibility()
 
-    -- Tail renderEditor so the right pane reflects the new selection (or
-    -- the empty-state branch) every time the list refreshes. resolveSelectionById
-    -- may have cleared self.selectedFilterId for an orphaned id; renderEditor
-    -- handles that branch.
+    -- Tail renderEditor so the right pane follows the new selection, including
+    -- the empty-state branch when resolveSelectionById cleared an orphaned id.
     self:renderEditor()
 end
 
---- Refresh only when the frame is currently open. Called by the three
---- RLFilter*Event:run handlers so remote create/update/delete mutations
---- rerender the list without requiring the user to reopen the menu.
+--- Refresh only when the frame is open, so a remote mutation rerenders the
+--- list without the user reopening the menu.
 function RLMenuSettingsFrame:refreshIfOpen()
     if self.isFrameOpen then
         Log:debug("RLMenuSettingsFrame:refreshIfOpen: refreshing")
@@ -882,19 +687,14 @@ function RLMenuSettingsFrame:refreshIfOpen()
     end
 end
 
---- Id-authoritative selection. Walks self.rows for self.selectedFilterId
---- and re-derives list.selectedIndex; clears the cached id (and the list
---- selection) if the id is no longer present. Called from refreshData so
---- undefined pairs-order reloads never silently desync the highlighted
---- row from the cached id that the editor will consume.
+--- Re-derive list.selectedIndex from selectedFilterId, clearing both when the
+--- id has gone. Undefined pairs-order reloads would otherwise desync them.
 function RLMenuSettingsFrame:resolveSelectionById()
     if self.filtersList == nil then return end
 
     if self.selectedFilterId == nil then
-        -- Clear both fields (not just selectedIndex) to match the Info
-        -- frame clear pattern. SmoothList expects numeric indices; nil
-        -- would crash. The null branch is not a state transition, log
-        -- at TRACE.
+        -- Clear both fields, not just selectedIndex: SmoothList expects
+        -- numeric indices and a nil would crash.
         self.filtersList.selectedSectionIndex = 0
         self.filtersList.selectedIndex = 0
         Log:trace("RLMenuSettingsFrame:resolveSelectionById: no id cached, cleared")
@@ -917,9 +717,8 @@ function RLMenuSettingsFrame:resolveSelectionById()
     self.filtersList.selectedIndex = 0
 end
 
---- Toggle the branched empty-state text + list/slider visibility. Branches
---- the empty-state copy on whether the player has a farm at all; mirrors
---- the Messages frame pattern.
+--- Toggle the empty-state text and the list/slider visibility, branching the
+--- copy on whether the player has a farm at all.
 function RLMenuSettingsFrame:updateEmptyState()
     local hasRows = #self.rows > 0
     local hasFarm = (self.farmId ~= nil and self.farmId ~= 0)
@@ -939,31 +738,17 @@ function RLMenuSettingsFrame:updateEmptyState()
         self.filtersList:setVisible(hasRows)
     end
 
-    -- Toggle the slider box alongside the list so the empty states don't
-    -- leave an orphaned scrollbar next to the "No saved filters" / "You
-    -- need a farm" text. Honors the spec's "slider box visibility follows
-    -- the list" contract explicitly rather than relying on layout.
+    -- Toggle the slider box alongside the list, so an empty state does not
+    -- leave an orphaned scrollbar beside the message.
     if self.filtersSliderBox ~= nil then
         self.filtersSliderBox:setVisible(hasRows)
     end
 end
 
---- Resolve which action-bar tier should be active given the current focus.
---- Returns 1 / 2 / 3, or nil when no tier-specific buttons apply (FocusManager
---- unavailable, no focus, or focus is on an element we do not track).
----
---- Tier 1 - filtersList scope: focus on filtersList. Filter operations.
---- Tier 2 - inner editor scope: focus on a metadata widget OR on
----          filterConditionsList with no row selected (empty list, or focus
----          landed on the list container without picking a row). Add
----          condition only - destructive filter actions intentionally
----          absent so MENU_CANCEL is not "delete filter" while focus is
----          inside the editor.
---- Tier 3 - condition row scope: focus on filterConditionsList AND a row
----          is selected. Full row-operations bar.
----
---- FocusManager treats SmoothList as one focusable element, so row-selected
---- is distinguished via getSelectedIndexInSection rather than focus state.
+--- Resolve the active action-bar tier from the current focus: 1 for the filter
+--- list, 2 for the editor, 3 for a selected condition row, nil for untracked.
+--- FocusManager treats a SmoothList as one element, so a selected row is
+--- distinguished by getSelectedIndexInSection rather than by focus state.
 function RLMenuSettingsFrame:resolveActionBarTier()
     if FocusManager == nil or FocusManager.getFocusedElement == nil then
         return nil
@@ -971,8 +756,7 @@ function RLMenuSettingsFrame:resolveActionBarTier()
     local focused = FocusManager:getFocusedElement()
     if focused == nil then return nil end
 
-    -- Walk the focus's parent chain looking for known anchors. Stop at the
-    -- first match; the chain is short (a handful of nesting levels).
+    -- Walk the focus's parent chain for a known anchor, stopping at the first.
     local node = focused
     while node ~= nil do
         if node == self.filterConditionsList then
@@ -999,16 +783,8 @@ function RLMenuSettingsFrame:resolveActionBarTier()
     return nil
 end
 
---- Rebuild the footer menu button array per active tier. Back is always
---- present; tier-specific buttons join only when activeSubtab=FILTERS AND
---- the player has a farm AND the tradeAnimals permission. Per-tier rules:
----
---- Tier 1: New filter (always); Duplicate + Delete filter (hasSelection)
---- Tier 2: Add condition (hasSelection) - no destructive slot
---- Tier 3: Edit / Add condition / Add group / Delete condition (hasSelection)
----
---- setMenuButtonInfoDirty triggers TabbedMenu's footer re-render on the
---- next tick.
+--- Rebuild the footer button array for the active tier. Back is always there;
+--- tier buttons need the Filters subtab, a farm, and the tradeAnimals right.
 function RLMenuSettingsFrame:updateButtonVisibility()
     local activeSubtab
     if self.subCategoryPaging ~= nil then
@@ -1019,15 +795,9 @@ function RLMenuSettingsFrame:updateButtonVisibility()
     local hasSelection = (self.selectedFilterId ~= nil)
     local appended = {}
 
-    -- Right-pane editor-widget gate: a worker without tradeAnimals (or any
-    -- player without a farm) sees the filter list and footer correctly
-    -- restricted to Back, but the Name / Animal Type / Op / Show-on widgets
-    -- were still accepting input. The server-side RLFilterUpdateEvent guard
-    -- already drops the forged mutation, but the local commit-then-revert
-    -- cycle is misleading and dispatches WARN-spammy wire churn. Mirror the
-    -- adminOnly pattern used by updateReadonlyState and push
-    -- the editable bit to each widget. setDisabled is idempotent, so this
-    -- is safe to call on every focus-driven re-entry.
+    -- Right-pane editor-widget gate: without it the metadata widgets accept
+    -- input the server then drops, giving a misleading commit-then-revert.
+    -- setDisabled is idempotent, so re-entry on every focus change is safe.
     local editable = hasFarm and hasPerm
     if self.filterNameInput          ~= nil then self.filterNameInput:setDisabled(not editable) end
     if self.filterAnimalTypeSelector ~= nil then self.filterAnimalTypeSelector:setDisabled(not editable) end
@@ -1038,16 +808,9 @@ function RLMenuSettingsFrame:updateButtonVisibility()
 
     self.menuButtonInfo = { self.backButtonInfo }
 
-    -- Tier resolution gated on subtab + permissions. Outside Filters, or
-    -- when the player can't create filters, tier stays nil and only Back
-    -- is shown - matches the pre-v2 behavior for other subtabs.
-    --
-    -- Tier 1 fallback: on the Filters subtab with farm + perm, if
-    -- resolveActionBarTier returns nil (no focus on any tracked anchor),
-    -- default to Tier 1. Without this, the empty state (0 saved filters)
-    -- traps the user with only [Back] because filtersList is hidden by
-    -- updateEmptyState - the "New filter" affordance vanishes exactly
-    -- when it is needed to escape the empty state.
+    -- Tier 1 is the fallback when no tracked anchor holds focus. Without it the
+    -- empty state traps the user on [Back] alone, because filtersList is hidden
+    -- and "New filter" would vanish exactly when it is needed to escape.
     local tier = nil
     if activeSubtab == RLMenuSettingsFrame.SUB_CATEGORY.FILTERS
        and hasFarm and hasPerm then
@@ -1076,10 +839,8 @@ function RLMenuSettingsFrame:updateButtonVisibility()
         if hasSelection then
             table.insert(self.menuButtonInfo, self.editConditionButtonInfo)
             table.insert(self.menuButtonInfo, self.addConditionButtonInfo)
-            -- "Add group" hidden until group editing is implemented.
-            -- addGroupButtonInfo / onAddGroupClicked / addGroupAtSelection stay
-            -- defined; re-enable by restoring these two inserts. The stub still
-            -- surfaces an InfoDialog if ever invoked directly.
+            -- "Add group" is hidden until group editing exists; restoring these
+            -- two inserts re-enables it.
             -- table.insert(self.menuButtonInfo, self.addGroupButtonInfo)
             table.insert(self.menuButtonInfo, self.deleteConditionButtonInfo)
             table.insert(appended, "Edit")
@@ -1096,11 +857,8 @@ function RLMenuSettingsFrame:updateButtonVisibility()
     self:setMenuButtonInfoDirty()
 end
 
---- UX-side permission gate for New filter. The authoritative boundary is
---- the server-side validation inside RLFilter{Create,Update,Delete}Event:run;
---- this check only controls button visibility and the early
---- abort in onClickNewFilter. Mirrors RLMenuMessagesFrame:hasDeletePermission
---- with "updateFarm" swapped for "tradeAnimals".
+--- UX-side permission gate for New filter. The authoritative boundary is the
+--- server-side validation in the RLFilter events; this only gates the button.
 function RLMenuSettingsFrame:hasCreatePermission()
     if g_currentMission == nil or g_currentMission.getHasPlayerPermission == nil then
         return false
@@ -1112,27 +870,16 @@ end
 -- Filter list: create handler
 -- =============================================================================
 
---- Disambiguated default name so repeated [New filter] clicks don't produce
---- N identical rows while the inline editor is still in flight. Base is the
---- localized "New filter" string; the " (N)" suffix is numeric so locales
---- can keep the base and get a universal index. "New filter", "New filter (2)",
---- "New filter (3)" in English.
----
---- File-local static so both the Settings-side `:onClickNewFilter` and the
---- QF-side `AnimalFilterDialog:onClickSaveFilter` produce the same sequence
---- without depending on a live RLMenuSettingsFrame instance. Takes a plain
---- name iterator (any array-like with string entries).
+--- Disambiguated default name, so repeated [New filter] clicks do not produce
+--- identical rows. Static, so both callers produce the same sequence.
 ---@param names string[] existing filter names
 ---@return string
 local function static_computeDefaultFilterName(names)
     local base = g_i18n:getText("rl_menu_filters_default_name")
-    -- Match "<base> (N)" where N is one or more digits, anchored end-to-end
-    -- (Lua patterns: %( and %) are literal parens, (%d+) captures digits).
+    -- Match "<base> (N)" where N is one or more digits, anchored end-to-end.
     local pattern = "^" .. base:gsub("(%W)", "%%%1") .. " %((%d+)%)$"
-    -- Track the MAX N seen, NOT the count: with sparse rows (e.g. only
-    -- "<base> (3)" present after deletes), count-based logic emits "(2)"
-    -- and the second click collides on "(3)". Bare base counts as N=1
-    -- because user-visible numbering starts at 2.
+    -- Track the MAX N seen, not the count: after deletes leave sparse rows, a
+    -- count would emit a name that collides. The bare base counts as N=1.
     local maxN = 0
     if names ~= nil then
         for _, name in ipairs(names) do
@@ -1161,20 +908,15 @@ local function static_computeDefaultFilterName(names)
     return result
 end
 
---- Exported static wrapper so AnimalFilterDialog (and any future caller)
---- can produce the same default name from a plain name list, without holding
---- a RLMenuSettingsFrame instance. Pair with `g_rlFilterService:list()` to
---- get the current registry's names.
+--- Exported static wrapper, so a caller without a frame instance can produce
+--- the same default name from a plain name list.
 ---@param names string[] existing filter names
 ---@return string
 function RLMenuSettingsFrame.computeDefaultFilterNameForNames(names)
     return static_computeDefaultFilterName(names)
 end
 
---- Instance wrapper: extract names from `self.rows` then delegate to the
---- static helper. Behavioural contract is identical to the previous inline
---- implementation; the refactor only moves the math to a pure function so
---- the QF-side save flow can reuse it.
+--- Instance wrapper: take the names from `self.rows` and delegate.
 ---@return string
 function RLMenuSettingsFrame:computeDefaultFilterName()
     local names = {}
@@ -1186,14 +928,8 @@ function RLMenuSettingsFrame:computeDefaultFilterName()
     return static_computeDefaultFilterName(names)
 end
 
---- Footer New filter handler. Creates a placeholder filter scoped to the
---- local farm with an empty AND expression (vacuous-true),
---- sets selectedFilterId so refreshData auto-selects the new row via
---- resolveSelectionById, then refreshes.
----
---- Nil-guard on create(): service returns nil on malformed input (programming
---- error, per the RLFilterService:create contract). Remote MP-rejection
---- rollback is deferred to a future iteration.
+--- Footer New filter handler: creates a farm-scoped placeholder with an empty
+--- (vacuous-true) AND expression, then refreshes onto the new row.
 function RLMenuSettingsFrame:onClickNewFilter()
     if not self:hasCreatePermission() then
         Log:trace("RLMenuSettingsFrame:onClickNewFilter: no tradeAnimals permission, aborting")
@@ -1224,8 +960,7 @@ function RLMenuSettingsFrame:onClickNewFilter()
         return
     end
 
-    -- Set the id BEFORE refresh so resolveSelectionById auto-selects the
-    -- new row without a separate walk.
+    -- Set the id BEFORE refresh so resolveSelectionById picks the new row.
     self.selectedFilterId = created.id
     Log:debug("RLMenuSettingsFrame:onClickNewFilter: created id=%s name='%s'",
         tostring(created.id), tostring(created.name))
@@ -1237,13 +972,10 @@ end
 -- Filter editor: helpers (file-local)
 -- =============================================================================
 
---- Resolve a localized label for an animal type. Delegates to the canonical
---- helper RLAnimalUtil.getAnimalTypeDisplayName which already handles the
---- groupTitle -> title -> ui_<name>s -> name -> "?" cascade, including the
---- hasText guard that distinguishes a real l10n hit from FS25's
---- "Missing '<key>' in l10n.xml" miss-stringification.
+--- Resolve a localized label for an animal type.
 ---@param at table animalType entry from animalSystem:getTypes()
 ---@return string label
+---@see RLAnimalUtil.getAnimalTypeDisplayName
 local function resolveAnimalTypeLabel(at)
     if RLAnimalUtil ~= nil and RLAnimalUtil.getAnimalTypeDisplayName ~= nil then
         return RLAnimalUtil.getAnimalTypeDisplayName(at)
@@ -1254,16 +986,14 @@ local function resolveAnimalTypeLabel(at)
     return at.groupTitle or at.name or "?"
 end
 
---- True when `node` looks like an expression group (op + children) rather
---- than a leaf condition. Used by deepEqualFilter to dispatch comparison.
+--- True when `node` is an expression group (op + children), not a leaf.
 ---@param node table|nil
 ---@return boolean
 local function isGroupNode(node)
     return node ~= nil and node.op ~= nil and node.children ~= nil
 end
 
---- Compare a condition's value field. Scalars (number/bool/string) via `==`;
---- list values (table, for `in`/`notin`) by length + ipairs element equality.
+--- Compare a condition's value: scalars by `==`, list values element-wise.
 --- Mixed types are unequal.
 ---@param va any
 ---@param vb any
@@ -1282,8 +1012,7 @@ end
 
 local deepEqualGroup -- forward decl for mutual recursion with deepEqualNode
 
---- Compare a single expression-tree node. Groups recurse; leaves compare
---- field/cmp/value.
+--- Compare one expression node: groups recurse, leaves compare field/cmp/value.
 ---@param a table|nil
 ---@param b table|nil
 ---@return boolean
@@ -1309,11 +1038,9 @@ deepEqualGroup = function(a, b)
     return true
 end
 
---- Deep-compare a merged filter snapshot against a stored filter on the
---- fields a Settings-editor overlay can change: name, animalType, farmId,
---- usage, expression tree. Used by flushPendingChangesForId to short-circuit
---- the wire update when an overlay collapses back to stored state. Skips id / version: id is invariant, version is
---- a server stamp not authored by the editor.
+--- Deep-compare a merged snapshot against a stored filter on the fields an
+--- overlay can change, so a collapsed overlay skips the wire update. Id and
+--- version are skipped: neither is authored by the editor.
 ---@param merged table
 ---@param stored table
 ---@return boolean equal
@@ -1326,21 +1053,14 @@ local function deepEqualFilter(merged, stored)
     return deepEqualGroup(merged.expression, stored.expression)
 end
 
---- Apply a pending overlay onto a stored filter, producing a merged snapshot.
---- Immutable fields (id, farmId, version) are copied from stored unchanged so
---- service:update never sees a divergence. animalType has three-state semantics
---- via the ANIMAL_TYPE_ANY sentinel (see module head).
+--- Apply a pending overlay onto a stored filter. Immutable fields are copied
+--- unchanged, so service:update never sees a divergence.
 ---@param stored table cloned snapshot from getById (never nil at this point)
 ---@param overlay table|nil per-id partial overlay or nil for "no pending"
 ---@return table merged shallow-cloned filter with overlay applied
 local function overlayPending(stored, overlay)
-    -- Stale stored.usage = nil defense. Every normal entry point
-    -- (create / update / serialization / wire / applyIncoming) normalises to
-    -- a canonical string. Defending here ensures that if a stale record ever
-    -- slips through (test fixture, hand-built record), the editor's flush
-    -- degrades to a successful service:update instead of triggering the
-    -- usage-nil rejection in service:update which would silently drop every
-    -- other pending edit on that filter.
+    -- A nil stored.usage would make service:update reject, silently dropping
+    -- every other pending edit on that filter; default it instead.
     local mergedUsage = stored.usage or RLFilterUsage.ANY
     local merged = {
         id         = stored.id,
@@ -1358,22 +1078,18 @@ local function overlayPending(stored, overlay)
         merged.name = overlay.name
     end
     if overlay.animalType == RLMenuSettingsFrame.ANIMAL_TYPE_ANY then
-        -- Sentinel marks an explicit "clear to Any"; converts to nil for
-        -- service:update + storage + wire.
+        -- Sentinel marks an explicit "clear to Any"; storage wants nil.
         merged.animalType = nil
     elseif overlay.animalType ~= nil then
         merged.animalType = overlay.animalType
     end
     if overlay.usage ~= nil then
-        -- 3-state enum, no sentinel needed; presence means "change to this
-        -- canonical value" (one of RLFilterUsage.ANY/OWNED/DEALER).
+        -- No sentinel needed: every usage state has a canonical string value.
         merged.usage = overlay.usage
     end
     if overlay.op ~= nil then
-        -- Build a fresh root group with the new op; preserve any nested
-        -- children so a filter authored with sub-groups (group editing / API /
-        -- peer) keeps its structure when the user flips the root match
-        -- mode in the UI.
+        -- Fresh root group with the new op, preserving nested children so a
+        -- filter authored with sub-groups keeps its structure.
         local stored_children = (stored.expression and stored.expression.children) or {}
         local copied = {}
         for i, child in ipairs(stored_children) do copied[i] = child end
@@ -1382,11 +1098,8 @@ local function overlayPending(stored, overlay)
     return merged
 end
 
---- Populate self.animalTypeStates with the canonical "Any" row at index 1 and
---- one row per type returned by animalSystem:getTypes(). Reseeded on every
---- renderEditor call (cheap, ~5-10 types). g_currentMission is guaranteed
---- non-nil here: every settings page is registered behind basePredicate in
---- RLMenu's page setup, so this code path is unreachable pre-mission.
+--- Populate self.animalTypeStates: the "Any" row at index 1, then one row per
+--- type from animalSystem:getTypes().
 ---@param self table frame instance
 local function seedAnimalTypeStates(self)
     local entries = {
@@ -1395,11 +1108,9 @@ local function seedAnimalTypeStates(self)
     if g_currentMission ~= nil and g_currentMission.animalSystem ~= nil then
         local types = g_currentMission.animalSystem:getTypes()
         if types ~= nil then
-            -- getTypes() is keyed by typeIndex (sparse-map shape), not a dense
-            -- 1-N array. ipairs would stop at the first gap and silently drop
-            -- exotic / map-bridge types. Mirror RLDealerQuery.listDealerTypes:
-            -- collect with pairs(), guard against nil entries / missing
-            -- typeIndex, then sort by typeIndex for stable ordering.
+            -- getTypes() is a sparse map keyed by typeIndex, not a dense array:
+            -- ipairs would stop at the first gap and drop map-bridge types.
+            -- Collect with pairs(), then sort by typeIndex for stable order.
             local collected = {}
             for _, at in pairs(types) do
                 if at ~= nil and at.typeIndex ~= nil then
@@ -1419,8 +1130,7 @@ local function seedAnimalTypeStates(self)
     end
     self.animalTypeStates = entries
 
-    -- Push labels into the selector. setTexts clamps state to #texts so an
-    -- earlier setState(largeIndex) survives a shrink (defense-in-depth).
+    -- setTexts clamps state to #texts, so an earlier setState survives a shrink.
     if self.filterAnimalTypeSelector ~= nil then
         local labels = {}
         for i, entry in ipairs(entries) do labels[i] = entry.label end
@@ -1429,11 +1139,7 @@ local function seedAnimalTypeStates(self)
     Log:trace("seedAnimalTypeStates: %d state(s) seeded", #entries)
 end
 
---- Push the 3-state Usage selector labels (Any / Owned / Dealer) into the
---- MultiTextOption widget. State 1 = ANY, state 2 = OWNED, state 3 = DEALER.
---- Idempotent and cheap; called from renderEditor on every render to mirror
---- seedAnimalTypeStates. No state cache needed because the mapping is
---- constant (3 fixed strings, no runtime variation).
+--- Push the Usage selector labels: state 1 ANY, 2 OWNED, 3 DEALER.
 ---@param self table frame instance
 local function seedUsageSelector(self)
     if self.filterUsageSelector == nil then
@@ -1451,23 +1157,12 @@ end
 -- Filter editor: render + widget callbacks
 -- =============================================================================
 
---- Drive the right-pane editor widgets from the current selection + pending
---- overlay. Called from refreshData (tail), onListSelectionChanged (tail), and
---- after Duplicate/Delete-Yes mutations. Empty-state branch hides the layout
---- and slider; selected branch builds a merged snapshot via overlayPending
---- and pushes values into the three widgets with callback-suppress flags so
---- the programmatic push doesn't re-enter the click handlers.
--- Forward declaration: renderConditionsForFilter is defined as a local
--- function further down the file (after partitionChildren which it depends
--- on), but renderEditor below needs to call it. Lua 5.1 resolves free
--- variables at parse time against locals declared EARLIER in the same
--- chunk; a local declared later does not retroactively become an upvalue,
--- so without this forward declaration the reference inside renderEditor
--- would resolve to a global at runtime, find nil, and crash on the call
--- ("attempt to call a nil value" at the call site).
--- The later `local function renderConditionsForFilter` line was converted
--- to `renderConditionsForFilter = function` so it assigns to THIS local
--- rather than shadowing with a fresh one.
+--- Drive the right-pane editor widgets from the selection and pending overlay.
+--- The programmatic pushes carry callback-suppress flags so they do not
+--- re-enter the click handlers.
+-- Forward declaration: renderConditionsForFilter is defined below, and Lua
+-- resolves free variables against locals declared EARLIER in the chunk, so
+-- without this the reference inside renderEditor would find a nil global.
 local renderConditionsForFilter
 
 function RLMenuSettingsFrame:renderEditor()
@@ -1475,11 +1170,9 @@ function RLMenuSettingsFrame:renderEditor()
         if self.filterEditorEmpty     ~= nil then self.filterEditorEmpty:setVisible(true) end
         if self.filterEditorLayout    ~= nil then self.filterEditorLayout:setVisible(false) end
         if self.filterEditorSliderBox ~= nil then self.filterEditorSliderBox:setVisible(false) end
-        -- v2 modal editor: conditions banner + list container are SIBLINGS
-        -- of filterEditorLayout (not children), so hiding the layout doesn't
-        -- recurse into them. Hide explicitly so a just-deleted filter's
-        -- preserved-banner + condition rows don't linger after selection
-        -- clears.
+        -- The banner and list container are SIBLINGS of filterEditorLayout, so
+        -- hiding the layout does not recurse into them - hide them explicitly
+        -- or a deleted filter's rows linger after the selection clears.
         if self.filterConditionsBanner        ~= nil then self.filterConditionsBanner:setVisible(false)        end
         if self.filterConditionsListContainer ~= nil then self.filterConditionsListContainer:setVisible(false) end
         if self.filterConditionsSliderBox     ~= nil then self.filterConditionsSliderBox:setVisible(false)     end
@@ -1487,12 +1180,9 @@ function RLMenuSettingsFrame:renderEditor()
         return
     end
 
-    -- Hydrate AnimalType selector states first so the index resolution below
-    -- maps against the live label set.
+    -- Hydrate the selector states first, so the index resolution below maps
+    -- against the live label set.
     seedAnimalTypeStates(self)
-
-    -- Seed the 3-state Usage selector labels. Constant mapping (Any/Owned/
-    -- Dealer); idempotent re-seed is cheap.
     seedUsageSelector(self)
 
     if g_rlFilterService == nil then
@@ -1502,20 +1192,16 @@ function RLMenuSettingsFrame:renderEditor()
 
     local stored = g_rlFilterService:getById(self.selectedFilterId)
     if stored == nil then
-        -- Selected id no longer present (race with remote delete, or a
-        -- pending edit reference that survived a refresh). Drop the
-        -- selection and fall back to the empty-state branch on the next
-        -- render pass. resolveSelectionById will catch this on the next
-        -- refreshData but we guard here too.
+        -- Selected id is gone - a race with a remote delete. Drop the
+        -- selection and fall through to the empty-state branch.
         Log:debug("RLMenuSettingsFrame:renderEditor: id=%s not in service, falling back to empty",
             tostring(self.selectedFilterId))
         self.selectedFilterId = nil
         if self.filterEditorEmpty     ~= nil then self.filterEditorEmpty:setVisible(true) end
         if self.filterEditorLayout    ~= nil then self.filterEditorLayout:setVisible(false) end
         if self.filterEditorSliderBox ~= nil then self.filterEditorSliderBox:setVisible(false) end
-        -- Mirror the no-selection branch above: hide the conditions banner +
-        -- list container so stale state from the just-disappeared filter
-        -- doesn't linger.
+        -- As in the no-selection branch: hide the conditions banner and list
+        -- container so the vanished filter's rows do not linger.
         if self.filterConditionsBanner        ~= nil then self.filterConditionsBanner:setVisible(false)        end
         if self.filterConditionsListContainer ~= nil then self.filterConditionsListContainer:setVisible(false) end
         if self.filterConditionsSliderBox     ~= nil then self.filterConditionsSliderBox:setVisible(false)     end
@@ -1527,35 +1213,21 @@ function RLMenuSettingsFrame:renderEditor()
     if self.filterEditorEmpty     ~= nil then self.filterEditorEmpty:setVisible(false) end
     if self.filterEditorLayout    ~= nil then self.filterEditorLayout:setVisible(true)  end
     if self.filterEditorSliderBox ~= nil then self.filterEditorSliderBox:setVisible(true) end
-    -- Re-show the conditions area whenever a filter is selected. Banner
-    -- visibility is then driven by renderConditionsForFilter based on the
-    -- partition's preserved count.
+    -- Re-show the conditions area; renderConditionsForFilter then drives the
+    -- banner from the partition's preserved count.
     if self.filterConditionsListContainer ~= nil then self.filterConditionsListContainer:setVisible(true) end
     if self.filterConditionsSliderBox     ~= nil then self.filterConditionsSliderBox:setVisible(true)     end
 
-    -- Tint the editor rows so the cream title text reads against a dark
-    -- backing. Same fix applied to the General subtab rows -
-    -- without it, rows fall back to the default white tint of
-    -- gui.colorPreset from baseReference and titles are invisible on the
-    -- new menu chrome. updateAlternatingElements skips hidden rows, so
-    -- this MUST run after the setVisible(true) above. Idempotent / cheap
-    -- to re-run on every render.
+    -- Tint the editor rows so the cream title text reads. This MUST run after
+    -- the setVisible(true) above, because updateAlternatingElements skips
+    -- hidden rows.
     if self.filterEditorLayout ~= nil then
         self:updateAlternatingElements(self.filterEditorLayout)
     end
 
-    -- Name: caret preservation only. A programmatic setText DOES fire
-    -- onTextChanged on a value change (the callback is raised by the
-    -- inherited TextElement setter, which setText reaches without passing a
-    -- skip flag - unlike setState(idx, false) on the option widgets); the
-    -- phantom-stash that causes is handled separately by onFilterNameChanged's
-    -- value-equality guard. THIS guard is purely about the caret: the input
-    -- control resets the caret to text-end on every programmatic value push -
-    -- including no-ops. When a remote RLFilterUpdateEvent triggers
-    -- refreshIfOpen -> refreshData -> renderEditor while the user is editing in
-    -- the middle of the field, that setText stomps the caret. Skip the push
-    -- when the input owns focus AND the text is unchanged (the user is editing
-    -- it now and the overlay already captures their pending edits).
+    -- Caret preservation: the input resets the caret to text-end on every
+    -- programmatic push, no-ops included, so a remote update arriving mid-edit
+    -- would stomp it. Skip the push while the input is focused and unchanged.
     if self.filterNameInput ~= nil then
         local desired = merged.name or ""
         local isFocused = self.filterNameInput.getIsFocused ~= nil
@@ -1570,10 +1242,8 @@ function RLMenuSettingsFrame:renderEditor()
         end
     end
 
-    -- AnimalType: walk animalTypeStates to find the entry matching the
-    -- merged animalType (nil for Any). Fallback to state 1 = Any when no
-    -- match (covers a stored type the local mission doesn't define, e.g.
-    -- a peer save-game with a bridge mod we don't have loaded).
+    -- AnimalType: fall back to state 1 (Any) when nothing matches, which
+    -- covers a stored type this mission does not define.
     local atStateIndex = 1
     for i, entry in ipairs(self.animalTypeStates) do
         if entry.typeIndex == merged.animalType then
@@ -1594,9 +1264,7 @@ function RLMenuSettingsFrame:renderEditor()
         self.filterOpSelector:setState(opStateIndex, false)
     end
 
-    -- Usage: 1 = ANY, 2 = OWNED, 3 = DEALER. Default to state 1 for any value
-    -- that doesn't match OWNED or DEALER (covers ANY, nil-from-legacy, and
-    -- defensive against an un-normalised in-memory record).
+    -- Usage: 1 = ANY, 2 = OWNED, 3 = DEALER; anything unrecognised means ANY.
     local usageStateIndex = 1
     if merged.usage == RLFilterUsage.OWNED then
         usageStateIndex = 2
@@ -1613,23 +1281,11 @@ function RLMenuSettingsFrame:renderEditor()
         tostring(merged.expression and merged.expression.op),
         tostring(merged.usage))
 
-    -- Render the conditions list + banner against the merged record.
-    -- Re-partitions expression children into supported/preserved, reloads
-    -- the SmoothList, and updates the banner.
     renderConditionsForFilter(self, merged)
 end
 
---- TextInput onTextChanged callback. The widget raises this with
---- (target, element, text); with colon-bound `self` absorbing the
---- target, our explicit args are (element, text).
----
---- Per-keystroke flow:
----   1. Stash the typed value into pendingChanges[id].name (lazy sub-table).
----   2. reloadData on the SmoothList so the left-pane cell text reflects
----      the live edit (populateCellForItemInSection reads the overlay).
----   3. Wrap reloadData in isReconciling so the synchronous selection
----      delegate fired by SmoothList:reloadData doesn't tail-call
----      renderEditor and stomp the caret mid-typing.
+--- TextInput onTextChanged callback: stash the typed name in the overlay and
+--- reload the left list so the cell tracks the live edit.
 --- @param element table The TextInput element
 --- @param _text string The new text (read from element for consistency)
 function RLMenuSettingsFrame:onFilterNameChanged(element, _text)
@@ -1644,16 +1300,9 @@ function RLMenuSettingsFrame:onFilterNameChanged(element, _text)
     local typed = element:getText() or ""
     local id = self.selectedFilterId
 
-    -- Phantom-rewrite guard: TextInput onChange fires not only on
-    -- real typing but also on programmatic setText during selection-change
-    -- reconcile and on refocus reemit. In those paths "typed" already
-    -- equals stored.name; stashing it produces an overlay the flush layer
-    -- cannot tell from a real edit, and service:update broadcasts a
-    -- byte-identical Update over the wire. Compare trimmed-typed to
-    -- trimmed-stored and short-circuit when they match. If an earlier
-    -- keystroke left a stale name in the overlay (user typed, then
-    -- reverted), clear it so it can't leak into a subsequent flush; drop
-    -- the overlay table entirely if it carries no other pending fields.
+    -- Phantom-rewrite guard: onChange also fires on programmatic setText, where
+    -- the typed value already equals stored.name. Stashing that would look like
+    -- a real edit and broadcast a byte-identical update over the wire.
     if g_rlFilterService ~= nil then
         local stored = g_rlFilterService:getById(id)
         if stored ~= nil then
@@ -1678,9 +1327,8 @@ function RLMenuSettingsFrame:onFilterNameChanged(element, _text)
     self.pendingChanges[id].name = typed
     Log:debug("RLMenuSettingsFrame:onFilterNameChanged: id=%s value='%s'", tostring(id), typed)
 
-    -- Reload the left list so the cell shows the pending name. isReconciling
-    -- gate prevents the synchronous onListSelectionChanged from re-entering
-    -- renderEditor (which would call setText and stomp the caret).
+    -- The isReconciling gate stops the synchronous onListSelectionChanged from
+    -- re-entering renderEditor, whose setText would stomp the caret.
     if self.filtersList ~= nil then
         self.isReconciling = true
         self.filtersList:reloadData()
@@ -1688,13 +1336,8 @@ function RLMenuSettingsFrame:onFilterNameChanged(element, _text)
     end
 end
 
---- MultiTextOption onClick callback. The widget raises this with
---- (target, state, widget, isLeftButtonEvent); with colon-bound `self`
---- absorbing the target, our explicit args are (state, widget).
----
---- state == 1 maps to the "Any" row (typeIndex = nil), persisted into the
---- overlay as the ANIMAL_TYPE_ANY sentinel so flush can distinguish
---- "explicit clear" from "no pending change".
+--- AnimalType selector callback. State 1 is the "Any" row, stored in the
+--- overlay as the ANIMAL_TYPE_ANY sentinel rather than as nil.
 --- @param state number 1-based selector state
 --- @param _widget table The widget that was clicked
 function RLMenuSettingsFrame:onAnimalTypeChanged(state, _widget)
@@ -1738,13 +1381,7 @@ function RLMenuSettingsFrame:onOpChanged(state, _widget)
         tostring(id), state, op)
 end
 
---- MultiTextOption onClick callback for the Usage scope selector.
---- state 1 -> ANY, state 2 -> OWNED, state 3 -> DEALER (matches the wire-byte
---- order 0/1/2 minus one for cognitive parity with the codec).
----
---- Out-of-range states (4+) are unreachable in practice because the widget
---- is seeded with exactly 3 labels; we log at TRACE and no-op as defence
---- against future label changes.
+--- Usage scope selector callback: state 1 ANY, 2 OWNED, 3 DEALER.
 --- @param state number 1-based selector state
 --- @param _widget table The widget that was clicked
 function RLMenuSettingsFrame:onUsageChanged(state, _widget)
@@ -1776,19 +1413,11 @@ end
 -- Filter editor: conditions list
 -- =============================================================================
 
---- Set of field types this slice can render in the conditions editor.
---- Covers number + bool (via the row's read-only Text widget) and enum +
---- string (via the modal RLFilterConditionDialog's MultiTextOption +
---- TextInput widgets, plus RLFilterValueSetDialog for `in`/`notin` over
---- ENUM). The cmp gate inside isSupportedConditionNode is type-conditional:
---- ENUM accepts in/notin; NUMBER/BOOL/STRING route those cmps through
---- partition -> preserved.
+--- Field types the conditions editor can render. The cmp gate in
+--- isSupportedConditionNode is type-conditional: only enum accepts in/notin.
 local SUPPORTED_TYPES = { number = true, bool = true, enum = true, string = true }
 
---- True when the given AST node is a flat condition the in-frame editor can
---- render directly. False for groups, conditions on unknown fields,
---- conditions on unsupported field types, and `in`/`notin` cmps on
---- non-enum fields (the multi-value editor only supports enum domains).
+--- True when the node is a flat condition the in-frame editor can render.
 ---@param node table
 ---@return boolean
 local function isSupportedConditionNode(node)
@@ -1798,31 +1427,17 @@ local function isSupportedConditionNode(node)
     local field = RLFilterFieldCatalog.get(node.field)
     if field == nil then return false end
     if not SUPPORTED_TYPES[field.type] then return false end
-    -- Enum supports in/notin via RLFilterValueSetDialog. All other
-    -- field types still route in/notin to preservedChildren (round-trip
-    -- only; no multi-value editor for number/string/bool).
+    -- Only enum has a multi-value editor; every other type routes in/notin to
+    -- preservedChildren for round-trip only.
     if (node.cmp == "in" or node.cmp == "notin") and field.type ~= "enum" then
         return false
     end
     return true
 end
 
---- Partition `expression.children` into the supported flat conditions the
---- editor can render plus a verbatim list of preserved (unsupported) child
---- nodes. Preserved nodes round-trip through flush unchanged so saving
---- supported edits cannot destroy nested groups or enum/string conditions
---- authored elsewhere (hand-edited XML, peer client, future group-editing UI).
----
---- Returned tables are shallow-cloned at the top level; supported rows are
---- fresh `{ field, cmp, value }` tables so editing one does not mutate the
---- stored expression. Preserved nodes are the existing references; flush
---- treats them as opaque - this is safe because the service performs its
---- own deep-clone before storing the merged record.
----
---- Empty / nil expression returns two empty arrays - the caller treats that
---- as "filter has no conditions yet". The root group's op is NOT mutated
---- here; `pendingChanges[id].op` (set by `onOpChanged`) flows through
---- `overlayPending` separately.
+--- Split `expression.children` into rows the editor can render and preserved
+--- nodes it cannot. Supported rows are fresh tables, so editing one never
+--- mutates the stored expression; preserved nodes round-trip verbatim.
 ---@param expression table|nil root group node
 ---@return table[] supported list of {field, cmp, value} editable rows
 ---@return table[] preserved list of opaque child nodes to round-trip
@@ -1847,10 +1462,8 @@ local function partitionChildren(expression)
     return supported, preserved
 end
 
---- Resolve a localized label for a catalog field key. Uses
---- `rl_menu_filters_field_<sanitized-key>` where periods in the key are
---- replaced by underscores to match XML attr-name conventions. Falls back
---- to the raw catalog key when the l10n entry is missing.
+--- Localized label for a catalog field key, via
+--- `rl_menu_filters_field_<key with periods as underscores>`, else the key.
 ---@param key string
 ---@return string
 local function resolveFieldLabel(key)
@@ -1862,12 +1475,9 @@ local function resolveFieldLabel(key)
     return key
 end
 
---- Format a condition row for the read-only conditions-list display, delegating to
---- RLFilterFieldDisplay.formatConditionDisplay so enum labels resolve via FillTypeManager
---- and i18n. A local wrapper, so the populateCell call site need not thread animalType.
----
---- The animalType lookup is inlined rather than calling resolveEffectiveAnimalType: that
---- helper is a `local function` declared later in the file and so is not visible here.
+--- Format a condition row for the read-only list display. The animalType
+--- lookup is inlined because resolveEffectiveAnimalType is declared later in
+--- the file and so is not visible from here.
 ---@param self table frame instance (used to resolve the filter's animalType scope)
 ---@param row table {field, cmp, value}
 ---@param field table catalog entry resolved from row.field
@@ -1891,10 +1501,8 @@ local function formatConditionDisplay(self, row, field)
     return RLFilterFieldDisplay.formatConditionDisplay(row, field, animalType)
 end
 
---- Return the list of catalog fields that the conditions editor can render
---- for the given filter, in stable catalog order. Caches the result on the
---- frame instance keyed by animalType (cleared on every renderEditor so a
---- mid-edit animalType change reseeds correctly).
+--- Renderable catalog fields for the filter, in catalog order. Cached on the
+--- frame keyed by animalType, and cleared on every renderEditor.
 ---@param self table frame instance
 ---@param animalTypeIndex number|nil
 ---@return table[]
@@ -1912,9 +1520,8 @@ local function getEditableFieldOptions(self, animalTypeIndex)
     return fields
 end
 
---- Locate the row at a given 1-based index inside the editor's working
---- state. Returns nil when the index is out of range; callers MUST nil-guard
---- (every widget callback runs through this).
+--- Row at a 1-based index in the editor's working state, or nil when out of
+--- range - every widget callback runs through this, so callers must nil-guard.
 ---@param self table frame instance
 ---@param index number
 ---@return table|nil row
@@ -1925,23 +1532,15 @@ local function getConditionRowAt(self, index)
     return rows[index]
 end
 
---- Reload the conditions SmoothList and restore focus. Captures the focused
---- row's index before the reload (or accepts a caller-supplied preferred
---- index), then re-focuses the same row's field picker after the reload.
---- Falls back to the addConditionButton when the list is now empty or the
---- preferred index is out of range. Without this, deleting a focused row
---- leaves FocusManager pointing at a recycled cell and a field-change
---- reload silently moves focus outside the list.
+--- Reload the conditions list and restore focus to the same row. Without this,
+--- deleting a focused row leaves FocusManager pointing at a recycled cell.
 ---@param self table frame instance
 ---@param preferredIndex number|nil 1-based row index to focus after reload
 local function reloadConditionsList(self, preferredIndex)
     if self.filterConditionsList == nil then return end
 
-    -- v2: rows are read-only Text widgets, no in-row focusable widgets.
-    -- Capture target row index from the SmoothList's own selection state
-    -- (getSelectedIndexInSection) when no override is provided. The old
-    -- findRowIndexForWidget walk-up is gone; FocusManager treats the list
-    -- as one focusable element, so the list's selection is authoritative.
+    -- Rows carry no focusable widgets, and FocusManager treats the list as one
+    -- element, so the list's own selection is the authoritative target.
     local targetIndex = preferredIndex
     if targetIndex == nil
        and self.filterConditionsList.getSelectedIndexInSection ~= nil then
@@ -1962,17 +1561,13 @@ local function reloadConditionsList(self, preferredIndex)
     end
 
     if targetIndex == nil or rowCount == 0 then
-        -- Empty list or no target. Focus the list container itself so the
-        -- Tier 2 action bar shows (Back + Add condition); pressing Add
-        -- routes through the dialog flow.
+        -- Empty list or no target: focus the container so Tier 2 shows.
         FocusManager:setFocus(self.filterConditionsList)
         Log:trace("reloadConditionsList: empty list / no target; focused filterConditionsList")
         return
     end
 
-    -- Restore selection to targetIndex and focus the list. The list's own
-    -- selection drives Tier 3 in the action bar; FocusManager treats the
-    -- list as one focusable element so we don't drill into the cell.
+    -- The list's own selection drives Tier 3, so focus the list, not the cell.
     if self.filterConditionsList.setSelectedIndex ~= nil then
         self.filterConditionsList:setSelectedIndex(targetIndex, false, true)
     end
@@ -1981,28 +1576,19 @@ local function reloadConditionsList(self, preferredIndex)
         targetIndex, rowCount)
 end
 
---- Render the conditions list against the currently-selected filter's
---- merged expression (overlay-aware). Re-partitions `expression.children`
---- into supported + preserved, stashes them on `self.conditionEditState`,
---- updates the preserved-banner visibility / text, and triggers a SmoothList
---- reload. Per-row population happens inside populateCellForItemInSection.
+--- Render the conditions list against the merged expression: re-partition the
+--- children, stash them on conditionEditState, and update the banner.
 ---@param self table frame instance
 ---@param merged table merged filter record (overlay applied)
--- Body assigned to the forward-declared local near renderEditor; do NOT
--- prefix with `local` here or it would shadow and re-introduce the
--- "attempt to call a nil value" bug from renderEditor.
+-- Assigned to the forward-declared local near renderEditor. Do NOT prefix with
+-- `local` - that would shadow it and leave renderEditor calling a nil global.
 renderConditionsForFilter = function(self, merged)
     self.conditionFieldOptionsCache = nil
     local supported, preserved = partitionChildren(merged.expression)
 
-    -- Detect remote-update clobber. RLFilterService:update deep-clones the
-    -- filter on every successful apply (via cloneFilter), so each new stored
-    -- record has a distinct expression-table reference. If the pending
-    -- overlay was snapshotted against an OLDER reference than the one we are
-    -- about to render, the storage has diverged - either a peer client
-    -- updated this filter via RLFilterUpdateEvent or the local user mutated
-    -- it through another path while editing. Either way, applying the stale
-    -- overlay would destroy the new authoritative state.
+    -- Remote-update clobber check. Each successful update deep-clones the
+    -- filter, so a new stored record has a distinct expression reference; an
+    -- overlay snapshotted against an older one would destroy the new state.
     local pending = self.pendingChanges[merged.id]
     if pending ~= nil and pending.conditions ~= nil
        and pending._originExpressionRef ~= nil
@@ -2012,16 +1598,13 @@ renderConditionsForFilter = function(self, merged)
         pending.conditions = nil
         pending.preservedChildren = nil
         pending._originExpressionRef = nil
-        -- pending may still hold name/animalType/op/usage edits; keep them.
-        -- Re-fetch the pointer to reflect the cleared shape below.
+        -- Keep any name/animalType/op/usage edits pending still holds.
         pending = self.pendingChanges[merged.id]
     end
 
-    -- If pendingChanges[id].conditions exists, it represents the in-flight
-    -- edited supported array (e.g. from an Add or per-row edit). Prefer it
-    -- over the partition-from-storage so re-renders mid-edit don't lose the
-    -- user's pending rows. Preserved children always come from storage -
-    -- they aren't editable so there is no pending overlay for them.
+    -- Prefer the in-flight edited array over the partition from storage, so a
+    -- re-render mid-edit does not lose pending rows. Preserved children are
+    -- not editable, so they always come from storage.
     if pending ~= nil and pending.conditions ~= nil then
         supported = {}
         for i, row in ipairs(pending.conditions) do
@@ -2043,8 +1626,7 @@ renderConditionsForFilter = function(self, merged)
 
     if self.filterConditionsBanner ~= nil then
         if #preserved > 0 then
-            -- Defensive pcall around string.format - a translator-supplied
-            -- `%f` / `%s` placeholder mismatch on a `%d` template would raise
+            -- pcall: a translator-supplied placeholder mismatch would raise
             -- and abort the render mid-frame.
             local fmt = g_i18n:getText("rl_menu_filters_preserved_banner")
             local ok, rendered = pcall(string.format, fmt, #preserved)
@@ -2067,7 +1649,7 @@ renderConditionsForFilter = function(self, merged)
     Log:debug("renderConditionsForFilter: id=%s supported=%d preserved=%d",
         tostring(merged.id), #supported, #preserved)
 
-    -- One-shot measure log. Runs once per process per spec Boundaries bullet.
+    -- One-shot measure log.
     if not self.didMeasureConditionsList
        and self.filterConditionsList ~= nil
        and self.filterConditionsList.size ~= nil
@@ -2077,10 +1659,8 @@ renderConditionsForFilter = function(self, merged)
             self.filterConditionsList.size[1] * 1920,
             self.filterConditionsList.size[2] * 1080)
 
-        -- Diagnostic measurement: log absPosition + absSize for each editor
-        -- sub-element so a layout regression (a missing or mispositioned
-        -- list / banner / button) can be diagnosed from the log without
-        -- additional instrumentation. One-shot via the same flag.
+        -- Log absPosition and absSize per editor sub-element, so a layout
+        -- regression is diagnosable from the log alone.
         local function measure(name, el)
             if el == nil then
                 Log:debug("MEASURE: %s = nil ref", name)
@@ -2110,11 +1690,8 @@ renderConditionsForFilter = function(self, merged)
     end
 end
 
---- Lazy-init the per-id pending conditions array from the current edit
---- state. Called by every in-row callback before mutating the pending
---- snapshot so a row-level edit captures the full supported array in one
---- shot (matches the whole-object overlay shape used by `name` and
---- `animalType`).
+--- Lazy-init the per-id pending conditions array, so a row-level edit captures
+--- the whole supported array in one shot.
 ---@param self table frame instance
 ---@param id string filter id
 local function ensurePendingConditions(self, id)
@@ -2128,19 +1705,16 @@ local function ensurePendingConditions(self, id)
                 cmp     = row.cmp,
                 value   = row.value,
                 rawText = row.rawText,
-                -- originSnapshot lets the flush path revert an EXISTING
-                -- numeric row to its stored value when the user mistypes
-                -- (e.g. "abc"), instead of silently deleting the condition.
-                -- Newly-added rows from [+ condition] do NOT get
-                -- originSnapshot, so an invalid new row is excluded entirely.
+                -- originSnapshot lets flush revert an EXISTING numeric row to
+                -- its stored value on a mistype rather than delete it. New rows
+                -- get none, so an invalid new row is excluded entirely.
                 originSnapshot = { field = row.field, cmp = row.cmp, value = row.value },
             }
         end
         self.pendingChanges[id].conditions = snapshot
-        -- Snapshot preservedChildren onto the per-id overlay so a close-path
-        -- retry after a rejected selection-switch flush still has the
-        -- unsupported nodes for filter A even after the user has rendered
-        -- filter B (which overwrites conditionEditState).
+        -- Snapshot preservedChildren per id, so a retry after a rejected flush
+        -- still has filter A's nodes once filter B has overwritten
+        -- conditionEditState.
         if self.conditionEditState ~= nil
            and self.conditionEditState.lastRenderedFilterId == id
            and self.conditionEditState.preservedChildren ~= nil then
@@ -2152,13 +1726,8 @@ local function ensurePendingConditions(self, id)
             Log:trace("ensurePendingConditions: id=%s snapshotted preservedChildren=%d onto overlay",
                 tostring(id), #preservedSnap)
         end
-        -- Pin the stored.expression reference the overlay was seeded against.
-        -- RLFilterService:update deep-clones on every apply, so the next
-        -- renderConditionsForFilter call can detect divergence by
-        -- reference-comparing this against `merged.expression`. A mismatch
-        -- means the storage moved (peer update via Pattern A, or local
-        -- mutation through another path) and the overlay must be discarded
-        -- to avoid clobbering authoritative state.
+        -- Pin the expression reference the overlay was seeded against, so the
+        -- next render can detect divergence by reference comparison.
         if self.conditionEditState ~= nil
            and self.conditionEditState.lastRenderedFilterId == id
            and self.conditionEditState.expressionRef ~= nil then
@@ -2169,18 +1738,14 @@ local function ensurePendingConditions(self, id)
     end
 end
 
---- Sync a single in-memory edit-state row into the pending overlay (and
---- write through to `self.conditionEditState.supportedRows` for live
---- read-back without a full re-render).
+--- Sync one edit-state row into the pending overlay, writing through to the
+--- supportedRows mirror for live read-back without a full re-render.
 ---@param self table frame instance
 ---@param id string filter id
 ---@param index number 1-based row index
 ---@param patch table partial fields to apply: {field?, cmp?, value?, rawText?}
----@param clearKeys table|nil optional list of keys to explicitly set to nil
----   on the row + edit-state mirror. Workaround for Lua dropping nil-valued
----   keys from table-literal patches. Used by
----   onConditionFieldChanged when the new field's type diverges from the old
----   and a stale `rawText` must not bleed across.
+---@param clearKeys table|nil keys to set to nil on the row and its mirror,
+---   since Lua drops nil-valued keys from a table-literal patch
 local function patchConditionRow(self, id, index, patch, clearKeys)
     ensurePendingConditions(self, id)
     local rows = self.pendingChanges[id].conditions
@@ -2197,8 +1762,7 @@ local function patchConditionRow(self, id, index, patch, clearKeys)
             rows[index][k] = nil
         end
     end
-    -- Mirror into edit-state so SmoothList's next populate pass reads the
-    -- live values without waiting for a flush + refresh.
+    -- Mirror into edit-state so the next populate pass reads live values.
     if self.conditionEditState and self.conditionEditState.supportedRows then
         self.conditionEditState.supportedRows[index] = self.conditionEditState.supportedRows[index] or {}
         for k, v in pairs(patch) do
@@ -2220,9 +1784,7 @@ local function patchConditionRow(self, id, index, patch, clearKeys)
         clearKeys ~= nil and table.concat(clearKeys, ",") or "-")
 end
 
---- Resolve the filter's effective animalType from stored + pending overlay.
---- Same logic the populate / dialog flow uses. Returns nil for ANY (no
---- per-type restriction on field options).
+--- The filter's effective animalType from stored plus overlay; nil means ANY.
 local function resolveEffectiveAnimalType(self, filterId)
     if g_rlFilterService == nil then return nil end
     local stored = g_rlFilterService:getById(filterId)
@@ -2239,10 +1801,8 @@ local function resolveEffectiveAnimalType(self, filterId)
     return animalType
 end
 
---- v2 modal dialog open. rowIndex nil = new condition; non-nil = edit existing.
---- Looks up the initialCondition + animalType, then hands off to the dialog.
---- Dialog calls back into onConditionDialogClosed with the coerced new
---- condition (or nil on Cancel).
+--- Open the condition dialog: rowIndex nil adds, non-nil edits. The dialog
+--- calls back into onConditionDialogClosed, with nil on Cancel.
 function RLMenuSettingsFrame:openConditionEditDialog(rowIndex)
     if self.selectedFilterId == nil then
         Log:trace("RLMenuSettingsFrame:openConditionEditDialog: no selection, ignoring")
@@ -2259,16 +1819,9 @@ function RLMenuSettingsFrame:openConditionEditDialog(rowIndex)
                 rowIndex)
             return
         end
-        -- Refuse to open the dialog when the row carries an enum
-        -- value whose domain is currently empty (subType when the filter
-        -- scope has no resolvable animal type, or the scoped type has zero
-        -- subtypes loaded). The condition stays intact in pendingChanges /
-        -- preservedChildren and round-trips through flush unchanged; the
-        -- user can re-author it after switching the filter's animalType.
-        -- SubType under unscoped filter (animalType=nil) now resolves
-        -- via the cross-species union helper (mirrors the dialog-side
-        -- _resolveActiveEnumDomain routing); the multi-value editor handles
-        -- the union domain. Other enum reads stay on the scoped resolver.
+        -- Refuse to open on an enum row whose domain is currently empty. The
+        -- condition stays intact and round-trips through flush, so the user
+        -- can re-author it after switching the filter's animalType.
         local field = RLFilterFieldCatalog.get(row.field)
         if field ~= nil and field.type == "enum" then
             local domain
@@ -2280,13 +1833,8 @@ function RLMenuSettingsFrame:openConditionEditDialog(rowIndex)
             if domain == nil or #domain == 0 then
                 Log:warning("RLMenuSettingsFrame:openConditionEditDialog: refusing edit on rowIndex=%d field=%s (empty enum domain for animalType=%s)",
                     rowIndex, tostring(row.field), tostring(animalType))
-                -- Surface the refuse via the existing filterConditionsBanner
-                -- element (same surface used for the "N condition(s) hidden"
-                -- preserved-children notice). The next renderConditionsForFilter
-                -- pass (driven by any subsequent selection change or
-                -- animalType edit) overwrites the banner with its own
-                -- content, so this is transient by design - matches the
-                -- spec's intent of a non-modal in-frame hint.
+                -- Surface the refusal on the conditions banner. The next
+                -- render overwrites it, so the hint is transient by design.
                 if self.filterConditionsBanner ~= nil and g_i18n ~= nil then
                     self.filterConditionsBanner:setText(
                         g_i18n:getText("rl_menu_filters_subtypeRequiresAnimalType"))
@@ -2316,10 +1864,8 @@ function RLMenuSettingsFrame:openConditionEditDialog(rowIndex)
         animalType)
 end
 
---- Dialog callback. newCondition is nil on Cancel, non-nil on OK. rowIndex
---- distinguishes Add (nil) from Edit (non-nil). On OK: route through
---- patchConditionRow (edit) or addConditionAtSelection (new), then reload
---- the conditions list so the row text refreshes and focus restores.
+--- Dialog callback: nil newCondition means Cancel, and a nil rowIndex means
+--- Add rather than Edit.
 function RLMenuSettingsFrame:onConditionDialogClosed(newCondition, rowIndex)
     if newCondition == nil then
         Log:debug("RLMenuSettingsFrame:onConditionDialogClosed: cancelled (rowIndex=%s)",
@@ -2332,25 +1878,20 @@ function RLMenuSettingsFrame:onConditionDialogClosed(newCondition, rowIndex)
     end
 
     if rowIndex == nil then
-        -- New condition: insert by selection rules.
         self:addConditionAtSelection(newCondition)
         return
     end
 
-    -- Edit existing row: patch full record. patchConditionRow handles
-    -- pendingChanges + conditionEditState mirror + clearKeys plumbing.
     local patch = {
         field = newCondition.field,
         cmp   = newCondition.cmp,
         value = newCondition.value,
     }
-    -- rawText is optional; if absent on newCondition the patch omits it
-    -- (no clear needed since the dialog only sets it when text != canonical).
     if newCondition.rawText ~= nil then
         patch.rawText = newCondition.rawText
     end
-    -- If the dialog did NOT include rawText but the row had one, clear it
-    -- so a stale buffer doesn't outlive the edit.
+    -- Clear a rawText the row had but the dialog did not return, so a stale
+    -- buffer cannot outlive the edit.
     local existing = getConditionRowAt(self, rowIndex)
     local clearKeys = nil
     if newCondition.rawText == nil and existing ~= nil and existing.rawText ~= nil then
@@ -2363,18 +1904,9 @@ function RLMenuSettingsFrame:onConditionDialogClosed(newCondition, rowIndex)
     reloadConditionsList(self, rowIndex)
 end
 
---- Walk `expression` (a group node) to locate `node`'s parent group and
---- 1-based index within that parent's children. v2 ships a flat root (no
---- nested groups), so the helper either returns `(expression, k)` for a
---- matching leaf condition in expression.children or `(nil, nil)` when
---- the node isn't present. Group editing will recurse through nested groups.
----
---- Signature takes `expression` explicitly so callers can pass whichever
---- AST they are operating on (stored filter, pending overlay, or
---- conditionEditState merged view). RLFilterService:getById deep-clones,
---- so re-fetching inside this helper would break reference equality
---- with the caller's node ref.
----
+--- Locate `node`'s parent group and its 1-based index in that group. The AST
+--- root is a parameter because getById deep-clones, so re-fetching here would
+--- break reference equality with the caller's node.
 ---@param expression table the AST root the caller wants searched
 ---@param node table the AST node to locate (a condition or group reference)
 ---@return table|nil parentGroup the group whose children list contains node
@@ -2393,14 +1925,8 @@ function RLMenuSettingsFrame:getParentGroupAndIndex(expression, node)
     return nil, nil
 end
 
---- Pure static helper: compute the 1-based index at which a new row should
---- be inserted into `rows`, given the currently-focused row's `selectedIndex`.
---- No GUI dependency; covered by rlTest.
----
---- Rules:
----   - rows nil / empty / no selection / out-of-range selection -> append.
----   - Selection k in [1..#rows] -> k+1 (insert as next sibling).
----
+--- 1-based index at which a new row is inserted: k+1 for a selected row k,
+--- otherwise append.
 ---@param rows table|nil array of existing condition rows
 ---@param selectedIndex number|nil 1-based focused row index, or nil
 ---@return number 1-based insertion index for table.insert(rows, idx, newCond)
@@ -2412,19 +1938,15 @@ function RLMenuSettingsFrame.computeInsertionIndex(rows, selectedIndex)
     return selectedIndex + 1
 end
 
---- Selection-aware insertion. For v2 with flat data, "selection" means the
---- 1-based index of the focused row in filterConditionsList. No selection
---- (or empty list) -> append to end. Selected row k -> insert at k+1 (next
---- sibling). Future group rows will route through getParentGroupAndIndex
---- to insert as child of a focused group; v2 always inserts at the root.
+--- Selection-aware insertion at the root: after the focused row, or appended
+--- when nothing is selected.
 function RLMenuSettingsFrame:addConditionAtSelection(newCond)
     if self.selectedFilterId == nil then return end
 
     ensurePendingConditions(self, self.selectedFilterId)
     local rows = self.pendingChanges[self.selectedFilterId].conditions
 
-    -- Resolve selection. SmoothList:getSelectedIndexInSection returns the
-    -- focused row's 1-based index, or 0/nil when nothing is selected.
+    -- getSelectedIndexInSection returns 0 or nil when nothing is selected.
     local selectedIndex = nil
     if self.filterConditionsList ~= nil
        and self.filterConditionsList.getSelectedIndexInSection ~= nil then
@@ -2455,12 +1977,8 @@ function RLMenuSettingsFrame:addConditionAtSelection(newCond)
     reloadConditionsList(self, insertAt)
 end
 
---- Group-editing stub. v2 binding: enabled callback that logs + warns + surfaces
---- an InfoDialog so the user gets visible feedback instead of a silent
---- no-op. Verifies the action-bar context-switching plumbing without
---- committing group semantics. InfoDialog.show gives the action
---- closed-loop feedback that grouping is intentionally unimplemented in
---- this version.
+--- Group-editing stub: shows an InfoDialog so the user gets visible feedback
+--- rather than a silent no-op.
 function RLMenuSettingsFrame:addGroupAtSelection(_newGroup)
     Log:warning("RLMenuSettingsFrame:addGroupAtSelection: Add group: placeholder (group editing not implemented) - no state change")
     if InfoDialog ~= nil and InfoDialog.show ~= nil and g_i18n ~= nil then
@@ -2469,16 +1987,12 @@ function RLMenuSettingsFrame:addGroupAtSelection(_newGroup)
     end
 end
 
---- Action-bar Add condition (Tier 2/3, MENU_EXTRA_1 in step 5). Currently
---- still bound to legacy MENU_ACCEPT slot until step 5 flips the slot.
---- Opens the dialog with rowIndex=nil (new condition); OK routes through
---- onConditionDialogClosed -> addConditionAtSelection.
+--- Action-bar Add condition: opens the dialog with no row index.
 function RLMenuSettingsFrame:onAddConditionClicked()
     self:openConditionEditDialog(nil)
 end
 
---- Action-bar Edit condition (Tier 3, MENU_ACCEPT after step 5). Opens
---- the dialog pre-populated with the focused row's values.
+--- Action-bar Edit condition: opens the dialog on the focused row.
 function RLMenuSettingsFrame:onEditConditionClicked()
     if self.selectedFilterId == nil then return end
     if self.filterConditionsList == nil
@@ -2494,10 +2008,8 @@ function RLMenuSettingsFrame:onEditConditionClicked()
     self:openConditionEditDialog(idx)
 end
 
---- Action-bar Delete condition (Tier 3, MENU_CANCEL after step 5). Removes
---- the focused row from pendingChanges + edit-state mirror, then reloads
---- the list. Focus restoration falls to the neighbor row via
---- reloadConditionsList's preferredIndex clamp.
+--- Action-bar Delete condition: drops the focused row from the overlay and the
+--- edit-state mirror, then reloads; focus clamps to the neighbouring row.
 function RLMenuSettingsFrame:onDeleteConditionClicked()
     if self.selectedFilterId == nil then return end
     if self.filterConditionsList == nil
@@ -2527,10 +2039,7 @@ function RLMenuSettingsFrame:onDeleteConditionClicked()
     reloadConditionsList(self, idx)
 end
 
---- Action-bar Add group stub (Tier 3, MENU_EXTRA_2 slot). The group-editing follow-up
---- replaces this body with selection-aware sibling-group insertion. The
---- v2 binding is enabled-but-no-op; this callback's existence verifies
---- the action-bar context-switching plumbing.
+--- Action-bar Add group: enabled but a no-op, pending group editing.
 function RLMenuSettingsFrame:onAddGroupClicked()
     self:addGroupAtSelection(nil)
 end
@@ -2539,12 +2048,9 @@ end
 -- Filter editor: flush
 -- =============================================================================
 
---- Drain self.pendingChanges to service:update. Called from onFrameClose AFTER isFrameOpen is
---- cleared, so a mid-flush remote RLFilterUpdateEvent rebroadcast early-returns through
---- refreshIfOpen and the re-entry window closes.
----
---- Flush is the name-boundary enforcement point: the widget callbacks stay permissive
---- mid-typing, so an empty trimmed name reverts to the stored one here.
+--- Drain self.pendingChanges to service:update. Flush is the name-boundary
+--- enforcement point: the widget callbacks stay permissive mid-typing, so an
+--- empty trimmed name reverts to the stored one here.
 function RLMenuSettingsFrame:flushPendingChanges()
     local idsIn = 0
     for _ in pairs(self.pendingChanges) do idsIn = idsIn + 1 end
@@ -2561,9 +2067,8 @@ function RLMenuSettingsFrame:flushPendingChanges()
 
     local updated, skipped = 0, 0
     local toClear = {}
-    -- Snapshot ids first so the per-id helper can mutate self.pendingChanges
-    -- without iterating-while-mutating semantics. Per-id outcome decides
-    -- whether the entry clears or stays for retry.
+    -- Snapshot ids first, so the per-id helper can mutate self.pendingChanges
+    -- without iterating while mutating.
     local ids = {}
     for id in pairs(self.pendingChanges) do table.insert(ids, id) end
     for _, id in ipairs(ids) do
@@ -2584,12 +2089,9 @@ function RLMenuSettingsFrame:flushPendingChanges()
         idsIn, updated, skipped, idsIn - updated - skipped)
 end
 
---- Flush ONE filter id's pending overlay through `RLFilterService:update`, so a selection
---- switch can flush the outgoing filter without draining the whole table - a rejected edit on
---- filter A must not silently drop edits on filter B.
----
---- `"updated"` and `"skipped"` (an orphan id) let the caller clear the entry; `"rejected"`
---- means the caller MUST KEEP it so the next flush pass can retry.
+--- Flush ONE id's overlay, so a rejected edit on one filter cannot drop edits
+--- on another. "updated" and "skipped" let the caller clear the entry;
+--- "rejected" means the caller MUST keep it for the next pass to retry.
 ---@param id string filter id
 ---@return string outcome code
 function RLMenuSettingsFrame:flushPendingChangesForId(id)
@@ -2627,15 +2129,9 @@ function RLMenuSettingsFrame:flushPendingChangesForId(id)
         merged.name = trimmed
     end
 
-    -- Rebuild expression.children = validSupported ++ preservedChildren
-    -- when the overlay carries `conditions`. Number rows go through
-    -- tonumber(rawText) validation.
-    --
-    -- On parse failure, EXISTING rows (those carrying originSnapshot from
-    -- ensurePendingConditions) revert to their stored field/cmp/value so the
-    -- user does not lose the condition - they only lose the edit.
-    -- NEWLY-ADDED rows (no originSnapshot, came from onAddConditionClicked)
-    -- are excluded entirely since there is no stored counterpart to revert to.
+    -- Rebuild children as validSupported ++ preserved. On a number parse
+    -- failure an EXISTING row reverts to its originSnapshot, so the user loses
+    -- the edit rather than the condition; a NEW row is excluded outright.
     if overlay.conditions ~= nil then
         local validSupported = {}
         for _, row in ipairs(overlay.conditions) do
@@ -2644,12 +2140,8 @@ function RLMenuSettingsFrame:flushPendingChangesForId(id)
             local outField, outCmp, outValue = row.field, row.cmp, row.value
             if field ~= nil and field.type == "number" and row.rawText ~= nil then
                 local parsed = tonumber(row.rawText)
-                -- Lua's tonumber accepts "inf", "-inf", scientific notation
-                -- like "1e308" (overflows to math.huge), and unbounded
-                -- negatives. Numeric fields in the catalog all have implicit
-                -- non-pathological semantics (age, weight, genetics.*,
-                -- healthScore). Reject NaN + +-inf the same way as a parse
-                -- failure - revert if originSnapshot is present, else exclude.
+                -- tonumber accepts "inf" and overflowing exponents, which no
+                -- catalog field means; treat those as a parse failure.
                 local isPathological = parsed ~= nil and (
                     parsed ~= parsed                 -- NaN
                     or parsed == math.huge
@@ -2680,12 +2172,9 @@ function RLMenuSettingsFrame:flushPendingChangesForId(id)
             end
         end
 
-        -- Prefer the per-id overlay snapshot of preservedChildren over the
-        -- frame-global conditionEditState. The overlay snapshot was taken
-        -- when ensurePendingConditions first created the conditions array
-        -- and survives selection-switches; conditionEditState gets clobbered
-        -- by every renderEditor so it would be wrong for any id other than
-        -- the currently-rendered one.
+        -- Prefer the per-id snapshot: it survives selection switches, while
+        -- conditionEditState is clobbered by every renderEditor and so is
+        -- wrong for any id other than the one currently rendered.
         local preserved = overlay.preservedChildren
                           or (self.conditionEditState
                               and self.conditionEditState.lastRenderedFilterId == id
@@ -2703,13 +2192,9 @@ function RLMenuSettingsFrame:flushPendingChangesForId(id)
             tostring(id), #validSupported, #preserved)
     end
 
-    -- Phantom-rewrite guard: a defensive net for any callsite
-    -- that tainted pendingChanges with values identical to stored. Without
-    -- this short-circuit a no-op overlay (e.g. retyping a name back to its
-    -- original, then closing the frame) would still emit a byte-identical
-    -- Update event, triggering fanout to all consumer frames on every
-    -- client. Returning "skipped" matches the orphan-id contract:
-    -- flushPendingChanges clears the entry rather than retaining for retry.
+    -- Phantom-rewrite guard: without it a no-op overlay still emits a
+    -- byte-identical Update, fanning out to every consumer frame on every
+    -- client. "skipped" clears the entry rather than retaining it.
     if deepEqualFilter(merged, stored) then
         Log:debug("RLMenuSettingsFrame:flushPendingChangesForId: id=%s overlay matches stored; skipping wire update",
             tostring(id))
@@ -2735,15 +2220,8 @@ end
 -- Filter editor: Duplicate
 -- =============================================================================
 
---- Compute a non-colliding duplicate name. Walks self.rows resolving each
---- row's display name via the pending overlay (so renames in flight on
---- OTHER rows still count toward the collision check). Appends the
---- localized `rl_menu_filters_duplicate_suffix` on the first duplicate;
---- subsequent duplicates use `rl_menu_filters_duplicate_suffix_n`, a
---- format string carrying the language's own word order / punctuation
---- around `%d` (e.g. " (copy %d)" in EN). Detection of existing dupes
---- builds a Lua pattern from the same localized template so the count
---- form is recognized regardless of how the translator phrased it.
+--- Compute a non-colliding duplicate name. Collision detection resolves names
+--- through the pending overlay, so a rename in flight on another row counts.
 --- @param baseName string Source filter's merged name
 --- @return string
 function RLMenuSettingsFrame:computeDuplicateName(baseName)
@@ -2752,12 +2230,8 @@ function RLMenuSettingsFrame:computeDuplicateName(baseName)
     local suffixNFmt  = g_i18n:getText("rl_menu_filters_duplicate_suffix_n")
     local first = base .. suffixFirst
 
-    -- Build a detection pattern from the localized numbered template.
-    -- Swap the %d placeholder for a sentinel byte first, escape all Lua
-    -- pattern specials in the surrounding literal text, then swap the
-    -- sentinel back for the (%d+) capture. Escaping `%` is required - it
-    -- is Lua's pattern escape char - which is why we cannot escape the
-    -- raw format string directly without first lifting the placeholder.
+    -- Lift the %d placeholder to a sentinel byte before escaping, because `%`
+    -- is itself Lua's pattern escape char, then restore it as a capture.
     local function escapePattern(s)
         return (s:gsub("([%(%)%.%%%+%-%*%?%[%]%^%$])", "%%%1"))
     end
@@ -2766,13 +2240,9 @@ function RLMenuSettingsFrame:computeDuplicateName(baseName)
         :gsub(placeholder, "(%%d+)")
     local countPattern = "^" .. escapePattern(base) .. templatePat .. "$"
 
-    -- Track the MAX N seen, NOT the count: with sparse rows (e.g. only
-    -- "<base> (copy 3)" present after deletes), count-based logic emits
-    -- "(copy 2)" and the second click collides on "(copy 3)". The bare
-    -- suffix form (`<base> (copy)`, no number) counts as N=1 because
-    -- user-visible numbering starts at 2 (no "(copy 1)" anywhere). Note:
-    -- the source row's bare name (`<base>` alone) is NOT counted - only
-    -- existing copies contribute.
+    -- Track the MAX N seen, not the count: after deletes leave sparse copies,
+    -- a count would collide. The bare suffix form counts as N=1, and the
+    -- source row's own name contributes nothing.
     local maxN = 0
     for _, row in ipairs(self.rows) do
         local pending = self.pendingChanges[row.id]
@@ -2800,11 +2270,8 @@ function RLMenuSettingsFrame:computeDuplicateName(baseName)
     return result
 end
 
---- Footer Duplicate handler. Gated on selection + permission + farm.
---- Clones the source filter (overlay-merged so in-flight edits are
---- duplicated too), assigns a non-colliding name, and creates via the
---- same g_rlFilterService:create call onClickNewFilter uses. Auto-selects
---- the new id via the existing resolveSelectionById path on refreshData.
+--- Footer Duplicate handler: clones the selected filter overlay-merged, names
+--- it without collision, and creates it, then selects the new row.
 function RLMenuSettingsFrame:onClickDuplicate()
     if self.selectedFilterId == nil then
         Log:trace("RLMenuSettingsFrame:onClickDuplicate: no selection, aborting")
@@ -2833,13 +2300,8 @@ function RLMenuSettingsFrame:onClickDuplicate()
     local merged = overlayPending(stored, self.pendingChanges[self.selectedFilterId])
     local dupName = self:computeDuplicateName(merged.name)
 
-    -- _cloneFilter deep-clones the expression (carryover ownership
-    -- contract). The service ALSO deep-clones internally; double-clone is
-    -- a correctness belt-and-suspenders honoured throughout the filter code.
-    -- Preserve the source filter's scope. A global filter (farmId == nil)
-    -- stays global; a farm-scoped filter keeps its farmId. Using
-    -- self.farmId here would narrow a global copy down to the active
-    -- farm.
+    -- Carry the SOURCE filter's scope, not self.farmId: that would narrow a
+    -- global filter (farmId == nil) down to the active farm.
     local cloned = RLFilterService._cloneFilter(merged)
     local newFilter = g_rlFilterService:create({
         name       = dupName,
@@ -2865,10 +2327,8 @@ end
 -- Filter editor: Delete
 -- =============================================================================
 
---- Footer Delete handler. Opens a YesNoDialog with the selected filter's
---- name; on Yes calls service:delete via onDeleteConfirmed. No state
---- mutation until the user confirms (mirrors
---- RLMenuMessagesFrame:onClickDeleteAll).
+--- Footer Delete handler: opens a YesNoDialog naming the filter. Nothing
+--- mutates until the user confirms.
 function RLMenuSettingsFrame:onClickDelete()
     if self.selectedFilterId == nil then
         Log:trace("RLMenuSettingsFrame:onClickDelete: no selection, aborting")
@@ -2906,9 +2366,8 @@ function RLMenuSettingsFrame:onClickDelete()
     Log:debug("RLMenuSettingsFrame:onClickDelete: opening YesNoDialog for id=%s name='%s'",
         tostring(stored.id), tostring(stored.name))
 
-    -- YesNoDialog passes (target, yesValue, callbackArgs) to its callback;
-    -- with target=self the colon-bound `self` absorbs it and we receive
-    -- (yes, id) explicitly. Mirrors RLMenuMessagesFrame's onDeleteAll flow.
+    -- YesNoDialog passes (target, yesValue, callbackArgs), and the colon-bound
+    -- `self` absorbs the target, so the callback receives (yes, id).
     YesNoDialog.show(
         self.onDeleteConfirmed,
         self,
@@ -2919,13 +2378,8 @@ function RLMenuSettingsFrame:onClickDelete()
     )
 end
 
---- YesNoDialog confirmation callback for Delete. Yields when the user
---- clicked No. On Yes: call service:delete FIRST and only react on its
---- return - on ok=true clear pending edits + selection; on ok=false
---- (stale id / race with another client) preserve pending edits + selection
---- and log WARNING so the user can retry / observe the next refresh event
---- resolving the divergence. No destructive local cleanup before confirming
---- the service applied the mutation.
+--- Delete confirmation callback. service:delete runs FIRST and local cleanup
+--- only follows a true return, so a rejected delete keeps the pending edits.
 --- @param yes boolean True when the user clicked Yes
 --- @param id string The filter id captured at click time
 function RLMenuSettingsFrame:onDeleteConfirmed(yes, id)
@@ -2949,21 +2403,15 @@ function RLMenuSettingsFrame:onDeleteConfirmed(yes, id)
     end
 end
 
---- SmoothList delegate for a row change. The frame hosts two SmoothLists on the same `self`
---- delegate, and only the filtersList case does anything here; conditions-list rows drive the
---- edit state through their own in-row widget callbacks.
----
---- The outgoing filter's pending overlay is flushed first, but the advance happens regardless
---- of the outcome - blocking selection on a service rejection would be hostile UX, and a
---- rejected entry stays in `self.pendingChanges` for the close-time pass.
+--- SmoothList row-change delegate, shared by both lists and dispatched by list
+--- reference. The outgoing filter is flushed first, but the advance happens
+--- regardless: a rejected entry waits in pendingChanges for the close pass.
 --- @param list table The SmoothList instance asking
 --- @param _section number Section index (single-section, ignored)
 --- @param index number 1-based row index
 function RLMenuSettingsFrame:onListSelectionChanged(list, _section, index)
-    -- v2 modal editor: conditions list selection IS user-meaningful. Row
-    -- selection drives Tier 2 (no row focused) <-> Tier 3 (row focused)
-    -- transitions on the action bar. Refresh and return; downstream
-    -- autoflush/selection logic below is filtersList-only.
+    -- Conditions-list selection drives the Tier 2 / Tier 3 transition on the
+    -- action bar; everything below this is filtersList-only.
     if list == self.filterConditionsList then
         Log:trace("RLMenuSettingsFrame:onListSelectionChanged: conditions list selection (index=%s) -> refreshing action bar",
             tostring(index))
@@ -2973,20 +2421,16 @@ function RLMenuSettingsFrame:onListSelectionChanged(list, _section, index)
     if list ~= self.filtersList then return end
     if index == nil then return end
 
-    -- Suppress overwrite during reconciliation. refreshData's reloadData +
-    -- resolveSelectionById both fire this delegate synchronously via
-    -- SmoothList's clamp-and-notify + our own setSelectedIndex call. The
-    -- id we'd capture under those paths is the post-clamp row's id, not
-    -- the user's intent; the outer path already knows the correct id.
+    -- Suppress during reconciliation: the id captured on those paths is the
+    -- post-clamp row, not the user's intent, and the caller knows the right one.
     if self.isReconciling then
         Log:trace("RLMenuSettingsFrame:onListSelectionChanged: suppressed during reconcile (index=%s)",
             tostring(index))
         return
     end
 
-    -- Autoflush the previously-selected filter before advancing.
-    -- Outcome is logged inside the helper; advance is unconditional so a
-    -- rejected flush does not strand the user on the dirty filter.
+    -- Autoflush the outgoing filter; the advance is unconditional so a
+    -- rejected flush cannot strand the user on the dirty filter.
     local previousId = self.selectedFilterId
     if previousId ~= nil and self.pendingChanges[previousId] ~= nil then
         local outcome = self:flushPendingChangesForId(previousId)
@@ -3002,10 +2446,8 @@ function RLMenuSettingsFrame:onListSelectionChanged(list, _section, index)
         self.selectedFilterId = nil
         Log:debug("RLMenuSettingsFrame:onListSelectionChanged: index=%s out of range, cleared",
             tostring(index))
-        -- Rerender the editor (-> empty state) + rebuild footer so Duplicate
-        -- and Delete drop with the now-cleared selection. Without these the
-        -- right pane keeps showing the previous filter's content and the
-        -- destructive buttons stay live until some later refresh reconciles.
+        -- Rerender and rebuild the footer, or the right pane keeps the old
+        -- filter's content and the destructive buttons stay live.
         self:renderEditor()
         self:updateButtonVisibility()
         return
@@ -3015,8 +2457,6 @@ function RLMenuSettingsFrame:onListSelectionChanged(list, _section, index)
     Log:debug("RLMenuSettingsFrame:onListSelectionChanged: index=%d id=%s",
         index, tostring(row.id))
 
-    -- Selection changed: rerender the right pane against the new id and
-    -- rebuild the footer so Duplicate/Delete toggle with selection.
     self:renderEditor()
     self:updateButtonVisibility()
 end
@@ -3024,15 +2464,11 @@ end
 -- =============================================================================
 -- SmoothList data source protocol
 --
--- Deliberately NOT logged. SmoothList calls these at draw frequency; tracing
--- them would swamp the log. refreshData + updateEmptyState + the selection
--- path are already logged and cover the render lifecycle.
+-- Deliberately NOT logged: these are called at draw frequency and tracing them
+-- would swamp the log.
 -- =============================================================================
 
---- How many items the list should render. Dispatch by list reference so the
---- single `self` delegate can host both filtersList (left-pane saved
---- filters) and filterConditionsList (right-pane condition rows) without
---- crosstalk.
+--- How many items the list should render, dispatched by list reference.
 --- @param list table
 --- @param _section number Ignored
 --- @return number
@@ -3049,9 +2485,7 @@ function RLMenuSettingsFrame:getNumberOfItemsInSection(list, _section)
     return 0
 end
 
---- Populate one data cell from the row at the given index. Dispatch by list
---- reference; conditions-list rows have a richer template (field picker /
---- cmp picker / value widget / delete button).
+--- Populate one data cell from the row at the given index, dispatched by list.
 --- @param list table
 --- @param _section number Ignored
 --- @param index number 1-based row index
@@ -3061,9 +2495,8 @@ function RLMenuSettingsFrame:populateCellForItemInSection(list, _section, index,
         local row = self.rows[index]
         if row == nil then return end
 
-        -- Resolve display name through the pending overlay so live edits show
-        -- in the left list immediately. Sort key (row.name) stays untouched so
-        -- row position remains stable mid-edit.
+        -- Display through the overlay so a live edit shows at once, while the
+        -- sort key stays row.name so the row does not move mid-edit.
         local pending = self.pendingChanges[row.id]
         local displayName = (pending and pending.name) or row.name or ""
 
@@ -3072,9 +2505,8 @@ function RLMenuSettingsFrame:populateCellForItemInSection(list, _section, index,
             nameCell:setText(displayName)
         end
 
-        -- One-shot first-two-cell log: validates rl_filterListItem geometry
-        -- (cell + title pos / size + text constraints) against the rendered
-        -- row metrics. Two cells = inter-row pitch + per-cell geometry.
+        -- Two cells is enough to derive both inter-row pitch and per-cell
+        -- geometry from the log.
         local idx = self.didMeasureFilterCellCount or 0
         if idx < 2 then
             self.didMeasureFilterCellCount = idx + 1
@@ -3099,9 +2531,7 @@ function RLMenuSettingsFrame:populateCellForItemInSection(list, _section, index,
 
     if list ~= self.filterConditionsList then return end
 
-    -- v2 modal editor: row is a single read-only Text widget showing the
-    -- formatted condition. Edits route through RLFilterConditionDialog via
-    -- the Tier 3 action bar's Edit button.
+    -- A row is one read-only Text widget; edits route through the dialog.
     local row = getConditionRowAt(self, index)
     if row == nil then return end
 
@@ -3121,13 +2551,9 @@ function RLMenuSettingsFrame:populateCellForItemInSection(list, _section, index,
 
     local displayText = formatConditionDisplay(self, row, field)
 
-    -- Pixel-accurate row truncation. String values use middle-truncate
-    -- so two long needles that differ only at the suffix render
-    -- distinguishably ("VeryLong...ABC" vs "VeryLong...XYZ"); other types
-    -- use suffix-truncate via the basegame helper. Width budget is the row's
-    -- own NDC width minus the left-indent offset, converted back to pixels.
-    -- conditionText.textSize is set by the rl_filterConditionText profile
-    -- (textSize 18px); we read it live so profile changes propagate.
+    -- Pixel-accurate truncation. String values truncate in the MIDDLE, so two
+    -- long values differing only at the suffix stay distinguishable. textSize
+    -- is read live from the widget so a profile change propagates.
     local textSize = conditionText.textSize
     local budgetPx = nil
     if cell ~= nil and cell.size ~= nil and cell.size[1] ~= nil
@@ -3145,16 +2571,9 @@ function RLMenuSettingsFrame:populateCellForItemInSection(list, _section, index,
 
     conditionText:setText(displayText)
 
-    -- Indent: depth-aware left position. v2 ships flat (depth=0 for every
-    -- row), so the static XML position="20px -10px" already produces the
-    -- correct layout and this branch is a no-op. The depth-aware override
-    -- is wired NOW so group editing just needs to populate self.conditionRowDepths
-    -- alongside its partition pass.
-    --
-    -- setPosition takes NORMALIZED coordinates; GuiUtils.getNormalizedXValue
-    -- is string-aware only - passing a raw number returns it unchanged, so we
-    -- convert explicitly via g_referenceScreenWidth * g_aspectScaleX (the same
-    -- conversion the string path applies for pixel strings).
+    -- Depth-aware indent, inert while every row is at depth 0. setPosition
+    -- takes NORMALIZED coordinates, and GuiUtils.getNormalizedXValue is
+    -- string-aware only, so the pixel offset is converted here explicitly.
     local depth = 0
     if self.conditionRowDepths ~= nil and self.conditionRowDepths[index] ~= nil then
         depth = self.conditionRowDepths[index]
@@ -3164,8 +2583,7 @@ function RLMenuSettingsFrame:populateCellForItemInSection(list, _section, index,
         local leftOffsetPx = 20 + depth * 20
         local scaleX = g_aspectScaleX or 1
         local normalizedX = (leftOffsetPx / g_referenceScreenWidth) * scaleX
-        -- Preserve Y from XML load (the negative offset that puts text 10px
-        -- below the row top). conditionText.position[2] is already normalized.
+        -- Preserve the Y offset from XML load; it is already normalized.
         local normalizedY = (conditionText.position and conditionText.position[2]) or 0
         conditionText:setPosition(normalizedX, normalizedY)
     end
@@ -3179,13 +2597,8 @@ end
 -- General subtab: populate, refresh, cascade, click dispatch
 -- =============================================================================
 
---- Build the per-row option-text arrays a state-row widget needs:
----   setting.getTexts -> the registry entry's own builder (runtime-composed texts)
----   binaryType=offOn -> {"Off", "On"} (localized)
----   valueType=int    -> { "20", "30", "40", ... }
----   valueType=float  -> { "0%", "10%", "20%", ... }
----   else             -> l10n keys "rl_settings_<name>_texts_<i>"
---- RLSettings.SETTINGS is the single source of truth for values and types.
+--- Build the option-text array a state-row widget needs, from the setting's own
+--- builder, its binary type, its value type, or its l10n keys.
 --- @param name string Setting key in RLSettings.SETTINGS
 --- @param setting table The setting entry
 --- @return table The texts array indexed by state
@@ -3215,16 +2628,9 @@ local function buildSettingTexts(name, setting)
     return texts
 end
 
---- One-shot per-clone wiring of the General subtab. Looks up each row's
---- widget via getDescendantById, builds option-text arrays for state rows,
---- and stores element + tooltip refs in self.controls / self.tooltips.
---- onClick attributes already wire each widget to the instance methods
---- (onClickGeneralSetting / onClickGeneralAction) at XML load time, so no
---- manual binding is needed.
----
---- Logs Log:error and bails (loud, not silent) if generalSettingsLayout is
---- missing. Per-row missing widgets log Log:warning and are skipped; refresh
---- subsequently no-ops on the missing entry.
+--- One-shot per-clone wiring of the General subtab: widget lookup, option-text
+--- arrays, and the element and tooltip registries. The XML onClick attributes
+--- already bind the handlers, so no manual binding happens here.
 function RLMenuSettingsFrame:populateGeneralSubtab()
     Log:debug("RLMenuSettingsFrame:populateGeneralSubtab: enter")
 
@@ -3249,9 +2655,7 @@ function RLMenuSettingsFrame:populateGeneralSubtab()
                 self.tooltips[name] = tooltip
             end
 
-            -- Stateful rows need their option-text arrays populated; action
-            -- rows (setting.ignore == true) keep the static $l10n_..._text
-            -- already set in XML.
+            -- Action rows keep the static text XML already set.
             if not setting.ignore then
                 widget:setTexts(buildSettingTexts(name, setting))
                 Log:trace("RLMenuSettingsFrame:populateGeneralSubtab: bound state row '%s'", name)
@@ -3259,10 +2663,8 @@ function RLMenuSettingsFrame:populateGeneralSubtab()
                 Log:trace("RLMenuSettingsFrame:populateGeneralSubtab: bound action row '%s'", name)
             end
 
-            -- Static tooltip text: write once at populate so action rows
-            -- (which refreshGeneralSubtab skips) get tooltip text too. Dynamic
-            -- tooltips for state rows seed at the default state here and are
-            -- updated per-state in refreshGeneralSubtab.
+            -- Write the tooltip once here so action rows, which
+            -- refreshGeneralSubtab skips, get one too.
             if tooltip ~= nil then
                 local tooltipKey
                 if setting.dynamicTooltip then
@@ -3278,9 +2680,7 @@ function RLMenuSettingsFrame:populateGeneralSubtab()
         end
     end
 
-    -- Aggregate sanity check: did we bind every setting? Per-row missing
-    -- widget already logs Log:warning, but the totals make a partial-bind
-    -- (XML drift, renamed setting, etc.) loud at a glance.
+    -- The totals make a partial bind from XML drift loud at a glance.
     local expected = 0
     for _ in pairs(RLSettings.SETTINGS) do expected = expected + 1 end
     if count ~= expected then
@@ -3290,15 +2690,9 @@ function RLMenuSettingsFrame:populateGeneralSubtab()
     end
 end
 
---- Push current RLSettings state into widgets, refresh tooltip text
---- (static or dynamic per setting.dynamicTooltip), then re-run the
---- dependency cascade. Called from onFrameOpen() and from refreshIfGeneralOpen()
---- after MP broadcasts. Click handlers also call this after delegating to
---- RLSettings.applyChange so the widget reflects whatever state.callback
---- side effects produced.
----
---- setState uses forceEvent=false to avoid re-entering onClickGeneralSetting
---- during the programmatic push.
+--- Push RLSettings state into the widgets, refresh their tooltips, and re-run
+--- the dependency cascade. setState passes forceEvent=false, so the
+--- programmatic push cannot re-enter onClickGeneralSetting.
 function RLMenuSettingsFrame:refreshGeneralSubtab()
     Log:debug("RLMenuSettingsFrame:refreshGeneralSubtab: enter")
 
@@ -3324,13 +2718,8 @@ function RLMenuSettingsFrame:refreshGeneralSubtab()
     self:updateReadonlyState()
 end
 
---- Per-row admin gate + dependency cascade. Operates on self.controls
---- (this frame's element registry), never on RLSettings.SETTINGS[*].element.
---- Per-row admin gating, not blanket non-admin disable: only rows flagged
---- setting.adminOnly==true are disabled for non-admins; the rest stay
---- enabled with their dependency cascade applied.
----
---- Admin check: g_server ~= nil OR g_currentMission.isMasterUser == true.
+--- Per-row admin gate and dependency cascade over self.controls. Only rows
+--- flagged adminOnly are disabled for non-admins; the rest stay enabled.
 function RLMenuSettingsFrame:updateReadonlyState()
     local isAdmin = (g_server ~= nil) or (g_currentMission ~= nil and g_currentMission.isMasterUser == true)
     Log:trace("RLMenuSettingsFrame:updateReadonlyState: isAdmin=%s", tostring(isAdmin))
@@ -3340,12 +2729,10 @@ function RLMenuSettingsFrame:updateReadonlyState()
         if widget ~= nil then
             local disabled = false
 
-            -- The lock arm leads: a locked row is disabled for EVERYONE, admin included,
-            -- which is the only visible difference a master user sees. It is what stops a
-            -- player toggling a setting whose engine is stubbed out underneath.
-            -- Note the arms are exclusive, so a locked row never evaluates its dependency
-            -- cascade. Harmless for diseasesEnabled, which declares none; a live constraint
-            -- for any future locked row that does.
+            -- The lock arm leads: a locked row is disabled for EVERYONE, admin
+            -- included, which stops a player toggling a setting whose engine is
+            -- stubbed out. The arms are exclusive, so a locked row never
+            -- evaluates its dependency cascade.
             if setting.lock then
                 disabled = true
             elseif setting.adminOnly and not isAdmin then
@@ -3364,11 +2751,8 @@ function RLMenuSettingsFrame:updateReadonlyState()
     end
 end
 
---- Refresh the General subtab if the frame is open. Called from
---- RL_BroadcastSettingsEvent:run so the page reflects MP-synced state
---- changes without requiring frame reopen. No-op when the frame is
---- closed - matches the refreshIfOpen convention used by the
---- filter-event hooks elsewhere on this branch.
+--- Refresh the General subtab when open, so an MP-synced state change shows
+--- without a frame reopen.
 function RLMenuSettingsFrame:refreshIfGeneralOpen()
     if not self.isFrameOpen then
         Log:trace("RLMenuSettingsFrame:refreshIfGeneralOpen: frame closed, skipping")
@@ -3378,22 +2762,15 @@ function RLMenuSettingsFrame:refreshIfGeneralOpen()
     self:refreshGeneralSubtab()
 end
 
---- XML onClick handler for state rows (BinaryOption / MultiTextOption): extract the setting
---- name from the widget id, delegate to RLSettings.applyChange - the single write path for
---- stateful settings - then refresh the widgets so the cascade and tooltips stay current.
----
---- The GUI loader raises onClickCallback for state rows with (target, state, widget,
---- isLeftButtonEvent) and target arrives as `self` through the colon syntax, so the explicit
---- args are (state, widget). A Button raises with only (target, widget), so the
---- `widget == nil` fallback keeps an accidental cross-wire resolving to a real widget.
+--- onClick handler for state rows: delegate to RLSettings.applyChange, the
+--- single write path, then refresh. A Button raises with only (target, widget),
+--- so the `widget == nil` fallback keeps a cross-wire resolving to a widget.
 --- @param state number 1-based new state from the widget post-click
 --- @param widget table The widget that was clicked
 function RLMenuSettingsFrame:onClickGeneralSetting(state, widget)
     if widget == nil then widget = state end
-    -- type-check after the shuffle: if `state` was passed as a number (the
-    -- documented MultiTextOption case where only state arrives without
-    -- widget), the shuffle would otherwise leave `widget` as a number and
-    -- the next line would crash on `widget.id`.
+    -- Type-check after the shuffle: when only a numeric state arrived, the
+    -- shuffle leaves `widget` a number and `widget.id` would crash.
     if type(widget) ~= "table" or widget.id == nil then return end
 
     local name = widget.id:match("^rlmenuSetting_(.+)$")
@@ -3412,34 +2789,22 @@ function RLMenuSettingsFrame:onClickGeneralSetting(state, widget)
         return
     end
 
-    -- The widget already advanced its own state on click; read off the
-    -- widget for safety (the state arg is also the new value for
-    -- MultiTextOption-derived elements per their raiseCallback chain).
+    -- The widget already advanced its own state on click, so read it back.
     local newState = widget:getState()
     Log:debug("RLMenuSettingsFrame:onClickGeneralSetting: name='%s' newState=%d", name, newState)
 
     RLSettings.applyChange(name, newState)
 
-    -- Sync the change off this client via RL_BroadcastSettingsEvent in its
-    -- single-setting form. The server validates the sender (master-user),
-    -- persists, and relays to other clients. Without this the RLMenu
-    -- change stays local and the server reverts it on save/reload.
+    -- Sync off this client: the server validates the sender, persists and
+    -- relays. Without it the change stays local and reverts on save/reload.
     Log:debug("RLMenuSettingsFrame:onClickGeneralSetting: broadcasting '%s' via RL_BroadcastSettingsEvent.sendEvent", name)
     RL_BroadcastSettingsEvent.sendEvent(name)
 
     self:refreshGeneralSubtab()
 end
 
---- XML onClick handler for action rows (Button). Resolves the setting name
---- from the button's id and invokes its setting.callback with no args -
---- action rows are self-contained (dialog / export / reset handlers).
----
---- ButtonElement.raiseCallback delivers two args (`target, button`), so
---- the colon-bound `self` absorbs the target and the explicit `button`
---- arg lands at the right slot.
----
---- No state mutation, no cascade refresh - actions are fire-and-forget
---- (open dialog / export / reset).
+--- onClick handler for action rows: invoke the setting's callback with no
+--- args. Fire-and-forget - no state mutation and no cascade refresh.
 --- @param button table The Button widget that was clicked
 function RLMenuSettingsFrame:onClickGeneralAction(button)
     if button == nil or button.id == nil then return end

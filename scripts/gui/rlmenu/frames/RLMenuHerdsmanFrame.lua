@@ -21,16 +21,10 @@ local Log = RmLogging.getLogger("RLRM")
 -- Store mod directory at source time (g_currentModDirectory only valid during source())
 local modDirectory = g_currentModDirectory
 
--- operation -> section-header i18n key. Localization wiring for the multi-section
--- list AND the Operation selector's state labels: the presenter stays key-free, so the
--- frame owns the label map. A value lookup, not decision logic.
---
--- Both readers TOLERATE a missing entry - the selector seed falls back to the raw operation name
--- and getTitleForSectionHeader returns nil - because a nil key once crashed the whole game through
--- the I18N.getText override. That tolerance is correct and stays. Its side effect is that a missing
--- label is invisible at runtime: the player simply reads a programmer string. So the map is expected
--- to be COMPLETE over OPERATION_ORDER, and a test sweep (not the runtime) is what enforces it -
--- which is why the table is exported below.
+-- operation -> section-header i18n key, for the list headers and the Operation selector.
+-- Both readers TOLERATE a missing entry, because a nil key once crashed the game through
+-- the I18N.getText override. The map is expected COMPLETE over OPERATION_ORDER, and a
+-- test sweep is what enforces that - which is why it is exported below.
 local OPERATION_TITLE_KEY = {
     sell      = "rl_menu_herdsman_section_sell",
     move      = "rl_menu_herdsman_section_move",
@@ -41,19 +35,13 @@ local OPERATION_TITLE_KEY = {
     horseCare = "rl_menu_herdsman_section_horsecare",
 }
 
--- Exposed read-only so a test can sweep it against OPERATION_ORDER and assert every operation has a
--- resolvable player-facing label. Same reason RLHerdsmanRuleService.OPERATION_ANIMAL_TYPES and
--- RLHerdsmanMessages.ID_FAMILY are exported: a declaration table no test can see is a declaration
--- nothing checks. Read it; never mutate it.
+-- Exported read-only so a test can sweep it against OPERATION_ORDER: a declaration table
+-- no test can see is a declaration nothing checks. Read it; never mutate it.
 RLMenuHerdsmanFrame.OPERATION_TITLE_KEY = OPERATION_TITLE_KEY
 
--- Row field -> the bounds string an "invalid" row marker renders, with the arguments that fill it.
--- Only the two numeric rows can ever be "invalid" - every other covered row is presence-only - so a
--- field absent from this table is not a gap.
---
--- The arguments are read from the presenter's own domain constants at CALL time, not copied here, so
--- the sentence the player reads and the rule that rejected their value cannot drift; the closure also
--- keeps this table free of a load-time read of a module sourced after this one.
+-- Row field -> the bounds string an "invalid" row marker renders. Only the two numeric rows
+-- can ever be invalid, so a field absent here is not a gap. The args are read from the
+-- presenter at CALL time, so the sentence and the rule that rejected the value cannot drift.
 local REASON_INVALID = {
     maxAnimals = {
         key = "rl_menu_herdsman_detail_wholeNumberRange",
@@ -61,41 +49,28 @@ local REASON_INVALID = {
             return RLHerdsmanRulePresenter.MAXANIMALS_MIN, RLHerdsmanRulePresenter.MAXANIMALS_MAX
         end,
     },
-    -- budget.fixed has a lower bound only, so it uses the one-placeholder string rather than the
-    -- range one. The floor is read from the presenter like maxAnimals' pair - a literal here would
-    -- be exactly the drift the comment above promises is impossible.
+    -- budget.fixed has a lower bound only, so it uses the one-placeholder string.
     ["budget|fixed"] = {
         key = "rl_menu_herdsman_detail_wholeNumberMin",
         args = function() return RLHerdsmanRulePresenter.BUDGET_FIXED_MIN end,
     },
 }
 
--- Exposed read-only for the same reason as OPERATION_TITLE_KEY above: a declaration table no test can
--- see is a declaration nothing checks. Read it; never mutate it.
+-- Exported read-only for the same reason as OPERATION_TITLE_KEY. Never mutate it.
 RLMenuHerdsmanFrame.REASON_INVALID = REASON_INVALID
 
 -- =============================================================================
 -- Module-local helpers (pure wiring; no decisions)
 -- =============================================================================
 
---- Resolve the animal type NAMES the operation x animalType declarations reference into live
---- indices, as a `name -> index` map for the gate. A name the registry does not carry is
---- OMITTED rather than mapped to nil, which is what gives the gate its polarity for free: an
---- allow-list with an unresolved name admits nothing, an exclude-list with one excludes nothing.
----
---- This is the frame's job precisely because it is the `AnimalType` READ; the resolution itself
---- belongs to RLHerdsmanRuleService, so the GUI and the planner resolve the same declared union
---- the same way. The nil-registry check STAYS here, above the delegation, because the resolver's
---- return cannot express the difference that matters diagnostically: "no registry at all" is a
---- load-order fault worth a WARNING, while "registry present, a declared name absent from it" is
---- ordinary DEBUG detail, and both would arrive as an empty map with every name missing.
----
---- Resolution is per call, never memoized: `AnimalType` is populated after this file is sourced,
---- so a cached empty map would close the horse gate for the whole session.
+--- Resolve the declared animal type NAMES into live indices as a `name -> index` map. An
+--- unresolved name is OMITTED rather than mapped to nil, which gives the gate its polarity
+--- for free. Resolution is per call, never memoized: `AnimalType` is populated after this
+--- file is sourced, so a cached empty map would close the horse gate for the session.
 ---@return table animalTypeIndexByName map of resolved NAME -> live animalType index (possibly empty)
 function RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
-    -- The nil check comes FIRST, above any declaration walk: on this path the names would be
-    -- computed, sorted and thrown away unused.
+    -- The nil check comes FIRST: past it the names would be computed and thrown away. A
+    -- missing registry is a load-order fault, which an empty map alone cannot express.
     if AnimalType == nil then
         Log:warning("RLMenuHerdsmanFrame.buildAnimalTypeIndexMap: AnimalType registry is nil; the operation x animalType gate gets an EMPTY map (allow-lists admit nothing, exclude-lists exclude nothing) - check AnimalSystem load order")
         return {}
@@ -118,9 +93,8 @@ function RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
     return map
 end
 
---- 1-based index of `value` in the ordered `values` array (==), or nil. The
---- index<->value bridge between the presenter's value domains and a MultiTextOption /
---- BinaryOption state.
+--- 1-based index of `value` in `values`, or nil: the bridge between the presenter's value
+--- domains and a widget state.
 ---@param values table
 ---@param value any
 ---@return number|nil
@@ -132,10 +106,8 @@ local function indexOfValue(values, value)
     return nil
 end
 
---- Caret-safe programmatic setText for a TextInput: a value push resets the caret to
---- text-end, which stomps the user mid-edit. Skip the push when the input owns focus AND
---- the text already matches (the overlay already captures the pending edit). Mirrors
---- RLMenuSettingsFrame:renderEditor's name-input guard.
+--- Caret-safe setText: a value push resets the caret to text-end, stomping the user
+--- mid-edit, so skip it while the input is focused and already matches.
 ---@param input table|nil TextInput element
 ---@param desired string|nil
 local function setTextCaretSafe(input, desired)
@@ -155,21 +127,12 @@ local function setRowVisible(row, visible)
     if row ~= nil then row:setVisible(visible == true) end
 end
 
---- Force a BinaryOption's green slider onto `targetState`, even when the toggle already
---- reports that state. A bare BinaryOptionElement:setState(target) short-circuits on
---- `state == self.state` and never runs updateSelection, so it cannot re-seat a slider that
---- was stranded while the row was hidden (a freshly-cloned toggle starts at state 1, so
---- pushing the state-1 default is inert). Toggle THROUGH the opposite state so the terminal
---- push is always a real change: updateSelection then points sliderMovingDirection at the
---- target and skipAnimation (3rd arg) snaps it in the next update(dt). Both pushes are
---- forceEvent=false, so MultiTextOptionElement:setState never raises the click callback -
---- the frame's onRule*Changed handlers do not fire and no pending edit is stashed.
---- CALL ONLY ON A VISIBLE toggle: a hidden BinaryOption gets no update(dt)
---- (getIsActiveNonRec == getIsVisibleNonRec), so a push there strands until it next shows.
---- NOTE: the toggle-through performs TWO real state changes, so it emits two notifyIndexChange
---- notifications per seat (MultiTextOptionElement:setState notifies on any change, regardless of
---- forceEvent). Harmless for these op-param toggles (no IndexChangeSubjectMixin observers) - but
---- do NOT attach an index-change observer (e.g. a page-dot indicator) to a toggle seated this way.
+--- Force a BinaryOption's slider onto `targetState`. A bare setState short-circuits when
+--- the state already matches and never re-seats a slider stranded while the row was hidden,
+--- so this toggles THROUGH the opposite state to make the terminal push a real change.
+--- CALL ONLY ON A VISIBLE toggle: a hidden one gets no update(dt) and the push strands.
+--- The toggle-through emits TWO notifyIndexChange notifications, so never attach an
+--- index-change observer to a toggle seated this way.
 ---@param toggle table|nil BinaryOptionElement
 ---@param targetState number BinaryOptionElement.STATE_LEFT (1) or STATE_RIGHT (2)
 local function forceSeatToggle(toggle, targetState)
@@ -180,9 +143,8 @@ local function forceSeatToggle(toggle, targetState)
     toggle:setState(targetState, false, true)
 end
 
---- Injected filter resolver for the presenter summaries / D5 revalidation / semen
---- animalType gate. nil-safe: a missing service or unknown id -> nil (the presenter then
---- substitutes labels.missing / labels.none).
+--- Injected filter resolver for the presenter summaries. nil-safe: a missing service or
+--- unknown id yields nil, and the presenter substitutes its own label.
 ---@param filterId any
 ---@return table|nil filter record
 local function resolveFilterById(filterId)
@@ -190,15 +152,9 @@ local function resolveFilterById(filterId)
     return g_rlFilterService:getById(filterId)
 end
 
---- Injected placeable-name resolver for the target summary AND the move destination button.
---- Resolves the rule's stored key (uniqueId on server, net-object-id on a pure client) via
---- RLHusbandryTargetKey.resolveDestination - the move-dest opt-in that also admits an EPP butcher on
---- the client, so the destination button renders the butcher name (targets are always husbandries, so
---- widening is a no-op for them). An EPP-shaped resolved placeable gets the shared "(butcher)" suffix
---- (RLAnimalQuery.composeDestinationLabel) so the button label agrees with the picker rows.
---- NIL-GUARDED: a deleted / stale / unresolvable key returns nil (NOT a crash) so the presenter
---- substitutes labels.missing - resolveDestination stays quiet on a clean not-found, so this
---- render-path resolver does not spam the log.
+--- Injected placeable-name resolver for the target summary and the destination button. An
+--- EPP-shaped placeable gets the shared "(butcher)" suffix so the button label agrees with
+--- the picker rows. A stale or unresolvable key returns nil rather than crashing.
 ---@param key any stable target/dest key (uniqueId server / net-object-id client)
 ---@return string|nil placeable name (with the "(butcher)" suffix for an EPP dest)
 local function resolvePlaceableName(key)
@@ -208,11 +164,9 @@ local function resolvePlaceableName(key)
     return RLAnimalQuery.composeDestinationLabel(placeable:getName(), isEPP)
 end
 
---- Multiset (order-insensitive) equality of two arrays of plain strings, for the husbandry-
---- pick no-op check. The picker commits in name-sorted DOMAIN order, which can differ from the
---- stored array order even when the membership is identical; comparing as SETS avoids a
---- spurious re-order stash -> flush -> MP broadcast on an OK that changed nothing. Counts
---- duplicates so a genuine add/remove still registers. nil-safe.
+--- Order-insensitive multiset equality, for the husbandry-pick no-op check: the picker
+--- commits in name-sorted order, so comparing as arrays would broadcast a re-order that
+--- changed no membership. Duplicates count, so a genuine add or remove still registers.
 ---@param a any
 ---@param b any
 ---@return boolean
@@ -230,47 +184,39 @@ local function sameStringSet(a, b)
 end
 
 --- Construct a new RLMenuHerdsmanFrame instance.
---- Called once by setupGui() during mod load.
 --- @return table self The new frame instance
 function RLMenuHerdsmanFrame.new()
     local self = RLMenuHerdsmanFrame:superClass().new(nil, RLMenuHerdsmanFrame_mt)
     self.name = "RLMenuHerdsmanFrame"
     self.isFrameOpen = false
-    -- One-shot guard for the layout measurement: reset on every onFrameOpen,
-    -- flipped once the stretched containers report settled sizes (see update).
+    -- One-shot layout-measurement guard, flipped once the stretched containers settle.
     self.didMeasureLayout = false
-    -- Open-time stored rule snapshot (the flush baseline; F7 owns refresh-while-open),
-    -- the sectioned DISPLAY model (overlay-merged), per-id pending edit overlays, the
-    -- current selection id, the reload re-entry guard, and a one-shot first-row log guard.
+    -- Open-time stored rules (the flush baseline), the overlay-merged display sections,
+    -- per-id pending edits, and the current selection.
     self.storedRules = {}
     self.sections = {}
     self.pendingChanges = {}
     self.selectedRuleId = nil
-    -- The rule id captured when the filter picker OPENS; the pick stashes against THIS id even
-    -- if the list selection moves while the modal is up (cleared by onFilterPicked).
+    -- The rule id captured when each picker OPENS, so the pick stashes against THAT id even
+    -- if the list selection moves while the modal is up.
     self.filterPickTargetId = nil
-    -- The same capture for the husbandry picker (cleared by onHusbandriesPicked / onFrameClose).
     self.husbandryPickTargetId = nil
-    -- The same capture for the single-select destination picker (cleared by onDestinationPicked).
     self.destinationPickTargetId = nil
     self.isReconciling = false
-    -- Set while refreshRuleDetail pushes values into the editor widgets: the three rule
-    -- TextInput handlers early-return on it so a programmatic setText (which fires
-    -- onTextChanged on a value change) is not mistaken for a user edit (mirrors the option
-    -- widgets' setState(idx, false) suppression).
+    -- Set while refreshRuleDetail pushes values in: the TextInput handlers early-return on
+    -- it, so a programmatic setText is not mistaken for a user edit.
     self.isPopulating = false
     self.didMeasureFirstRow = false
-    -- One-shot seat-observation guard: armed per selection by refreshRuleDetail,
-    -- drained at the update seam once the re-seated op-param sliders settle. Starts drained.
+    -- One-shot seat-observation guard, armed per selection and drained at the update seam
+    -- once the re-seated sliders settle. Starts drained.
     self.didLogSeat = true
     self.seatLogExpected = nil
     Log:trace("RLMenuHerdsmanFrame.new: instance created")
     return self
 end
 
---- Load the herdsman frame XML and register the frame with g_gui.
---- Called from RLMenu.setupGui() before the menu XML is loaded so that
---- rlMenu.xml's FrameReference ref="RLMenuHerdsmanFrame" resolves.
+--- Load the herdsman frame XML and register the frame with g_gui. Must run before the menu
+--- XML loads, so its FrameReference resolves.
 function RLMenuHerdsmanFrame.setupGui()
     local frame = RLMenuHerdsmanFrame.new()
     g_gui:loadGui(
@@ -282,9 +228,8 @@ function RLMenuHerdsmanFrame.setupGui()
     Log:debug("RLMenuHerdsmanFrame.setupGui: registered")
 end
 
---- Resolve element references, bind the rule list, and seed the fixed-domain selector
---- option texts (operation / enabled / mark / convention / budget-type / budget-percentage)
---- once after XML parsing. The semen selector is rebuilt per render (live dewar pool).
+--- Resolve element references, bind the rule list, and seed the fixed-domain selector texts
+--- once. The semen selector is rebuilt per render, from the live dewar pool.
 function RLMenuHerdsmanFrame:onGuiSetupFinished()
     RLMenuHerdsmanFrame:superClass().onGuiSetupFinished(self)
 
@@ -348,16 +293,12 @@ function RLMenuHerdsmanFrame:onGuiSetupFinished()
     -- semenValues is rebuilt per render in populateSemenSelector.
     self.semenValues = { RLHerdsmanRulePresenter.SEMEN_ANY }
 
-    -- Seed the fixed-domain selector texts once. Operation = the section labels in
-    -- OPERATION_ORDER; the binary on/off + 2-value option labels reuse existing i18n;
-    -- budget-percentage = the frame's tostring(v).."%" render of the whitelist.
+    -- Seed the fixed-domain selector texts once, in OPERATION_ORDER.
     if self.ruleOperationSelector ~= nil then
         local opTexts = {}
         for i, op in ipairs(RLHerdsmanRulePresenter.OPERATION_ORDER) do
-            -- Backstop, not a supported state: an operation with no title key falls back to its raw
-            -- name instead of crashing getText on a nil key - mirrors the nil-key guard in
-            -- getTitleForSectionHeader. The map is expected complete over OPERATION_ORDER and a test
-            -- sweep enforces that; reaching this fallback in a shipped build is the defect.
+            -- Backstop, not a supported state: a missing title key falls back to the raw
+            -- name rather than crashing getText. Reaching it in a shipped build is a defect.
             local key = OPERATION_TITLE_KEY[op]
             opTexts[i] = key ~= nil and g_i18n:getText(key) or op
         end
@@ -370,9 +311,8 @@ function RLMenuHerdsmanFrame:onGuiSetupFinished()
         })
     end
     if self.ruleMarkToggle ~= nil then
-        -- The Mark row is the Action selector (decision 2b): state 1 Perform
-        -- (mark=false), state 2 Mark only (mark=true). The manual per-animal Mark/Unmark button
-        -- keeps reading the untouched rl_ui_mark / rl_ui_dontMark strings.
+        -- The Mark row is the Action selector: state 1 Perform (mark=false), state 2
+        -- Mark only (mark=true).
         self.ruleMarkToggle:setTexts({
             g_i18n:getText("rl_menu_herdsman_action_perform"),
             g_i18n:getText("rl_menu_herdsman_action_markOnly"),
@@ -404,13 +344,9 @@ function RLMenuHerdsmanFrame:onGuiSetupFinished()
         Log:trace("RLMenuHerdsmanFrame:onGuiSetupFinished: rulesList bound")
     end
 
-    -- Per-row tooltip help lines. The tooltip Text lives INSIDE each row's value widget
-    -- (the legacy rl_aiTooltip home - the row container clips to its bounds, so a right-margin tooltip
-    -- must hang off the non-clipping widget); getDescendantByName is recursive, so grabbing off the
-    -- ROW still finds it wherever it sits in the row subtree (mirrors
-    -- RLMenuSettingsFrame:populateGeneralSubtab). setVisible(true) on grab in case the profile
-    -- defaults hidden (as legacy RealisticLivestock_AnimalScreen does). The text is (re)set per render
-    -- in refreshRuleDetail via the pure RLHerdsmanRulePresenter.getTooltipDescriptor.
+    -- Per-row tooltip help lines. The tooltip Text hangs off each row's VALUE WIDGET, not
+    -- the row container, which clips to its bounds; getDescendantByName is recursive, so
+    -- grabbing off the row still finds it. setVisible(true) covers a profile defaulting hidden.
     self.tooltips = {}
     local function grabTooltip(row, field)
         if row == nil then return end
@@ -436,12 +372,9 @@ function RLMenuHerdsmanFrame:onGuiSetupFinished()
     grabTooltip(self.ruleHusbandriesRow, "husbandries")
     grabTooltip(self.ruleDestinationRow, "destination")
 
-    -- Per-row REASON lines: the second Text stacked in the same value widget as the help line
-    -- above, carrying the required / out-of-range marker. Grabbed exactly like the tooltips
-    -- (recursive getDescendantByName off the ROW, setVisible on grab) but only for the SIX rows
-    -- that carry one - extending grabTooltip would emit seven spurious "no reason child" lines
-    -- per setup. A missing node on a covered row is a wiring defect, not a runtime condition:
-    -- the XML and this file ship together, so it is an ERROR rather than a trace.
+    -- Per-row REASON lines: a second Text stacked in the same value widget, carrying the
+    -- required / out-of-range marker, grabbed only for the six rows that carry one. A
+    -- missing node on a covered row is a wiring defect, so it is an ERROR, not a trace.
     self.reasons = {}
     local function grabReason(row, field)
         if row == nil then return end
@@ -460,11 +393,9 @@ function RLMenuHerdsmanFrame:onGuiSetupFinished()
     grabReason(self.ruleHusbandriesRow, "husbandries")
     grabReason(self.ruleDestinationRow, "destination")
 
-    -- Action bar (single-tier; no Filters Tier 2/3 - the herdsman frame has no conditions
-    -- sub-list): Back / New / Duplicate / Delete. Code-driven footer (menuButtonInfo), not XML,
-    -- mirroring RLMenuSettingsFrame; updateButtonVisibility rebuilds the set per selection +
-    -- permission. hasCustomMenuButtons=true forces the first page-switch to use
-    -- self.menuButtonInfo over RLMenu's back-only default (avoids a one-frame flicker).
+    -- Single-tier action bar: Back / New / Duplicate / Delete, rebuilt per selection and
+    -- permission by updateButtonVisibility. hasCustomMenuButtons makes the first page switch
+    -- use self.menuButtonInfo, avoiding a one-frame flicker.
     self.hasCustomMenuButtons = true
     self.backButtonInfo = { inputAction = InputAction.MENU_BACK }
     self.newRuleButtonInfo = {
@@ -485,10 +416,8 @@ function RLMenuHerdsmanFrame:onGuiSetupFinished()
     self.menuButtonInfo = { self.backButtonInfo }
 end
 
---- Called by the Paging element when this tab becomes active. Reads the rule registry,
---- builds the display sections, reloads the list, seeds the initial selection, and focuses
---- the list. Pending edits reset per open (this frame is a fresh edit session; F7 owns
---- refresh-while-open).
+--- Called by the Paging element when this tab becomes active: read the registry, build the
+--- sections, seed the selection, focus the list. Pending edits reset per open.
 function RLMenuHerdsmanFrame:onFrameOpen()
     RLMenuHerdsmanFrame:superClass().onFrameOpen(self)
     self.isFrameOpen = true
@@ -499,15 +428,13 @@ function RLMenuHerdsmanFrame:onFrameOpen()
     self.didMeasureNameRow = false
     self.didMeasureMaxAnimalsRow = false
     self.didMeasureBudgetFixedRow = false
-    -- Seat-observation guard: the seeded selection below re-arms it via
-    -- refreshRuleDetail; start drained so a no-rule open logs nothing.
+    -- Start drained so a no-rule open logs nothing; the seeded selection re-arms it.
     self.didLogSeat = true
     self.seatLogExpected = nil
     self.pendingChanges = {}
 
-    -- Real read path: F4 edits + F7 create/delete write back through the same
-    -- g_rlHerdsmanRuleService, and MP syncs through it. RLHerdsmanRulePresenter owns
-    -- grouping/order/sort. Dev rules are seeded with rlHerdsmanRuleCreate (SP).
+    -- Edits and create/delete write back through this same service, and MP syncs through
+    -- it. RLHerdsmanRulePresenter owns grouping, order and sort.
     local farmId = RLAnimalInfoService.getCurrentFarmId()
     local rules = {}
     if farmId == nil or farmId == 0 then
@@ -533,17 +460,14 @@ function RLMenuHerdsmanFrame:onFrameOpen()
     end
 end
 
---- Called by the Paging element when this tab is deactivated. Clears isFrameOpen BEFORE
---- draining the pending overlays: g_rlHerdsmanRuleService:update dispatches an Update
---- event on success, and a remote rebroadcast arriving mid-flush would re-enter the
---- refresh path and fight the drain loop. Clearing the flag first closes that window
---- (mirrors RLMenuSettingsFrame:onFrameClose's ordering invariant).
+--- Deactivation hook: clears isFrameOpen BEFORE draining the overlays, or a rebroadcast
+--- arriving mid-flush re-enters the refresh path and fights the drain loop.
 function RLMenuHerdsmanFrame:onFrameClose()
     RLMenuHerdsmanFrame:superClass().onFrameClose(self)
     self.isFrameOpen = false
     self:flushAllPending()
-    -- Drop any picker open-time id (an ESC/back dismiss closes the dialog without firing the
-    -- cancel callback, so it would otherwise dangle until the next open re-captures it).
+    -- Drop the picker open-time ids: an ESC dismiss closes the dialog without firing the
+    -- cancel callback, so they would dangle until the next open re-captured them.
     self.filterPickTargetId = nil
     self.husbandryPickTargetId = nil
     self.destinationPickTargetId = nil
@@ -569,12 +493,9 @@ end
 -- LAYOUT MEASUREMENT (verification only - no layout decisions)
 -- =============================================================================
 
---- Log the size + top edge of the list + editor containers plus the header panel's
---- bottom edge as the baseline, so the master-detail placement under the (tab-bar-less)
---- header is provable from the log. Returns true once BOTH stretched containers report
---- settled, non-zero sizes and the measurement was emitted; false while unsettled, so
---- update()'s one-shot guard retries. absPosition is the element's bottom edge (FS25
---- Y-up), so top = bottom + height; reference screen is 1920x1080.
+--- Log the containers' size and top edge against the header baseline, so the master-detail
+--- placement is provable from the log. Returns false while either container is unsettled,
+--- so update()'s one-shot guard retries. absPosition is the BOTTOM edge (FS25 is Y-up).
 --- @return boolean measured
 function RLMenuHerdsmanFrame:logLayoutMeasurements()
     local function settled(e)
@@ -604,15 +525,9 @@ function RLMenuHerdsmanFrame:logLayoutMeasurements()
     return true
 end
 
---- One-shot proof that the op-param BinaryOption sliders seated on their stored option after a
---- refreshRuleDetail. Armed per selection (refreshRuleDetail fills seatLogExpected +
---- clears didLogSeat); drained here once every seated toggle's slider has SETTLED. The physical
---- move runs in BinaryOptionElement:update(dt) - applied this frame by superClass:update in the
---- update seam - so retry (return false) while any slider still moves, mirroring
---- logLayoutMeasurements' settle-retry. Proves POSITION (sliderState: 0=left, NUM_SLIDER_STATES=
---- right, plus the slider's screen-space left edge in px) AND each button's getIsSelected()
---- against the expected state; hidden toggles are never in the list. TRACE + one-shot, so
---- production INFO/WARN runs and idle frames stay quiet.
+--- One-shot proof that the op-param sliders seated on their stored option. The physical move
+--- runs in BinaryOptionElement:update(dt), so this returns false while any slider is still
+--- moving and the update seam retries. Hidden toggles are never in the list.
 --- @return boolean logged true once emitted (or nothing to prove); false while a slider still moves
 function RLMenuHerdsmanFrame:logToggleSeatOnce()
     local expected = self.seatLogExpected
@@ -644,10 +559,8 @@ end
 -- DISPLAY MODEL (stored snapshot + pending overlay -> sections)
 -- =============================================================================
 
---- Rebuild the sectioned DISPLAY model from the stored snapshot with each rule's pending
---- overlay applied, so the list reflects live edits (a pending op-change moves the rule to
---- its new section; a pending name re-sorts within the section). buildSections owns all
---- grouping/order/sort. Called on open, op-change, and name-edit.
+--- Rebuild the display sections from the stored snapshot with each rule's overlay applied,
+--- so a pending op-change moves the rule and a pending name re-sorts it.
 function RLMenuHerdsmanFrame:rebuildDisplaySections()
     local overlaid = {}
     for i, stored in ipairs(self.storedRules) do
@@ -689,9 +602,8 @@ function RLMenuHerdsmanFrame:replaceStoredRule(id, record)
     end
 end
 
---- Rebuild the display sections, reload the list, and re-highlight `id` by id - all under
---- the isReconciling guard so the synchronous onListSelectionChanged does not re-enter the
---- editor render (caret stomp). Used after a name-edit and an op-change.
+--- Rebuild the sections, reload the list and re-highlight `id`, under the isReconciling
+--- guard so the synchronous selection delegate cannot re-enter the render and stomp the caret.
 --- @param id any rule id to keep selected
 function RLMenuHerdsmanFrame:refreshList(id)
     self:rebuildDisplaySections()
@@ -740,8 +652,8 @@ function RLMenuHerdsmanFrame:getNumberOfItemsInSection(list, section)
     return sec ~= nil and #sec.rules or 0
 end
 
---- Populate one rule row. The display sections already carry the overlay-merged record,
---- so the row name reflects pending edits live (read element -> setText; no decisions).
+--- Populate one rule row. The sections already carry the overlay-merged record, so the row
+--- name reflects pending edits live.
 --- @param list table
 --- @param section number
 --- @param index number
@@ -767,9 +679,8 @@ function RLMenuHerdsmanFrame:populateCellForItemInSection(list, section, index, 
     end
 end
 
---- Selection delegate: autoflush the previously-selected rule, then store the new
---- selection id and refresh the detail pane from the STORED baseline (refreshRuleDetail
---- re-applies the overlay). Suppressed during a programmatic reload (isReconciling).
+--- Selection delegate: autoflush the outgoing rule, then refresh the detail pane from the
+--- STORED baseline, which re-applies the overlay. Suppressed during a programmatic reload.
 --- @param list table
 --- @param section number
 --- @param index number
@@ -780,8 +691,7 @@ function RLMenuHerdsmanFrame:onListSelectionChanged(list, section, index)
         return
     end
 
-    -- Autoflush the previously-selected rule before advancing (advance is
-    -- unconditional so a rejected flush does not strand the user on the dirty rule).
+    -- The advance is unconditional, so a rejected flush cannot strand the user.
     local previousId = self.selectedRuleId
     if previousId ~= nil and self.pendingChanges[previousId] ~= nil then
         local outcome = self:flushPendingForId(previousId)
@@ -811,21 +721,16 @@ end
 -- DETAIL PANE (read element -> presenter/edit-model call -> write element)
 -- =============================================================================
 
---- Populate the rule editor from the overlay-merged record. The value pushes are
---- programmatic, not user edits: setState pushes are silent (forceEvent=false), but a
---- TextInput's setText fires onTextChanged on a value change, so they run under the
---- isPopulating guard and the three rule TextInput handlers early-return while it is set,
---- so a stale stored value snapping to a default is not persisted. Row visibility comes
---- from getParamVisibility + getBudgetFieldVisibility; the summaries from getFilterSummary
---- / getHusbandrySummary. nil rule -> hide the editor, show the empty-state.
+--- Populate the rule editor from the overlay-merged record. The pushes are programmatic:
+--- setState is silent, but setText fires onTextChanged, so the whole block runs under
+--- isPopulating and the TextInput handlers early-return while it is set.
 --- @param stored table|nil the STORED rule record (overlay is re-applied here), or nil
 function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
     if stored == nil then
         setRowVisible(self.ruleEditorLayout, false)
         if self.ruleEditorEmpty ~= nil then self.ruleEditorEmpty:setVisible(true) end
-        -- Disarm the seat proof: the editor (and its op-param toggles) is now hidden,
-        -- so a still-armed seatLogExpected would drain stale proof for hidden toggles at the update
-        -- seam. A real selection re-arms it.
+        -- Disarm the seat proof: the toggles are hidden now, so a still-armed expectation
+        -- would drain stale proof at the update seam. A real selection re-arms it.
         self.seatLogExpected = nil
         self.didLogSeat = true
         Log:debug("RLMenuHerdsmanFrame:refreshRuleDetail: no selection; editor hidden, empty-state shown")
@@ -839,20 +744,15 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
     local p = merged.params or {}
     local budget = p.budget
 
-    -- Op-param BinaryOption target states, derived ONCE here so the value push below, the
-    -- visible-toggle re-seat, and the tooltip block all read one source and cannot
-    -- drift. (budgetTypeState is only consumed when the budget row is visible, i.e. budget ~= nil.)
+    -- Op-param target states, derived ONCE so the value push, the re-seat and the tooltip
+    -- block read one source and cannot drift.
     local markState       = (p.mark == true) and 2 or 1
     local conventionState = indexOfValue(self.conventionValues, p.convention) or 1
     local budgetTypeState = indexOfValue(self.budgetTypeValues, budget and budget.type) or 1
 
-    -- Values. These are programmatic pushes, NOT user edits: setState gates its callback on
-    -- forceEvent (the false here is silent), but a TextInput's setText fires onTextChanged on
-    -- a value change, so the whole push block runs under isPopulating and the three rule
-    -- TextInput handlers early-return while it is set. save/restore keeps it reentrancy-safe
-    -- (refreshRuleDetail is re-entered from genuine option edits, whose re-render text pushes
-    -- are also not user edits); the pcall + unconditional reset guarantees the flag is cleared
-    -- even if an engine layout push raises - then re-raise to preserve today's propagation.
+    -- Save/restore rather than set/clear, because refreshRuleDetail re-enters from genuine
+    -- option edits. The pcall guarantees the flag clears even if an engine push raises;
+    -- the re-raise preserves the existing propagation.
     local wasPopulating = self.isPopulating
     self.isPopulating = true
     local pushOk, pushErr = pcall(function()
@@ -870,9 +770,8 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
         if self.ruleConventionToggle ~= nil then
             self.ruleConventionToggle:setState(conventionState, false)
         end
-        -- Budget widgets: ALWAYS push a deterministic state (a malformed buy rule with no
-        -- budget table must never show a stale toggle/input); real values only when a budget
-        -- table exists.
+        -- Always push a deterministic state, so a buy rule with no budget table cannot show
+        -- a stale toggle or input.
         if self.ruleBudgetTypeToggle ~= nil then
             self.ruleBudgetTypeToggle:setState(budgetTypeState, false)
         end
@@ -903,15 +802,10 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
     setRowVisible(self.ruleBudgetFixedRow, bvis.fixed)
     setRowVisible(self.ruleBudgetPercentageRow, bvis.percentage)
 
-    -- Op-param BinaryOption seating. The value pushes above ran while these rows
-    -- still carried the PREVIOUS rule's visibility, and BinaryOptionElement:setState short-
-    -- circuits on state == self.state, so a hidden or same-value push leaves the green slider
-    -- stranded on the wrong option. Now that visibility is final, re-seat every currently-
-    -- VISIBLE op-param toggle on its stored state via forceSeatToggle (toggle-through +
-    -- skipAnimation). A hidden toggle is left untouched - it gets no update(dt), so seating it
-    -- would re-strand the next show; it re-seats when it next becomes visible. Uses the same
-    -- hoisted *State locals as the value push and the tooltip block (one source, no drift). The
-    -- pushes stay forceEvent=false inside isPopulating so no pending edit is stashed.
+    -- Re-seat the toggles now that visibility is final. The value pushes above ran while the
+    -- rows still carried the PREVIOUS rule's visibility, and setState short-circuits on an
+    -- unchanged state, so a hidden or same-value push leaves the slider stranded. A hidden
+    -- toggle is left alone: it gets no update(dt), and re-seats when it next shows.
     local seatWasPopulating = self.isPopulating
     self.isPopulating = true
     local seatOk, seatErr = pcall(function()
@@ -930,9 +824,8 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
         Log:error("RLMenuHerdsmanFrame:refreshRuleDetail: op-param toggle re-seat error: %s", tostring(seatErr))
     end
 
-    -- Arm the one-shot seat-observation log, drained at the update seam once the sliders settle.
-    -- Only currently-VISIBLE op-param toggles are proven; hidden ones are excluded (nothing to
-    -- prove while they receive no update). An unknown op hides all three -> empty list -> no log.
+    -- Arm the seat-observation log, drained at the update seam once the sliders settle. Only
+    -- VISIBLE toggles are proven; a hidden one receives no update, so there is nothing to prove.
     local seatLog = {}
     if vis.mark and self.ruleMarkToggle ~= nil then
         seatLog[#seatLog + 1] = { name = "mark", toggle = self.ruleMarkToggle, expected = markState }
@@ -952,17 +845,14 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
         missing = g_i18n:getText("rl_menu_herdsman_detail_missing"),
     }
     if self.ruleFilterButton ~= nil then
-        -- Button label: the bound filter's name, or a "Select filter" CTA when nothing usable
-        -- is bound (nil OR deleted / out-of-scope). On an actionable button both empty states
-        -- invite a pick, so they collapse to one CTA - unlike the read-only husbandries summary
-        -- below, which keeps the (none) / (missing) wording.
+        -- Both empty states invite a pick on an actionable button, so they collapse to one
+        -- CTA rather than keeping the (none) / (missing) wording.
         local selectText = g_i18n:getText("rl_menu_herdsman_filter_select")
         self.ruleFilterButton:setText(RLHerdsmanRulePresenter.getFilterSummary(
             merged.filterId, resolveFilterById, { none = selectText, missing = selectText }))
     end
-    -- One-shot screen-space geometry of the (interactive) Filter row, so the in-row button
-    -- vs title layout is provable from the log. absPosition is the element's bottom-left edge
-    -- (FS25 Y-up); reference screen 1920x1080. Per-open guard.
+    -- One-shot Filter-row geometry, so the in-row button vs title layout is provable from
+    -- the log. absPosition is the bottom-left edge (FS25 is Y-up).
     if vis.filter and not self.didMeasureFilterRow
         and self.ruleFilterRow ~= nil and self.ruleFilterRow.elements ~= nil then
         self.didMeasureFilterRow = true
@@ -976,9 +866,7 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
         end
     end
     if self.ruleHusbandriesButton ~= nil then
-        -- Button label: 0 targets -> a "select husbandries" CTA (mirrors the Filter button's
-        -- empty CTA); 1 -> that husbandry's resolved name (or (missing)); >= 2 -> "N selected"
-        -- (the count form; the full name list is the deferred Ask-First area below).
+        -- Label: 0 targets is a CTA, 1 is that husbandry's name, 2+ is the count form.
         local selectText = g_i18n:getText("rl_menu_herdsman_husbandry_select")
         self.ruleHusbandriesButton:setText(RLHerdsmanRulePresenter.formatHusbandryButtonLabel(
             merged.targetHusbandries, resolvePlaceableName, {
@@ -987,10 +875,7 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
                 selected = g_i18n:getText("rl_menu_herdsman_husbandry_count"),
             }))
     end
-    -- One-shot screen-space geometry of the (interactive, always-visible) Husbandries row, so
-    -- the in-row button vs title layout is provable from the log. absPosition is the element's
-    -- bottom-left edge (FS25 Y-up); reference screen 1920x1080. Per-open guard (mirror the
-    -- Filter row measurement above).
+    -- One-shot Husbandries-row geometry, as for the Filter row above.
     if not self.didMeasureHusbandriesRow
         and self.ruleHusbandriesRow ~= nil and self.ruleHusbandriesRow.elements ~= nil then
         self.didMeasureHusbandriesRow = true
@@ -1005,14 +890,12 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
     end
 
     if self.ruleDestinationButton ~= nil then
-        -- Button label (move only): the chosen destination husbandry name, a "Select destination"
-        -- CTA when none is picked (the blank-trim CTA), or (missing) for an unresolvable stored dest.
+        -- Label (move only): the destination name, a CTA when none is picked, or (missing).
         local selectText = g_i18n:getText("rl_menu_herdsman_destination_select")
         self.ruleDestinationButton:setText(RLHerdsmanRulePresenter.formatDestinationButtonLabel(
             p.destinationHusbandry, resolvePlaceableName, { none = selectText, missing = labels.missing }))
     end
-    -- One-shot screen-space geometry of the Destination row (mirror the Husbandries row), so the
-    -- in-row button vs title layout is provable from the log. Per-open guard; only when shown.
+    -- One-shot Destination-row geometry, as for the Husbandries row above.
     if vis.destination and not self.didMeasureDestinationRow
         and self.ruleDestinationRow ~= nil and self.ruleDestinationRow.elements ~= nil then
         self.didMeasureDestinationRow = true
@@ -1026,36 +909,27 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
         end
     end
 
-    -- Per-row help text. Re-resolved every render (op-dynamic: an op-change swaps the
-    -- strings); the always-visible rows set unconditionally, the conditional rows only when their
-    -- row is shown (the SAME gating as the setVisible toggles above). Content + arg come from the
-    -- pure RLHerdsmanRulePresenter.getTooltipDescriptor; the frame formats the live value per arg.
+    -- Per-row help text, re-resolved every render because an op-change swaps the strings.
+    -- Conditional rows are gated exactly as their setVisible toggles above.
     local enabledState    = (merged.enabled == true) and 2 or 1
-    -- markState / conventionState / budgetTypeState are hoisted to the top of refreshRuleDetail
-    -- (one source shared by the value push, the seat, and this tooltip block; they cannot drift).
-    -- Resolve semen from the SELECTOR's snapped index, not raw p.semen: populateSemenSelector
-    -- snaps a stale / absent dewar id to "any" (state 1), so the tooltip key family AND the option
-    -- label must follow the DISPLAYED option - else a stale dewar yields the dewar tooltip ("...from
-    -- %s") filled with the fallback "any" label, disagreeing with what the selector shows.
+    -- Resolve semen from the SELECTOR's snapped index, not raw p.semen: the selector snaps a
+    -- stale dewar id to "any", so the tooltip must follow the DISPLAYED option or a stale
+    -- dewar renders the dewar tooltip filled with the "any" label.
     local semenIdx        = indexOfValue(self.semenValues, p.semen or RLHerdsmanRulePresenter.SEMEN_ANY) or 1
     local semenValue      = self.semenValues[semenIdx] or RLHerdsmanRulePresenter.SEMEN_ANY
     local semenOptionText = (self.semenTexts ~= nil and self.semenTexts[semenIdx]) or ""
 
-    -- Clear every covered row FIRST, BEFORE resolving anything. Two reasons, and the order matters
-    -- for both. tip() runs only for rows this render shows, so a row hidden by an operation change
-    -- would otherwise keep the marker its last visible render wrote - stale text on a row the player
-    -- cannot see, which reappears the moment the row comes back. And the editor is already visible
-    -- by this point, so anything that raises below - a resolver reaching dead game state, or the
-    -- deliberate re-raise in the value-push block - would leave the PREVIOUS rule's markers sitting
-    -- on the pane against a different rule. Clearing first makes that failure blank rather than wrong.
+    -- Clear every covered row FIRST. tip() runs only for rows this render shows, so a row
+    -- hidden by an op-change would keep its last marker and show it again on return; and the
+    -- editor is already visible, so a raise below would strand the PREVIOUS rule's markers on
+    -- the pane. Clearing first makes either failure blank rather than wrong.
     for field in pairs(self.reasons) do
         self:applyRowReason(field, nil)
     end
 
-    -- Per-row repair markers, resolved ONCE for the whole pane from the merged draft and written
-    -- inside the tip() loop below, so the marker and the help line share one gating decision and one
-    -- write path. Both resolvers are the same ones the summaries above use, so a reference the
-    -- button renders as a CTA is marked, and one it renders as a name is not.
+    -- Repair markers resolved ONCE for the pane and written inside tip(), so the marker and
+    -- the help line share one gating decision and one write path. The resolvers are the ones
+    -- the summaries use, so a reference the button renders as a CTA is the one marked.
     local issues = RLHerdsmanRulePresenter.rowIssues(merged, resolveFilterById, resolvePlaceableName)
 
     local tipKeys = {}
@@ -1067,10 +941,9 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
         self:applyRowReason(field, issue)
         if issue ~= nil then reasonMarks[#reasonMarks + 1] = field .. "=" .. issue end
     end
-    -- ORDER IS LOAD-BEARING, and pinned outside this file. The reason marks reach the debug line
-    -- below in the order these calls run, and an ordered log assertion in the in-game leg config
-    -- requires husbandries to arrive before filter. Reordering these for readability turns that red
-    -- with no signal local to this file.
+    -- ORDER IS LOAD-BEARING and pinned outside this file: the reason marks reach the debug
+    -- line in the order these calls run, and an ordered log assertion requires husbandries
+    -- before filter. Reordering for readability turns that red with no signal here.
     tip("operation")
     tip("name")
     tip("enabled", enabledState)
@@ -1087,8 +960,7 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
     Log:debug("RLMenuHerdsmanFrame:refreshRuleDetail: tooltips op=%s keys[%s] reasons[%s]",
         tostring(op), table.concat(tipKeys, " "), table.concat(reasonMarks, " "))
 
-    -- One-shot in-row geometry of the TextInput rows + their tooltip Text (Ask-First:
-    -- does fs25_multiTextOptionTooltip anchor cleanly inside a TextInput row?). Per-open guards.
+    -- One-shot in-row geometry of the TextInput rows and their tooltip Text.
     self:logTooltipRowGeometryOnce("ruleNameRow", self.ruleNameRow, self.tooltips["name"], "didMeasureNameRow")
     if vis.maxAnimals then
         self:logTooltipRowGeometryOnce("ruleMaxAnimalsRow", self.ruleMaxAnimalsRow, self.tooltips["maxAnimals"], "didMeasureMaxAnimalsRow")
@@ -1097,9 +969,8 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
         self:logTooltipRowGeometryOnce("ruleBudgetFixedRow", self.ruleBudgetFixedRow, self.tooltips["budget|fixed"], "didMeasureBudgetFixedRow")
     end
 
-    -- Tint the visible rows (dark alternating settings shade) AND reflow the layout so the
-    -- per-operation hidden rows collapse instead of leaving gaps. MUST run after the
-    -- setVisible toggles above (mirror RLMenuSettingsFrame:renderEditor).
+    -- Tint the visible rows and reflow, so the hidden rows collapse rather than leave gaps.
+    -- MUST run after the setVisible toggles above.
     self:updateAlternatingElements(self.ruleEditorLayout)
 
     Log:debug("RLMenuHerdsmanFrame:refreshRuleDetail: ruleId=%s op=%s visible[maxAnimals=%s mark=%s convention=%s budget=%s budgetFixed=%s budgetPct=%s semen=%s filter=%s]",
@@ -1108,11 +979,9 @@ function RLMenuHerdsmanFrame:refreshRuleDetail(stored)
         tostring(vis.semen), tostring(vis.filter))
 end
 
---- Format a live param value into a tooltip string's single `%s`, per the presenter descriptor's
---- `arg`. number -> g_i18n:formatNumber; money -> g_i18n:formatMoney; percent -> the selector's
---- displayed "N%" (indexOfValue(...) or 1 mirrors how refreshRuleDetail seeds the percentage
---- selector, so a nil/non-member percentage reads the selector's current/first whitelist value,
---- not a bare 0); option -> the semen selector's current option label (passed in). Unknown arg -> "".
+--- Format a live param value into a tooltip's single `%s`, per the descriptor's `arg`. The
+--- percent branch mirrors how the selector is seeded, so a non-member value reads the
+--- selector's displayed whitelist value rather than a bare 0.
 --- @param arg string|nil descriptor arg
 --- @param raw any the live value (number for number/money/percent; option label for option)
 --- @return string formatted
@@ -1130,13 +999,8 @@ function RLMenuHerdsmanFrame:formatTooltipArg(arg, raw)
     return ""
 end
 
---- Resolve + write ONE detail row's tooltip from the pure presenter descriptor. Reads the
---- descriptor for (op, field, state, value); arg=nil writes getText(key) verbatim, else
---- string.format(getText(key), formatTooltipArg(arg, raw)). A nil descriptor (the presenter
---- already trace-logged why) or a missing tooltip element writes nothing. Returns the written
---- key (or nil) for refreshRuleDetail's per-render summary log. Mirrors the Settings frame's
---- per-render tooltip:setText (RLMenuSettingsFrame:refreshGeneralSubtab), NOT the legacy
---- focus-gated updateTooltip.
+--- Resolve and write ONE row's tooltip from the presenter descriptor. A nil descriptor or a
+--- missing element writes nothing; the written key is returned for the per-render log.
 --- @param tooltipElem table|nil the row's tooltip Text element
 --- @param field string row field token
 --- @param op string rule operation
@@ -1156,18 +1020,9 @@ function RLMenuHerdsmanFrame:applyRowTooltip(tooltipElem, field, op, state, valu
     return d.key
 end
 
---- Write ONE detail row's REASON line from its resolved issue token. nil clears the line to the
---- empty string; "required" writes the shared Required string; "invalid" writes that row's bounds
---- string, formatted with its own bounds.
----
---- Touches ONLY self.reasons, never self.tooltips. Keeping the two Texts on separate write paths is
---- what makes them unable to clobber each other, so no precedence rule between them is needed.
----
---- The REASON_INVALID presence check below guards a nil INDEX (`bounds.key`), not a nil i18n key:
---- the mod's own I18N override delegates a nil key to the base implementation rather than raising,
---- so `getText(nil)` would merely render a placeholder. Deleting the check would raise on
---- `bounds.key` instead, in a render path - which is why it stays even though nothing produces the
---- state today (only the two numeric rows ever report "invalid", and both have entries).
+--- Write ONE row's REASON line from its issue token. Touches ONLY self.reasons, never
+--- self.tooltips: separate write paths are what makes the two Texts unable to clobber each
+--- other, so no precedence rule between them is needed.
 --- @param field string row field token
 --- @param issue string|nil "required" | "invalid" | nil
 function RLMenuHerdsmanFrame:applyRowReason(field, issue)
@@ -1186,10 +1041,9 @@ function RLMenuHerdsmanFrame:applyRowReason(field, issue)
 
     local bounds = REASON_INVALID[field]
     if bounds == nil then
-        -- Unreachable today (only the two numeric rows produce "invalid"). A WARNING rather than a
-        -- silent blank, so a row that starts reporting it is visible instead of rendering nothing -
-        -- but ONE-SHOT per field, because this sits on the render path AND on the per-keystroke
-        -- path: an unlatched warning here would write a line per character typed.
+        -- Unreachable today, and warned rather than silently blank so a row that starts
+        -- reporting it is visible. ONE-SHOT per field: this sits on the per-keystroke path,
+        -- so an unlatched warning would write a line per character typed.
         self._warnedNoBounds = self._warnedNoBounds or {}
         if not self._warnedNoBounds[field] then
             self._warnedNoBounds[field] = true
@@ -1203,14 +1057,9 @@ function RLMenuHerdsmanFrame:applyRowReason(field, issue)
     elem:setText(string.format(g_i18n:getText(bounds.key), bounds.args()))
 end
 
---- Live-update ONE value-row's tooltip after a TextInput edit, WITHOUT a full refreshRuleDetail -
---- a re-render would push setText(tostring(tonumber(typed))) into the FOCUSED input and stomp the
---- caret on partial input ("05", "5."). Resolves the merged operation for the current selection,
---- then re-resolves just that row's tooltip via applyRowTooltip with the freshly-typed value, and
---- re-resolves that row's REASON marker the same way - so a value going out of range marks, and one
---- coming good clears, without waiting for a render the caret cannot survive.
---- No-op if nothing is selected / the rule is not in the snapshot: both mean there is no row on
---- screen to update.
+--- Live-update ONE value row's tooltip and marker after a TextInput edit, WITHOUT a full
+--- refreshRuleDetail: a re-render would push the canonicalised number into the FOCUSED
+--- input and stomp the caret on partial input like "05" or "5.".
 --- @param field string the row field token ("name" | "maxAnimals" | "budget|fixed")
 --- @param raw any the live value to format into the tooltip %s
 function RLMenuHerdsmanFrame:refreshValueRowTooltip(field, raw)
@@ -1220,17 +1069,13 @@ function RLMenuHerdsmanFrame:refreshValueRowTooltip(field, raw)
     if stored == nil then return end
     local merged = RLHerdsmanRuleEditModel.overlayRule(stored, self.pendingChanges[id])
     self:applyRowTooltip(self.tooltips[field], field, merged.operation, nil, nil, raw)
-    -- The caller has already stashed the keystroke into pending, so the merged draft above carries
-    -- the value the player just typed and the marker reflects it rather than the last render's.
+    -- The caller already stashed the keystroke, so the merged draft carries what was typed.
     local issues = RLHerdsmanRulePresenter.rowIssues(merged, resolveFilterById, resolvePlaceableName)
     self:applyRowReason(field, issues[field])
 end
 
---- One-shot geometry of a TextInput editor row + its tooltip Text, so the Ask-First (does
---- fs25_multiTextOptionTooltip anchor cleanly inside a TextInput row?) is provable from the log,
---- not eyeballed. Mirrors the Filter/Husbandries/Destination row measurement (absPosition is the
---- element's bottom-left edge, FS25 Y-up; reference screen 1920x1080). Per-open guard via
---- `guardField` (reset in onFrameOpen).
+--- One-shot geometry of a TextInput row and its tooltip Text, so the anchoring is provable
+--- from the log rather than eyeballed. absPosition is the bottom-left edge (FS25 is Y-up).
 --- @param rowName string log label
 --- @param row table|nil row container
 --- @param tooltipElem table|nil the row's tooltip Text
@@ -1250,12 +1095,8 @@ function RLMenuHerdsmanFrame:logTooltipRowGeometryOnce(rowName, row, tooltipElem
     end
 end
 
---- Apply the alternating dark settings-row tint to the visible editor rows AND reflow
---- the layout so the per-operation hidden rows collapse instead of leaving gaps. Mirrors
---- RLMenuSettingsFrame:updateAlternatingElements: walk layout.elements in XML order, tint
---- each VISIBLE row that exposes setImageColor via InGameMenuSettingsFrame.COLOR_ALTERNATING
---- (parity toggles per tinted row), skip hidden rows, then invalidateLayout() to re-flow.
---- The read-only summary rows have no setImageColor and are left untinted (on the dark pane).
+--- Alternately tint the visible editor rows and reflow, so the per-operation hidden rows
+--- collapse rather than leave gaps. Rows without setImageColor are left untinted.
 --- @param layout table|nil the editor ScrollingLayout
 function RLMenuHerdsmanFrame:updateAlternatingElements(layout)
     if layout == nil or layout.elements == nil then
@@ -1283,14 +1124,9 @@ function RLMenuHerdsmanFrame:updateAlternatingElements(layout)
     Log:trace("RLMenuHerdsmanFrame:updateAlternatingElements: tinted=%d row(s)", tinted)
 end
 
---- Build the semen MultiTextOption options for an ai rule: "any" (prepended by the
---- frame, the presenter owns only the SEMEN_ANY value) + the live dewar pool for the
---- rule's filter animalType, enumerated from g_dewarManager (engine state; mirrors
---- RealisticLivestock_AnimalScreen). Every hop is nil-guarded -> degrades to just "any".
---- The per-dewar LABEL goes through F4a's formatSemenOption; the per-dewar VALUE is the
---- dewar uniqueId. A stored semen no longer in the live pool snaps the selector to "any"
---- (legacy parity); the setState push is silent (forceEvent=false), so this snap does not
---- stash and the stored id survives a flush.
+--- Build the semen selector options: "any" plus the live dewar pool for the rule's filter
+--- animalType. Every hop is nil-guarded, so it degrades to just "any". A stored semen no
+--- longer in the pool snaps the selector to "any" SILENTLY, so the stored id survives a flush.
 --- @param merged table the overlay-merged rule record
 function RLMenuHerdsmanFrame:populateSemenSelector(merged)
     if self.ruleSemenSelector == nil then return end
@@ -1317,8 +1153,7 @@ function RLMenuHerdsmanFrame:populateSemenSelector(merged)
     end
 
     self.semenValues = values
-    -- Parallel option-text array: the tooltip's %s for a dewar semen value is that
-    -- dewar's option label, looked up by the same index as semenValues.
+    -- Parallel to semenValues: the tooltip's %s is the dewar's label at the same index.
     self.semenTexts = texts
     self.ruleSemenSelector:setTexts(texts)
     local storedSemen = (merged.params and merged.params.semen) or RLHerdsmanRulePresenter.SEMEN_ANY
@@ -1326,10 +1161,8 @@ function RLMenuHerdsmanFrame:populateSemenSelector(merged)
     Log:trace("RLMenuHerdsmanFrame:populateSemenSelector: %d option(s), selected=%s", #values, tostring(storedSemen))
 end
 
---- The rule's animalType gate (D8): the chosen filter's animalType, or nil (ANY = all
---- types) when there is no filter / it is unresolvable / it is an Any-type filter. The single
---- source for both the husbandry-target gate (selectTargetableHusbandries / revalidateTargets)
---- and the semen dewar pool.
+--- The rule's animalType gate: the filter's animalType, or nil for ANY. The single source
+--- for both the husbandry-target gate and the semen dewar pool.
 --- @param filterId any
 --- @return number|nil
 function RLMenuHerdsmanFrame:resolveFilterAnimalType(filterId)
@@ -1339,8 +1172,7 @@ function RLMenuHerdsmanFrame:resolveFilterAnimalType(filterId)
     return filter.animalType
 end
 
---- The animalType index for the semen dewar pool == the rule's filter animalType (delegates
---- to resolveFilterAnimalType). No filter / unresolvable / Any-type -> nil (options = "any").
+--- The animalType index for the semen dewar pool: the rule's filter animalType.
 --- @param filterId any
 --- @return number|nil
 function RLMenuHerdsmanFrame:resolveSemenAnimalTypeIndex(filterId)
@@ -1351,12 +1183,9 @@ end
 -- FILTER PICKER (in-row button -> dialog -> stash filterId)
 -- =============================================================================
 
---- Filter row button click: open the single-select picker scoped to the rule's operation.
---- The presenter owns the scope decision (getFilterPickerUsage, derived from ALLOWED_USAGES)
---- and the candidate ordering (sortFiltersByName); this frame computes farmId, nil-guards, and
---- issues ONE listAvailable(nil, farmId, usage) query (animalType = nil: a rule has no type
---- until a filter is bound; usage is the only DoD scope). A nil usage / farmId / service would
---- be a list-everything WILDCARD in listAvailable, so the picker does NOT open in that case.
+--- Filter row button click: open the single-select picker scoped to the rule's operation. A
+--- nil usage, farmId or service would make listAvailable a list-everything WILDCARD, so the
+--- picker refuses to open in that case.
 --- @param _button table the ruleFilterButton element (unused; selection comes from selectedRuleId)
 function RLMenuHerdsmanFrame:onClickRuleFilter(_button)
     local id = self.selectedRuleId
@@ -1379,18 +1208,16 @@ function RLMenuHerdsmanFrame:onClickRuleFilter(_button)
         return
     end
 
-    -- usageMatch folds ANY/nil filters in (RLFilterService:listAvailable), so a non-nil usage
-    -- AND farmId yield exactly the operation's { ANY, X } pool. Then drop filters whose
-    -- animalType the operation forbids (castrate excludes chicken, horse care allows only
-    -- horses) keeping ANY-type, and sort alpha for the picker.
+    -- listAvailable folds ANY filters in, so a non-nil usage and farmId yield exactly the
+    -- operation's pool. Then drop filters whose animalType the operation forbids, keeping
+    -- ANY-type, and sort alphabetically for the picker.
     local animalTypeIndexByName = RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
     local scoped = RLHerdsmanRulePresenter.filterCandidateFilters(
         g_rlFilterService:listAvailable(nil, farmId, pickerUsage), merged.operation, animalTypeIndexByName)
     local candidates = RLHerdsmanRulePresenter.sortFiltersByName(scoped)
 
-    -- M4: a current binding the retrofit dropped (e.g. a chicken filter on a castrate rule) is
-    -- no longer in the list; flag it so the picker surfaces "current unavailable" rather than
-    -- silently preselecting row 1 (a silent rebind on OK).
+    -- A current binding the gate dropped is no longer in the list; flag it so the picker
+    -- says "current unavailable" rather than preselecting row 1 and rebinding on OK.
     local currentUnavailable = false
     if merged.filterId ~= nil then
         currentUnavailable = true
@@ -1399,7 +1226,7 @@ function RLMenuHerdsmanFrame:onClickRuleFilter(_button)
         end
     end
 
-    -- Capture the target id at OPEN; the pick stashes against THIS id (selection may move).
+    -- Capture at OPEN: the pick stashes against THIS id even if the selection moves.
     self.filterPickTargetId = id
 
     Log:debug("RLMenuHerdsmanFrame:onClickRuleFilter: id=%s operation=%s usage=%s farmId=%s -> %d candidate(s) currentFilterId=%s currentUnavailable=%s",
@@ -1408,11 +1235,9 @@ function RLMenuHerdsmanFrame:onClickRuleFilter(_button)
     RLHerdsmanFilterPickerDialog.show(self.onFilterPicked, self, candidates, merged.filterId, currentUnavailable)
 end
 
---- Picker result (target-first via the dialog). nil -> cancel (rule unchanged). A pick equal to
---- the current binding with NOTHING else pending -> no-op (no redundant :update). Otherwise stash
---- pending.filterId against the OPEN-TIME id and re-render the overlay (the semen pool re-derives
---- from merged.filterId on refreshRuleDetail). Flush happens on the existing selection-change/close
---- path through g_rlHerdsmanRuleService:update.
+--- Filter picker result: nil cancels, and a re-pick of the current binding with nothing else
+--- pending is a no-op rather than a redundant update. Flush stays on the selection-change
+--- and close paths.
 --- @param filterId string|nil chosen filter id, or nil on cancel
 function RLMenuHerdsmanFrame:onFilterPicked(filterId)
     local id = self.filterPickTargetId
@@ -1442,17 +1267,13 @@ function RLMenuHerdsmanFrame:onFilterPicked(filterId)
     Log:debug("RLMenuHerdsmanFrame:onFilterPicked: id=%s filterId stashed %s -> %s",
         tostring(id), tostring(merged.filterId), tostring(filterId))
 
-    -- Cross-type revalidation against the NEW merged (filterId now applied): drop
-    -- type-incompatible RESOLVABLE targets (preserve unresolvable) + reset semen if its
-    -- dewar leaves the new animalType pool. Pinned to current merged so two edits compose.
+    -- Revalidate against the NEW merged record, pinned so two edits compose.
     local newMerged = RLHerdsmanRuleEditModel.overlayRule(stored, self.pendingChanges[id])
     self:revalidatePendingTargetsAndSemen(id, newMerged)
-    -- Drop a now-type-incompatible move destination (the filter-rebind axis). Recompute the
-    -- merged record first so the dest sees the post-target-revalidation source set.
+    -- Recompute first, so the destination sees the post-revalidation source set.
     local afterTargets = RLHerdsmanRuleEditModel.overlayRule(stored, self.pendingChanges[id])
     self:revalidatePendingDestination(id, afterTargets, afterTargets.targetHusbandries)
-    -- A rebind can empty the resolvable targets or strand the move dest; if that leaves an
-    -- ENABLED rule unflushable, demote it here so the render below shows the toggle already off.
+    -- Demote before the render, so the toggle already shows off if the rebind stranded it.
     self:demoteEnableIfInvalidated(id)
     self:refreshRuleDetail(stored)
 end
@@ -1462,10 +1283,7 @@ end
 -- =============================================================================
 
 --- Husbandries row button click: open the multi-select picker scoped to the rule's filter
---- animalType + operation (D8). The presenter owns the gate + sort (selectTargetableHusbandries);
---- this frame enumerates the farm's live husbandries (RLAnimalQuery descriptors - one source,
---- M12), resolves the filter animalType + the CHICKEN index, nil-guards farm / husbandrySystem
---- (mirror onClickRuleFilter's refuse-to-open), and hands plain data to the dialog.
+--- animalType and operation. Refuses to open without a farm or husbandry system.
 --- @param _button table the ruleHusbandriesButton element (unused; selection = selectedRuleId)
 function RLMenuHerdsmanFrame:onClickRuleHusbandries(_button)
     local id = self.selectedRuleId
@@ -1494,7 +1312,7 @@ function RLMenuHerdsmanFrame:onClickRuleHusbandries(_button)
     local candidates = RLHerdsmanRulePresenter.selectTargetableHusbandries(
         descriptors, filterAnimalType, merged.operation, animalTypeIndexByName)
 
-    -- Capture the target id at OPEN; the pick stashes against THIS id (selection may move).
+    -- Capture at OPEN: the pick stashes against THIS id even if the selection moves.
     self.husbandryPickTargetId = id
 
     Log:debug("RLMenuHerdsmanFrame:onClickRuleHusbandries: id=%s operation=%s filterType=%s farmId=%s -> %d candidate(s), %d current target(s)",
@@ -1504,13 +1322,9 @@ function RLMenuHerdsmanFrame:onClickRuleHusbandries(_button)
     RLHerdsmanHusbandryPickerDialog.show(self.onHusbandriesPicked, self, candidates, merged.targetHusbandries or {})
 end
 
---- Picker result (target-first via the dialog). nil -> cancel (rule unchanged; targets
---- preserved). Otherwise re-read the merged baseline at commit and stash the picked set
---- as pending targetHusbandries. The dialog already PRESERVED checked-but-out-of-scope /
---- unresolvable targets and guaranteed non-empty strings, so this frame stashes the
---- set as-is - it does NOT re-strip (the type-incompatible drop is a rebind/op-change concern,
---- not a pick concern). A pick equal to the current targets with nothing else pending -> no-op
---- (no redundant :update). Flush happens on the existing selection-change / close path.
+--- Husbandry picker result: nil cancels. The dialog already preserved out-of-scope and
+--- unresolvable targets, so the set is stashed as-is and NOT re-stripped - the
+--- type-incompatible drop is a rebind concern, not a pick concern.
 --- @param uniqueIds table|nil chosen target uniqueIds, or nil on cancel
 function RLMenuHerdsmanFrame:onHusbandriesPicked(uniqueIds)
     local id = self.husbandryPickTargetId
@@ -1531,10 +1345,8 @@ function RLMenuHerdsmanFrame:onHusbandriesPicked(uniqueIds)
     end
     local merged = RLHerdsmanRuleEditModel.overlayRule(stored, self.pendingChanges[id])
 
-    -- No-op when the chosen SET matches the current targets (order-insensitive): the picker
-    -- commits in name-sorted order, which can differ from the stored order even with identical
-    -- membership; a set compare avoids a spurious re-order flush + MP broadcast, and is correct
-    -- whether or not other pending edits already exist for this rule.
+    -- Set compare, not array: the picker commits in name-sorted order, so an array compare
+    -- would broadcast a re-order that changed no membership.
     if sameStringSet(merged.targetHusbandries, uniqueIds) then
         Log:debug("RLMenuHerdsmanFrame:onHusbandriesPicked: id=%s unchanged target set; no-op", tostring(id))
         return
@@ -1543,19 +1355,16 @@ function RLMenuHerdsmanFrame:onHusbandriesPicked(uniqueIds)
     self:ensurePending(id).targetHusbandries = uniqueIds
     Log:debug("RLMenuHerdsmanFrame:onHusbandriesPicked: id=%s targetHusbandries stashed (%d target(s))",
         tostring(id), #uniqueIds)
-    -- Drop a move destination that the new source set turned into a source (the source-set axis).
+    -- Drop a move destination the new source set just turned into a source.
     local afterPick = RLHerdsmanRuleEditModel.overlayRule(stored, self.pendingChanges[id])
     self:revalidatePendingDestination(id, afterPick, uniqueIds)
-    -- The pick itself can never empty the targets (the dialog refuses an empty commit), but it CAN
-    -- absorb the move dest as a source; demote before the render if that stranded an enabled rule.
+    -- The pick cannot empty the targets, but it CAN absorb the destination as a source.
     self:demoteEnableIfInvalidated(id)
     self:refreshRuleDetail(stored)
 end
 
---- Build a uniqueId -> animalType map for the farm's LIVE husbandries (non-nil types only),
---- the typeByUid input to revalidateTargets. Reuses the same RLAnimalQuery descriptor source
---- as the picker (M12), so a uid the picker would gate is gated identically on rebind cleanup,
---- and a uid absent here is exactly an unresolvable target (revalidateTargets preserves it).
+--- Build a uniqueId -> animalType map for the farm's LIVE husbandries. Shares the picker's
+--- descriptor source, so a uid absent here is exactly an unresolvable target.
 --- @param farmId number|nil
 --- @return table typeByUid map uniqueId(string) -> animalType index
 function RLMenuHerdsmanFrame:buildHusbandryTypeByUid(farmId)
@@ -1566,13 +1375,9 @@ function RLMenuHerdsmanFrame:buildHusbandryTypeByUid(farmId)
     return typeByUid
 end
 
---- Build a uniqueId -> type-spec map for the farm's LIVE move DESTINATIONS (husbandries + EPP
---- butchers), the dest-axis SIBLING of buildHusbandryTypeByUid feeding revalidatePendingDestination
----A husbandry maps to its scalar animalType; an EPP butcher maps to its type-index SET
---- (animalTypes) so revalidateDestination gates an EPP dest set-aware instead of treating it as
---- unresolvable and preserving it forever. Reuses listMoveDestinationDescriptorsForFarm so this
---- map and the dest picker share ONE enumeration source. A descriptor with no usable type-spec is
---- omitted - an omitted uid is exactly an unresolvable dest, which revalidateDestination preserves.
+--- Build a uniqueId -> type-spec map for the farm's LIVE move destinations. A husbandry maps
+--- to its scalar animalType, an EPP butcher to its type-index SET, so an EPP destination is
+--- gated set-aware rather than treated as unresolvable and preserved forever.
 --- @param farmId number|nil
 --- @return table typeByUid map uniqueId(string) -> animalType index (husbandry) or type-index set (EPP)
 function RLMenuHerdsmanFrame:buildDestinationTypeByUid(farmId)
@@ -1592,10 +1397,8 @@ function RLMenuHerdsmanFrame:buildDestinationTypeByUid(farmId)
     return typeByUid
 end
 
---- True when dewar `semenUid` is still in the farm's dewar pool for `filterAnimalType` -
---- mirrors populateSemenSelector's g_dewarManager enumeration exactly. An ANY / nil
---- filterAnimalType has no typed pool (only the "any" sentinel), so any real dewar is out of
---- pool. Every hop nil-guarded.
+--- True when dewar `semenUid` is still in the farm's pool for `filterAnimalType`. A nil
+--- filterAnimalType has no typed pool, so any real dewar is out of pool.
 --- @param semenUid string the selected dewar uniqueId
 --- @param filterAnimalType number|nil the new filter animalType
 --- @param farmId number|nil
@@ -1611,11 +1414,9 @@ function RLMenuHerdsmanFrame:isSemenInPool(semenUid, filterAnimalType, farmId)
     return false
 end
 
---- Cross-type revalidation after a filter rebind OR an operation change, pinned to the
---- passed `merged` baseline (current stored+pending). Drops type-incompatible RESOLVABLE
---- targets via the pure revalidateTargets (preserving unresolvable), and resets a non-"any"
---- ai semen to "any" ONLY when its dewar left the new animalType pool (a widen / ANY keeps a
---- valid dewar). Stashes results into pending against `id`; logs the dropped-target count.
+--- Cross-type revalidation after a filter rebind or an op change: drop type-incompatible
+--- RESOLVABLE targets, preserving unresolvable ones, and reset a non-"any" semen only when
+--- its dewar left the new pool, so a widening edit keeps a still-valid dewar.
 --- @param id any rule id
 --- @param merged table the current overlay-merged record (filter/op already applied)
 function RLMenuHerdsmanFrame:revalidatePendingTargetsAndSemen(id, merged)
@@ -1632,7 +1433,7 @@ function RLMenuHerdsmanFrame:revalidatePendingTargetsAndSemen(id, merged)
             tostring(id), #before, #kept, #before - #kept)
     end
 
-    -- Semen reset (ai only): a non-"any" dewar that left the new animalType pool snaps to "any".
+    -- ai only: a dewar that left the new animalType pool snaps to "any".
     local semen = merged.params and merged.params.semen
     if merged.operation == "ai" and type(semen) == "string" and semen ~= RLHerdsmanRulePresenter.SEMEN_ANY then
         if not self:isSemenInPool(semen, filterAnimalType, farmId) then
@@ -1643,24 +1444,19 @@ function RLMenuHerdsmanFrame:revalidatePendingTargetsAndSemen(id, merged)
     end
 end
 
---- Revalidate a move rule's pending destination after a filter rebind OR a source-set change -
---- the dest twin of revalidatePendingTargetsAndSemen. Drops a now-type-incompatible RESOLVABLE dest
---- (the picker's gate) or a dest that became a source (preserving an unresolvable one), and stashes
---- the survivor. No-op for a non-move rule or a nil dest. `sourceUids` is the rule's source target
---- set AFTER the edit (the live targets on a filter rebind; the just-picked set on a husbandries change).
+--- The destination twin of revalidatePendingTargetsAndSemen: drop a now-type-incompatible
+--- RESOLVABLE destination, or one that became a source, preserving an unresolvable one.
 --- @param id any rule id
 --- @param merged table the current overlay-merged record (filter/targets already applied)
---- @param sourceUids table|nil the rule's source target uniqueIds after the edit
+--- @param sourceUids table|nil the rule's source target uniqueIds AFTER the edit
 function RLMenuHerdsmanFrame:revalidatePendingDestination(id, merged, sourceUids)
     if merged.operation ~= "move" then return end
     local dest = merged.params and merged.params.destinationHusbandry or nil
     if dest == nil then return end
     local farmId = RLAnimalInfoService.getCurrentFarmId()
-    -- Dest-axis map (husbandries + EPP butchers): an EPP dest resolves to its type-index SET here, so
-    -- revalidateDestination type-gates it instead of treating it as unresolvable-preserved-forever.
     local typeByUid = self:buildDestinationTypeByUid(farmId)
-    -- 4th arg, NOT 5th: revalidateDestination carries no `operation` (it applies "move"), so the
-    -- type map sits one slot left of its position in revalidateTargets above.
+    -- 4th arg, NOT 5th: revalidateDestination carries no `operation`, so the type map sits
+    -- one slot left of its position in revalidateTargets.
     local animalTypeIndexByName = RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
     local filterAnimalType = self:resolveFilterAnimalType(merged.filterId)
     local kept = RLHerdsmanRulePresenter.revalidateDestination(dest, typeByUid, filterAnimalType, animalTypeIndexByName, sourceUids)
@@ -1671,18 +1467,12 @@ function RLMenuHerdsmanFrame:revalidatePendingDestination(id, merged, sourceUids
     end
 end
 
---- Demote an ENABLED rule the edit just invalidated: stash `enabled = false` so the edit
---- survives as a disabled draft instead of being thrown away whole at flush.
----
---- A WRITE of `false`, never `nil`: a rule stored ENABLED has nothing to fall back to, and
---- `overlayRule` only overrides on a non-nil value, so `nil` would demote nothing while
---- reading exactly like it works.
----
---- Call this at an edit site AFTER that site's revalidations, so the axes reflect the finished
---- edit, and BEFORE its first render, so no display model is built from a pre-demote overlay.
+--- Demote an ENABLED rule the edit just invalidated, so it survives as a disabled draft
+--- rather than being thrown away whole at flush. A WRITE of `false`, never `nil`:
+--- `overlayRule` only overrides on a non-nil value, so `nil` would demote nothing. Call it
+--- AFTER the site's revalidations and BEFORE its first render.
 --- @param id any rule id
---- @return boolean demoted true when the enable was written false; no caller branches on it
----         today - it exists so the decision is observable to a test without reading the log
+--- @return boolean demoted true when the enable was written false
 function RLMenuHerdsmanFrame:demoteEnableIfInvalidated(id)
     local stored = self:getStoredRuleById(id)
     if stored == nil then return false end
@@ -1693,8 +1483,8 @@ function RLMenuHerdsmanFrame:demoteEnableIfInvalidated(id)
     if axes == nil then return false end
 
     self:ensurePending(id).enabled = false
-    -- Name the AXES, not just the fact. "My task switched itself off" is diagnosed off this
-    -- line, and the axis list is what says which field the player has to repair.
+    -- Name the AXES: "my task switched itself off" is diagnosed off this line, and the axis
+    -- list is what says which field the player has to repair.
     Log:debug("RLMenuHerdsmanFrame:demoteEnableIfInvalidated: id=%s demoted enable (axes=%s)",
         tostring(id), table.concat(axes, ","))
     return true
@@ -1704,12 +1494,9 @@ end
 -- DESTINATION PICKER (move only; in-row button -> single-select dialog -> stash dest)
 -- =============================================================================
 
---- Destination row button click (move only): open the SINGLE-select destination picker, scoped
---- to the rule's filter animalType and excluding the rule's own source husbandries. The
---- presenter owns the gate, sort and source-exclusion; this frame enumerates the farm's live
---- husbandries and flags a stored dest the gate dropped as currentUnavailable, so the picker
---- requires an explicit pick. Opens even on an empty candidate set - the dialog shows
---- empty-text with OK disabled, which is feedback rather than a dead click.
+--- Destination row button click (move only): open the single-select picker, scoped to the
+--- rule's filter animalType and excluding its own sources. Opens even on an empty candidate
+--- set, because empty-text with OK disabled is feedback where a dead click is not.
 --- @param _button table the ruleDestinationButton element (unused; selection = selectedRuleId)
 function RLMenuHerdsmanFrame:onClickRuleDestination(_button)
     local id = self.selectedRuleId
@@ -1732,20 +1519,18 @@ function RLMenuHerdsmanFrame:onClickRuleDestination(_button)
         return
     end
 
-    -- Move-dest enumeration = husbandries + owner-farm EPP butchers; the presenter's
-    -- set-aware gate keeps a multi-type butcher under an ANY filter and a type-matching one under a
-    -- typed filter. Husbandry-only picker sources would never offer a butcher.
+    -- Destinations are husbandries PLUS owner-farm EPP butchers; a husbandry-only source
+    -- would never offer a butcher.
     local descriptors = RLAnimalQuery.listMoveDestinationDescriptorsForFarm(farmId)
-    -- 3rd arg, NOT 4th: selectDestinationHusbandries carries no `operation`, so the type map sits
-    -- one slot left of its position in selectTargetableHusbandries.
+    -- 3rd arg, NOT 4th: selectDestinationHusbandries carries no `operation`, so the type map
+    -- sits one slot left of its position in selectTargetableHusbandries.
     local animalTypeIndexByName = RLMenuHerdsmanFrame.buildAnimalTypeIndexMap()
     local filterAnimalType = self:resolveFilterAnimalType(merged.filterId)
     local candidates = RLHerdsmanRulePresenter.selectDestinationHusbandries(
         descriptors, filterAnimalType, animalTypeIndexByName, merged.targetHusbandries or {})
 
-    -- A stored dest the gate dropped (its type left the filter scope, or it became a source) is no
-    -- longer in the list; flag it so the picker surfaces "current unavailable" rather than silently
-    -- preselecting row 1 (mirror onClickRuleFilter).
+    -- A stored destination the gate dropped is no longer in the list; flag it so the picker
+    -- says "current unavailable" rather than preselecting row 1.
     local currentDest = merged.params and merged.params.destinationHusbandry or nil
     local currentUnavailable = false
     if currentDest ~= nil then
@@ -1755,7 +1540,7 @@ function RLMenuHerdsmanFrame:onClickRuleDestination(_button)
         end
     end
 
-    -- Capture the target id at OPEN; the pick stashes against THIS id (selection may move).
+    -- Capture at OPEN: the pick stashes against THIS id even if the selection moves.
     self.destinationPickTargetId = id
 
     Log:debug("RLMenuHerdsmanFrame:onClickRuleDestination: id=%s filterType=%s farmId=%s -> %d candidate(s), currentDest=%s currentUnavailable=%s",
@@ -1764,10 +1549,8 @@ function RLMenuHerdsmanFrame:onClickRuleDestination(_button)
     RLHerdsmanDestinationPickerDialog.show(self.onDestinationPicked, self, candidates, currentDest, currentUnavailable)
 end
 
---- Picker result (target-first via the dialog). nil -> cancel (rule unchanged). A pick equal to the
---- overlay-merged dest with NOTHING else pending -> no-op (no redundant flush). Otherwise stash
---- pending.params.destinationHusbandry against the OPEN-TIME id and re-render. Flush happens on the
---- existing selection-change / close path.
+--- Destination picker result: nil cancels, and a re-pick of the current destination with
+--- nothing else pending is a no-op rather than a redundant flush.
 --- @param destKey string|nil chosen destination uniqueId, or nil on cancel
 function RLMenuHerdsmanFrame:onDestinationPicked(destKey)
     local id = self.destinationPickTargetId
@@ -1815,10 +1598,8 @@ function RLMenuHerdsmanFrame:ensurePending(id)
     return pending
 end
 
---- Lazily get/create the pending overlay AND ensure pending.params is a COMPLETE copy of
---- the current overlay-merged params (so a partial param edit never drops nested-budget
---- siblings before the whole-object update). The first param edit deep-copies via the
---- edit-model's overlayRule, then the caller mutates the single field.
+--- Lazily get/create the pending overlay, with pending.params a COMPLETE copy of the merged
+--- params, so a partial edit never drops nested budget siblings before the whole-object update.
 --- @param id any
 --- @return table pending (with pending.params populated)
 function RLMenuHerdsmanFrame:ensurePendingParams(id)
@@ -1844,9 +1625,8 @@ function RLMenuHerdsmanFrame:onRuleNameChanged(element, _text)
     self:ensurePending(id).name = typed
     Log:debug("RLMenuHerdsmanFrame:onRuleNameChanged: id=%s value=%q", tostring(id), typed)
     self:refreshList(id)
-    -- Same per-row refresh the other two TextInput handlers make, so clearing the name marks the row
-    -- required. The name input holds focus while the player clears it, so the marker is transparent
-    -- until focus leaves - the write still has to happen here, or it never appears at all.
+    -- Clearing the name marks the row required. The input holds focus while the player clears
+    -- it, so the write has to happen here or the marker never appears at all.
     self:refreshValueRowTooltip("name", typed)
 end
 
@@ -1862,7 +1642,7 @@ function RLMenuHerdsmanFrame:onRuleMaxAnimalsChanged(element, _text)
     local typed = element:getText() or ""
     self:ensurePendingParams(id).params.maxAnimals = tonumber(typed)
     Log:debug("RLMenuHerdsmanFrame:onRuleMaxAnimalsChanged: id=%s typed=%q parsed=%s", tostring(id), typed, tostring(tonumber(typed)))
-    -- Live tooltip update WITHOUT a full re-render (which would stomp the caret mid-type) - F1.
+    -- Live tooltip update; a full re-render would stomp the caret mid-type.
     self:refreshValueRowTooltip("maxAnimals", tonumber(typed))
 end
 
@@ -1879,7 +1659,7 @@ function RLMenuHerdsmanFrame:onRuleBudgetFixedChanged(element, _text)
     if type(pending.params.budget) ~= "table" then pending.params.budget = {} end
     pending.params.budget.fixed = tonumber(typed)
     Log:debug("RLMenuHerdsmanFrame:onRuleBudgetFixedChanged: id=%s typed=%q parsed=%s", tostring(id), typed, tostring(tonumber(typed)))
-    -- Live tooltip update WITHOUT a full re-render (which would stomp the caret mid-type) - F1.
+    -- Live tooltip update; a full re-render would stomp the caret mid-type.
     self:refreshValueRowTooltip("budget|fixed", tonumber(typed))
 end
 
@@ -1930,8 +1710,7 @@ function RLMenuHerdsmanFrame:onRuleBudgetPercentageChanged(state, _widget)
     if type(pending.params.budget) ~= "table" then pending.params.budget = {} end
     pending.params.budget.percentage = self.budgetPercentageValues[state]
     Log:debug("RLMenuHerdsmanFrame:onRuleBudgetPercentageChanged: id=%s percentage=%s", tostring(id), tostring(self.budgetPercentageValues[state]))
-    -- Re-render so the budget% tooltip follows the new value (F1; mirrors the sibling selector
-    -- handlers - the silent setState push during re-render does not re-fire this handler).
+    -- Re-render so the tooltip follows; the silent setState push does not re-fire this.
     self:refreshRuleDetail(self:getStoredRuleById(id))
 end
 
@@ -1941,12 +1720,11 @@ function RLMenuHerdsmanFrame:onRuleSemenChanged(state, _widget)
     if id == nil then return end
     self:ensurePendingParams(id).params.semen = self.semenValues[state]
     Log:debug("RLMenuHerdsmanFrame:onRuleSemenChanged: id=%s semen=%s", tostring(id), tostring(self.semenValues[state]))
-    -- Re-render so the semen tooltip follows the new value (F1; mirrors the sibling selector handlers).
+    -- Re-render so the semen tooltip follows the new value.
     self:refreshRuleDetail(self:getStoredRuleById(id))
 end
 
---- operation MultiTextOption: the D5 op-change. Reshape params via the edit-model, clear
---- the filter when the new op forbids it, re-section live, and re-render.
+--- operation MultiTextOption: reshape params, clear a now-forbidden filter, re-section.
 function RLMenuHerdsmanFrame:onRuleOperationChanged(state, _widget)
     local id = self.selectedRuleId
     if id == nil then return end
@@ -1955,15 +1733,9 @@ function RLMenuHerdsmanFrame:onRuleOperationChanged(state, _widget)
     self:applyOperationChange(id, newOp)
 end
 
---- Apply an operation change (D5): stash the operation, reshape pending.params via the
---- edit-model (shared scalars carried, op-specific reseeded), and revalidate the filter through
---- the presenter's single clear predicate - which folds all three causes (naming carries no
---- filter, the usage bucket is not drawn on, the animal type cannot be acted on) into one
---- answer. An unresolvable / deleted filter is left as-is. Then re-section live + re-render.
----
---- The clear MUST precede revalidatePendingTargetsAndSemen: revalidation reads the merged
---- record, so clearing first is what widens the filter scope to ANY before targets are gated.
---- Reverse the two and a type-incompatible switch revalidates against the OLD filter's type.
+--- Apply an operation change: stash it, reshape the params, and clear a filter the new
+--- operation forbids. The clear MUST precede revalidatePendingTargetsAndSemen, which reads
+--- the merged record: reverse the two and a switch revalidates against the OLD filter's type.
 --- @param id any
 --- @param newOp string
 function RLMenuHerdsmanFrame:applyOperationChange(id, newOp)
@@ -1981,23 +1753,19 @@ function RLMenuHerdsmanFrame:applyOperationChange(id, newOp)
         newOp, filter, RLMenuHerdsmanFrame.buildAnimalTypeIndexMap())
     if clearReason ~= nil then
         pending.filterId = RLHerdsmanRuleEditModel.CLEAR
-        -- Name the rejected VALUES, not just the cause. "My filter disappeared" is diagnosed off
-        -- this line, and a player reporting it will not be running at TRACE.
+        -- Name the rejected VALUES: "my filter disappeared" is diagnosed off this line, and a
+        -- player reporting it will not be running at TRACE.
         Log:debug("RLMenuHerdsmanFrame:applyOperationChange: id=%s -> %s; filterId cleared (reason=%s usage=%s animalType=%s)",
             tostring(id), tostring(newOp), tostring(clearReason),
             tostring(type(filter) == "table" and filter.usage or nil),
             tostring(type(filter) == "table" and filter.animalType or nil))
     end
 
-    -- Cross-type revalidation against the NEW merged op/filter - the SAME path a filter
-    -- rebind runs: a switch to castrate drops chicken targets/semen; a filter cleared above
-    -- widens the gate. Re-read merged so the op + filter-clear are both reflected.
+    -- Re-read merged so the op and the filter-clear are both reflected.
     local newMerged = RLHerdsmanRuleEditModel.overlayRule(stored, self.pendingChanges[id])
     self:revalidatePendingTargetsAndSemen(id, newMerged)
-    -- BEFORE refreshList, not just before refreshRuleDetail: the demote must precede EVERY render
-    -- at this site, or the list is built from an overlay the pane is about to contradict. The op
-    -- switch is the richest invalidator here - it can clear the filter, empty the targets, and
-    -- reseed params with no destination, all in one edit.
+    -- BEFORE refreshList, not just before refreshRuleDetail: the demote must precede EVERY
+    -- render here, or the list is built from an overlay the pane is about to contradict.
     self:demoteEnableIfInvalidated(id)
 
     Log:debug("RLMenuHerdsmanFrame:applyOperationChange: id=%s newOp=%s (re-sectioning)", tostring(id), newOp)
@@ -2009,11 +1777,9 @@ end
 -- FLUSH (pending overlay -> g_rlHerdsmanRuleService:update)
 -- =============================================================================
 
---- Flush one id's pending overlay through the real service update, gated by the presenter's
---- enabled-conditional validateFlush. A disabled or incomplete rule persists as a draft; a rule
---- that is enabled but missing an enable-gated axis is DEMOTED by the backstop below, which
---- keeps every other edit. A validation skip or a service reject clears the overlay and reverts
---- the display to the stored record.
+--- Flush one id's overlay through the service, gated by validateFlush. A disabled or
+--- incomplete rule persists as a draft; a validation skip or a service reject clears the
+--- overlay and reverts the display to the stored record.
 --- @param id any
 --- @return string outcome "updated" | "skipped" | "rejected"
 function RLMenuHerdsmanFrame:flushPendingForId(id)
@@ -2029,26 +1795,11 @@ function RLMenuHerdsmanFrame:flushPendingForId(id)
 
     local merged = RLHerdsmanRuleEditModel.overlayRule(stored, pending)
     local g = RLHerdsmanRulePresenter.validateFlush(merged)
-    -- Gate: nameOk + operationOk + paramsOk always; husbandriesOk (>= 1 target) AND a
-    -- bound non-naming filter required ONLY when enabled (F7's enabled-conditional filter, the
-    -- frame-side twin of the relaxed service floor). A disabled / incomplete rule persists as a draft (nil
-    -- filterId / 0 targets = no-op); an enabled rule missing either is handled by the
-    -- demote backstop below, not a service reject.
-
-    -- Demote backstop: when the ONLY thing stopping this flush is an enable-gated axis, write
-    -- the enable OFF and re-evaluate rather than discarding the overlay, so the rule persists
-    -- as a disabled draft carrying every edit the player made. Dropping enable relaxes all
-    -- three gates, so the re-eval normally passes; a residual malformed value still falls
-    -- through to the full revert.
-    --
-    -- The edit sites demote as they happen, so the player sees the toggle move; this catches
-    -- what they cannot - a frame-close flush, and a rule already persisted
-    -- enabled-but-incomplete, which would otherwise stay flush-blocked forever. That one heals
-    -- only once something stashes an overlay for it, since an id with no pending entry returns
-    -- above without reaching here.
-    --
-    -- `false`, never `nil`: a stored-ENABLED rule has nothing to fall back to, and overlayRule
-    -- only overrides on a non-nil value.
+    -- Demote backstop: when the ONLY thing blocking the flush is an enable-gated axis, write
+    -- the enable off and re-evaluate rather than discard the overlay, so the rule persists as
+    -- a disabled draft carrying every edit. The edit sites demote as they happen, so the
+    -- player sees the toggle move; this catches the frame-close flush and a rule already
+    -- persisted enabled-but-incomplete, which would otherwise stay blocked forever.
     local demotionAxes = RLHerdsmanRulePresenter.enableDemotionAxes(g)
     if demotionAxes ~= nil then
         pending.enabled = false
@@ -2086,8 +1837,8 @@ function RLMenuHerdsmanFrame:flushPendingForId(id)
     return "updated"
 end
 
---- Drain every pending overlay (frame close). Snapshots the id set first so clearing
---- entries mid-iteration is safe.
+--- Drain every pending overlay. Snapshots the id set first, so clearing entries
+--- mid-iteration is safe.
 function RLMenuHerdsmanFrame:flushAllPending()
     local ids = {}
     for id in pairs(self.pendingChanges) do ids[#ids + 1] = id end
@@ -2103,8 +1854,7 @@ end
 
 --- Seed the initial selection on open. reloadData does NOT reliably fire
 --- onListSelectionChanged when the clamped section has items, so highlight row 1 AND drive
---- the detail seam by hand (mirror RLMenuInfoFrame:restoreSelection). No rules -> clear the
---- cached id + the list's visual selection and show the editor empty-state.
+--- the detail seam by hand.
 function RLMenuHerdsmanFrame:selectInitialRule()
     if self.rulesList == nil then return end
 
@@ -2146,8 +1896,7 @@ end
 -- =============================================================================
 
 --- UX-side permission gate for the action bar. The authoritative boundary is the server-side
---- validation inside RLHerdsmanRule{Create,Update,Delete}Event:run; this only controls button
---- visibility + the per-handler early abort. Mirrors RLMenuSettingsFrame:hasCreatePermission.
+--- validation in the rule events; this only gates button visibility and the early abort.
 --- @return boolean
 function RLMenuHerdsmanFrame:hasCreatePermission()
     if g_currentMission == nil or g_currentMission.getHasPlayerPermission == nil then
@@ -2156,10 +1905,8 @@ function RLMenuHerdsmanFrame:hasCreatePermission()
     return g_currentMission:getHasPlayerPermission("tradeAnimals") == true
 end
 
---- Rebuild the single-tier footer from the current selection + permission and mark it dirty.
---- Back is always present; New on farm + tradeAnimals ONLY (never gated on selection, so the
---- empty state stays escapable); Duplicate + Delete additionally need a selection. Mirrors
---- RLMenuSettingsFrame:updateButtonVisibility (Tier 1, minus Tier 2/3).
+--- Rebuild the footer from the selection and permission. New is never gated on selection, so
+--- the empty state stays escapable; Duplicate and Delete additionally need one.
 function RLMenuHerdsmanFrame:updateButtonVisibility()
     local farmId = RLAnimalInfoService.getCurrentFarmId()
     local hasFarm = (farmId ~= nil and farmId ~= 0)
@@ -2182,8 +1929,8 @@ function RLMenuHerdsmanFrame:updateButtonVisibility()
     self:setMenuButtonInfoDirty()
 end
 
---- Collect the live rule names for the collision-incrementing default/duplicate name helpers,
---- with each rule's pending overlay applied so an in-flight rename on another row still counts.
+--- The live rule names for the name-collision helpers, with each rule's overlay applied so an
+--- in-flight rename on another row still counts.
 --- @return string[] names
 function RLMenuHerdsmanFrame:collectRuleNames()
     local names = {}
@@ -2195,11 +1942,8 @@ function RLMenuHerdsmanFrame:collectRuleNames()
     return names
 end
 
---- Footer New handler. Gated on permission + farm ONLY (never selection). Autoflushes the
---- current selection's pending first (so a dirty edit is not lost when New steals the
---- selection), then creates a disabled Sell draft via the SAME g_rlHerdsmanRuleService:create
---- the console command + Pattern-A receivers use. On create == nil (rejected payload) warns and
---- leaves the list/selection unchanged. On success selects the new rule and refreshes.
+--- Footer New handler, gated on permission and farm only, never selection. Autoflushes the
+--- current pending first, so a dirty edit is not lost when New steals the selection.
 function RLMenuHerdsmanFrame:onClickNewRule()
     if not self:hasCreatePermission() then
         Log:trace("RLMenuHerdsmanFrame:onClickNewRule: no tradeAnimals permission, aborting")
@@ -2236,11 +1980,8 @@ function RLMenuHerdsmanFrame:onClickNewRule()
     self:refreshData()
 end
 
---- Footer Duplicate handler. Gated on selection + permission + farm. Autoflushes the current
---- pending first (so the STORED baseline reflects the user's intent), then clones the STORED
---- record (NOT the overlay-merged view, which can be floor-invalid under the draft model) with
---- a collision-free `(copy)` name and the source's immutable farmId, via the SAME
---- g_rlHerdsmanRuleService:create. create == nil -> warn + abort. On success selects the clone.
+--- Footer Duplicate handler. Autoflushes first, then clones the STORED record, NOT the
+--- overlay-merged view, which can be floor-invalid under the draft model.
 function RLMenuHerdsmanFrame:onClickDuplicate()
     if self.selectedRuleId == nil then
         Log:trace("RLMenuHerdsmanFrame:onClickDuplicate: no selection, aborting")
@@ -2291,10 +2032,8 @@ function RLMenuHerdsmanFrame:onClickDuplicate()
     self:refreshData()
 end
 
---- Footer Delete handler. Gated on selection + permission + farm, with a g_gui dialog-visible
---- re-entry guard (also suppresses Delete while a picker dialog is open). Opens a YesNoDialog
---- with the rule name; the actual delete happens in onDeleteConfirmed on Yes. Mirrors
---- RLMenuSettingsFrame:onClickDelete (YesNoDialog is base-game, no registration).
+--- Footer Delete handler: opens a YesNoDialog naming the rule. The dialog-visible check also
+--- suppresses Delete while a picker is open.
 function RLMenuHerdsmanFrame:onClickDelete()
     if self.selectedRuleId == nil then
         Log:trace("RLMenuHerdsmanFrame:onClickDelete: no selection, aborting")
@@ -2329,8 +2068,8 @@ function RLMenuHerdsmanFrame:onClickDelete()
     Log:debug("RLMenuHerdsmanFrame:onClickDelete: opening YesNoDialog for id=%s name=%q",
         tostring(stored.id), tostring(stored.name))
 
-    -- YesNoDialog passes (target, yesValue, callbackArgs) to its callback; target=self absorbs
-    -- the colon-bound self so onDeleteConfirmed receives (yes, id). Mirrors the Settings flow.
+    -- YesNoDialog passes (target, yesValue, callbackArgs), and the colon-bound `self` absorbs
+    -- the target, so the callback receives (yes, id).
     YesNoDialog.show(
         self.onDeleteConfirmed,
         self,
@@ -2341,10 +2080,8 @@ function RLMenuHerdsmanFrame:onClickDelete()
     )
 end
 
---- YesNoDialog confirmation callback for Delete. No-ops on No. On Yes: call the SAME
---- g_rlHerdsmanRuleService:delete the console command + Pattern-A receivers use; on success
---- drop pending[id], clear the selection if it matched, refresh; on false (stale id / race)
---- preserve selection + pending and warn (the next refresh event resolves the divergence).
+--- Delete confirmation callback. A false return preserves the selection and the pending
+--- edits, so a stale id or a race resolves on the next refresh rather than losing work.
 --- @param yes boolean
 --- @param id string the rule id captured at click time
 function RLMenuHerdsmanFrame:onDeleteConfirmed(yes, id)
@@ -2370,13 +2107,9 @@ end
 -- REFRESH (local CRUD + remote MP event hook)
 -- =============================================================================
 
---- Re-read the rule registry for the current farm, KEEPING the local pending overlay
---- (local-pending-wins for F7; the authoritative-surface mid-edit reconcile is deferred).
---- Drops pending whose id is gone from the re-read snapshot (orphan prune) and clears the
---- selection to the empty-state when the selected id was pruned (so a stale focused input
---- cannot re-stash a resurrected orphan). Rebuilds + reloads under isReconciling, re-pins the
---- selection by id (so a remotely re-sectioned rule re-pins), then refreshes empty-state +
---- footer + banner + detail. Mirrors RLMenuSettingsFrame:refreshData.
+--- Re-read the rule registry for the current farm, KEEPING the local pending overlay. Drops
+--- pending whose id has gone and clears the selection when the selected id was pruned, so a
+--- stale focused input cannot re-stash a resurrected orphan.
 function RLMenuHerdsmanFrame:refreshData()
     local farmId = RLAnimalInfoService.getCurrentFarmId()
     local rules = {}
@@ -2389,8 +2122,7 @@ function RLMenuHerdsmanFrame:refreshData()
     end
     self.storedRules = rules
 
-    -- Orphan prune: drop any pending overlay whose id is no longer present (a remote delete),
-    -- and clear the selection to the empty-state if its id went.
+    -- Orphan prune: drop any overlay whose id a remote delete has removed.
     local liveIds = {}
     for _, stored in ipairs(self.storedRules) do liveIds[stored.id] = true end
     local pruned = 0
