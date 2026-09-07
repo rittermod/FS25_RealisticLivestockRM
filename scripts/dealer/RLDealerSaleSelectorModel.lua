@@ -1,36 +1,31 @@
 -- RLDealerSaleSelectorModel.lua
--- Pure, dual-run core for the dealer sale-availability selector dialog (B2). Turns the
--- B1 catalog view-model into the sectioned checkbox model the dialog renders, and
--- collects the checked rows back into a caller-facing for-sale set. Data in / data out:
--- no g_*, GUI, XML, or engine natives - only the RmLogging stub is reached, so the same
--- file runs under in-game rlTest and the headless harness.
+-- Pure, dual-run core for the dealer sale-availability selector dialog: turns the catalog
+-- view-model into the sectioned checkbox model the dialog renders, and collects the checked rows
+-- back into a caller-facing for-sale set. Data in / data out - no g_*, GUI, XML or engine
+-- natives - so the same file runs under in-game rlTest and the headless harness.
 --
--- Three groups, all pure (the GUI wiring lives in RLDealerSaleSelectorDialog):
---   * buildSectionModel(catalog) - one SECTION per catalog subType (dropping any that
---     yields no keyable row), each row keyed by a composite (subTypeName, minAge) string.
---   * buildResult(selected, keyMeta, sectionOrder, itemsBySection) - the checked in-scope
---     rows as a deduped, section/row-ordered array of {subTypeName, minAge}.
---   * the selection transitions and their predicates - toggleAll / toggleSection and
---     hasAnySelection / hasSectionSelection. The transitions return a NEW map and mutate
---     nothing; the predicates are pure reads. They live here rather than in the dialog
---     because the section arithmetic is off-by-one-prone and no automated tier reaches a
---     dialog handler.
+-- Three groups, all pure; the GUI wiring lives in RLDealerSaleSelectorDialog:
+--   * buildSectionModel(catalog) - one SECTION per catalog subType, dropping any that yields no
+--     keyable row, with each row keyed by a composite (subTypeName, minAge) string.
+--   * buildResult(selected, keyMeta, sectionOrder, itemsBySection) - the checked in-scope rows
+--     as a deduped, section/row-ordered array of {subTypeName, minAge}.
+--   * the selection transitions and their predicates. They live here rather than in the dialog
+--     because the section arithmetic is off-by-one-prone and no automated tier reaches a dialog
+--     handler.
 --
--- Composite key scheme: `subTypeName .. U+001F .. tostring(minAge)`. U+001F (unit
--- separator) cannot occur in a subType identifier, so the join is unambiguous. The key
--- is an INTERNAL handle (it drives selected / initialSelected / keyMeta); the PUBLIC row
+-- Composite key scheme: `subTypeName .. U+001F .. tostring(minAge)`. U+001F cannot occur in a
+-- subType identifier, so the join is unambiguous. The key is an INTERNAL handle; the PUBLIC row
 -- identity the dialog and caller see stays the decomposed (subTypeName, minAge) pair.
 --
--- Selection-out only: this model never mutates the registry, the store, or the catalog,
--- and never round-trips out-of-scope keys - it only knows the in-scope catalog it was
--- handed (absent-subType overrides are pruned downstream, not here).
+-- Selection-out only: this model never mutates the registry, the store or the catalog, and never
+-- round-trips out-of-scope keys - it only knows the in-scope catalog it was handed.
 
 local Log = RmLogging.getLogger("RLRM")
 
 RLDealerSaleSelectorModel = {}
 
--- The composite-key separator: ASCII unit separator (U+001F). Cannot appear in a subType
--- identifier, so `subTypeName .. SEP .. tostring(minAge)` is a lossless, collision-free join.
+-- ASCII unit separator, which cannot appear in a subType identifier, so the composite join is
+-- lossless and collision-free.
 local KEY_SEP = "\31"
 
 --- Build the internal composite key for a (subTypeName, minAge) row.
@@ -41,8 +36,8 @@ local function rowKey(subTypeName, minAge)
     return tostring(subTypeName) .. KEY_SEP .. tostring(minAge)
 end
 
---- Section title with the spec's fallback chain: the resolved subTypeLabel, else the raw
---- subTypeName, else "?". A non-string / empty value at a level falls through to the next.
+--- Section title, falling through the resolved subTypeLabel, the raw subTypeName, then "?". A
+--- non-string or empty value at a level falls to the next.
 ---@param subTypeLabel any
 ---@param subTypeName any
 ---@return string
@@ -56,23 +51,16 @@ end
 -- buildSectionModel - catalog view-model -> sectioned checkbox model
 -- =============================================================================
 
---- Compose the sectioned checkbox model from a B1 catalog view-model.
+--- Compose the sectioned checkbox model from a catalog view-model: one SECTION per catalog
+--- subType keyed by subTypeName, each visual becoming one row. A row whose composite key was
+--- already emitted anywhere in this build is SKIPPED, so no checkbox aliasing or keyMeta
+--- overwrite occurs, and a subType that yields ZERO keyable rows emits NO section rather than a
+--- headed, row-less one.
 ---
---- One SECTION per catalog subType; the section key is the subTypeName. Each catalog
---- visual (age stage) becomes one ROW `{subTypeName, minAge, ageRangeLabel, iconFilename,
---- key}`; `key` is the composite (subTypeName, minAge). A row whose composite key was
---- already emitted (a duplicate (subTypeName, minAge) across this whole build) is SKIPPED
---- so no checkbox aliasing / keyMeta overwrite occurs. A visual with a non-numeric minAge
---- is skipped (it cannot be keyed). A catalog subType that yields ZERO keyable rows (empty
---- visuals, all-non-numeric minAge, or every row a duplicate) emits NO section - never a
---- headed, row-less section.
----
---- `initialSelected[key] = (visual.buyable == true)` - the initial checkbox state equals
---- the catalog's effective buyability. `keyMeta[key] = {subTypeName, minAge}` decodes a key
---- back to its public pair for buildResult. Order is catalog order for sections and visual
---- order within a section - stable, never sorted here (B1 already ordered).
----
----@param catalog table|nil B1 catalog: array of { subTypeName, subTypeLabel, visuals=[{minAge, ageRangeLabel, iconFilename, buyable}] }
+--- `initialSelected[key]` is the catalog's effective buyability, and `keyMeta[key]` decodes a key
+--- back to its public pair for buildResult. Order is catalog order for sections and visual order
+--- within a section - never sorted here, since the catalog already ordered them.
+---@param catalog table|nil catalog: array of { subTypeName, subTypeLabel, visuals=[{minAge, ageRangeLabel, iconFilename, buyable}] }
 ---@return table model { sectionOrder=[key], itemsBySection={key->rows}, titlesBySection={key->title}, initialSelected={key->bool}, keyMeta={key->{subTypeName,minAge}} }
 function RLDealerSaleSelectorModel.buildSectionModel(catalog)
     local model = {
@@ -95,9 +83,7 @@ function RLDealerSaleSelectorModel.buildSectionModel(catalog)
             counters.entriesSkipped = counters.entriesSkipped + 1
             Log:trace("RLDealerSaleSelectorModel.buildSectionModel: dropped a non-table catalog entry")
         elseif type(entry.subTypeName) ~= "string" or entry.subTypeName == "" then
-            -- Sections are keyed by subTypeName; a nil/empty/non-string name cannot key a
-            -- section (t[nil] would crash) and buildResult would reject its rows anyway. Drop
-            -- it like every other malformed shape rather than crash the whole build.
+            -- Sections are keyed by subTypeName, and `t[nil]` would crash on write.
             counters.entriesSkipped = counters.entriesSkipped + 1
             Log:trace("RLDealerSaleSelectorModel.buildSectionModel: dropped an entry with nil/empty subTypeName (%s)",
                 tostring(entry.subTypeName))
@@ -106,10 +92,9 @@ function RLDealerSaleSelectorModel.buildSectionModel(catalog)
             Log:trace("RLDealerSaleSelectorModel.buildSectionModel: %s has nil/non-table visuals; skipped",
                 tostring(entry.subTypeName))
         elseif model.itemsBySection[entry.subTypeName] ~= nil then
-            -- Two catalog entries share a subTypeName. Skip the later one BEFORE building its
-            -- rows - registering it would overwrite the first entry's rows and double-append the
-            -- section key; deferring the row build keeps keyMeta / initialSelected free of the
-            -- skipped entry's stray keys.
+            -- Skip a duplicate section key BEFORE building its rows: registering it would
+            -- overwrite the first entry's rows and double-append the section key, and deferring
+            -- the row build keeps keyMeta and initialSelected free of its stray keys.
             counters.entriesSkipped = counters.entriesSkipped + 1
             Log:trace("RLDealerSaleSelectorModel.buildSectionModel: duplicate section key %s; later entry skipped",
                 tostring(entry.subTypeName))
@@ -162,17 +147,12 @@ end
 -- buildResult - checked rows -> caller-facing for-sale set
 -- =============================================================================
 
---- Collect the checked in-scope rows into the caller's for-sale set: an array of
---- `{subTypeName, minAge}` for every row whose composite key is checked in `selected`,
---- in section then row order, deduped by key. Order and dedup come from walking
---- `sectionOrder` x `itemsBySection` (the rows are already unique by key from
---- buildSectionModel; the emitted-set guard is defence-in-depth). A checked key whose
---- meta is missing or malformed (subTypeName not a non-empty string, or minAge not a
---- number) is dropped with a TRACE, never emitted.
+--- Collect the checked in-scope rows into the caller's for-sale set, in section then row order,
+--- deduped by key. Order and dedup both come from walking `sectionOrder` x `itemsBySection`. A
+--- checked key whose meta is missing or malformed is dropped, never emitted.
 ---
---- May return `{}` (nothing checked) - the caller treats an empty array as a legitimate
---- "nothing for sale", distinct from the dialog's nil (cancel).
----
+--- May return `{}` - the caller treats an empty array as a legitimate "nothing for sale",
+--- distinct from the dialog's nil for cancel.
 ---@param selected table {key->true} checked composite keys
 ---@param keyMeta table {key->{subTypeName, minAge}} from buildSectionModel
 ---@param sectionOrder table [key] section order from buildSectionModel
@@ -200,8 +180,8 @@ function RLDealerSaleSelectorModel.buildResult(selected, keyMeta, sectionOrder, 
                         emitted[key] = true
                         result[#result + 1] = { subTypeName = meta.subTypeName, minAge = meta.minAge }
                     else
-                        -- Sanitize the composite key for logging: its U+001F separator has no
-                        -- glyph in the console texture font (would warn "Character '31' not found").
+                        -- Sanitize the key for logging: U+001F has no glyph in the console
+                        -- texture font and would warn "Character '31' not found".
                         Log:trace("RLDealerSaleSelectorModel.buildResult: dropped checked key with malformed meta (%s)",
                             (tostring(key):gsub("\31", "|")))
                     end
@@ -215,19 +195,15 @@ function RLDealerSaleSelectorModel.buildResult(selected, keyMeta, sectionOrder, 
 end
 
 -- =============================================================================
--- Selection transitions + predicates - the state changes SPACE and the section
--- control drive. Pure: data in, data out; the dialog is thin wiring over them.
+-- Selection transitions + predicates
 -- =============================================================================
 
--- The DOMAIN of every transition and predicate below is `sectionOrder` x `itemsBySection`
--- - the rows the dialog actually rendered. A checked key that is unreachable from
--- `sectionOrder` is therefore invisible to every DECISION here: it can neither be cleared
--- by a toggle nor pin a predicate true, which is what stops a leftover key from making
--- "is anything selected" permanently true and SPACE unable to select-all again.
---
--- The transitions still COPY the incoming map first, so such a key survives the round-trip
--- untouched rather than being silently dropped. That copy is a preservation step, not a
--- domain walk - it decides nothing.
+-- The DOMAIN of every transition and predicate below is `sectionOrder` x `itemsBySection` - the
+-- rows the dialog actually rendered. A checked key unreachable from `sectionOrder` is therefore
+-- invisible to every DECISION here: it can neither be cleared by a toggle nor pin a predicate
+-- true, which is what stops a leftover key from making "is anything selected" permanently true
+-- and select-all unable to fire again. The transitions still COPY the incoming map first, so
+-- such a key survives the round-trip untouched - a preservation step, not a domain walk.
 
 --- Shallow copy of a selection map, normalizing to the `true`/`nil`-never-`false` invariant.
 ---@param selected table {key->true}
@@ -240,10 +216,10 @@ local function copySelection(selected)
     return copy
 end
 
---- Walk the rows reachable from `sectionOrder` x `itemsBySection`, optionally restricted to
---- ONE section index. `visit(row, sectionKey, sectionIndex)` returning true stops the walk.
---- A section whose `itemsBySection` entry is nil/non-table, and a row that is not a table with
---- a string key, are skipped with a TRACE - never a crash (a nil key would raise on write).
+--- Walk the rows reachable from `sectionOrder` x `itemsBySection`, optionally restricted to one
+--- section index. `visit` returning true stops the walk. A section with a nil/non-table rows
+--- entry, and a row that is not a table with a string key, are skipped rather than crashing on a
+--- nil-key write.
 ---@param sectionOrder table [sectionKey]
 ---@param itemsBySection table {sectionKey->rows}
 ---@param visit function fn(row, sectionKey, sectionIndex) -> boolean stop
@@ -275,10 +251,9 @@ local function walkReachable(sectionOrder, itemsBySection, visit, onlySectionInd
     return sectionsVisited, false
 end
 
---- Resolve a section INDEX to its `sectionOrder` key, or nil when there is no usable section.
---- Three arms, each TRACEd by name: nil, the documented `0` sentinel, and an index with no
---- `sectionOrder` entry (the reachable case - a stale out-of-range index left by a prior open).
---- A non-numeric index is caught alongside them rather than reaching `sectionOrder[section]`.
+--- Resolve a section INDEX to its `sectionOrder` key, or nil when there is no usable section:
+--- nil, the documented `0` sentinel, a non-numeric index, or an index with no entry - the
+--- reachable case being a stale out-of-range index left by a prior open.
 ---@param sectionOrder table [sectionKey]
 ---@param section any section index
 ---@param context string caller name, for the TRACE lines
@@ -341,9 +316,9 @@ function RLDealerSaleSelectorModel.hasSectionSelection(selected, sectionOrder, i
     return found
 end
 
---- LIST-WIDE toggle: any row checked anywhere -> clear EVERY row in EVERY section; none
---- checked -> check them all. Mixed state deselects first, matching the six sibling
---- select-all surfaces. Focus is irrelevant - this never consults a focused section.
+--- LIST-WIDE toggle: any row checked anywhere clears EVERY row in EVERY section, none checked
+--- checks them all. Mixed state deselects first, matching the sibling select-all surfaces, and
+--- focus is irrelevant - this never consults a focused section.
 ---@param selected table {key->true} the working selection (never mutated)
 ---@param sectionOrder table [sectionKey] from buildSectionModel
 ---@param itemsBySection table {sectionKey->rows} from buildSectionModel
@@ -369,16 +344,16 @@ function RLDealerSaleSelectorModel.toggleAll(selected, sectionOrder, itemsBySect
         return false
     end, nil, "toggleAll")
 
-    -- Rows TRANSITIONED (not rows now checked), plus the SECTION count - together they
-    -- distinguish a true list-wide sweep from a focused-section-only regression.
+    -- Rows TRANSITIONED, not rows now checked, plus the SECTION count: together they distinguish
+    -- a true list-wide sweep from a focused-section-only regression.
     Log:debug("RLDealerSaleSelectorModel.toggleAll: %s %d row(s) across %d section(s)",
         clearing and "cleared" or "selected", transitioned, sectionsVisited)
     return result
 end
 
---- SECTION-SCOPED toggle: any row in the focused section checked -> clear that section;
---- none -> check it. Every other section is untouched. No usable section is a NO-OP that
---- returns a new map equal to the input.
+--- SECTION-SCOPED toggle: any row in the focused section checked clears that section, none
+--- checks it, and every other section is untouched. No usable section is a no-op returning a new
+--- map equal to the input.
 ---@param selected table {key->true} the working selection (never mutated)
 ---@param sectionOrder table [sectionKey] from buildSectionModel
 ---@param itemsBySection table {sectionKey->rows} from buildSectionModel
@@ -410,8 +385,8 @@ function RLDealerSaleSelectorModel.toggleSection(selected, sectionOrder, itemsBy
         return false
     end, section, "toggleSection")
 
-    -- Report whether the section was actually WALKED. Without it a section whose rows entry is
-    -- malformed logs "0 row(s)" identically to a genuinely empty one, and the TRACE that
+    -- Report whether the section was actually WALKED: without it, a section whose rows entry is
+    -- malformed logs "0 row(s)" identically to a genuinely empty one, and the trace that
     -- distinguishes them is off at the default level.
     Log:debug("RLDealerSaleSelectorModel.toggleSection: section %s (%s) -> %s %d row(s)%s",
         tostring(section), tostring(sectionKey), clearing and "cleared" or "selected", transitioned,

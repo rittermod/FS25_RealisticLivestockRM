@@ -25,19 +25,16 @@ RLFilterEvaluator = {}
 -- Comparator implementations
 -- =============================================================================
 
---- Return true when `animalValue op conditionValue` holds. Graceful on nil
---- inputs (any nil operand fails the comparison).
---- `in` / `notin` treat `conditionValue` as a list; `animalValue` is a scalar.
+--- Return true when `animalValue op conditionValue` holds. Graceful on nil inputs - any nil
+--- operand fails the comparison. `in` / `notin` treat `conditionValue` as a list.
 ---@param op string comparator token
 ---@param animalValue any value returned by field getter
 ---@param conditionValue any value stored on the condition
 ---@return boolean
 local function compare(op, animalValue, conditionValue)
-    -- `==` and `!=` require matching types before comparing. Lua's raw
-    -- `~=` would return true for `age ~= "50"` because int ~= string is
-    -- true - that's "fail open" and broadens matches on malformed data.
-    -- Gate on type() equality first; mismatched types -> false for both
-    -- `==` and `!=` so bad filter data never broadens the result set.
+    -- `==` and `!=` gate on type equality FIRST, because Lua's raw `~=` returns true for
+    -- `age ~= "50"` - failing open and broadening matches on malformed data. A type mismatch is
+    -- false for both operators, so bad filter data can never widen the result set.
     if op == "==" or op == "!=" then
         if type(animalValue) ~= type(conditionValue) then
             return false
@@ -59,12 +56,8 @@ local function compare(op, animalValue, conditionValue)
         return not found
     end
 
-    -- String-substring operators: case-insensitive, plain (non-pattern) match
-    -- via string.find(..., 1, true). Both operands must be strings; malformed
-    -- payloads fail closed. Empty needle explicitly rejected so "contains ''"
-    -- does not trivially match every named animal. Upstream evalCondition
-    -- already short-circuits a nil animalValue, so nil only appears here
-    -- through a malformed condition payload -> false is the correct fallback.
+    -- Case-insensitive plain (non-pattern) substring match. Both operands must be strings, and
+    -- an empty needle is rejected so "contains ''" does not trivially match every named animal.
     if op == "contains" or op == "notcontains" then
         if type(animalValue) ~= "string" or type(conditionValue) ~= "string" then
             return false
@@ -92,9 +85,8 @@ end
 -- Leaf (condition) evaluation
 -- =============================================================================
 
---- Evaluate a condition node against an animal. Never raises; returns false
---- for any graceful-degrade case and logs the reason at trace/warning with
---- the `ctx` table deduping warnings per outer call.
+--- Evaluate a condition node against an animal. Never raises: every graceful-degrade case
+--- returns false and logs its reason, with `ctx` deduping warnings per outer call.
 ---@param condition table { field, cmp, value }
 ---@param animal table
 ---@param ctx table per-call context with `warnedFields` and `typeMismatchFields` sets
@@ -109,7 +101,6 @@ local function evalCondition(condition, animal, ctx)
     local field = RLFilterFieldCatalog.get(fieldKey)
 
     if field == nil then
-        -- Unknown field: warn once per outer evaluate() call for this key.
         if not ctx.warnedFields[fieldKey] then
             Log:warning("RLFilterEvaluator.evalCondition: unknown field '%s' (catalog lookup failed); returning false for all occurrences in this call",
                 tostring(fieldKey))
@@ -118,8 +109,7 @@ local function evalCondition(condition, animal, ctx)
         return false
     end
 
-    -- Type-scope gate (e.g. genetics.productivity on PIG). Trace once per
-    -- (field, call) to avoid spamming; still return false.
+    -- Type-scope gate, e.g. genetics.productivity on PIG.
     local animalTypeIndex = animal and animal.animalTypeIndex or nil
     if not RLFilterFieldCatalog.isAvailableForType(field, animalTypeIndex) then
         if not ctx.typeMismatchFields[fieldKey] then
@@ -130,7 +120,7 @@ local function evalCondition(condition, animal, ctx)
         return false
     end
 
-    -- Monitor gate handled inside getter; nil result is the signal.
+    -- The monitor gate is handled inside the getter; a nil result is the signal.
     local animalValue = field.getter(animal)
     if animalValue == nil then
         Log:trace("RLFilterEvaluator.evalCondition: field '%s' returned nil for animal (monitor off / missing genetics / etc.); returning false",
@@ -149,7 +139,7 @@ end
 -- Recursive group / node evaluation
 -- =============================================================================
 
---- Dispatch by node kind (group vs condition). Single-pass recursion.
+--- Dispatch by node kind: a group has `op` and `children`, a condition has `field` and `cmp`.
 ---@param node table
 ---@param animal table
 ---@param ctx table
@@ -160,12 +150,10 @@ local function evalNode(node, animal, ctx)
         return false
     end
 
-    -- A group has an `op` and `children`; a condition has `field` + `cmp`.
     if node.op ~= nil and node.children ~= nil then
         local op = node.op
         local children = node.children
 
-        -- Empty-children vacuous branches.
         if #children == 0 then
             if op == "AND" then
                 Log:debug("RLFilterEvaluator.evalNode: empty AND children, returning true (vacuous)")
@@ -197,7 +185,6 @@ local function evalNode(node, animal, ctx)
         end
     end
 
-    -- Condition leaf
     return evalCondition(node, animal, ctx)
 end
 
@@ -205,12 +192,8 @@ end
 -- Public entry point
 -- =============================================================================
 
---- Evaluate a filter or bare node against an animal.
----
---- Accepts either a filter record (has `.expression`) or a node directly
---- (group or condition). A fresh `ctx` is allocated per outer call when one
---- is not supplied, giving per-call warning dedup.
----
+--- Evaluate a filter record (carrying `.expression`) or a bare node against an animal. A fresh
+--- `ctx` is allocated per outer call when none is supplied, giving per-call warning dedup.
 ---@param filterOrNode table filter (with .expression) or node (group|condition)
 ---@param animal table animal instance (read-only access via catalog getters)
 ---@param ctx table|nil optional context; caller rarely supplies one
@@ -225,15 +208,13 @@ function RLFilterEvaluator.evaluate(filterOrNode, animal, ctx)
         return false
     end
 
-    -- The catalog getters assume a non-nil animal table. Guard once at the
-    -- entry point instead of inside every getter; preserves the "never
-    -- raises" contract documented on this function.
+    -- The catalog getters assume a non-nil animal table, so this guards once at the entry point
+    -- rather than inside every getter, preserving the never-raises contract.
     if animal == nil then
         Log:trace("RLFilterEvaluator.evaluate: nil animal, returning false")
         return false
     end
 
-    -- Unwrap a filter record to its expression; node shapes pass through.
     local node = filterOrNode.expression or filterOrNode
     local result = evalNode(node, animal, ctx)
 

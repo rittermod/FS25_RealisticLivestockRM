@@ -18,23 +18,15 @@
 --   enum   -> setString/getString
 --   string -> setString/getString (same codec as enum; semantic split only)
 --
--- animalType is stored in XML as the STABLE STRING NAME ("COW", "SHEEP", ...)
--- not the runtime int index -- matches the persistence contract used for
--- subType elsewhere (see AnimalPersistence.lua) and survives AnimalType
--- reordering across game versions or mod sets. MP wire format still uses
--- the int index.
+-- animalType is stored as the STABLE STRING NAME, not the runtime int index, matching the
+-- persistence contract `AnimalPersistence` uses for subType: it survives AnimalType reordering
+-- across game versions or mod sets. The MP wire format still carries the int index.
 --
--- Defensive contracts:
---  * nil resolution of animalType name<->index emits `:warning` so silent
---    scope drops on reload are diagnosable.
---  * missing `.group` subtree at read time emits `:warning` and returns
---    nil (filter is skipped) rather than fabricating an empty-AND that would
---    match every animal.
---  * scalar condition with nil `value` is rejected with `:warning` at
---    write time instead of passing nil to `setXMLFloat/Bool/String` C bindings.
---  * condition `cmp` is validated against the catalog field's `cmps`
---    whitelist on both read and write; invalid tokens are skipped with a
---    warning.
+-- Fail-closed on both directions. A failed animalType name<->index resolution warns, so a silent
+-- scope drop on reload is diagnosable. A missing `.group` subtree on read warns and skips the
+-- filter rather than fabricating an empty AND that would match every animal. A scalar condition
+-- with a nil `value` is rejected at write time instead of passing nil to the XML C bindings. And
+-- `cmp` is validated against the catalog field's whitelist on read and write alike.
 
 local Log = RmLogging.getLogger("RLRM")
 

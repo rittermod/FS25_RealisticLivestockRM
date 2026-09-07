@@ -1,31 +1,25 @@
 --[[
     RLDealerQualityModel.lua
-    Dealer-quality preset model: the three shipped presets (genetics band, price
-    markup, per-animal outlier chance) plus the reshape math the dealer
-    generation path composes.
+    Dealer-quality preset model: the three shipped presets (genetics band, price markup,
+    per-animal outlier chance) plus the reshape math the dealer generation path composes.
 
-    Pure data-in / data-out. The module holds NO state, reads NO setting and
-    never touches game globals, GUI, XML or the network - resolving the ACTIVE
-    preset from RLSettings belongs to the generation slice, so every entry point
-    takes `presetIndex` as a parameter. The one engine dependency is the GIANTS
-    `math.clamp` extension (the headless entry installs it through the shared
-    engine_api lib, so a missing native fails loud rather than sitting nil).
+    Pure data-in / data-out. The module holds NO state, reads NO setting and never touches
+    game globals, GUI, XML or the network - resolving the ACTIVE preset belongs to the
+    generation slice, so every entry point takes `presetIndex` as a parameter. The one engine
+    dependency is the GIANTS `math.clamp` extension.
 
-    The preset ARRAY is a CODE CONSTANT and is APPEND-ONLY: only the chosen
-    INDEX is savegame state, so reordering or inserting a preset would silently
-    reinterpret every already-saved value. A future fourth preset appends at
-    [4]; a retired preset keeps its slot.
+    The preset ARRAY is a CODE CONSTANT and is APPEND-ONLY: only the chosen INDEX is savegame
+    state, so reordering or inserting a preset would silently reinterpret every already-saved
+    value. A retired preset keeps its slot.
 
-    `PRESETS` - and every table `getPreset` hands out - is READ-ONLY shared
-    state by documented contract: the LIVE table is returned, with no defensive
-    copy (both the dealer-row price path and the reshape loop are hot) and no
-    metatable freeze. Callers must never write through the reference.
+    `PRESETS` - and every table `getPreset` hands out - is READ-ONLY shared state by contract:
+    the LIVE table is returned, with no defensive copy and no metatable freeze, because both
+    the dealer-row price path and the reshape loop are hot. Never write through the reference.
 
-    A malformed preset is a mis-edited code constant, never runtime data, so the
-    table is validated ONCE at load and FAILS LOUD. Runtime INPUT is the
-    opposite: a merely out-of-domain value is clamped SILENTLY (an expected
-    legacy-save shape), while a structurally invalid one degrades to a
-    documented fallback and warns ONCE per log site.
+    A malformed preset is a mis-edited code constant, never runtime data, so the table is
+    validated ONCE at load and FAILS LOUD. Runtime INPUT is the opposite: an out-of-domain
+    value is clamped silently, while a structurally invalid one degrades to a documented
+    fallback and warns once per log site.
 ]]
 
 RLDealerQualityModel = {}
@@ -37,50 +31,39 @@ local Log = RmLogging.getLogger("RLRM")
 -- Constants
 -- =============================================================================
 
--- Genetics domain: ONE home, RLConstants. This module re-exports rather than
--- re-declaring, so the sibling dealer-quality slices have a single name to
--- consume without a second DECLARATION of the bounds existing anywhere. Other
--- modules re-export the same constants under their own names (`RLGeneticsDraw`
--- publishes `.MIN` / `.MAX`); those are additional NAMES for one declaration,
--- not second copies of the values.
+-- Re-exported from RLConstants rather than re-declared, so the sibling dealer-quality slices
+-- have one name to consume without a second DECLARATION of the bounds existing anywhere.
 RLDealerQualityModel.GENETICS_MIN  = RLConstants.GENETICS_MIN
 RLDealerQualityModel.GENETICS_MAX  = RLConstants.GENETICS_MAX
 RLDealerQualityModel.GENETICS_SPAN = RLConstants.GENETICS_SPAN
 
--- Arbitrage guard: below a markup of 1.00 the dealer's asking price is under
--- what the same animal fetches when sold straight back, so buy-then-sell with
--- zero elapsed time is a deterministic profit loop. This is a TABLE invariant
--- asserted at load, never a runtime clamp - `resolveMarkup` returns the table's
--- value as-is. It stays local to this module: it is a dealer-economy rule, not
--- a genetics-domain fact.
+-- Arbitrage guard: below a markup of 1.00 the dealer's asking price is under what the same
+-- animal fetches when sold straight back, so buy-then-sell with zero elapsed time is a
+-- deterministic profit loop. A TABLE invariant asserted at load, never a runtime clamp.
 RLDealerQualityModel.MARKUP_FLOOR = 1.00
 
 -- Fallback index for every invalid-index path (the identity preset).
 RLDealerQualityModel.DEFAULT_INDEX = 2
 
--- Array, 1..3 ascending in quality. The INDEX is the persisted setting value,
--- so this array is APPEND-ONLY: never reorder, never insert.
---
--- The band bounds stay LITERAL here on purpose: this table is the locked-numbers
--- artifact and the tripwire test pins these exact values, so they must read
--- plainly. `assertPresetTable` is what checks them against RLConstants at load.
+-- Array, 1..3 ascending in quality. The INDEX is the persisted setting value, so this array is
+-- APPEND-ONLY: never reorder, never insert. The band bounds stay LITERAL because this table is
+-- the locked-numbers artifact and the tripwire test pins these exact values;
+-- `assertPresetTable` is what checks them against RLConstants at load.
 RLDealerQualityModel.PRESETS = {
     [1] = { key = "budget",   lo = 0.25, hi = 1.00, markup = 1.01,  outlierChance = 0.075 },
     [2] = { key = "standard", lo = 0.25, hi = 1.75, markup = 1.075, outlierChance = 0.075 },
     [3] = { key = "premium",  lo = 1.15, hi = 1.75, markup = 1.30,  outlierChance = 0.075 },
 }
--- [2].outlierChance is UNREACHABLE through `reshapeGenetics` (the identity
--- short-circuit returns before the flip) and is pinned anyway, so the three rows
--- stay structurally uniform and the shape check has no special case. Standard
--- outliers are not a feature; they are a can't-happen.
+-- [2].outlierChance is UNREACHABLE through `reshapeGenetics` - the identity short-circuit
+-- returns before the flip - and is pinned anyway, so the three rows stay structurally uniform
+-- and the shape check needs no special case.
 
--- DERIVED, and declared AFTER PRESETS because it reads it: the count cannot
--- drift from the table it describes.
+-- DERIVED, and declared AFTER PRESETS because it reads it, so the count cannot drift from the
+-- table it describes.
 RLDealerQualityModel.PRESET_COUNT = #RLDealerQualityModel.PRESETS
 
 
--- Hot-path locals. The reshape loop and the dealer-row price path both reach
--- these on every call.
+-- Hot-path locals: the reshape loop and the dealer-row price path both reach these per call.
 local MIN  = RLDealerQualityModel.GENETICS_MIN
 local MAX  = RLDealerQualityModel.GENETICS_MAX
 local SPAN = RLDealerQualityModel.GENETICS_SPAN
@@ -89,10 +72,9 @@ local SPAN = RLDealerQualityModel.GENETICS_SPAN
 -- =============================================================================
 -- One-shot warning latches
 -- =============================================================================
--- ONE per-map-load boolean PER LOG SITE, never one shared latch: a fired
--- warning must not silence a different diagnostic. Each site below owns exactly
--- one of these. Lifetime is the MAP LOAD, not the process: FS25 re-sources every
--- mod file on each map load, so these module-scope locals reset to false then.
+-- ONE boolean PER LOG SITE, never one shared latch: a fired warning must not silence a
+-- different diagnostic. Lifetime is the MAP LOAD, not the process - FS25 re-sources every mod
+-- file on each map load, so these reset to false then.
 
 --- Invalid `rolled` reached `applyBand` while the band was usable.
 local _warnedInvalidRolledBanded = false
@@ -103,9 +85,8 @@ local _warnedInvalidRolledUnbanded = false
 --- A usable `rolled` reached `applyBand` behind an unusable band.
 local _warnedUnusableBand = false
 
---- An index that addresses no shipped preset reached `getPreset`. This is the
---- module's SOLE invalid-index warn site; the public wrappers that delegate
---- here add no warning of their own, so a composed call warns exactly once.
+--- An index that addresses no shipped preset reached `getPreset`. The module's SOLE
+--- invalid-index warn site, so a composed call warns exactly once.
 local _warnedInvalidIndex = false
 
 --- Non-table `genetics` reached `reshapeGenetics`.
@@ -116,9 +97,8 @@ local _warnedInvalidGenetics = false
 -- Internal helpers
 -- =============================================================================
 
---- True for a number that is neither NaN nor an infinity. `type()` alone cannot
---- detect either (`type(0/0)` is `"number"`), so both guards are explicit:
---- `v ~= v` catches NaN, the two comparisons catch the infinities.
+--- True for a number that is neither NaN nor an infinity. `type()` alone catches neither
+--- (`type(0/0)` is `"number"`), so `v ~= v` handles NaN and the two comparisons the infinities.
 ---@param v any
 ---@return boolean isReal
 local function isRealNumber(v)
@@ -126,8 +106,7 @@ local function isRealNumber(v)
 end
 
 
---- Log the offending preset and abort the load. Called only from
---- `assertPresetTable`, which runs at module load with a code constant.
+--- Log the offending preset and abort the load. Called only from `assertPresetTable`.
 ---@param index any Preset index that failed
 ---@param message string What the violation was
 ---@param value any The offending value (for the message)
@@ -143,30 +122,23 @@ end
 -- Preset table validation (fail loud at load)
 -- =============================================================================
 
---- Validate a preset table, erroring LOUDLY on the first violation.
---- Called once at module load with `PRESETS`, immediately before the
---- load-confirmation line, so that line only ever prints a table that passed.
---- Public so a suite can exercise the REAL validator under `pcall` rather than
---- a re-implementation of it.
+--- Validate a preset table, erroring loudly on the first violation. Called once at load,
+--- immediately before the confirmation line, so that line only ever prints a table that
+--- passed. Public so a suite can exercise the REAL validator under `pcall`.
 ---
---- A band outside the genetics domain can only come from someone mis-editing
---- `PRESETS`: it is a CODE bug, never runtime data, so the loud once-per-process
---- failure is the honest response. It deliberately does NOT live in `applyBand`,
---- which runs on the order of a thousand times per dealer repopulate and whose
---- band cannot change between calls. The consequence that matters to callers is
---- that `applyBand`'s published `number in [lo, hi]` return is TRUE for every
---- band this module can hand out - the precondition is enforced, not assumed.
+--- It deliberately does NOT live in `applyBand`, which runs on the order of a thousand times
+--- per dealer repopulate and whose band cannot change between calls. What that buys callers is
+--- that `applyBand`'s published `number in [lo, hi]` return holds for every band this module
+--- can hand out - the precondition is enforced, not assumed.
 ---@param presets table Array of preset rows to validate
 function RLDealerQualityModel.assertPresetTable(presets)
     if type(presets) ~= "table" then
         failPreset("?", "preset table is not a table", type(presets))
     end
 
-    -- Count and key-check through pairs, NOT `#presets`. `#` reports the array
-    -- part only, so a table with a hole or an out-of-array key would carry rows
-    -- that `isValidIndex` / `getPreset` still reach - reachable but unvalidated,
-    -- which is exactly what this gate exists to prevent. A mis-edited PRESETS is
-    -- the only way to get here, so every violation fails the load loudly.
+    -- Count and key-check through pairs, NOT `#presets`: `#` reports the array part only, so a
+    -- hole or an out-of-array key would carry rows that `isValidIndex` / `getPreset` still
+    -- reach - reachable but unvalidated, which is what this gate exists to prevent.
     local count = 0
 
     for key in pairs(presets) do
@@ -181,8 +153,8 @@ function RLDealerQualityModel.assertPresetTable(presets)
         failPreset("?", "preset table is empty", count)
     end
 
-    -- Contiguity: with keys 1..count all present, `#presets` is trustworthy and
-    -- the row loop below reaches every row the lookups can reach.
+    -- Contiguity: with keys 1..count all present, `#presets` is trustworthy and the row loop
+    -- below reaches every row the lookups can reach.
     for index = 1, count do
         if presets[index] == nil then
             failPreset(index, "preset table has a hole - keys must be contiguous 1..N", "nil")
@@ -233,8 +205,8 @@ end
 -- Preset lookup
 -- =============================================================================
 
---- True when `presetIndex` addresses a shipped preset. `2.0` is true (Lua reads
---- `PRESETS[2.0]` as `PRESETS[2]`); `2.5` is false, and so is every non-number.
+--- True when `presetIndex` addresses a shipped preset. `2.0` is true (Lua reads `PRESETS[2.0]`
+--- as `PRESETS[2]`); `2.5` is false, and so is every non-number.
 ---@param presetIndex any
 ---@return boolean isValid
 function RLDealerQualityModel.isValidIndex(presetIndex)
@@ -242,9 +214,8 @@ function RLDealerQualityModel.isValidIndex(presetIndex)
 end
 
 
---- Resolve a preset index to its LIVE preset row - never nil. An index that
---- addresses no preset degrades to `DEFAULT_INDEX` and warns once per process.
---- The returned table is READ-ONLY by contract; do not write through it.
+--- Resolve a preset index to its LIVE preset row - never nil. An index that addresses no preset
+--- degrades to `DEFAULT_INDEX` and warns once. The returned table is READ-ONLY by contract.
 ---@param presetIndex any Index of the wanted preset
 ---@return table preset The preset row (`key`/`lo`/`hi`/`markup`/`outlierChance`)
 function RLDealerQualityModel.getPreset(presetIndex)
@@ -269,32 +240,23 @@ end
 
 --- Remap one genetics value from the full domain onto `[lo, hi]`.
 ---
---- The identity short-circuit (`lo == GENETICS_MIN and hi == GENETICS_MAX`) is
---- DEFENSIVE against a future non-dyadic domain, not an optimization: the
---- generic path would compute `MIN + ((x - MIN) / SPAN) * SPAN`, which in
---- IEEE-754 doubles is not exactly `x` for an arbitrary MIN/SPAN.
+--- The identity short-circuit is DEFENSIVE against a future non-dyadic domain, not an
+--- optimization: the generic path computes `MIN + ((x - MIN) / SPAN) * SPAN`, which in
+--- IEEE-754 doubles is not exactly `x` for an arbitrary MIN/SPAN. For the shipped constants it
+--- IS exact, so this branch is not what makes today's bit-for-bit claim true - it is what keeps
+--- it true if either bound moves off a dyadic value. Do not remove it on the strength of "the
+--- numbers work without it". It keys on the BAND, not the preset index, so a future full-range
+--- preset inherits the zero-arithmetic path.
 ---
---- For the SHIPPED constants it IS exact - `MIN = 0.25` is dyadic and
---- `SPAN = 1.5` round-trips cleanly, measured at 0 mismatches over a
---- 1,000,001-point dense sweep and 500,000 random samples (2026-07-29). So this
---- branch is not what makes today's bit-for-bit claim true; it is what keeps it
---- true if either bound ever moves off a dyadic value. Do not remove it on the
---- strength of "the numbers work without it" - they do, for now.
----
---- It keys on the BAND, not on the preset index, so any future full-range preset
---- inherits the zero-arithmetic path automatically.
----
---- This leaf logs nothing but its own one-shot input warnings: a full repopulate
---- calls it hundreds to thousands of times. The per-trait TRACE line lives in
---- `reshapeGenetics`.
+--- This leaf logs nothing but its own one-shot input warnings: a full repopulate calls it
+--- hundreds to thousands of times.
 ---@param rolled any The raw genetics value (runtime data; may be malformed)
 ---@param lo any Band floor
 ---@param hi any Band ceiling
 ---@return number banded Value inside `[lo, hi]` for any band this module ships
 function RLDealerQualityModel.applyBand(rolled, lo, hi)
-    -- Guard FIRST: math.clamp would error on nil, and NaN/inf survive a type()
-    -- check. There is deliberately NO per-call domain check on the band itself -
-    -- that is a TABLE invariant, asserted once at load.
+    -- Guard FIRST: math.clamp would error on nil, and NaN/inf survive a type() check. There is
+    -- deliberately no per-call domain check on the band itself - that is a table invariant.
     local bandUsable = isRealNumber(lo) and isRealNumber(hi) and hi >= lo
 
     if not isRealNumber(rolled) then
@@ -304,13 +266,10 @@ function RLDealerQualityModel.applyBand(rolled, lo, hi)
                     tostring(rolled), lo)
                 _warnedInvalidRolledBanded = true
             end
-            -- Band-consistent floor, NOT the domain minimum: on the BANDED path,
-            -- handing the worst genetics in the domain to a premium animal is the
-            -- defect this closes. The outlier path in `reshapeGenetics` is the
-            -- deliberate exception, not a contradiction: an outlier skips this
-            -- function entirely and keeps its raw roll, which under premium can
-            -- legitimately sit below the band. Malformed INPUT is what gets the
-            -- band-consistent floor; a deliberate band skip is not malformed.
+            -- The BAND floor, not the domain minimum: handing the worst genetics in the domain
+            -- to a premium animal is the defect this closes. An outlier skipping the band and
+            -- keeping a sub-band raw roll is the deliberate exception, not a contradiction -
+            -- malformed INPUT gets the band-consistent floor, a deliberate band skip does not.
             return lo
         end
 
@@ -333,8 +292,8 @@ function RLDealerQualityModel.applyBand(rolled, lo, hi)
         return math.clamp(rolled, MIN, MAX)
     end
 
-    -- Domain guard; in production `r == rolled`, and clamping an in-range value
-    -- is exact, so the identity path below stays bit-for-bit.
+    -- Domain guard; in production `r == rolled`, and clamping an in-range value is exact, so
+    -- the identity path below stays bit-for-bit.
     local r = math.clamp(rolled, MIN, MAX)
 
     if lo == MIN and hi == MAX then
@@ -347,11 +306,9 @@ function RLDealerQualityModel.applyBand(rolled, lo, hi)
 end
 
 
---- The preset's price markup. Deliberately SILENT at every level: this sits
---- behind the dealer item's price getter, which every dealer-screen row calls on
---- every refresh. An index that addresses no preset warns once from `getPreset`
---- and resolves to the default markup, so the price path can never crash or
---- return nil.
+--- The preset's price markup. Deliberately SILENT at every level: this sits behind the dealer
+--- item's price getter, which every dealer-screen row calls on every refresh. An invalid index
+--- warns once from `getPreset` and resolves to the default, so the price path can never crash.
 ---@param presetIndex any Index of the active preset
 ---@return number markup Multiplier, `>= MARKUP_FLOOR` by table invariant
 function RLDealerQualityModel.resolveMarkup(presetIndex)
@@ -359,16 +316,13 @@ function RLDealerQualityModel.resolveMarkup(presetIndex)
 end
 
 
---- Flip the per-ANIMAL outlier coin for a preset. A fired flip means the animal
---- skips the band entirely and keeps its raw base roll - direction-agnostic, so
---- a premium outlier keeps a possibly-poor roll and a budget outlier keeps a
---- possibly-excellent one. Both are intended.
----
---- Note the zero-draw guarantee belongs to `reshapeGenetics`, not here: this
---- function DOES draw for every preset, the identity one included.
+--- Flip the per-ANIMAL outlier coin for a preset. A fired flip means the animal skips the band
+--- entirely and keeps its raw base roll - direction-agnostic, so a premium outlier keeps a
+--- possibly-poor roll and a budget outlier a possibly-excellent one. Both are intended. The
+--- zero-draw guarantee belongs to `reshapeGenetics`: this function draws for every preset.
 ---@param presetIndex any Index of the active preset
----@param rng function|nil Zero-arg RNG returning a float in `[0, 1)`. TRUSTED
----       INTERNAL TEST SEAM - deliberately NOT validated; defaults to `math.random`.
+---@param rng function|nil Zero-arg RNG returning a float in `[0, 1)`. TRUSTED INTERNAL TEST
+---       SEAM - deliberately NOT validated; defaults to `math.random`.
 ---@return boolean fired True when this animal is an outlier
 function RLDealerQualityModel.rollOutlier(presetIndex, rng)
     local preset = RLDealerQualityModel.getPreset(presetIndex)
@@ -378,28 +332,20 @@ function RLDealerQualityModel.rollOutlier(presetIndex, rng)
 end
 
 
---- Reshape one animal's genetics table under a preset. THE composed entry point,
---- and the single home for two invariants that must not be duplicated:
---- (a) the outlier coin flip is per ANIMAL, evaluated ONCE before the trait loop
----     (a per-iteration flip would make the result depend on trait-iteration
----     order and would break "one flip per animal");
---- (b) the identity preset returns before any rng draw, so it perturbs neither
----     the values nor the RNG stream.
+--- Reshape one animal's genetics table under a preset - THE composed entry point, and the
+--- single home for two invariants: the outlier coin flip is per ANIMAL, evaluated once before
+--- the trait loop, so the result cannot depend on trait-iteration order; and the identity
+--- preset returns before any rng draw, so it perturbs neither the values nor the RNG stream.
 ---
---- Non-mutating: the input table is never written, and a NEW table is returned
---- under every preset. What lands in it is PATH-DEPENDENT, and the difference
---- matters for a malformed input:
----   - identity band and outlier: a plain copy, so the copy is SHALLOW and a
----     non-scalar member is ALIASED between input and output. Genetics tables
----     are a flat map of scalars today, which is the contract this module
----     assumes, but a future nested member would be shared.
----   - banded: every member is routed through `applyBand`, so the result is
----     all-numeric by construction - a non-number member is replaced by the band
----     floor (with a one-shot WARNING from the leaf), never aliased.
+--- Non-mutating, and a NEW table is returned under every preset, but what lands in it is
+--- PATH-DEPENDENT for a malformed input. On the identity and outlier paths the copy is SHALLOW,
+--- so a non-scalar member would be ALIASED - genetics tables are a flat map of scalars today,
+--- which is the contract this module assumes. On the banded path every member is routed through
+--- `applyBand`, so the result is all-numeric by construction.
 ---@param genetics any The animal's genetics table (runtime data; may be malformed)
 ---@param presetIndex any Index of the active preset
----@param rng function|nil Zero-arg RNG returning a float in `[0, 1)`. TRUSTED
----       INTERNAL TEST SEAM - deliberately NOT validated; defaults to `math.random`.
+---@param rng function|nil Zero-arg RNG returning a float in `[0, 1)`. TRUSTED INTERNAL TEST
+---       SEAM - deliberately NOT validated; defaults to `math.random`.
 ---@return table|nil newGenetics A new table, or nil when `genetics` was not a table
 ---@return boolean wasOutlier True when the animal skipped the band
 function RLDealerQualityModel.reshapeGenetics(genetics, presetIndex, rng)
@@ -418,9 +364,8 @@ function RLDealerQualityModel.reshapeGenetics(genetics, presetIndex, rng)
     local lo, hi = preset.lo, preset.hi
     local result = {}
 
-    -- Identity preset: a PLAIN COPY, never routed through `applyBand` (routing
-    -- it would clamp out-of-domain legacy values and break the bit-for-bit
-    -- claim), and no rng draw at all.
+    -- Identity preset: a PLAIN COPY, never routed through `applyBand` - routing it would clamp
+    -- out-of-domain legacy values and break the bit-for-bit claim - and no rng draw at all.
     if lo == MIN and hi == MAX then
         for key, value in pairs(genetics) do
             result[key] = value
@@ -437,40 +382,24 @@ function RLDealerQualityModel.reshapeGenetics(genetics, presetIndex, rng)
             result[key] = value
         end
 
-        -- TRACE, not DEBUG: this is a per-item DECISION (which branch this animal
-        -- took), which `wiki/conventions/logging-levels.md` puts at TRACE - per-item
-        -- DETAIL is what belongs at DEBUG. The spec originally classified it as
-        -- detail; Ritter reclassified it as a decision (2026-07-29). A2's
-        -- per-animal reshape line stays at DEBUG: it dumps the resulting values,
-        -- which is detail, and it is level-guarded.
+        -- TRACE, not DEBUG: this is a per-item DECISION - which branch this animal took -
+        -- where per-item DETAIL is what belongs at DEBUG.
         Log:trace("RLDealerQualityModel.reshapeGenetics: outlier animal under preset '%s' - band skipped, raw roll kept",
             preset.key)
 
         return result, true
     end
 
-    -- Level-guarded: RmLogger:trace checks the level INSIDE the method, so the
-    -- three tostring() calls below would be evaluated for every trait of every
-    -- animal even at ERROR - hundreds to thousands of throwaway strings per
-    -- repopulate. Mirrors the guards at `RealisticLivestock_AnimalSystem`
-    -- (createNewSaleAnimal's reshape line) and `RLMenuBuyFrame` (the dealer-list
-    -- digest). The leaf itself deliberately stays logging-free.
+    -- Level-guarded: RmLogger:trace checks the level inside the method, so the tostring() calls
+    -- below would be evaluated for every trait of every animal even at ERROR - hundreds to
+    -- thousands of throwaway strings per repopulate. The leaf itself stays logging-free.
     local traceEnabled = Log.level >= RmLogging.LOG_LEVEL.TRACE
 
     for key, value in pairs(genetics) do
-        -- EVERY member goes through applyBand, non-numbers included. applyBand's
-        -- isRealNumber guard already replaces anything that is not a finite
-        -- number with the band floor and warns ONCE, so a corrupt string or
-        -- table member now gets the SAME treatment as NaN/inf instead of riding
-        -- through into the sold animal (where `Animal:getSellPrice` does
-        -- `meatFactor - 1` and throws, far from the cause).
-        --
-        -- REVERSAL, Ritter 2026-07-29: the spec originally pinned "copied
-        -- verbatim" on the reasoning that a WARNING here "would fire per animal
-        -- on a corrupt save and drown the log". The one-shot latch makes that
-        -- obsolete - `_warnedInvalidRolledBanded` fires once per map load, not
-        -- once per animal - so the objection that justified the old behaviour no
-        -- longer holds. See the spec Change Log.
+        -- EVERY member goes through applyBand, non-numbers included: its isRealNumber guard
+        -- replaces anything that is not a finite number with the band floor and warns once, so
+        -- a corrupt string or table member cannot ride through into the sold animal, where
+        -- `Animal:getSellPrice` does `meatFactor - 1` and throws far from the cause.
         local banded = RLDealerQualityModel.applyBand(value, lo, hi)
 
         if traceEnabled then
@@ -488,8 +417,8 @@ end
 -- =============================================================================
 -- Load-time gate
 -- =============================================================================
--- The validation call comes FIRST and the confirmation line SECOND, so the
--- confirmation can never print for a table that failed.
+-- The validation call comes FIRST and the confirmation line SECOND, so the confirmation can
+-- never print for a table that failed.
 
 RLDealerQualityModel.assertPresetTable(RLDealerQualityModel.PRESETS)
 

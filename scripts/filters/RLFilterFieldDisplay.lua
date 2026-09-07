@@ -79,11 +79,9 @@ end
 --- to extract `subType.name`. Order follows XML-load-order and is
 --- deterministic within a session.
 ---
---- Returns an empty table when the domain is unresolvable: animalTypeIndex
---- is nil, the live mission isn't loaded, or the scoped type has zero
---- subtypes. Callers treat empty as "field picker omits this field" + "Edit
---- attempt on a legacy row of this field is refused" (per spec I/O matrix
---- row 3).
+--- Returns an empty table when the domain is unresolvable: animalTypeIndex is nil, the live
+--- mission is not loaded, or the scoped type has zero subtypes. Callers treat empty as "the
+--- field picker omits this field" and "an edit attempt on a legacy row of it is refused".
 ---@param fieldKey string "gender" or "subType"
 ---@param animalTypeIndex number|nil filter's animalType scope (nil = ANY)
 ---@return string[] ordered internal keys (empty if unresolvable)

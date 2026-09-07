@@ -2,9 +2,9 @@
 -- Declarative registry of fields usable in saveable filters.
 --
 -- Single source of truth consumed by:
---   - RLFilterEvaluator: read field value off animal via `getter(animal)`
---   - P2 RLFilterSerialization: `type` drives wire/XML encoding
---   - P1+ UI editor: `cmps`, `animalTypes`, `type` drive the field picker
+--   - RLFilterEvaluator: reads the field value off an animal via `getter(animal)`
+--   - RLFilterSerialization / RLFilterWire: `type` drives XML and wire encoding
+--   - the UI editor: `cmps`, `animalTypes` and `type` drive the field picker
 --
 -- Field entry shape:
 --   {
@@ -18,16 +18,13 @@
 --     getter       = function(animal) -> value | nil,
 --     monitorGated = true | false,   -- true means getter requires monitor.active
 --     scale        = "0-99" | nil,   -- presentation scale hint for UI
---     min          = number | nil,   -- inclusive lower bound enforced by the
---                                    -- editor on OK. nil = unbounded on that
---                                    -- side. Number fields only; ignored
---                                    -- elsewhere. The evaluator does NOT
---                                    -- consult these bounds (out-of-range
---                                    -- values still evaluate correctly; this
---                                    -- is editor-only UX polish).
---     max          = number | nil,   -- inclusive upper bound enforced by the
---                                    -- editor on OK. See `min`.
+--     min          = number | nil,   -- inclusive lower bound, number fields only; nil is
+--                                    -- unbounded on that side
+--     max          = number | nil,   -- inclusive upper bound; see `min`
 --   }
+--
+-- `min` / `max` are enforced by the EDITOR on OK and never by the evaluator, so an
+-- out-of-range value still evaluates correctly.
 --
 -- Canonical genetics scale is 0-99 via RLScaleHelper.scaleToNinetyNine.
 -- All enum values use STABLE INTERNAL KEYS (e.g. "male"/"female"), NOT
@@ -120,10 +117,8 @@ RLFilterFieldCatalog.FIELDS = {
         animalTypes = "all",
         getter      = function(animal) return animal.age end,
         monitorGated = false,
-        -- Best-effort upper bound: HORSE's 360-month max plus headroom.
-        -- Editor renders with animalType=nil for cross-species filters
-        -- so a per-species cap isn't reachable here. Map mods adding longer-lived
-        -- animals can override via a future catalog hook if needed.
+        -- Best-effort upper bound: HORSE's 360-month max plus headroom. The editor renders
+        -- cross-species filters with animalType=nil, so a per-species cap is not reachable here.
         min          = 0,
         max          = 400,
     },

@@ -1,30 +1,23 @@
 -- RLDealerSaleCatalog.lua
--- Live, per-open view of every loaded animal type / subType / age-stage with its
--- current dealer buyability, icon, and labels - the read model the sale-availability
--- selector dialog consumes. Reads only the EFFECTIVE `store.canBeBought` (the value
--- the apply layer already folded onto the live flags); it never mutates the
--- registry, the store, or the subtype set.
+-- Live, per-open view of every loaded animal type / subType / age-stage with its current dealer
+-- buyability, icon and labels - the read model the sale-availability selector dialog consumes.
+-- Reads only the EFFECTIVE `store.canBeBought` that the apply layer already folded onto the live
+-- flags, and never mutates the registry, the store or the subtype set.
 --
--- Split (mirrors the apply layer): a PURE core `build(types, deps)` that composes the
--- view-model from plain tables + injected `deps` - no `g_*`, GUI, XML, or engine
--- natives - plus a thin in-game shell `enumerate()` that reads the live
--- `animalSystem` and binds the real subtype/label seams. The pure core dual-runs
--- (in-game rlTest + headless with STUB deps); the shell is in-game glue.
+-- Split like the apply layer: a PURE core `build(types, deps)` that composes the view-model from
+-- plain tables plus injected `deps` - no `g_*`, GUI, XML or engine natives - and a thin in-game
+-- shell `enumerate()` that reads the live `animalSystem` and binds the real label seams.
 --
--- Key scheme: each stage entry is identified by (subTypeName, minAge) - the SAME
--- separate-arg key the override registry takes at set/get/clear, so a consumer
--- toggles the registry directly off an entry with no composite-key decoding.
+-- Each stage entry is keyed by (subTypeName, minAge), the SAME separate-arg key the override
+-- registry takes, so a consumer toggles the registry directly off an entry with no decoding.
 --
--- Age ranges MIRROR the real sale generator
--- `RealisticLivestock_AnimalSystem:_pickSaleAnimalAge` so the displayed band equals
--- what the dealer actually sells: a store-bearing stage spans
--- `[minAge, nextRawVisual.minAge - 1]` (the next visual by ascending minAge, store-less
--- or not), and the LAST raw visual extends to `animalType.maxBuyAge` (or 60 when a
--- bridge type ships no max). A store-less visual is a BOUNDARY, not a stage - it bounds
--- the preceding stage but emits no entry. A stage whose upper bound falls below its
--- `minAge` is DROPPED (never clamped), exactly as the generator's `hi >= lo` guard drops
--- an empty band; that drop also collapses a duplicate `minAge` so each surviving
--- `(subTypeName, minAge)` key stays unique.
+-- Age ranges MIRROR the real sale generator `_pickSaleAnimalAge`, so the displayed band equals
+-- what the dealer actually sells: a store-bearing stage spans `[minAge, nextRawVisual.minAge - 1]`
+-- and the LAST raw visual extends to `animalType.maxBuyAge`, or 60 when a bridge type ships no
+-- max. A store-less visual is a BOUNDARY, not a stage - it bounds the preceding stage but emits
+-- nothing. A stage whose upper bound falls below its `minAge` is DROPPED rather than clamped,
+-- exactly as the generator's `hi >= lo` guard drops an empty band; that drop also collapses a
+-- duplicate `minAge`, so each surviving key stays unique.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -44,12 +37,10 @@ local function hasDeps(deps)
         and type(deps.subTypeLabel) == "function"
 end
 
---- Collect the sparse `getTypes()` map into a dense array, dropping nil entries and
---- entries with no `typeIndex` (TRACEd + counted like every other skip), then sort by
---- `typeIndex` ascending with a `name` tie-break so ordering never flakes on a
---- fixture/mod tie. `pairs()` (never `ipairs`) because the map is keyed by `typeIndex`
---- and a hole would truncate an `ipairs` walk, silently dropping map-bridge / exotic
---- types.
+--- Collect the sparse `getTypes()` map into a dense array, then sort by `typeIndex` with a
+--- `name` tie-break so ordering never flakes on a fixture or mod tie. `pairs()`, never `ipairs`:
+--- the map is keyed by `typeIndex`, and a hole would truncate an `ipairs` walk, silently
+--- dropping map-bridge and exotic types.
 ---@param types table getTypes() result (sparse map)
 ---@param counters table { typesSkipped= }
 ---@return table[] sorted dense array of animalType tables
@@ -72,16 +63,16 @@ local function sortedTypes(types, counters)
     return collected
 end
 
---- Gate-equivalent buyable boolean (mirrors the apply layer's `and true or false`):
---- an absent or falsy `canBeBought` reads `false`, and the field is always a boolean.
+--- Gate-equivalent buyable boolean, mirroring the apply layer: an absent or falsy
+--- `canBeBought` reads `false`, so the field is always a boolean.
 ---@param store table visual.store
 ---@return boolean
 local function buyableOf(store)
     return store.canBeBought and true or false
 end
 
---- Icon path, normalized so an empty string collapses to nil (the dialog treats
---- both "no icon" cases the same and must not try to load "").
+--- Icon path, normalized so an empty string collapses to nil - the dialog treats both "no icon"
+--- cases the same and must not try to load "".
 ---@param store table visual.store
 ---@return string|nil
 local function iconOf(store)
@@ -89,23 +80,15 @@ local function iconOf(store)
     return (f ~= nil and f ~= "") and f or nil
 end
 
---- Build the per-stage view-model for one subtype, mirroring the real sale generator
---- `_pickSaleAnimalAge`. Every visual with a numeric `minAge` is a BOUNDARY (store-less
---- ones included), sorted ascending; only a store-bearing visual emits a stage, bounded
---- off the NEXT raw visual's `minAge` (last raw -> `maxBuyAge`). A stage with `hi < lo`
---- is DROPPED (the generator's `hi >= lo` guard) - this covers `maxBuyAge < minAge` and
---- collapses a duplicate `minAge` (the earlier twin's `hi = lo - 1`), so each surviving
---- stage keeps a unique `minAge`. A visual with a non-numeric `minAge` can be neither
---- stage nor boundary and is dropped (TRACE).
+--- Build the per-stage view-model for one subtype, per the age-range rule in the file header. A
+--- visual with a non-numeric `minAge` can be neither stage nor boundary and is dropped.
 ---@param subType table { name=, visuals= }
 ---@param maxBuyAge number last-stage upper bound (already numeric-guarded)
 ---@param counters table { visualsSkipped=, stagesDropped= }
 ---@return table[] stage view-models (possibly empty)
 local function buildStages(subType, maxBuyAge, counters)
-    -- Boundary array: every numeric-minAge visual, store-bearing OR store-less, ascending
-    -- by minAge - the same raw array the generator walks. A store-less visual stays in as
-    -- a boundary; only a non-numeric minAge (would break the sort, is not a real stage) is
-    -- dropped here.
+    -- The boundary array is every numeric-minAge visual, store-bearing or not, ascending - the
+    -- same raw array the generator walks.
     local ordered = {}
     for _, visual in ipairs(subType.visuals) do
         if type(visual.minAge) == "number" then
@@ -148,17 +131,14 @@ local function buildStages(subType, maxBuyAge, counters)
     return stages
 end
 
---- Build the sale-availability catalog view-model from a `getTypes()` map and an
---- injected `deps` bundle. Pure: every live lookup (subtype resolution, both labels)
---- arrives through `deps`, so the core reaches no global. Read-only: never mutates
---- `types`, any subtype, or any store flag.
+--- Build the catalog view-model from a `getTypes()` map and an injected `deps` bundle. Pure:
+--- every live lookup arrives through `deps`, so the core reaches no global, and it never mutates
+--- `types`, any subtype or any store flag.
 ---
---- Walk: types by `typeIndex` (then `name`); each type's `subTypes` is a DENSE array
---- of subtype INDICES resolved via `deps.getSubTypeByIndex` (`ipairs` is correct on
---- that dense array - the sparse-map ban is `getTypes()` only). A subtype with no
---- resolvable entry, no name, or no store-bearing stage is skipped with a TRACE and
+--- Each type's `subTypes` is a DENSE array of subtype INDICES resolved via
+--- `deps.getSubTypeByIndex`, so `ipairs` is correct there - the sparse-map ban applies to
+--- `getTypes()` only. A subtype with no resolvable entry, no name, or no store-bearing stage
 --- contributes no entry.
----
 ---@param types table|nil getTypes() result (sparse map keyed by typeIndex)
 ---@param deps table { getSubTypeByIndex=fn(idx)->subType|nil, typeLabel=fn(animalType)->string, subTypeLabel=fn(name,typeIndex)->string }
 ---@return table[] catalog array of { typeIndex, typeLabel, subTypeIndex, subTypeName, subTypeLabel, visuals={...} }
@@ -178,8 +158,7 @@ function RLDealerSaleCatalog.build(types, deps)
 
     for _, animalType in ipairs(orderedTypes) do
         local typeLabel = deps.typeLabel(animalType)
-        -- Numeric-guard maxBuyAge the same way `minAge` is guarded: a mod shipping a
-        -- non-number (e.g. "60") must not reach math on `maxBuyAge`.
+        -- Numeric-guarded like `minAge`: a mod shipping a non-number must not reach math here.
         local maxBuyAge = type(animalType.maxBuyAge) == "number" and animalType.maxBuyAge or 60
         if type(animalType.subTypes) ~= "table" then
             Log:trace("RLDealerSaleCatalog.build: type %s has no subTypes array; skipped",
@@ -224,15 +203,11 @@ end
 -- In-game shell (binds the live animalSystem + real label seams)
 -- =============================================================================
 
---- Build the catalog from the live animal system. Thin glue over `build`: resolves
---- `g_currentMission.animalSystem`, binds `getSubTypeByIndex` + the two real
---- (env-coupled) label seams into `deps`, then delegates. Guards the
---- animalSystem/getTypes chain and returns `{}` with a WARNING on any miss (mirrors
---- `RLDealerQuery.listDealerTypes`). The `build` call is wrapped in a last-resort
---- `pcall` (the boundary `RLDealerSaleApply.applyToLiveSubTypes` also carries): a
---- throwing label seam or subtype lookup surfaces as `{}` + ERROR rather than reaching
---- the dialog opener. The seams themselves are load-order guaranteed (RLAnimalUtil +
---- RLFilterFieldDisplay source before this module), so the pcall is defence-in-depth.
+--- Build the catalog from the live animal system: resolve the animalSystem, bind
+--- `getSubTypeByIndex` and the two env-coupled label seams into `deps`, then delegate. Returns
+--- `{}` with a warning on any unavailable dependency. The `build` call is wrapped in a
+--- last-resort `pcall` so a throwing label seam surfaces as `{}` plus an error rather than
+--- reaching the dialog opener; the seams are load-order guaranteed, so that is defence in depth.
 ---@return table[] catalog (empty on any unavailable dependency or build error)
 function RLDealerSaleCatalog.enumerate()
     if g_currentMission == nil or g_currentMission.animalSystem == nil then
