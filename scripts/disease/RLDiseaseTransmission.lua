@@ -174,8 +174,9 @@ end
 function RLDiseaseTransmission.betaMonthly(model, maxLifespanMonths, incubationTicks, daysPerPeriod)
     if type(model) ~= "table" then return 0, 0 end
 
-    -- NOT the 1..28 range bound, which no slice owns: this refuses exactly the one
-    -- value that would make the division below form an `x/0`.
+    -- NOT a range bound: `daysPerPeriod` is trusted as an integer 1..28, so every
+    -- in-contract value passes. It rejects anything not above zero, which is what
+    -- keeps the division below from forming an `x/0`.
     if not (daysPerPeriod > 0) then return 0, 0 end
 
     local months = incubationTicks / daysPerPeriod
