@@ -547,8 +547,9 @@ function RLDiseaseRecord.advanceTreatment(record, treatment, daysPerPeriod, rng)
     if type(treatment) ~= "table" then return RLDiseaseRecord.REFUSED, RESULT.NONE end
 
     if record.state ~= RLDiseaseRecord.STATE.INFECTIOUS then
-        -- A record that left INFECTIOUS with a course running keeps its counter, and
-        -- this refusal is what makes that stale value inert rather than harmful.
+        -- A record that left INFECTIOUS for DEAD keeps its counter, and this refusal is
+        -- what stops anything advancing it afterwards. The natural-recovery exit clears
+        -- it instead, in the progression driver, so nothing stale survives there.
         Log:trace("RLDiseaseRecord.advanceTreatment: refused title=%s - state is %s, "
             .. "not INFECTIOUS", tostring(record.title), tostring(record.state))
 

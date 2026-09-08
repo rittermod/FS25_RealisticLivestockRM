@@ -126,10 +126,18 @@ function RLDiseaseProgression.stepMonth(record, model, ctx)
     -- that recovers unseeded is REMOVED on its very next tick.
     record.immunityMonthsRemaining = model.immunityMonths
 
+    -- The record SURVIVES this exit and stays renderable, so a part-served course left
+    -- standing here contradicts the counter's contract. The CURE exit needs no clear -
+    -- `advanceTreatment` writes 0 on every completion - and the DEATH exit deliberately
+    -- keeps its counters.
+    local clearedTreatmentMonths = record.treatmentMonthsRemaining
+    record.treatmentMonthsRemaining = 0
+
     Log:debug("RLDiseaseProgression: recovered naturally title=%s - elapsed %s of %s "
-        .. "month(s), seeded immunity at %s month(s)",
+        .. "month(s), seeded immunity at %s month(s), cleared a treatment counter of %s",
         tostring(record.title), tostring(record.monthsElapsed),
-        tostring(model.durationMonths), tostring(model.immunityMonths))
+        tostring(model.durationMonths), tostring(model.immunityMonths),
+        tostring(clearedTreatmentMonths))
 
     return true
 end
@@ -230,8 +238,9 @@ local function runSteps(record, model, ctx, rollsFatality)
         detail.fatality = RLDiseaseProgression.stepFatality(record, model, ctx)
 
         if detail.fatality == RLDiseaseFatality.FATALITY_RESULT.DIED then
-            -- Steps 3 to 5 are skipped and both counters keep the values they held. A
-            -- record at DEAD never outlives the tick that wrote it.
+            -- Steps 3 to 5 are skipped and both counters keep the values they held.
+            -- Nothing ADVANCES a counter on a DEAD record: every applier refuses a
+            -- non-INFECTIOUS record, and the state gate above returns NONE for DEAD.
             return finish(INSTRUCTION.DIED)
         end
     end
