@@ -228,6 +228,36 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
     -- one figure would make it unassertable for any of them.
     local droppedLegacyDiseaseRecords = 0
 
+    -- Resolved ONCE: constant for the animal, where the loop below is per-record. A nil
+    -- SKIPS the type check rather than failing closed, which would drop every record on
+    -- every animal - so every step here takes NO default and yields nil instead.
+    --
+    -- Re-read rather than reusing `subTypeIndex`: that one defaults to COW_HOLSTEIN, and
+    -- inheriting the default would type an unlabelled animal COW and drop a sheep's or a
+    -- pig's records under a rule that is meant to skip when it cannot tell.
+    local animalTypeName
+    local typedSubType = isLegacy and subTypeIndex
+        or g_currentMission.animalSystem:getSubTypeIndexByName(xmlFile:getString(key .. "#subType"))
+    local animalSubType = typedSubType ~= nil
+        and g_currentMission.animalSystem:getSubTypeByIndex(typedSubType) or nil
+    local typeIndexToName = g_currentMission.animalSystem.typeIndexToName
+
+    if animalSubType ~= nil and typeIndexToName ~= nil then
+        animalTypeName = typeIndexToName[animalSubType.typeIndex]
+    end
+
+    if animalTypeName == nil then
+        -- Not a WARNING: the type check is designed to skip here. But a permanently broken
+        -- resolution and "nothing to drop" are otherwise indistinguishable in a log.
+        Log:debug("loadAnimal: no animal type resolved, the record-adherence type check is "
+            .. "skipped for this animal (farmId=%s uniqueId=%s)", tostring(farmId), tostring(id))
+    end
+
+    -- SEPARATE from the legacy counter above, never folded in: that one is an oracle scoped
+    -- to a single reason, and a combined figure would be unassertable for either.
+    local droppedNonAdherent = {}
+    local droppedNonAdherentTotal = 0
+
     -- Every skip below is a BARE return, never `return false`. Returning exactly false from an
     -- iterate callback ends the walk, so it would drop every REMAINING disease on this animal
     -- rather than just the one that could not be resolved. Returning nothing continues it.
@@ -270,9 +300,58 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
 
         disease:loadFromXMLFile(xmlFile, diseaseKey)
 
+        -- Read at CALL time: main.lua sources this file well before the disease modules, so a
+        -- file-scope alias would be nil in-game and populated headless.
+        local adherent, reason = RLDiseaseRecord.isAdherent(disease, diseaseType, animalTypeName)
+
+        if not adherent then
+
+            -- Never index the tally with the raw return: a renamed reason constant makes
+            -- `reason` nil, and `t[nil] = v` RAISES inside an iterate callback on the load
+            -- path, turning a designed drop into a failed animal load.
+            local reasonKey = reason or "UNSPECIFIED"
+
+            droppedNonAdherent[reasonKey] = (droppedNonAdherent[reasonKey] or 0) + 1
+            droppedNonAdherentTotal = droppedNonAdherentTotal + 1
+
+            Log:trace("loadAnimal: dropping a disease record, reason=%s (title=%s state=%s farmId=%s uniqueId=%s)",
+                tostring(reason), tostring(diseaseType.title), tostring(disease.state),
+                tostring(farmId), tostring(id))
+
+            return
+
+        end
+
         table.insert(diseases, disease)
 
     end)
+
+    -- ONE line per animal, for the reason the legacy warning above carries one: a herd that
+    -- meets a re-authored definition file drops together. INFO, not WARNING - this is the rule
+    -- working as designed, and nothing asks the player to act.
+    if droppedNonAdherentTotal > 0 then
+
+        -- Sorted, so the rendered order does not depend on hash order and cannot differ
+        -- between the two runners.
+        -- The RAW keys, never a `tostring` copy: re-keying the lookup would read nil for
+        -- any non-string key and hand that nil straight to `%d`.
+        local reasons = {}
+
+        for reason in pairs(droppedNonAdherent) do reasons[#reasons + 1] = reason end
+
+        table.sort(reasons, function(a, b) return tostring(a) < tostring(b) end)
+
+        local rendered = {}
+
+        for i = 1, #reasons do
+            rendered[i] = string.format("%s=%d", tostring(reasons[i]), droppedNonAdherent[reasons[i]])
+        end
+
+        Log:info("loadAnimal: dropped %s disease record(s) that no longer fit their definition, %s (farmId=%s uniqueId=%s)",
+            tostring(droppedNonAdherentTotal), table.concat(rendered, " "),
+            tostring(farmId), tostring(id))
+
+    end
 
     -- ONE line per animal, never one per record: a herd carrying the old shape is the normal
     -- case on the first load of this build, so per-record lines would bury the load log in

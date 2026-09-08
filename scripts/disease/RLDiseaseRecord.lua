@@ -11,6 +11,11 @@
       RECOVERED    immune for its window, blocks reinfection, sheds nothing
       DEAD         died OF THIS DISEASE, never "the animal is dead"
 
+    It also answers whether a STORED record still fits its definition. Two rules govern
+    one when the definitions change underneath it: a record written in the pre-SEIR
+    shape is dropped on load and never migrated, and a record that no longer fits its
+    current definition is dropped too. `isAdherent` is the second.
+
     Pure data-in / data-out - RmLogging is the only dependency, so it dual-runs headless.
 ]]
 
@@ -218,6 +223,87 @@ function RLDiseaseRecord.canRecover(endpoint, reason)
     end
 
     return mayRecover
+end
+
+
+--- Why a stored record no longer fits the definition it names.
+---
+--- READ-ONLY by contract, like `STATE`, so a caller field-compares a reason rather
+--- than matching a message.
+RLDiseaseRecord.ADHERENCE_REASON = {
+    ["NO_RECORD"] = "NO_RECORD",
+    ["NO_MODEL"] = "NO_MODEL",
+    ["UNKNOWN_STATE"] = "UNKNOWN_STATE",
+    ["ANIMAL_TYPE"] = "ANIMAL_TYPE",
+    ["TREATMENT_GONE"] = "TREATMENT_GONE",
+    ["UNREACHABLE_STATE"] = "UNREACHABLE_STATE"
+}
+
+
+--- Does this stored record still fit the definition its title resolves to?
+---
+--- A record whose state a re-authored model can no longer produce is dropped, never
+--- repaired - it holds no history to repair from. The check ORDER is declared, because
+--- a record can fail two conditions and the reason drives the caller's tally.
+--- @param record table|nil The `Disease` object - eight record keys grafted flat plus
+---        `treatmentRunning`. TRUSTED INTERNAL input; nothing here raises.
+--- @param model table|nil The parsed `<model>` entry. The endpoint is read from HERE.
+--- @param animalTypeName string|nil Uppercase type name, nil when unresolvable.
+--- @return boolean adherent True when the record still fits the model
+--- @return string|nil reason An `ADHERENCE_REASON` value, nil when adherent
+function RLDiseaseRecord.isAdherent(record, model, animalTypeName)
+    local REASON = RLDiseaseRecord.ADHERENCE_REASON
+
+    -- TYPE tests throughout, as in the appliers: `false` is the reachable non-table.
+    if type(record) ~= "table" then return false, REASON.NO_RECORD end
+    if type(model) ~= "table" then return false, REASON.NO_MODEL end
+
+    -- `state` is the one field a save can carry outside the enum - the codec reads it
+    -- with a default and validates nothing - and every applier then refuses it forever.
+    if RLDiseaseRecord.STATE[record.state] == nil then
+        return false, REASON.UNKNOWN_STATE
+    end
+
+    -- An EMPTY list skips too, and that half is the one worth stating: the parser drops a
+    -- disease resolving no type, so neither shape is reachable - but an empty list would
+    -- otherwise match nothing and drop every record on every animal.
+    if animalTypeName ~= nil and type(model.animals) == "table" and #model.animals > 0 then
+        local bound = false
+
+        for i = 1, #model.animals do
+            if model.animals[i] == animalTypeName then
+                bound = true
+                break
+            end
+        end
+
+        if not bound then return false, REASON.ANIMAL_TYPE end
+    end
+
+    -- Gated on INFECTIOUS because nothing clears the running flag at a cure, so a
+    -- recovered and immune animal legitimately still carries it.
+    if record.state == RLDiseaseRecord.STATE.INFECTIOUS then
+        local remaining = record.treatmentMonthsRemaining
+        local midCourse = (type(remaining) == "number" and remaining > 0)
+            or record.treatmentRunning == true
+
+        if midCourse and type(model.treatment) ~= "table" then
+            return false, REASON.TREATMENT_GONE
+        end
+    end
+
+    -- Reads `RECOVERY_EXITS` rather than naming `lifelong`, so a fifth endpoint
+    -- inherits the rule.
+    if record.state == RLDiseaseRecord.STATE.RECOVERED then
+        local exits = RLDiseaseRecord.RECOVERY_EXITS[model.endpoint]
+        local reachable = type(exits) == "table"
+            and (exits[RLDiseaseRecord.EXIT_REASON.NATURAL] == true
+                or exits[RLDiseaseRecord.EXIT_REASON.CURE] == true)
+
+        if not reachable then return false, REASON.UNREACHABLE_STATE end
+    end
+
+    return true, nil
 end
 
 
