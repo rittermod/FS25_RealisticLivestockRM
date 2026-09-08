@@ -1487,12 +1487,21 @@ function Animal:updateOutput(temp)
         local milkCurve, milkFactor, milkProductivity, milkPreDisease
 
         if isMilk then
-            local monthsSinceLastBirth = self.monthsSinceLastBirth or 12
+            -- [BullSpermFix] bullStable.xml (FS25_HofBergmann) reuses this same
+            -- <milk fillType="BULLSPERM"> output entry for bull semen collection.
+            -- A BULL-subtype animal can never give birth/lactate, so without this
+            -- bypass its semen output is permanently gated to 0 below. Only the
+            -- literal "BULL" subtype is affected - RL's own breeding cattle
+            -- (BULL_HOLSTEIN etc.) are untouched.
+            local subTypeForGate = self.getSubType ~= nil and self:getSubType() or nil
+            local isBullSpermFix = subTypeForGate ~= nil and subTypeForGate.name == "BULL"
+
+            local monthsSinceLastBirth = isBullSpermFix and 0 or (self.monthsSinceLastBirth or 12)
             local factor = 0.8
             local productivity = self.genetics.productivity or 1
             local curveLitersPerDay = litersPerDay
 
-            if monthsSinceLastBirth >= 10 or not self.isLactating or not self.isParent then
+            if (not isBullSpermFix) and (monthsSinceLastBirth >= 10 or not self.isLactating or not self.isParent) then
                 factor = 0
             elseif monthsSinceLastBirth <= 3 then
                 factor = factor + (monthsSinceLastBirth / 6)
