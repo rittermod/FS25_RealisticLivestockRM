@@ -607,6 +607,7 @@
         <text name="rl_death_health" text="健康状况差"/>
         <text name="rl_death_age" text="年龄"/>
         <text name="rl_death_accident" text="事故"/>
+        <text name="rl_death_disease" text="a disease"/>
 
 
 

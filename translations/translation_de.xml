@@ -572,6 +572,7 @@
         <text name="rl_death_health" text="geringe Gesundheit"/>
         <text name="rl_death_age" text="Alter"/>
         <text name="rl_death_accident" text="ein Unfall"/>
+        <text name="rl_death_disease" text="a disease"/>
 
 
 

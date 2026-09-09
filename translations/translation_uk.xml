@@ -551,6 +551,7 @@
         <text name="rl_death_health" text="поганий стан здоров’я"/>
         <text name="rl_death_age" text="похилий вік"/>
         <text name="rl_death_accident" text="нещасний випадок"/>
+        <text name="rl_death_disease" text="a disease"/>
 
 
 

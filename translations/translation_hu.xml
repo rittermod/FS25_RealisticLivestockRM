@@ -636,6 +636,7 @@
         <text name="rl_death_health" text="gyenge egészségi állapot"/>
         <text name="rl_death_age" text="végelgyengülés"/>
         <text name="rl_death_accident" text="baleset"/>
+        <text name="rl_death_disease" text="a disease"/>
 
 
 

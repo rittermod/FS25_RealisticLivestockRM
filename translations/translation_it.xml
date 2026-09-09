@@ -602,6 +602,7 @@
         <text name="rl_death_health" text="salute bassa"/>
         <text name="rl_death_age" text="vecchiaia"/>
         <text name="rl_death_accident" text="un incidente"/>
+        <text name="rl_death_disease" text="a disease"/>
 
         <!-- DEPENDENCIES -->
 

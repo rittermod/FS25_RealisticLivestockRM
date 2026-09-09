@@ -577,6 +577,7 @@
         <text name="rl_death_health" text="een slechte gezondheid"/>
         <text name="rl_death_age" text="ouderdom"/>
         <text name="rl_death_accident" text="een ongeluk"/>
+        <text name="rl_death_disease" text="a disease"/>
 
 
 

@@ -587,6 +587,7 @@
         <text name="rl_death_health" text="heikko terveys"/>
         <text name="rl_death_age" text="vanhuus"/>
         <text name="rl_death_accident" text="onnettomuus"/>
+        <text name="rl_death_disease" text="a disease"/>
 
 
 

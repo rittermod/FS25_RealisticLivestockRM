@@ -607,6 +607,7 @@
         <text name="rl_death_health" text="salud baja"/>
         <text name="rl_death_age" text="vejez"/>
         <text name="rl_death_accident" text="un accidente"/>
+        <text name="rl_death_disease" text="a disease"/>
 
 
 

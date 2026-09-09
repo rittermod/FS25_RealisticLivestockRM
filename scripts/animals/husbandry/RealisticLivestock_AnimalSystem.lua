@@ -2466,6 +2466,31 @@ function AnimalSystem:onDayChanged()
         local day = 1 + math.floor((currentDayInPeriod - 1) * (getDaysInMonth(month) / daysPerPeriod))
         local year = environment.currentYear
 
+        -- The pen block carries the other copy of this gate. Guarding only one of the two
+        -- would let dealer stock progress with the feature switched off.
+        local diseasesOn = self.isServer and g_diseaseManager ~= nil
+            and g_diseaseManager.diseasesEnabled == true
+
+        -- NO fee and NO death broadcast: these pools have no pen, so no payer and no cluster
+        -- system to address an event to.
+        ---@param animal table The pool animal to advance.
+        ---@param poolName string Which pool, for log attribution only.
+        local function tickDisease(animal, poolName)
+            if not diseasesOn or animal.numAnimals <= 0 or animal.isDead then
+                Log:trace("AnimalSystem:onDayChanged: skipped the %s disease tick (enabled=%s dead=%s farmId=%s uniqueId=%s)",
+                    poolName, tostring(diseasesOn), tostring(animal.isDead),
+                    tostring(animal.farmId), tostring(animal.uniqueId))
+                return
+            end
+
+            RmSafeUtils.safeAnimalCall(animal, "onDiseaseTick", function()
+                return animal:onDiseaseTick(daysPerPeriod)
+            end, {false, 0})
+
+            Log:trace("AnimalSystem:onDayChanged: ticked disease for a %s animal (farmId=%s uniqueId=%s)",
+                poolName, tostring(animal.farmId), tostring(animal.uniqueId))
+        end
+
         for _, animals in pairs(self.animals) do
 
             for _, animal in pairs(animals) do
@@ -2475,6 +2500,8 @@ function AnimalSystem:onDayChanged()
                 RmSafeUtils.safeAnimalCall(animal, "AnimalSystem:onDayChanged", function()
                     animal:onDayChanged(nil, self.isServer, day, month, year, currentDayInPeriod, daysPerPeriod, true)
                 end)
+
+                tickDisease(animal, "sale")
 
             end
 
@@ -2486,6 +2513,8 @@ function AnimalSystem:onDayChanged()
                 RmSafeUtils.safeAnimalCall(animal, "AnimalSystem:onDayChanged(ai)", function()
                     animal:onDayChanged(nil, self.isServer, day, month, year, currentDayInPeriod, daysPerPeriod, true)
                 end)
+
+                tickDisease(animal, "AI")
             end
 
         end

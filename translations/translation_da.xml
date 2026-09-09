@@ -564,6 +564,7 @@
         <text name="rl_death_health" text="Lavt helbred"/>
         <text name="rl_death_age" text="Alderdom"/>
         <text name="rl_death_accident" text="Ulykke"/>
+        <text name="rl_death_disease" text="a disease"/>
 
 
 

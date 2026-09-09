@@ -635,6 +635,7 @@
         <text name="rl_death_health" text="mauvaise santé"/>
         <text name="rl_death_age" text="vieillesse"/>
         <text name="rl_death_accident" text="un accident"/>
+        <text name="rl_death_disease" text="a disease"/>
 
         <text name="rl_ui_dependencies_missing" text="RealisticLivestock nécessite les dépendances suivantes :"/>
         <text name="rl_ui_dependency_missing_notInstalled" text="- %s (Non installé)"/>

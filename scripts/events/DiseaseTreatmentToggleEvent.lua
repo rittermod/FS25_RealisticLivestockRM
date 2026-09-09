@@ -107,11 +107,11 @@ function DiseaseTreatmentToggleEvent:run(connection)
         local refusal
 
         -- Both clauses must keep mirroring the dialog's own gate exactly - that mirroring is
-        -- the whole reason this block exists. Which states may start or resume a course is
-        -- the enrolment rule's to decide, not this one's.
+        -- the whole reason this block exists. INFECTIOUS is the state enrolTreatment accepts,
+        -- so a record outside it can never have a course started behind the flag.
         if disease ~= nil then
-            if disease.state == RLDiseaseRecord.STATE.RECOVERED then
-                refusal = "recovered"
+            if disease.state ~= RLDiseaseRecord.STATE.INFECTIOUS then
+                refusal = "not-infectious"
             elseif disease.model.treatment == nil then
                 refusal = "untreatable"
             end
@@ -140,9 +140,22 @@ function DiseaseTreatmentToggleEvent:run(connection)
     if animal ~= nil then
         for _, disease in pairs(animal.diseases) do
             if disease.title == self.diseaseTitle then
+                -- The flag LEADS the writes: it is the sole cause of replication, so writing
+                -- it last puts it behind every statement that can raise.
+                animal:setDirty()
+
                 disease.treatmentRunning = self.treatmentRunning
-                Log:trace("DiseaseTreatmentToggleEvent:run: %s treatment=%s uniqueId=%s",
-                    self.diseaseTitle, tostring(self.treatmentRunning), tostring(identifiers.uniqueId))
+
+                -- START only. On a resume the refusal of a non-zero counter IS the pause
+                -- contract, so the served months survive. No wire field is needed: the value
+                -- is `treatment.months` off a model every peer holds identically.
+                if self.treatmentRunning then
+                    RLDiseaseRecord.enrolTreatment(disease, disease.model.treatment)
+                end
+
+                Log:trace("DiseaseTreatmentToggleEvent:run: %s treatment=%s treatmentMonthsRemaining=%s uniqueId=%s",
+                    self.diseaseTitle, tostring(self.treatmentRunning),
+                    tostring(disease.treatmentMonthsRemaining), tostring(identifiers.uniqueId))
                 return
             end
         end

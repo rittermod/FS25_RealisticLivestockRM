@@ -316,12 +316,11 @@ end
 --- Refuse one pen's transmission pass: the legacy engine is switched off, so no animal
 --- catches anything from a pen mate until the SEIR spread pass lands.
 ---
---- THE ONLY ENTRY POINT to the transmission pass, called once per pen from the period
+--- THE ONLY ENTRY POINT to the transmission pass, called once per pen from the DAILY
 --- tick, ABOVE that tick's per-animal progression loop.
 ---
---- NOTHING ON THIS PATH READS THE PLAYER'S DISEASE SETTING ANY MORE, and what makes that
---- safe is that this body is a STUB rather than that the setting is unreachable, so the
---- slice that re-arms the pass must ADD a guard here rather than restore one.
+--- This body reads no setting. The pen's own `diseasesEnabled` gate is what stops the
+--- call, so a second entry point here would walk straight past it.
 --- @see RLSettings.applyChange
 ---@param animals table the pen's animals. Unread while the engine is off.
 ---@param penName string|nil the husbandry's display name, for log attribution only

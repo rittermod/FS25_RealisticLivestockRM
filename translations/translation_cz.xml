@@ -635,6 +635,7 @@
         <text name="rl_death_health" text="nízké zdraví"/>
         <text name="rl_death_age" text="stáří"/>
         <text name="rl_death_accident" text="nehoda"/>
+        <text name="rl_death_disease" text="a disease"/>
 
         <text name="rl_ui_dependencies_missing" text="Realistic Livestock vyžaduje následující závislosti:"/>
         <text name="rl_ui_dependency_missing_notInstalled" text="- %s (není nainstalováno)"/>

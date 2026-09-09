@@ -1194,19 +1194,126 @@ function Animal:advanceRecoveryPeriod()
         tostring(self.uniqueId), self.monthsSinceLastBirth, tostring(self.isLactating))
 end
 
+--- Advance this animal's per-period state. Recovery only; disease runs on the daily tick.
 function Animal:onPeriodChanged()
     self:advanceRecoveryPeriod()
+end
+
+
+-- ONE setDirty per animal per tick however many transitions land, because the flag is
+-- per-container and the countdown between transitions deliberately does not replicate.
+-- It leads every write this function makes; the driver's own writes precede it.
+--- Advance every non-genetic record on this animal by one daily tick and apply the result.
+---@param daysPerPeriod number The environment's configured days per period, 1..28.
+---@return boolean died True when a record killed this animal on this tick.
+---@return number treatmentCost The pen's share of this animal's treatment fees this tick.
+function Animal:onDiseaseTick(daysPerPeriod)
+    local INSTRUCTION = RLDiseaseProgression.INSTRUCTION
+    local STATE = RLDiseaseRecord.STATE
 
     local totalTreatmentCost = 0
+    local geneticSkips = 0
+    local flagged = false
+    local died = false
 
-    for i = #self.diseases, 1, -1 do
-        local died, treatmentCost = self.diseases[i]:onPeriodChanged(self, self.deathEnabled)
-        totalTreatmentCost = totalTreatmentCost + treatmentCost
-
-        if died then return totalTreatmentCost end
+    -- Guarded so it cannot fire twice, and called BEFORE the write it protects.
+    ---@return nil
+    local function flagOnce()
+        if not flagged then
+            self:setDirty()
+            flagged = true
+        end
     end
 
-    return totalTreatmentCost
+    for i = #self.diseases, 1, -1 do
+        local disease = self.diseases[i]
+
+        -- The record's own copy, which is what every other SEIR consumer reads. A skipped
+        -- record never leaves EXPOSED and is never removed. GENETIC only: the archetype
+        -- vocabulary also admits `management`, which no shipped disease uses.
+        if disease.archetype == "genetic" then
+            geneticSkips = geneticSkips + 1
+        else
+            local stateBefore = disease.state
+            local runningBefore = disease.treatmentRunning
+            local counterBefore = disease.treatmentMonthsRemaining
+
+            local instruction, treatmentCost =
+                disease:onDayChanged(self, self.deathEnabled, daysPerPeriod)
+
+            totalTreatmentCost = totalTreatmentCost + treatmentCost
+
+            -- A course is over exactly when a running counter reached 0, which is the one
+            -- write `advanceTreatment` makes on every completion. A RELIEVED or FAILED
+            -- completion leaves the state alone, so state alone cannot see it.
+            local courseEnded = runningBefore == true and counterBefore ~= 0
+                and disease.treatmentMonthsRemaining == 0
+
+            -- Keyed on the record's state, not on the tick's outcome: a record that ENTERED
+            -- already RECOVERED never reports a transition and must still be cleared, or it
+            -- renders "Being treated" for its whole immunity window with no way to clear it.
+            -- A DEAD record deliberately keeps its flag, as the death exit keeps its counters.
+            if disease.treatmentRunning and (disease.state == STATE.RECOVERED or courseEnded) then
+                flagOnce()
+                disease.treatmentRunning = false
+
+                Log:debug("onDiseaseTick: treatment course ended, flag cleared (disease=%s "
+                    .. "state=%s farmId=%s uniqueId=%s)",
+                    tostring(disease.title), tostring(disease.state),
+                    tostring(self.farmId), tostring(self.uniqueId))
+            end
+
+            if disease.state ~= stateBefore then
+                flagOnce()
+
+                Log:debug("onDiseaseTick: record moved %s -> %s (disease=%s farmId=%s uniqueId=%s)",
+                    tostring(stateBefore), tostring(disease.state), tostring(disease.title),
+                    tostring(self.farmId), tostring(self.uniqueId))
+            end
+
+            if instruction == INSTRUCTION.REMOVE then
+                flagOnce()
+                -- BY INDEX: `removeDisease` walks pairs and takes the first title match, so a
+                -- title-keyed dispatch from this reverse loop could remove a different record.
+                table.remove(self.diseases, i)
+
+                Log:debug("onDiseaseTick: immunity expired, record removed (disease=%s "
+                    .. "farmId=%s uniqueId=%s remaining=%d)",
+                    tostring(disease.title), tostring(self.farmId), tostring(self.uniqueId),
+                    #self.diseases)
+
+            elseif instruction == INSTRUCTION.DIED then
+                flagOnce()
+                died = true
+
+                Log:debug("onDiseaseTick: record killed the animal (disease=%s farmId=%s "
+                    .. "uniqueId=%s)", tostring(disease.title), tostring(self.farmId),
+                    tostring(self.uniqueId))
+
+                self:die("rl_death_disease")
+
+                -- The fee accrued earlier in this loop is KEPT: those ticks were served.
+                return died, totalTreatmentCost
+
+            elseif instruction == INSTRUCTION.NONE then
+                Log:trace("onDiseaseTick: nothing applied, the record stays attached "
+                    .. "(disease=%s state=%s farmId=%s uniqueId=%s)",
+                    tostring(disease.title), tostring(disease.state),
+                    tostring(self.farmId), tostring(self.uniqueId))
+            end
+        end
+    end
+
+    if geneticSkips > 0 then
+        Log:debug("onDiseaseTick: skipped %d genetic record(s) (farmId=%s uniqueId=%s)",
+            geneticSkips, tostring(self.farmId), tostring(self.uniqueId))
+    end
+
+    Log:trace("onDiseaseTick: done (records=%d skipped=%d flagged=%s cost=%s farmId=%s uniqueId=%s)",
+        #self.diseases, geneticSkips, tostring(flagged), tostring(totalTreatmentCost),
+        tostring(self.farmId), tostring(self.uniqueId))
+
+    return died, totalTreatmentCost
 end
 
 function Animal:onDayChanged(spec, isServer, day, month, year, currentDayInPeriod, daysPerPeriod, isSaleAnimal)
@@ -1551,18 +1658,10 @@ function Animal:getHasName()
     return self.name ~= nil and self.name ~= ""
 end
 
+-- Silent by contract: a cured notification belongs to the transition that cures. Matching is
+-- by title over an unordered walk, so two records of one title lose an UNSPECIFIED one - which
+-- is why `Animal:onDiseaseTick`, with no production caller left here, removes by INDEX.
 --- Detach the first record carrying `title`, silently.
----
---- Silence is the CONTRACT, not an omission: the player-facing cured notification belongs to
---- whichever transition actually cures a record, and `Disease:onPeriodChanged` owns both of
---- those sites. This function's only production caller is that same function's immunity-expiry
---- branch, so anything announced from here would announce the END of protection rather than a
---- cure. Do not restore a notification here.
----
---- Matching is by title and stops at the first hit, and the walk is unordered, so an animal
---- carrying two records of one title loses an UNSPECIFIED one of them - not necessarily the
---- one whose immunity expired. Pre-existing; stated so the next reader does not infer an
---- ordering guarantee the walk does not give.
 ---
 --- The dirty flag LEADS `table.remove`, and only inside the match branch. Leading is the
 --- contract: the flag is the sole cause of replication, so writing it last puts it behind the

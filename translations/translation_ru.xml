@@ -570,6 +570,7 @@
         <text name="rl_death_health" text="low health"/>
         <text name="rl_death_age" text="old age"/>
         <text name="rl_death_accident" text="an accident"/>
+        <text name="rl_death_disease" text="a disease"/>
 
 
 

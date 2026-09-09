@@ -623,6 +623,7 @@
         <text name="rl_death_health" text="düşük sağlık"/>
         <text name="rl_death_age" text="yaşlılık"/>
         <text name="rl_death_accident" text="bir kaza"/>
+        <text name="rl_death_disease" text="a disease"/>
 
 
 

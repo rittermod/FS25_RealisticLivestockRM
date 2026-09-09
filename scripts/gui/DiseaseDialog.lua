@@ -86,35 +86,51 @@ function DiseaseDialog:onClickOk()
 
     local disease = self.diseases[self.diseaseList.selectedIndex]
 
-    -- Each clause means: a record with no authored course, or one already past its infection.
+    -- A record with no authored course, or one not currently symptomatic. INFECTIOUS mirrors
+    -- what enrolTreatment accepts, so the flag can never go true with no course behind it.
     if disease == nil or disease.model.treatment == nil
-        or disease.state == RLDiseaseRecord.STATE.RECOVERED then
+        or disease.state ~= RLDiseaseRecord.STATE.INFECTIOUS then
         return
     end
 
-    local newState = not disease.treatmentRunning
+    -- The ANIMAL's record, never the open-time clone: the clone's array is a shallow snapshot
+    -- and a daily tick can have removed this record since the dialog opened.
+    local liveDisease = self.animal:getDisease(disease.title)
+
+    if liveDisease == nil then
+        Log:warning("DiseaseDialog:onClickOk: the animal no longer carries that record, refusing (disease=%s uniqueId=%s)",
+            tostring(disease.title), tostring(self.animal.uniqueId))
+        return
+    end
+
+    local newState = not liveDisease.treatmentRunning
     local husbandry = self.animal.clusterSystem.owner
 
-    -- The remaining counter is months left, captured before the toggle. It is this peer's own
-    -- value, not authoritative course state: the toggle event replicates the running flag and
-    -- never the counter, whose per-month decrement is deliberately unsynced.
+    -- Read BEFORE the seed, or a fresh start reads its own seeded counter and says RESUME.
+    local isResuming = liveDisease.treatmentMonthsRemaining > 0
+
     Log:trace("DiseaseDialog:onClickOk sending event disease=%s treatment=%s treatmentMonthsRemaining=%s uniqueId=%s",
-        disease.title, tostring(newState), tostring(disease.treatmentMonthsRemaining),
+        disease.title, tostring(newState), tostring(liveDisease.treatmentMonthsRemaining),
         tostring(self.animal.uniqueId))
     DiseaseTreatmentToggleEvent.sendEvent(husbandry, self.animal, disease.title, newState)
 
+    -- The flag LEADS the writes, as everywhere else on this path: it is the sole cause of
+    -- replication, so writing it last puts it behind every statement that can raise.
+    self.animal:setDirty()
+
     disease.treatmentRunning = newState
-    for _, aDisease in pairs(self.animal.diseases) do
-        if aDisease.title == disease.title then
-            aDisease.treatmentRunning = newState
-            break
-        end
+    liveDisease.treatmentRunning = newState
+
+    -- START only. On a RESUME the refusal of a non-zero counter IS the pause contract - the
+    -- served months survive because nothing writes the counter down.
+    if newState then
+        RLDiseaseRecord.enrolTreatment(liveDisease, liveDisease.model.treatment)
     end
 
     if not newState then
         self.animal:addMessage("DISEASE_TREATMENT_STOP", { disease.model.name })
     else
-        self.animal:addMessage("DISEASE_TREATMENT_" .. (disease.treatmentMonthsRemaining > 0 and "RESUME" or "START"), { disease.model.name, string.format(g_i18n:getText("rl_ui_feePerMonth"), g_i18n:formatMoney(disease.model.treatment.cost, 2, true, true)) })
+        self.animal:addMessage("DISEASE_TREATMENT_" .. (isResuming and "RESUME" or "START"), { disease.model.name, string.format(g_i18n:getText("rl_ui_feePerMonth"), g_i18n:formatMoney(disease.model.treatment.cost, 2, true, true)) })
     end
 
     self:onClickListItem(self.diseaseList.selectedIndex)
@@ -127,10 +143,10 @@ function DiseaseDialog:onClickListItem(index)
 
     local disease = self.diseases[index]
 
-    -- The same repointed gate as onClickOk's, and the two must stay identical: this one decides
-    -- whether the button is offered, that one decides whether the click is honoured.
+    -- The same gate as onClickOk's, and the two must stay identical: this one decides whether
+    -- the button is offered, that one decides whether the click is honoured.
     if disease == nil or disease.model.treatment == nil
-        or disease.state == RLDiseaseRecord.STATE.RECOVERED then
+        or disease.state ~= RLDiseaseRecord.STATE.INFECTIOUS then
 
         self.yesButton:setDisabled(true)
         return

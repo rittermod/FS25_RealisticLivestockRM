@@ -4,10 +4,11 @@
     FLAT onto it, plus the treatment-running flag and the two genetics markers, with
     both codecs and the player-facing labels.
 
-    The legacy progression engine is SWITCHED OFF for the SEIR switchover, so the four
-    behaviour methods refuse unconditionally rather than keying on `diseasesEnabled` -
-    the setting is forced off beside them but stays writable, so the two mechanisms
-    fail in OPPOSITE directions and only these still hold if it is turned back on.
+    Progression is LIVE and runs off the pen's daily tick, deciding through
+    `RLDiseaseProgression` and applying nothing itself. The three remaining legacy
+    behaviour methods - reproduction, sale value and output - still refuse
+    unconditionally rather than keying on `diseasesEnabled`, which is forced off beside
+    them but stays writable, so those two mechanisms fail in OPPOSITE directions.
 ]]
 
 Disease = {}
@@ -144,24 +145,83 @@ function Disease:readStream(streamId, connection)
 end
 
 
---- Refuse to advance this record: the legacy progression engine is off, so a record
---- freezes exactly as it stands - a part-served treatment included.
----
---- Both return values are the contract and must stay two: the caller destructures them
---- and adds the second to a running per-pen total, so a bare `return` makes that
---- `number + nil`.
----@param animal table Host animal. Read for log identity only while the engine is off.
----@param deathEnabled boolean Whether the fatality roll may run. Unread while the engine is off.
----@return boolean died Always false - a frozen record kills nobody.
----@return number treatmentCost Always 0 - a frozen record bills nothing.
-function Disease:onPeriodChanged(animal, deathEnabled)
+-- Keyed on the TYPE index, so a goat resolves to SHEEP: goats are a subtype under that
+-- type and the lifespan table carries no GOAT row to find.
+--- Resolve an animal's uppercase type name, the key the lifespan table uses.
+---@param animal table Host animal.
+---@return string|nil typeName Uppercase type name, nil when the registry cannot answer.
+local function resolveAnimalTypeName(animal)
 
-	Log:trace("Disease:onPeriodChanged: refused, reason=legacy engine off (disease=%s farmId=%s uniqueId=%s)",
-		tostring(self.title),
-		tostring(animal and animal.farmId or nil),
-		tostring(animal and animal.uniqueId or nil))
+	local animalSystem = g_currentMission ~= nil and g_currentMission.animalSystem or nil
+	local subType = animal.getSubType ~= nil and animal:getSubType() or nil
 
-	return false, 0
+	if animalSystem == nil or animalSystem.typeIndexToName == nil or subType == nil then
+		return nil
+	end
+
+	return animalSystem.typeIndexToName[subType.typeIndex]
+
+end
+
+
+-- `deathEnabled` picks the ENTRY POINT, never a discarded return: the roll writes DEAD
+-- inside the pure module before returning. Both return values are contract - the caller
+-- adds the second to a per-pen total, so a bare `return` makes that `number + nil`.
+--- Advance this record by one daily tick and report what the caller must do with it.
+---@param animal table Host animal, supplying the vulnerability terms and the log identity.
+---@param deathEnabled boolean Whether this tick may roll fatality.
+---@param daysPerPeriod number The environment's configured days per period, 1..28.
+---@return string instruction An `RLDiseaseProgression.INSTRUCTION` value.
+---@return number treatmentCost This tick's share of the authored monthly fee; 0 when nothing was served.
+function Disease:onDayChanged(animal, deathEnabled, daysPerPeriod)
+
+	local typeName = resolveAnimalTypeName(animal)
+	local maxLifespanMonths = typeName ~= nil
+		and RLDiseaseVulnerability.maxLifespanMonthsFor(typeName) or nil
+
+	if maxLifespanMonths == nil then
+		-- `factor` drops the age term for a nil span, so this degrades rather than failing.
+		Log:warning("Disease:onDayChanged: no lifespan resolved, skipping the vulnerability "
+			.. "age term (disease=%s type=%s farmId=%s uniqueId=%s)",
+			tostring(self.title), tostring(typeName),
+			tostring(animal.farmId), tostring(animal.uniqueId))
+	end
+
+	-- The running flag lives on this object, not in the eight-key record, so it can only
+	-- reach the driver as call context. `rng` stays absent: it is a test seam.
+	local ctx = {
+		["daysPerPeriod"] = daysPerPeriod,
+		["vulnerability"] = RLDiseaseVulnerability.factor(animal.health, animal.genetics.health,
+			animal.age, maxLifespanMonths),
+		["treatmentRunning"] = self.treatmentRunning
+	}
+
+	local instruction, detail
+
+	if deathEnabled then
+		instruction, detail = RLDiseaseProgression.advance(self, self.model, ctx)
+	else
+		Log:trace("Disease:onDayChanged: deaths off, skipping the fatality roll (disease=%s "
+			.. "farmId=%s uniqueId=%s)",
+			tostring(self.title), tostring(animal.farmId), tostring(animal.uniqueId))
+
+		instruction, detail = RLDiseaseProgression.advanceWithoutFatality(self, self.model, ctx)
+	end
+
+	local treatmentCost = 0
+
+	-- `served` covers completions too - that tick is billed - and implies an authored
+	-- block, since the counter cannot move without one.
+	if detail.served then
+		treatmentCost = self.model.treatment.cost / daysPerPeriod
+
+		Log:trace("Disease:onDayChanged: served a treatment tick accruing %s of %s per month "
+			.. "(disease=%s farmId=%s uniqueId=%s)",
+			tostring(treatmentCost), tostring(self.model.treatment.cost),
+			tostring(self.title), tostring(animal.farmId), tostring(animal.uniqueId))
+	end
+
+	return instruction, treatmentCost
 
 end
 
