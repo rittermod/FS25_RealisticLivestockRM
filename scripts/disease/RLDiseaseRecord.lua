@@ -123,10 +123,11 @@ RLDiseaseRecord.TREATMENT_RESULT = {
 
 --- How close to zero the treatment counter must land to count as completed.
 ---
---- ABSOLUTE, never relative and never a bare `<= 0`: the counter accumulates
---- `1 / daysPerPeriod` subtractions, so completion lands on float noise either side of
---- zero, and a bare `<= 0` over-serves about half of all authored courses by a tick.
-RLDiseaseRecord.TREATMENT_COMPLETION_EPSILON = 1e-9
+--- ABSOLUTE and measured POST-SAVEGAME, never a bare `<= 0`: the counter persists as a
+--- float, quantised far coarser than in memory. A FIXED tolerance, never a share of the
+--- span, so it does not scale with one - it clears the worst persisted residue by about 6x.
+--- `RLDiseaseProgression` holds the same value.
+RLDiseaseRecord.TREATMENT_COMPLETION_EPSILON = 1e-3
 
 
 --- The legal transitions, as a closed table rather than a chain of conditionals -

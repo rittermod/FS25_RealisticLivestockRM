@@ -34,11 +34,11 @@ RLDiseaseProgression.INSTRUCTION = {
 
 --- How close to a boundary a counter must land to count as having reached it.
 ---
---- ABSOLUTE and never a bare equality: both counters this module writes accumulate
---- `1 / daysPerPeriod` steps, which is not exactly representable for most settings.
---- It is an IN-MEMORY tolerance only - a counter crossing a SAVE boundary is quantised
---- far more coarsely, so a reload can cost one extra tick, always late and never early.
-RLDiseaseProgression.COMPLETION_EPSILON = 1e-9
+--- ABSOLUTE and never a bare equality, measured POST-SAVEGAME: these counters persist as
+--- floats, quantised far coarser than in memory. A FIXED tolerance, never a share of the
+--- span, so it does not scale with one - it clears the worst persisted residue by about 6x.
+--- `RLDiseaseRecord` holds the same value.
+RLDiseaseProgression.COMPLETION_EPSILON = 1e-3
 
 
 --- STEP 1 - advance the hidden window, surfacing the record when it closes.
