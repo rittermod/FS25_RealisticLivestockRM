@@ -3,10 +3,12 @@
     The disease registry: loads `xml/diseases.xml` through `RLDiseaseDefinition`, keeps
     the title-keyed model map, and resolves a persisted or transmitted title back to it.
 
-    Four of its behaviour methods are SWITCHED OFF for the SEIR switchover and refuse
-    unconditionally rather than keying on `diseasesEnabled`, and `collectTransmissionSources`
-    is inert with no production caller. The slice that re-arms the transmission pass must
-    ADD a guard rather than restore one.
+    `onDayChanged` is LIVE: it rolls spontaneous infection per animal per tick against the
+    authored per-month curve and constructs the record. `setGeneticDiseasesForSaleAnimal`
+    and `calculateTransmission` are still SWITCHED OFF and refuse unconditionally rather
+    than keying on `diseasesEnabled`, and `collectTransmissionSources` is inert with no
+    production caller. The slice that re-arms the transmission pass must ADD a guard rather
+    than restore one.
 ]]
 
 DiseaseManager = {}
@@ -199,16 +201,291 @@ function DiseaseManager:resolveRecordType(title, identity)
 end
 
 
---- Refuse the daily spontaneous-infection roll: the legacy engine is switched off, so no
---- animal contracts a new disease from this path. Its `math.random` draw is gone with it.
----
---- Unconditional rather than keyed on `diseasesEnabled`, so it keeps holding once
---- something turns the setting back on.
----@param animal table The animal that would have rolled. Read for log identity only.
-function DiseaseManager:onDayChanged(animal)
+-- `ageMonths` on a key is the TOP of its band: the first key not exceeded wins, the last is the
+-- catch-all. A one-key model reads the same under the floor reading, so only a multi-key one
+-- separates them. An empty list answers 0 explicitly - `{}` walks like any other table.
+--- Resolve the authored per-month infection chance at an age.
+---@param infection table|nil ARRAY of `{ ageMonths, perMonth }` in document order; trusted internal
+---@param ageMonths number the animal's integer month count
+---@return number perMonth the authored probability, and 0 when the model authors no key
+local function infectionChanceFor(infection, ageMonths)
 
-	Log:trace("DiseaseManager:onDayChanged: refused, reason=legacy engine off (farmId=%s uniqueId=%s)",
-		tostring(animal and animal.farmId or nil), tostring(animal and animal.uniqueId or nil))
+    if type(infection) ~= "table" or #infection == 0 then
+
+        Log:trace("infectionChanceFor: no authored <infection> key, chance is 0 (ageMonths=%s)",
+            tostring(ageMonths))
+
+        return 0
+
+    end
+
+    for i = 1, #infection do
+        if ageMonths <= infection[i].ageMonths then return infection[i].perMonth end
+    end
+
+    return infection[#infection].perMonth
+
+end
+
+
+-- Keyed on the TYPE index, so a goat resolves to SHEEP.
+--- Resolve an animal's uppercase type name, the key `model.animals` is written in.
+---@param animal table the animal being rolled
+---@return string|nil typeName uppercase type name, nil when the registry cannot answer
+local function resolveAnimalTypeName(animal)
+
+    -- Ordered: `Animal:getSubType` indexes `animalSystem` itself, so testing it after the
+    -- call would raise instead of refusing.
+    local animalSystem = g_currentMission ~= nil and g_currentMission.animalSystem or nil
+
+    if animalSystem == nil or animalSystem.typeIndexToName == nil then
+        Log:trace("resolveAnimalTypeName: no animal-type registry, cannot resolve (uniqueId=%s)",
+            tostring(animal.uniqueId))
+        return nil
+    end
+
+    local subType = animal.getSubType ~= nil and animal:getSubType() or nil
+
+    if subType == nil then
+        Log:trace("resolveAnimalTypeName: animal answers no subType (uniqueId=%s)",
+            tostring(animal.uniqueId))
+        return nil
+    end
+
+    return animalSystem.typeIndexToName[subType.typeIndex]
+
+end
+
+
+-- Keyed on the registry TABLE, not a dirty flag: `loadDiseases` replaces the table, and so does
+-- a suite swapping in a probe registry, so identity catches both without either having to know.
+--- The registry's titles in sorted order, rebuilt only when the registry table changes.
+---@return table titles a sorted array of title strings; the manager's own, do not mutate
+function DiseaseManager:getSortedTitles()
+
+    if self.sortedTitlesFor == self.diseases then return self.sortedTitles end
+
+    local titles = {}
+
+    for title in pairs(self.diseases) do titles[#titles + 1] = title end
+
+    table.sort(titles)
+
+    self.sortedTitles = titles
+    self.sortedTitlesFor = self.diseases
+
+    Log:trace("getSortedTitles: rebuilt the sorted walk for a new registry (%d title(s))", #titles)
+
+    return titles
+
+end
+
+
+-- Authored per MONTH, rolled per TICK, so lifetime risk no longer moves with days-per-month.
+-- Titles are walked SORTED: the registry is a title-keyed map and draw order is an outcome.
+--- Roll spontaneous infection for one animal against every disease it is eligible for.
+---@param animal table the animal rolling; mutated only through `Animal:addDisease` on a hit
+---@param ctx table `{ daysPerPeriod, rng }`, built by each call site; `rng` returns `[0, 1)` and
+--- defaults to `math.random`. A nil `daysPerPeriod` raises on the conversion, deliberately.
+function DiseaseManager:onDayChanged(animal, ctx)
+
+    -- No call site is contractually server-only, so the authority guard lives here
+    -- rather than at the callers.
+    if g_server == nil then
+
+        Log:trace("DiseaseManager:onDayChanged: refused, reason=not the authority (uniqueId=%s)",
+            tostring(animal.uniqueId))
+
+        return
+
+    end
+
+    if not self.diseasesEnabled then
+
+        Log:trace("DiseaseManager:onDayChanged: refused, reason=diseases disabled (uniqueId=%s)",
+            tostring(animal.uniqueId))
+
+        return
+
+    end
+
+    -- ONE evaluation bound to a local, mirroring the pen's transmission gate, so an rlTest run
+    -- does not infect its own fixture animals.
+    local testPrefix = RealisticLivestock.testAnimalPrefix
+
+    if testPrefix ~= nil then
+
+        Log:trace("DiseaseManager:onDayChanged: refused, reason=test-prefix run (uniqueId=%s)",
+            tostring(animal.uniqueId))
+
+        return
+
+    end
+
+    if animal.numAnimals <= 0 or animal.isDead then
+
+        Log:trace("DiseaseManager:onDayChanged: refused, reason=not a live animal (uniqueId=%s dead=%s count=%s)",
+            tostring(animal.uniqueId), tostring(animal.isDead), tostring(animal.numAnimals))
+
+        return
+
+    end
+
+    local titles = self:getSortedTitles()
+
+    local ageMonths = animal.age
+    local typeName = resolveAnimalTypeName(animal)
+    local rng = ctx.rng or math.random
+
+    for _, title in ipairs(titles) do
+
+        local model = self.diseases[title]
+
+        -- Every archetype is admitted except `genetic`, whose records belong to the genetics
+        -- slice. An unrecognised one rides along: the parser owns that vocabulary's warning.
+        if model.archetype == "genetic" then
+
+            Log:trace("DiseaseManager:onDayChanged: skipped title=%s, reason=genetic archetype (uniqueId=%s)",
+                tostring(title), tostring(animal.uniqueId))
+
+        else
+
+            -- Fail CLOSED on an unresolvable type, the opposite direction from `isAdherent`:
+            -- there a skip protects an existing herd's records, here refusing only declines to
+            -- create a new one.
+            local bound = false
+
+            if typeName ~= nil then
+                for i = 1, #model.animals do
+                    if model.animals[i] == typeName then
+                        bound = true
+                        break
+                    end
+                end
+            end
+
+            local eligible, reason
+
+            if bound then eligible, reason = RLDiseaseSpread.isEligible(animal, title, model) end
+
+            if not bound then
+
+                Log:trace("DiseaseManager:onDayChanged: skipped title=%s, reason=type not affected "
+                    .. "(type=%s uniqueId=%s)", tostring(title), tostring(typeName), tostring(animal.uniqueId))
+
+            elseif not eligible then
+
+                -- Alive, holds no record of this title in ANY state - which is where immunity
+                -- lives - and every prerequisite matches. Reused rather than re-answered.
+                Log:trace("DiseaseManager:onDayChanged: skipped title=%s, reason=%s (uniqueId=%s)",
+                    tostring(title), tostring(reason), tostring(animal.uniqueId))
+
+            else
+
+                local pMonth = infectionChanceFor(model.infection, ageMonths)
+
+                -- The inverted comparison rejects zero, a negative and a NaN in one test.
+                if not (pMonth > 0) then
+
+                    Log:trace("DiseaseManager:onDayChanged: skipped title=%s, reason=no chance at this age "
+                        .. "(ageMonths=%s pMonth=%s uniqueId=%s)", tostring(title), tostring(ageMonths),
+                        tostring(pMonth), tostring(animal.uniqueId))
+
+                else
+
+                    local pTick = RLDiseaseRates.perTick(pMonth, ctx.daysPerPeriod)
+
+                    -- Eligibility runs BEFORE the draw, so a refused animal consumes no
+                    -- randomness and the draw budget is a pure function of the collection.
+                    -- STRICTLY below, never at, which makes a rate of 0 never fire.
+                    local draw = rng()
+
+                    if draw < pTick then
+
+                        Log:debug("DiseaseManager:onDayChanged: CONTRACTED title=%s farmId=%s uniqueId=%s "
+                            .. "ageMonths=%s pMonth=%s pTick=%s daysPerPeriod=%s draw=%s",
+                            tostring(title), tostring(animal.farmId), tostring(animal.uniqueId),
+                            tostring(ageMonths), tostring(pMonth), tostring(pTick),
+                            tostring(ctx.daysPerPeriod), tostring(draw))
+
+                        self:contractDisease(animal, model)
+
+                    else
+
+                        Log:trace("DiseaseManager:onDayChanged: missed title=%s, draw=%s pTick=%s (uniqueId=%s)",
+                            tostring(title), tostring(draw), tostring(pTick), tostring(animal.uniqueId))
+
+                    end
+
+                end
+
+            end
+
+        end
+
+    end
+
+end
+
+
+-- `incubationTicksFor` floors at MIN_INCUBATION_TICKS, so the seeder cannot express zero: an
+-- authored 0 transitions straight to INFECTIOUS. Fail-loud, no rollback - `addDisease` has
+-- already flagged, inserted and messaged by the time this runs.
+--- Attach a fresh record and put it into its authored starting state.
+---@param animal table the animal that just contracted the disease
+---@param model table the parsed `<model>` entry it contracted
+function DiseaseManager:contractDisease(animal, model)
+
+    animal:addDisease(model)
+
+    local record = animal:getDisease(model.title)
+
+    if record == nil then
+
+        Log:warning("contractDisease: no record immediately after addDisease (title=%s farmId=%s uniqueId=%s)",
+            tostring(model.title), tostring(animal.farmId), tostring(animal.uniqueId))
+
+        return
+
+    end
+
+    if model.incubationTicks > 0 then
+
+        local outcome = RLDiseaseRecord.seedIncubation(record, model.incubationTicks)
+
+        if outcome ~= RLDiseaseRecord.APPLIED then
+
+            Log:warning("contractDisease: seedIncubation returned %s, the window stays zero (title=%s "
+                .. "ticks=%s farmId=%s uniqueId=%s)", tostring(outcome), tostring(model.title),
+                tostring(model.incubationTicks), tostring(animal.farmId), tostring(animal.uniqueId))
+
+            return
+
+        end
+
+        Log:trace("contractDisease: seeded a %s-tick hidden window (title=%s uniqueId=%s)",
+            tostring(model.incubationTicks), tostring(model.title), tostring(animal.uniqueId))
+
+        return
+
+    end
+
+    -- Transitions dirty; `Animal:addDisease` already flagged the animal at the top of this
+    -- call, so the lock is satisfied without a second flush here.
+    local outcome = RLDiseaseRecord.transition(record, RLDiseaseRecord.STATE.INFECTIOUS)
+
+    if outcome ~= RLDiseaseRecord.APPLIED then
+
+        Log:warning("contractDisease: the zero-incubation transition returned %s, the record stays EXPOSED "
+            .. "(title=%s farmId=%s uniqueId=%s)", tostring(outcome), tostring(model.title),
+            tostring(animal.farmId), tostring(animal.uniqueId))
+
+        return
+
+    end
+
+    Log:trace("contractDisease: authored zero incubation, symptomatic at once (title=%s uniqueId=%s)",
+        tostring(model.title), tostring(animal.uniqueId))
 
 end
 

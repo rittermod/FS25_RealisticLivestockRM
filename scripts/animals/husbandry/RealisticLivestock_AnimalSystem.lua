@@ -1752,7 +1752,9 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
 
     animal.diseases = {}
 
-    g_diseaseManager:onDayChanged(animal)
+    -- No spontaneous roll here: dealer stock sits in `self.animals`, which the DAY tick already
+    -- rolls once per animal per day. A generation roll would convert the same monthly chance
+    -- through `perTick` a second time, and an animal generated late in the day would draw twice.
     g_diseaseManager:setGeneticDiseasesForSaleAnimal(animal)
 
 
@@ -2491,6 +2493,20 @@ function AnimalSystem:onDayChanged()
                 poolName, tostring(animal.farmId), tostring(animal.uniqueId))
         end
 
+        -- Sale stock only. The AI stud catalogue's exemption IS the absence of this call: the
+        -- player owns straws rather than studs, so a sick stud carries no agency and a fatality
+        -- would silently delete it from the catalogue.
+        ---@param animal table the sale animal to roll.
+        local function rollInfection(animal)
+            -- `diseasesOn` owns the manager-nil half of the guard; the body owns the
+            -- `g_server` half. Both are needed, and neither covers the other.
+            if not diseasesOn then return end
+
+            RmSafeUtils.safeAnimalCall(animal, "diseaseRoll", function()
+                g_diseaseManager:onDayChanged(animal, { ["daysPerPeriod"] = daysPerPeriod })
+            end)
+        end
+
         for _, animals in pairs(self.animals) do
 
             for _, animal in pairs(animals) do
@@ -2502,6 +2518,9 @@ function AnimalSystem:onDayChanged()
                 end)
 
                 tickDisease(animal, "sale")
+
+                -- AFTER progression, exactly as the pen orders it.
+                rollInfection(animal)
 
             end
 

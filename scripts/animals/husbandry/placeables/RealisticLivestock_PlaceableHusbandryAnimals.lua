@@ -497,6 +497,15 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onDayChanged()
                     end
                 end
 
+                -- LAST, and after progression in the same iteration: a record this roll creates
+                -- must not be advanced by the driver on the tick that created it, or a one-tick
+                -- incubation surfaces the same day. The isDead re-read is fresh, not the outer one.
+                if not animal.isDead then
+                    RmSafeUtils.safeAnimalCall(animal, "diseaseRoll", function()
+                        g_diseaseManager:onDayChanged(animal, { ["daysPerPeriod"] = daysPerPeriod })
+                    end)
+                end
+
             end
 
         end

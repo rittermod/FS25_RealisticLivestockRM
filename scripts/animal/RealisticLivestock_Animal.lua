@@ -1317,8 +1317,6 @@ function Animal:onDiseaseTick(daysPerPeriod)
 end
 
 function Animal:onDayChanged(spec, isServer, day, month, year, currentDayInPeriod, daysPerPeriod, isSaleAnimal)
-    if g_server ~= nil and g_diseaseManager ~= nil then g_diseaseManager:onDayChanged(self) end
-
     self:setRecentlyBoughtByAI(false)
 
     local birthday = self.birthday
