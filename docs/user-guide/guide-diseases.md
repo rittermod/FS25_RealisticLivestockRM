@@ -292,11 +292,10 @@ Avian Flu has **no treatment**. Infected chickens stop producing eggs entirely a
 
 ## Disease Settings
 
-Two settings control diseases globally:
+One setting controls diseases globally:
 
 | Setting | Default | Range | Effect |
 |---------|---------|-------|--------|
 | **Diseases Enabled** | On | On/Off | Toggles entire disease system |
-| **Disease Chance** | 1x | 0.25-5x | Scales infection probability |
 
-*Reducing Disease Chance to 0.25x makes diseases much less common. Setting to 5x makes them much more frequent. Disabling diseases suspends them - no new infections, spread, or effects; animals already infected are not cured, and their diseases resume if you re-enable the setting.*
+*Disabling diseases suspends them - no new infections, spread, or effects; animals already infected are not cured, and their diseases resume if you re-enable the setting.*

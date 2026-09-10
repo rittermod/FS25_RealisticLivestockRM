@@ -436,9 +436,6 @@
         <text name="rl_settings_diseasesEnabled_tooltip_1" text="Los animales no pueden contraer ni heredar enfermedades"/>
         <text name="rl_settings_diseasesEnabled_tooltip_2" text="Los animales pueden contraer o heredar enfermedades"/>
 
-        <text name="rl_settings_diseasesChance_label" text="Probabilidad de enfermedad"/>
-        <text name="rl_settings_diseasesChance_tooltip" text="Cambia la probabilidad de que los animales contraigan enfermedades"/>
-
         <text name="rl_settings_useCustomAnimals_label" text="Usar animales personalizados"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Usar modelos de animales de RealisticLivestock (requiere reinicio)"/>
         <text name="rl_settings_useCustomAnimals_tooltip_2" text="Usar modelos de animales personalizados (requiere reinicio, deben estar descomprimidos)"/>

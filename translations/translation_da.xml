@@ -416,9 +416,6 @@
         <text name="rl_settings_diseasesEnabled_tooltip_1" text="Dyrerne kan ikke blive smittet med eller arve sygdomme"/>
         <text name="rl_settings_diseasesEnabled_tooltip_2" text="Dyrerne kan blive smittet med eller arve sygdomme"/>
 
-        <text name="rl_settings_diseasesChance_label" text="Sygdomsrisiko"/>
-        <text name="rl_settings_diseasesChance_tooltip" text="Ændre sandsynligheden for, at dyrerne blive syge"/>
-
         <text name="rl_settings_useCustomAnimals_label" text="Brug brugerdefinerede dyr"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Brug Realistisk Dyrhold dyremodeller (kræver genstart)"/>
         <text name="rl_settings_useCustomAnimals_tooltip_2" text="Use custom animal models (experimental, requires restart, must be unzipped)"/>

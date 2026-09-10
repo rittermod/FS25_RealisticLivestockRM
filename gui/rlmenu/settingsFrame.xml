@@ -36,7 +36,7 @@
             <!-- ScrollingLayout uses fs25_settingsLayout. Rows render in
                  source order; per-section 20px GuiElement spacers act as
                  visual gaps without text headers. Order matches
-                 RLSettings.SETTINGS index 1..21. -->
+                 RLSettings.SETTINGS index 1..20. -->
             <ScrollingLayout profile="fs25_settingsLayout" id="generalSettingsLayout">
 
                 <!-- 1. Mortality -->
@@ -61,12 +61,6 @@
                         <Text profile="fs25_multiTextOptionTooltip" name="tooltip"/>
                     </BinaryOption>
                     <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_settings_diseasesEnabled_label"/>
-                </Bitmap>
-                <Bitmap profile="fs25_multiTextOptionContainer" id="rlmenuSettingRow_diseasesChance">
-                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="rlmenuSetting_diseasesChance" onClick="onClickGeneralSetting">
-                        <Text profile="fs25_multiTextOptionTooltip" name="tooltip"/>
-                    </MultiTextOption>
-                    <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_settings_diseasesChance_label"/>
                 </Bitmap>
 
                 <GuiElement size="100% 20px" name="sectionHeader"/>
@@ -239,16 +233,12 @@
             </GuiElement>
 
             <!-- Editor pane: right-side sibling of filtersListContainer.
-                 Uses RL-local profile rlMenu_filterEditorContainer (defined
-                 in rlMenuProfiles.xml) which stretches both axes inside the
-                 parent subCategoryPages[2] and trims width by 410px to leave
-                 the left list its sidebar space. Reusing fs25_subCategoryContainer
-                 was attempted first but failed: that profile's anchorStretchingYLeft
-                 pins width to 410px regardless of inline size overrides,
-                 leaving the editor at 410px wide (runtime-verified by the
-                 measure log on the first try). Empty-state Text + three-row
-                 ScrollingLayout (Name / AnimalType / AND-OR) + docked slider
-                 column. Visibility toggle goes through this wrapper. -->
+                 rlMenu_filterEditorContainer stretches both axes and sits
+                 right of the list sidebar. fs25_subCategoryContainer does not
+                 fit here: its fixed width ignores an inline size. Holds the
+                 empty-state Text, the four-row metadata layout, the banner
+                 and the conditions list; visibility toggles through this
+                 wrapper. -->
             <GuiElement profile="rlMenu_filterEditorContainer" id="filterEditorContainer">
 
                 <Text profile="fs25_animalListEmptyText"
@@ -293,21 +283,17 @@
                     </Bitmap>
 
                     <!-- Row 3: Usage scope - which consumer frames the
-                         filter appears on. State 1=ANY, 2=OWNED, 3=DEALER per
-                         spec Boundaries "Editor row" bullet; wire byte order
-                         (0/1/2) matches state-index minus 1 for cognitive
-                         parity with the wire codec.
-                         Moved from row 4 to row 3 so the
-                         match-logic (Conditions) row sits at the bottom of
-                         the metadata block. Source-order swap also reorders
-                         keyboard/gamepad focus traversal - intentional. -->
+                         filter appears on. State 1=ANY, 2=OWNED, 3=DEALER;
+                         the wire byte is the state index minus 1. It sits
+                         above the match-logic row so that row closes the
+                         block, and source order is also focus order. -->
                     <Bitmap profile="fs25_multiTextOptionContainer">
                         <MultiTextOption profile="fs25_settingsMultiTextOption" id="filterUsageSelector" onClick="onUsageChanged"/>
                         <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_menu_filters_editor_title_usage"/>
                     </Bitmap>
 
-                    <!-- Row 4: Conditions match-logic (stored AND/OR; displayed
-                         "Match ALL" / "Match ANY" per item 5). -->
+                    <!-- Row 4: Conditions match-logic (stored AND/OR;
+                         displayed "Match ALL" / "Match ANY"). -->
                     <Bitmap profile="fs25_multiTextOptionContainer">
                         <MultiTextOption profile="fs25_settingsMultiTextOption" id="filterOpSelector" onClick="onOpChanged"/>
                         <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_menu_filters_editor_title_op"/>
@@ -321,26 +307,17 @@
                      render a misplaced "scroller" bar; the ScrollingLayout
                      works without a visible thumb. -->
 
-                <!-- Preserved-node banner. Shows "%d condition(s)
-                     hidden - editable in a later phase. Saved on close." when
-                     the partition step finds nested groups or enum/string/
-                     in/notin conditions that the editor cannot render.
-                     Hidden when preserved count == 0.
-                     Profile rl_filterConditionsBanner pins
-                     this element just above the conditions list (was floating
-                     mid-list at the old position="20px 290px" with default
-                     anchorBottomLeft). Same element is also reused as a
-                     transient subType-refuse surface (RLMenuSettingsFrame.lua
-                     :2138-2148). Both messages now render above the list. -->
+                <!-- Banner above the conditions list. Shows the preserved
+                     count when the partition finds conditions the editor
+                     cannot render (nested groups, unsupported field types,
+                     in/notin on a non-enum field), hidden at zero.
+                     openConditionEditDialog reuses it for a transient
+                     refusal when an enum row has an empty domain. -->
                 <Text profile="rl_filterConditionsBanner" id="filterConditionsBanner"
                       visible="false"/>
 
-                <!-- Conditions list container. SmoothList of condition
-                     rows + paired Slider; mirrors the structure of the left-
-                     pane `filtersList` above. Row template
-                     carries a field picker, cmp picker, two value widgets
-                     (number TextInput + bool MultiTextOption, toggled via
-                     setVisible from Lua), and a delete button. -->
+                <!-- Conditions list container: SmoothList plus paired
+                     Slider, mirroring the left-pane filtersList. -->
                 <!-- Scrollable middle. Uses rlMenu_filterEditorMiddle profile
                      which carries the stretching-Y anchor + size offset
                      reservations. Trait composition lives in the profile,
@@ -362,18 +339,15 @@
                              offset (depth * 20px), computed in
                              populateCellForItemInSection. Without inline
                              widgets the row template stays stable across
-                             field-type swaps and Phase 2 group rows. -->
+                             field-type swaps and future group rows. -->
                         <ListItem profile="rlMenu_filterConditionRow" name="defaultCell">
-                            <!-- Legacy parity with rl_moveDestName usage in
-                                 AnimalMoveDestinationDialog.xml:18. Profile
-                                 uses anchorTopLeft (anchors=0 0 1 1; pivot=
-                                 0 1) so the explicit size attribute is
-                                 honored. Position Y=-10px puts the text
-                                 baseline 10px below the row top (FS25 Y-up
-                                 -> negative is "below anchor"); matches the
-                                 -5px legacy offset scaled for our 50px row
-                                 (vs legacy 55px). populateCellForItemInSection
-                                 shifts X via setPosition for indent. -->
+                            <!-- Mirrors rl_moveDestName in
+                                 AnimalMoveDestinationDialog.xml: a top-left
+                                 anchored profile, so the explicit size holds.
+                                 Y=-10px puts the baseline 10px below the row
+                                 top, that dialog's -5px scaled to this 50px
+                                 row. populateCellForItemInSection shifts X
+                                 for the indent. -->
                             <Text profile="rl_filterConditionText" name="conditionText"
                                   position="20px -10px" size="800px 28px"/>
                         </ListItem>

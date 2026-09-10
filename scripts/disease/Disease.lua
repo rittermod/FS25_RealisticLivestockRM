@@ -7,8 +7,8 @@
     Progression is LIVE and runs off the pen's daily tick, deciding through
     `RLDiseaseProgression` and applying nothing itself. The three remaining legacy
     behaviour methods - reproduction, sale value and output - still refuse
-    unconditionally rather than keying on `diseasesEnabled`, which is forced off beside
-    them but stays writable, so those two mechanisms fail in OPPOSITE directions.
+    unconditionally rather than keying on `diseasesEnabled`, so they stay off even in a
+    save with diseases switched on.
 ]]
 
 Disease = {}

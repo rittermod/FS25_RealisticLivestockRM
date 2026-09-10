@@ -31,10 +31,8 @@ end
 
 --- Open the treatment dialog for one animal.
 ---
---- Refuses while the disease engine is off, and both callers funnel through here, so under
---- the lock no open reaches onClickOk's treatment write, the toggle event or the messages.
---- It does not close an already-open dialog and needs no recheck: under the lock one could
---- never have opened.
+--- Refuses while diseases are off, and both callers funnel through here. It does not close a
+--- dialog that is already open.
 ---@param animal table|nil The animal whose records to show.
 ---@param onCloseCallback function|nil Invoked on close so the parent can refresh.
 ---@param onCloseTarget table|nil `self` for the close callback.

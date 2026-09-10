@@ -443,9 +443,6 @@
         <text name="rl_settings_diseasesEnabled_tooltip_1" text="动物不会感染或遗传疾病"/>
         <text name="rl_settings_diseasesEnabled_tooltip_2" text="动物会感染或遗传疾病"/>
 
-        <text name="rl_settings_diseasesChance_label" text="疾病概率"/>
-        <text name="rl_settings_diseasesChance_tooltip" text="调整动物感染疾病的几率"/>
-
         <text name="rl_settings_useCustomAnimals_label" text="使用自定义动物"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="使用真实畜牧动物模型（需要重启）"/>
         <text name="rl_settings_useCustomAnimals_tooltip_2" text="使用自定义动物模型（需要重启，必须解压）"/>

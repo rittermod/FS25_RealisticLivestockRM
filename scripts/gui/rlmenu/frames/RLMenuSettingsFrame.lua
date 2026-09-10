@@ -2718,8 +2718,7 @@ function RLMenuSettingsFrame:refreshGeneralSubtab()
     self:updateReadonlyState()
 end
 
---- Per-row admin gate and dependency cascade over self.controls. Only rows
---- flagged adminOnly are disabled for non-admins; the rest stay enabled.
+--- Admin gate, then dependancy cascade: adminOnly disables a row for a non-admin, else a child follows its parent.
 function RLMenuSettingsFrame:updateReadonlyState()
     local isAdmin = (g_server ~= nil) or (g_currentMission ~= nil and g_currentMission.isMasterUser == true)
     Log:trace("RLMenuSettingsFrame:updateReadonlyState: isAdmin=%s", tostring(isAdmin))
@@ -2729,13 +2728,7 @@ function RLMenuSettingsFrame:updateReadonlyState()
         if widget ~= nil then
             local disabled = false
 
-            -- The lock arm leads: a locked row is disabled for EVERYONE, admin
-            -- included, which stops a player toggling a setting whose engine is
-            -- stubbed out. The arms are exclusive, so a locked row never
-            -- evaluates its dependency cascade.
-            if setting.lock then
-                disabled = true
-            elseif setting.adminOnly and not isAdmin then
+            if setting.adminOnly and not isAdmin then
                 disabled = true
             elseif setting.dependancy ~= nil then
                 local parent = RLSettings.SETTINGS[setting.dependancy.name]

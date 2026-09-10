@@ -207,10 +207,10 @@ end
 -- each row by its rlmenuSetting_<name> element id. setting.index is consumed by
 -- RLDebugUtils.dumpSettings, which prints state rows in index order (it skips
 -- ignore==true rows), so index must stay a faithful mirror of the XML order below.
--- Keep the two in step when adding or moving a row. Sections (1..21):
--- Mortality (1-2), Health & Disease (3-4), Husbandry & Economy (5-8),
--- Custom Animals (9-10), Message Log (11-12), Display Preferences (13-16),
--- Tools & Admin (17-20), Visual Animals (21, client-local, no admin gate).
+-- Keep the two in step when adding or moving a row. Sections (1..20):
+-- Mortality (1-2), Health & Disease (3), Husbandry & Economy (4-7),
+-- Custom Animals (8-9), Message Log (10-11), Display Preferences (12-15),
+-- Tools & Admin (16-19), Visual Animals (20, client-local, no admin gate).
 RLSettings.SETTINGS = {
 
 	["deathEnabled"] = {
@@ -238,11 +238,6 @@ RLSettings.SETTINGS = {
 		}
 	},
 
-	-- `lock` forces this row's EFFECTIVE state for the SEIR switchover window: initialize
-	-- pins it to lockState and the RL Menu renders it disabled, so a player cannot turn on
-	-- an engine that is stubbed out anyway. It does NOT refuse a programmatic applyChange -
-	-- the in-game legs that enable diseases keep working, and the five stubs still refuse.
-	-- The pinned value never reaches disk; writeSettingStates persists prePinState instead.
 	["diseasesEnabled"] = {
 		["index"] = 3,
 		["adminOnly"] = true,
@@ -251,27 +246,11 @@ RLSettings.SETTINGS = {
 		["default"] = 2,
 		["binaryType"] = "offOn",
 		["values"] = { false, true },
-		["lock"] = true,
-		["lockState"] = 1,
 		["callback"] = DiseaseManager.onSettingChanged
 	},
 
-	["diseasesChance"] = {
-		["index"] = 4,
-		["adminOnly"] = true,
-		["type"] = "MultiTextOption",
-		["default"] = 4,
-		["valueType"] = "float",
-		["values"] = { 0.25, 0.5, 0.75, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5 },
-		["callback"] = DiseaseManager.onSettingChanged,
-		["dependancy"] = {
-			["name"] = "diseasesEnabled",
-			["state"] = 2
-		}
-	},
-
 	["foodScale"] = {
-		["index"] = 5,
+		["index"] = 4,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 2,
@@ -281,7 +260,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["maxDealerAnimals"] = {
-		["index"] = 6,
+		["index"] = 5,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 4,
@@ -298,7 +277,7 @@ RLSettings.SETTINGS = {
 	-- and every reader depend on values[i] == i, which RLSettingsTests pins
 	-- against RLDealerQualityModel.DEFAULT_INDEX / PRESET_COUNT.
 	["dealerQuality"] = {
-		["index"] = 7,
+		["index"] = 6,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 2,
@@ -311,7 +290,7 @@ RLSettings.SETTINGS = {
 	-- and the resolver cannot drift. Option texts are runtime-built (getTexts):
 	-- only "Map default" is localized, country names render in English.
 	["mapCountry"] = {
-		["index"] = 8,
+		["index"] = 7,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 1,
@@ -329,7 +308,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["useCustomAnimals"] = {
-		["index"] = 9,
+		["index"] = 8,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
@@ -339,7 +318,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["animalsXML"] = {
-		["index"] = 10,
+		["index"] = 9,
 		["adminOnly"] = true,
 		["type"] = "Button",
 		["ignore"] = true,
@@ -351,7 +330,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["messageSummary"] = {
-		["index"] = 11,
+		["index"] = 10,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
@@ -362,7 +341,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["maxNumMessages"] = {
-		["index"] = 12,
+		["index"] = 11,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 5,
@@ -372,7 +351,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["geneticsDisplay"] = {
-		["index"] = 13,
+		["index"] = 12,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 1,
@@ -380,7 +359,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["geneticsPosition"] = {
-		["index"] = 14,
+		["index"] = 13,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["default"] = 1,
@@ -388,7 +367,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["sortByGenetics"] = {
-		["index"] = 15,
+		["index"] = 14,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
@@ -398,7 +377,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["tagColour"] = {
-		["index"] = 16,
+		["index"] = 15,
 		["adminOnly"] = true,
 		["type"] = "Button",
 		["ignore"] = true,
@@ -406,7 +385,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["exportCSV"] = {
-		["index"] = 17,
+		["index"] = 16,
 		["adminOnly"] = true,
 		["type"] = "Button",
 		["ignore"] = true,
@@ -414,7 +393,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["resetDealer"] = {
-		["index"] = 18,
+		["index"] = 17,
 		["type"] = "Button",
 		["ignore"] = true,
 		["adminOnly"] = true,
@@ -425,7 +404,7 @@ RLSettings.SETTINGS = {
 	-- dealer offers. Server-authoritative (the Confirm handler writes the override
 	-- registry and regenerates the dealer), hence the admin gate.
 	["dealerSale"] = {
-		["index"] = 19,
+		["index"] = 18,
 		["type"] = "Button",
 		["ignore"] = true,
 		["adminOnly"] = true,
@@ -433,7 +412,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["resetAIAnimals"] = {
-		["index"] = 20,
+		["index"] = 19,
 		["type"] = "Button",
 		["ignore"] = true,
 		["adminOnly"] = true,
@@ -446,7 +425,7 @@ RLSettings.SETTINGS = {
 	-- and out of rm_RlSettings.xml. The dialog persists the value per peer to
 	-- modSettings/Settings.xml.
 	["maxVisualAnimals"] = {
-		["index"] = 21,
+		["index"] = 20,
 		["type"] = "Button",
 		["ignore"] = true,
 		["callback"] = RLSettings.onClickVisualAnimals
@@ -663,39 +642,16 @@ end
 --- index; string-coded settings (valueType == "string") write the VALUE
 --- string (state 1 writes "default") so an AREA_CODES reorder can never
 --- re-map saves.
---- A LOCKED row persists the state the savegame provided (`prePinState`), never the pinned
---- one. The pin is an EFFECTIVE-state override for the switchover window only: the player's
---- real choice has to survive on disk, because a later slice migrates exactly this value
---- onto a difficulty preset and a persisted pin would put every save on the lowest rung.
---- The fallback covers a locked row that somehow never ran the pin - persisting the live
---- state is then strictly better than writing nil.
 --- @param xmlFile table Open XMLFile document to write into
 function RLSettings.writeSettingStates(xmlFile)
+
+	local written = 0
 
 	for settingName, setting in pairs(RLSettings.SETTINGS) do
 
 		if setting.ignore then continue end
 
 		local persistedState = setting.state or setting.default
-
-		if setting.lock then
-
-			persistedState = setting.prePinState or setting.state or setting.default
-
-			-- Two different situations, so they get two different lines: normally the stash is
-			-- present and this row's whole point is that the pin does not reach disk. Where the
-			-- stash is absent the pin never ran, so the live state IS the player's value and
-			-- persisting it is correct - but saying "pre-pin rather than pinned" there would be
-			-- describing a substitution that did not happen.
-			if setting.prePinState ~= nil then
-				Log:trace("RLSettings.writeSettingStates: '%s' is locked, persisting the pre-pin state %s rather than the pinned %s",
-					settingName, tostring(persistedState), tostring(setting.state))
-			else
-				Log:trace("RLSettings.writeSettingStates: '%s' is locked but carries no pre-pin state, so the live state %s is persisted as-is",
-					settingName, tostring(persistedState))
-			end
-
-		end
 
 		if setting.valueType == "string" then
 			local value = setting.values[persistedState]
@@ -712,13 +668,13 @@ function RLSettings.writeSettingStates(xmlFile)
 			xmlFile:setInt("rm_RlSettings." .. settingName .. "#value", persistedState)
 		end
 
-		-- persistedState, not setting.state: this decides what goes on DISK beside the value
-		-- written above, so on a locked row it has to agree with it. Inert while
-		-- useCustomAnimals is unlocked, and the one line that would silently disagree if it
-		-- ever were.
+		written = written + 1
+
 		if settingName == "useCustomAnimals" and persistedState == 2 and RLSettings.animalsXMLPath ~= nil then xmlFile:setString("rm_RlSettings.useCustomAnimals#path", RLSettings.animalsXMLPath) end
 
 	end
+
+	Log:debug("RLSettings.writeSettingStates: wrote %d setting state(s)", written)
 
 end
 
@@ -795,36 +751,6 @@ function RLSettings.saveToXMLFile(name, state)
 end
 
 
---- Pin every locked row's EFFECTIVE state, stashing what the savegame actually provided so the
---- codec can persist that instead.
----
---- The stash is the whole point. The pin must never reach disk: a later slice migrates the
---- player's real `diseasesEnabled` onto a difficulty preset, and a persisted pin would land
---- every save on the lowest rung regardless of what they actually played with.
----
---- Called from `initialize` after the defaulting loop and above its no-GUI early return, so a
---- fresh save stashes its default rather than nil and a dedicated server is pinned too. It is a
---- named function rather than an inline loop so a suite can drive the real pin - inlined, the
---- only way to cover it was to re-implement it in the test, which tests the copy.
-function RLSettings.applyLocks()
-
-	for name, setting in pairs(RLSettings.SETTINGS) do
-
-		if setting.lock then
-
-			setting.prePinState = setting.state or setting.default
-			setting.state = setting.lockState
-
-			Log:debug("RLSettings.applyLocks: pinned locked setting '%s' to state %s (savegame provided %s, which is what will be persisted)",
-				name, tostring(setting.state), tostring(setting.prePinState))
-
-		end
-
-	end
-
-end
-
-
 --- Build the RLRM launcher row on the base-game pause-menu Settings page.
 --- The server-side settings load runs first and unconditionally, followed
 --- by an unconditional defaulting pass for states the savegame did not
@@ -832,15 +758,6 @@ end
 --- row whose click opens the RL Menu Settings tab - the sole RLRM
 --- settings editor. The GUI build is skipped (load and defaulting already
 --- done) when the menu tree chain is absent.
----
---- It also owns the LOCK PIN, via `applyLocks`, and the ORDER is a contract rather than a
---- convenience: the pin runs after defaulting so a fresh save stashes its default rather than
---- nil, and above the no-GUI early return so a dedicated server is pinned too. Moving it below
---- that return leaves the row reading On for the whole session on a dedi.
----
---- The pin writes `setting.state` only. It needs no live `g_diseaseManager`: the manager field
---- is written later, when `applyDefaultSettings` fires each row's callback with
---- `setting.values[setting.state]` - which by then is the pinned value.
 function RLSettings.initialize()
 
 	if g_server ~= nil then RLSettings.loadFromXMLFile() end
@@ -859,13 +776,6 @@ function RLSettings.initialize()
 	end
 
 	if defaulted > 0 then Log:debug("RLSettings.initialize: defaulted %d setting state(s) missing from the savegame", defaulted) end
-
-	-- Position is load-bearing TWICE: after the defaulting loop, so a fresh save stashes its
-	-- default rather than nil; and ABOVE the g_inGameMenu early return below, so a dedicated
-	-- server - which returns there - is pinned too rather than running with the row On.
-	-- Extracted rather than inlined so a suite can drive the real pin; inlined, the only way
-	-- to test it was to re-implement it, which tests the copy.
-	RLSettings.applyLocks()
 
 	if g_inGameMenu == nil or g_inGameMenu.pageSettings == nil or g_inGameMenu.pageSettings.gameSettingsLayout == nil then
 		Log:info("RLSettings.initialize: no pause-menu settings layout (g_inGameMenu chain nil); skipping launcher button build")

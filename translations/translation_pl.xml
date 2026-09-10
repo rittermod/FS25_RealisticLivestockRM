@@ -424,9 +424,6 @@
         <text name="rl_settings_diseasesEnabled_tooltip_1" text="Animals cannot catch or inherit diseases"/>
         <text name="rl_settings_diseasesEnabled_tooltip_2" text="Animals can catch or inherit diseases"/>
 
-        <text name="rl_settings_diseasesChance_label" text="Disease Chance"/>
-        <text name="rl_settings_diseasesChance_tooltip" text="Change the likelihood of animals contracting diseases"/>
-
         <text name="rl_settings_useCustomAnimals_label" text="Use Custom Animals"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Use RealisticLivestock animal models (requires restart)"/>
         <text name="rl_settings_useCustomAnimals_tooltip_2" text="Use custom animal models (experimental, requires restart, must be unzipped)"/>

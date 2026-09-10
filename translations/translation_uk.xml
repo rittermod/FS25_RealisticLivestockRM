@@ -403,9 +403,6 @@
         <text name="rl_settings_diseasesEnabled_tooltip_1" text="Тварини не можуть заразитися або успадкувати хвороби"/>
         <text name="rl_settings_diseasesEnabled_tooltip_2" text="Тварини можуть заразитися або успадкувати хвороби"/>
 
-        <text name="rl_settings_diseasesChance_label" text="Ймовірність захворювання"/>
-        <text name="rl_settings_diseasesChance_tooltip" text="Змінити ймовірність зараження тварин хворобами"/>
-
         <text name="rl_settings_useCustomAnimals_label" text="Використовувати власні моделі тварин"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Використовувати моделі тварин RealisticLivestock (потрібен перезапуск)"/>
         <text name="rl_settings_useCustomAnimals_tooltip_2" text="Використовувати користувальницькі моделі тварин (потрібен перезапуск, архів має бути розпакований)"/>

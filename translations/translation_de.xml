@@ -424,9 +424,6 @@
         <text name="rl_settings_diseasesEnabled_tooltip_1" text="Tiere können keine Krankheiten bekommen oder vererben."/>
         <text name="rl_settings_diseasesEnabled_tooltip_2" text="Tiere können Krankheiten bekommen oder vererben."/>
 
-        <text name="rl_settings_diseasesChance_label" text="Krankheitsrisiko"/>
-        <text name="rl_settings_diseasesChance_tooltip" text="Die Wahrscheinlichkeit ändern, dass Tiere Krankheiten bekommen"/>
-
         <text name="rl_settings_useCustomAnimals_label" text="Benutzerdefinierte Tiere verwenden"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Verwenden Sie RealisticLivestock-Tiermodelle (erfordert Neustart)"/>
         <text name="rl_settings_useCustomAnimals_tooltip_2" text="Benutzerdefinierte Tiermodelle verwenden (erfordert Neustart, muss entpackt werden)"/>

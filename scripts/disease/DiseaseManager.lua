@@ -18,6 +18,8 @@ local diseaseManager_mt = Class(DiseaseManager)
 
 local Log = RmLogging.getLogger("RLRM")
 
+--- Construct the manager and load the disease registry into it.
+---@return table
 function DiseaseManager.new()
 
     local self = setmetatable({}, diseaseManager_mt)
@@ -27,7 +29,6 @@ function DiseaseManager.new()
 	-- not an array, so `#` on it is always 0.
 	self.diseases = {}
 	self.diseasesEnabled = true
-	self.diseasesChance = 1
 
 	self:loadDiseases()
 
