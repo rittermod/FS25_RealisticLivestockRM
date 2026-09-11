@@ -184,6 +184,8 @@ These are set on the `<animal type="...">` element and affect all breeds of that
 
 Price, production, and consumption curves use age-based keyframes. The game linearly interpolates between keyframes.
 
+Consumption curves (`<input>`: food, water, straw) accept decimal values such as `0.2`. Every other curve reads whole numbers only - a decimal there is cut down to its whole part (`2.9` becomes `2`).
+
 ```xml
 <buyPrice>
     <key ageMonth="0" value="200"/>     <!-- At birth: $200 -->

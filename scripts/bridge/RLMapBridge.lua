@@ -1085,7 +1085,7 @@ end
 --- Format an AnimCurve's keyframes as a grep-friendly debug string.
 --- Used by the override appliers to log curve content at DEBUG level so an operator
 --- can verify what the bridge actually loaded without sampling in-game.
----@param curve table|nil AnimCurve instance from AnimalSystem.loadAnimCurve, or nil
+---@param curve table|nil AnimCurve from AnimalSystem.loadAnimCurve or RLMapBridge.loadFloatAnimCurve, or nil
 ---@return string formatted Like "[0m=300, 24m=2500]"; "[]" for nil or empty
 function RLMapBridge._formatCurveKeys(curve)
     if curve == nil then
@@ -1101,6 +1101,48 @@ function RLMapBridge._formatCurveKeys(curve)
         table.insert(parts, string.format("%dm=%s", kf.time or 0, tostring(kf[1])))
     end
     return "[" .. table.concat(parts, ", ") .. "]"
+end
+
+
+--- Load an age curve whose key values are floats; nil when the element is absent or loads no key.
+---@param xmlFile table XMLFile handle
+---@param key string XML path of the curve element, such as "<subType key>.input.food"
+---@return AnimCurve|nil curve The loaded keys, or nil when the element is absent or yields no key
+function RLMapBridge.loadFloatAnimCurve(xmlFile, key)
+    Log:trace(">>> RLMapBridge.loadFloatAnimCurve(%s)", tostring(key))
+
+    if not xmlFile:hasProperty(key) then
+        Log:trace("<<< RLMapBridge.loadFloatAnimCurve = nil (absent)")
+        return nil
+    end
+
+    -- The base curve loader reads key values as integers, which would cut a fractional bridge
+    -- rate (0.2 L of food a day) to 0. Ages stay whole months; only values are floats.
+    local curve = AnimCurve.new(linearInterpolator1)
+    local loaded = 0
+    for _, keyPath in xmlFile:iterator(key .. ".key") do
+        local ageMonth = xmlFile:getInt(keyPath .. "#ageMonth")
+        local value = xmlFile:getFloat(keyPath .. "#value")
+        local failing = (ageMonth == nil and "ageMonth") or (value == nil and "value") or nil
+        if failing ~= nil then
+            Log:warning("MapBridge: '%s' curve key '%s' has no readable #%s, skipping the key",
+                tostring(xmlFile.filename), tostring(keyPath), failing)
+        else
+            curve:addKeyframe({ value, time = ageMonth })
+            loaded = loaded + 1
+        end
+    end
+
+    if loaded == 0 then
+        Log:warning("MapBridge: '%s' curve '%s' loaded no keys, keeping the current curve",
+            tostring(xmlFile.filename), tostring(key))
+        Log:trace("<<< RLMapBridge.loadFloatAnimCurve = nil (no keys)")
+        return nil
+    end
+
+    Log:debug("MapBridge: float curve '%s' loaded %s keyframe(s)", tostring(key), tostring(loaded))
+    Log:trace("<<< RLMapBridge.loadFloatAnimCurve = %s keyframe(s)", tostring(loaded))
+    return curve
 end
 
 
@@ -1299,21 +1341,21 @@ function RLMapBridge.applySubTypeOverrides(subType, animalSystem, xmlFile, key, 
     end
 
     -- Input (AnimCurves)
-    local food = AnimalSystem.loadAnimCurve(animalSystem, xmlFile, key .. ".input.food")
+    local food = RLMapBridge.loadFloatAnimCurve(xmlFile, key .. ".input.food")
     if food ~= nil then
         subType.input.food = food
         table.insert(patches, "input.food")
         Log:debug("MapBridge: SubType '%s' input.food keys: %s", subTypeName, RLMapBridge._formatCurveKeys(food))
     end
 
-    local straw = AnimalSystem.loadAnimCurve(animalSystem, xmlFile, key .. ".input.straw")
+    local straw = RLMapBridge.loadFloatAnimCurve(xmlFile, key .. ".input.straw")
     if straw ~= nil then
         subType.input.straw = straw
         table.insert(patches, "input.straw")
         Log:debug("MapBridge: SubType '%s' input.straw keys: %s", subTypeName, RLMapBridge._formatCurveKeys(straw))
     end
 
-    local water = AnimalSystem.loadAnimCurve(animalSystem, xmlFile, key .. ".input.water")
+    local water = RLMapBridge.loadFloatAnimCurve(xmlFile, key .. ".input.water")
     if water ~= nil then
         subType.input.water = water
         table.insert(patches, "input.water")
