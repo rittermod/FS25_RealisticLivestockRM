@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.4.0.0-dev.2:
+
+- Dropped all disease infections, immunities and part-way treatments from existing saves - the new record format cannot read the old ones.
+- Unlocked the Diseases setting again (admins only in multiplayer) - on by default; illness rates are untuned and diseases do not spread yet.
+- Rebuilt the illness lifecycle: incubation, symptoms, treatment, recovery and immunity now run on the daily tick.
+- Hid an incubating animal's illness until symptoms show, and moved the "Contracted" message to that day.
+- Brought back treatment, its cost and disease deaths (with Deaths on, listed as "a disease").
+- Changed each disease's chance of striking to a monthly rate by age, so longer months no longer raise it.
+- Stopped illness affecting sale price and milk, egg and manure output until the new effects are wired in.
+- Renamed Avian Flu to Avian Flu (LPAI) in every language.
+- Removed the Disease Chance setting, which no longer did anything.
+- Updated the disease guide and chicken factsheet for the new name and the hidden incubation.
+
 ## 1.4.0.0-dev.1:
 
 - Turned the disease system off while it is rebuilt - animals no longer catch, spread or recover from diseases, and an existing illness stays frozen exactly where it is.
