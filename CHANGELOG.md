@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.2.1:
+
+- Fixed newborn rabbits on the Witcombe map never gaining health, so many of them died at their first day change - rabbits of every age now eat and drink the amounts the Witcombe support sets.
+- Corrected the disease guide's spread ratings - Foot & Mouth is the one disease that sustains an outbreak on its own, while PED and avian flu outbreaks usually burn out.
+- Documented in the pack-creation guide which curves accept decimal values - food, water and straw do, every other curve reads whole numbers only.
+- Enabled animal packs to set decimal food, water and straw rates, such as 0.2 - they were previously cut down to whole numbers.
+
 ## 1.3.2.0:
 
 ### Heads up before you update

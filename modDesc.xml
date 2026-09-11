@@ -1,6 +1,6 @@
 <modDesc descVersion="110">
     <author>Ritter</author>
-    <version>1.3.2.0</version>
+    <version>1.3.2.1</version>
     <title>
         <en>Realistic Livestock - Ritter version</en>
         <it>Allevamento Realistico - Versione Ritter</it>
@@ -18,11 +18,18 @@ Notes:
 - Savegame data from Arrow-kb's original version is automatically migrated on first load
 - Font Library mod is no longer required
 - Incompatible with FS25_EnhancedLivestock, FS25_MoreVisualAnimals, and FS25_EnhancedAnimalSystem
+- Works on virtually any map; maps that add their own custom animals or breeds have built-in support (see docs)
 
 Documentation: https://rittermod.github.io/FS25_RealisticLivestockRM
 Source code and issue tracker: https://github.com/rittermod/FS25_RealisticLivestockRM
 
 Changelog
+
+1.3.2.1:
+- Fixed newborn rabbits on the Witcombe map never gaining health, so many of them died at their first day change - rabbits of every age now eat and drink the amounts the Witcombe support sets.
+- Corrected the disease guide's spread ratings - Foot & Mouth is the one disease that sustains an outbreak on its own, while PED and avian flu outbreaks usually burn out.
+- Documented in the pack-creation guide which curves accept decimal values - food, water and straw do, every other curve reads whole numbers only.
+- Enabled animal packs to set decimal food, water and straw rates, such as 0.2 - they were previously cut down to whole numbers.
 
 1.3.2.0:
 Heads up before you update:

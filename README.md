@@ -47,6 +47,8 @@ This is a maintained version of the original mod by Arrow-kb, who has discontinu
 
 ## Supported Maps & Packs
 
+RLRM works on virtually any map out of the box. It does not need to be on a list. The maps below are special only because they add their own custom animal types or breeds, which need built-in support for those extras to get the full RLRM treatment (genetics, breeding, reproduction). On any other map, the standard animals just work.
+
 **Maps:**
 - [Hof Bergmann](https://www.lsfarming-mods.com/) - ducks, geese, cats, rabbits, alpacas, quail with full breeding support
 - [Witcombe](https://oxygendavid.itch.io/witcombe-park-farm) - UK breeds (Jersey, Gloucestershire Old Spot, Texel, Suffolk, Blue Faced Leicester) with full breeding support; Hereford heritage profile
