@@ -107,6 +107,8 @@ function PlayerHUDUpdater:showHandToolInfo(object)
 end
 
 
+--- Fill the monitor, genetics and disease HUD boxes for the animal under the crosshair. Unlogged: runs every frame.
+---@param animal table The animal being looked at.
 function RealisticLivestock_PlayerHUDUpdater:showAnimalInfo(animal)
 
     if self.monitorBox == nil then self.monitorBox = g_currentMission.hud.infoDisplay:createBox(InfoDisplayKeyValueBox) end
@@ -134,7 +136,9 @@ function RealisticLivestock_PlayerHUDUpdater:showAnimalInfo(animal)
     local box = self.diseaseBox
     box:clear()
 
-    if animal.diseases ~= nil and #animal.diseases > 0 and g_diseaseManager.diseasesEnabled then
+    -- Last, because it allocates: with diseases off it is never evaluated.
+    if animal.diseases ~= nil and #animal.diseases > 0 and g_diseaseManager.diseasesEnabled
+        and #animal:getVisibleDiseases() > 0 then
         box:setTitle(g_i18n:getText("rl_diseases"))
         animal:showDiseasesInfo(box)
         box:showNextFrame()

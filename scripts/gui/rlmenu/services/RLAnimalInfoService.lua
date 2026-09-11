@@ -65,10 +65,10 @@ local function buildChildrenRow(animal)
     }
 end
 
---- Disease rows for read-only display, named from the record's already-localized model
---- entry. Gated on `diseasesEnabled` like the card icons and the HUD box: with diseases
---- off, a frozen record here would claim an animal is sick while every other surface
---- disagrees. The nil-manager arm is cheap symmetry, not a claim the tree is nil-safe.
+-- Gated on `diseasesEnabled` like the card icons and the HUD box: with diseases off, a frozen
+-- record here would claim an animal is sick while every other surface disagrees. The nil-manager
+-- arm is cheap symmetry, not a claim the tree is nil-safe.
+--- Disease rows for read-only display, one per record a player may see, named from its model entry.
 --- @param animal table
 --- @return table rows
 local function buildDiseaseRows(animal)
@@ -78,21 +78,30 @@ local function buildDiseaseRows(animal)
         return rows
     end
     if animal == nil or type(animal.diseases) ~= "table" then return rows end
-    -- EVERY record, unfiltered: hiding a state is the display layer's job. This guard and
-    -- the getStatus one below only ever cover a hand-built fixture, so an assert against
-    -- their fallback measures the fallback rather than the row.
+    -- Only what `Disease.isVisibleToPlayer` admits, the rule the HUD and the dialog share. The
+    -- model and getStatus guards only ever cover a hand-built fixture, so an assert against their
+    -- fallback measures the fallback rather than the row.
+    local hidden = 0
     for _, disease in ipairs(animal.diseases) do
         if disease ~= nil and disease.model ~= nil then
-            local status = ""
-            if disease.getStatus ~= nil then
-                local ok, statusText = pcall(function() return disease:getStatus() end)
-                if ok and statusText ~= nil then status = statusText end
+            if not Disease.isVisibleToPlayer(disease) then
+                hidden = hidden + 1
+            else
+                local status = ""
+                if disease.getStatus ~= nil then
+                    local ok, statusText = pcall(function() return disease:getStatus() end)
+                    if ok and statusText ~= nil then status = statusText end
+                end
+                table.insert(rows, {
+                    name   = disease.model.name or "",
+                    status = status,
+                })
             end
-            table.insert(rows, {
-                name   = disease.model.name or "",
-                status = status,
-            })
         end
+    end
+    if hidden > 0 then
+        Log:trace("RLAnimalInfoService.buildDiseaseRows: hid %d incubating record(s) (farmId=%s uniqueId=%s)",
+            hidden, tostring(animal.farmId), tostring(animal.uniqueId))
     end
     return rows
 end

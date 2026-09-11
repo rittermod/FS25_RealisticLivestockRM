@@ -1110,8 +1110,24 @@ function Animal:showMonitorInfo(box)
     end
 end
 
+--- The records a naming surface shows, as a fresh array in record order. Unlogged: the HUD calls it every frame.
+---@return table visible A new array of the records `Disease.isVisibleToPlayer` admits; empty when none.
+function Animal:getVisibleDiseases()
+    local visible = {}
+
+    if self.diseases == nil then return visible end
+
+    for _, disease in ipairs(self.diseases) do
+        if Disease.isVisibleToPlayer(disease) then table.insert(visible, disease) end
+    end
+
+    return visible
+end
+
+--- Add one HUD line per record a player may see. Unlogged: the HUD calls it every frame.
+---@param box table The HUD key/value box being filled.
 function Animal:showDiseasesInfo(box)
-    for _, disease in pairs(self.diseases) do disease:showInfo(box) end
+    for _, disease in ipairs(self:getVisibleDiseases()) do disease:showInfo(box) end
 end
 
 function Animal:getFillTypeTitle()
@@ -1269,6 +1285,17 @@ function Animal:onDiseaseTick(daysPerPeriod)
                 Log:debug("onDiseaseTick: record moved %s -> %s (disease=%s farmId=%s uniqueId=%s)",
                     tostring(stateBefore), tostring(disease.state), tostring(disease.title),
                     tostring(self.farmId), tostring(self.uniqueId))
+
+                -- Symptom onset is when a player first learns of the disease, so the contraction
+                -- message posts here. It precedes the death dispatch below, so a record that
+                -- surfaces and kills on one tick still announces.
+                if stateBefore == STATE.EXPOSED and disease.state ~= STATE.EXPOSED then
+                    self:addMessage("DISEASE_CONTRACTED", { disease.model.name })
+
+                    Log:debug("onDiseaseTick: symptoms showed, contraction announced (disease=%s state=%s "
+                        .. "farmId=%s uniqueId=%s)", tostring(disease.title), tostring(disease.state),
+                        tostring(self.farmId), tostring(self.uniqueId))
+                end
             end
 
             if instruction == INSTRUCTION.REMOVE then
@@ -1689,17 +1716,10 @@ function Animal:removeDisease(title)
         tostring(title), tostring(self.uniqueId))
 end
 
+-- The flag leads the insert, for `removeDisease`'s reason. Safe only because `setDirty` defers the flush to the
+-- placeable's next update: never flush synchronously between them. Sale, dealer and AI animals have no cluster
+-- system, so their flag goes nowhere. No message: the record announces when it surfaces.
 --- Attach a new disease record to this animal.
----
---- The dirty flag LEADS the insert, for the reason spelled out on `removeDisease` above: it is
---- the only thing that causes the pen to replicate, so it must not sit behind a statement that
---- can raise. Flag-first is safe only because nothing can flush in the window - `setDirty`
---- marks the cluster system and wakes the owning placeable, whose own later `update(dt)` runs
---- the flush - so do not introduce a synchronous flush between the flag and the insert.
----
---- Sale, dealer and AI animals reach this too and carry no cluster system. `setDirty` nil-guards
---- that delegate, so the flag is set locally and goes nowhere; those pools replicate through
---- their own state event instead. Harmless, and not a claim that this path syncs them.
 ---@param model table Disease model entry from the disease manager's registry.
 ---@param isCarrier boolean|nil True for an asymptomatic carrier record.
 ---@param genes number|nil Count of affected genes inherited, 0 when not genetic.
@@ -1710,8 +1730,6 @@ function Animal:addDisease(model, isCarrier, genes)
         tostring(model.title), tostring(self.farmId), tostring(self.uniqueId))
 
     table.insert(self.diseases, Disease.new(model, isCarrier, genes))
-
-    self:addMessage("DISEASE_CONTRACTED", { model.name })
 end
 
 function Animal:getDisease(title)

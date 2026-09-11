@@ -280,6 +280,14 @@ function Disease:modifyOutput(type, value)
 end
 
 
+--- Whether a naming surface shows this record: hidden only at EXPOSED without a carried gene. Unlogged (per-frame).
+---@param record table A disease record; a plain table works, which is why this is dot form.
+---@return boolean visible False only for a non-carrier record at EXPOSED.
+function Disease.isVisibleToPlayer(record)
+    return record.isCarrier == true or record.state ~= RLDiseaseRecord.STATE.EXPOSED
+end
+
+
 function Disease:showInfo(box)
 
 	local time

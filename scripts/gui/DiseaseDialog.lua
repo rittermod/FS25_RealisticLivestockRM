@@ -29,10 +29,9 @@ function DiseaseDialog.createFromExistingGui(gui)
 end
 
 
---- Open the treatment dialog for one animal.
----
---- Refuses while diseases are off, and both callers funnel through here. It does not close a
---- dialog that is already open.
+-- Refuses while diseases are off, and both callers funnel through here. It does not close a dialog
+-- already open, and the list is an open-time snapshot the next open reads again.
+--- Open the treatment dialog for one animal, listing only the records a player may see.
 ---@param animal table|nil The animal whose records to show.
 ---@param onCloseCallback function|nil Invoked on close so the parent can refresh.
 ---@param onCloseTarget table|nil `self` for the close callback.
@@ -49,7 +48,11 @@ function DiseaseDialog.show(animal, onCloseCallback, onCloseTarget)
     local dialog = DiseaseDialog.INSTANCE
 
     dialog.animal = animal
-    dialog.diseases = table.clone(animal.diseases)
+    -- A fresh array: the row count and the cells both read this one table, never the animal's
+    -- live array.
+    dialog.diseases = animal:getVisibleDiseases()
+    Log:debug("DiseaseDialog.show: listing %d of %d records (uniqueId=%s)",
+        #dialog.diseases, #animal.diseases, tostring(animal.uniqueId))
     dialog.onCloseCallback = onCloseCallback
     dialog.onCloseTarget = onCloseTarget
 
@@ -91,8 +94,8 @@ function DiseaseDialog:onClickOk()
         return
     end
 
-    -- The ANIMAL's record, never the open-time clone: the clone's array is a shallow snapshot
-    -- and a daily tick can have removed this record since the dialog opened.
+    -- The ANIMAL's record, never the open-time list: that list is a shallow snapshot and a daily
+    -- tick can have removed this record since the dialog opened.
     local liveDisease = self.animal:getDisease(disease.title)
 
     if liveDisease == nil then
@@ -137,6 +140,8 @@ function DiseaseDialog:onClickOk()
 end
 
 
+--- Offer the course for one listed row: enabled only for a treatable symptomatic record.
+---@param index number|nil The row's index in the open-time list.
 function DiseaseDialog:onClickListItem(index)
 
     local disease = self.diseases[index]
@@ -147,6 +152,9 @@ function DiseaseDialog:onClickListItem(index)
         or disease.state ~= RLDiseaseRecord.STATE.INFECTIOUS then
 
         self.yesButton:setDisabled(true)
+        -- Reset, or the disabled button keeps the label the previously selected row gave it.
+        self.yesButton:setText(g_i18n:getText("rl_ui_startTreatment"))
+        Log:trace("DiseaseDialog:onClickListItem: button disabled, label reset (index=%s)", tostring(index))
         return
 
     end
@@ -164,9 +172,13 @@ function DiseaseDialog:getNumberOfSections()
 end
 
 
+--- Count the rows from the same open-time table the cells are populated from.
+---@param list table The dialog's list.
+---@param section number The one section.
+---@return number count
 function DiseaseDialog:getNumberOfItemsInSection(list, section)
 
-	return #self.animal.diseases
+	return #self.diseases
 
 end
 

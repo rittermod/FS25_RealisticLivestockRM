@@ -431,8 +431,8 @@ end
 
 -- `incubationTicksFor` floors at MIN_INCUBATION_TICKS, so the seeder cannot express zero: an
 -- authored 0 transitions straight to INFECTIOUS. Fail-loud, no rollback - `addDisease` has
--- already flagged, inserted and messaged by the time this runs.
---- Attach a fresh record and put it into its authored starting state.
+-- already flagged and inserted by the time this runs.
+--- Attach a fresh record in its authored starting state, announcing it only when it starts symptomatic.
 ---@param animal table the animal that just contracted the disease
 ---@param model table the parsed `<model>` entry it contracted
 function DiseaseManager:contractDisease(animal, model)
@@ -485,8 +485,12 @@ function DiseaseManager:contractDisease(animal, model)
 
     end
 
-    Log:trace("contractDisease: authored zero incubation, symptomatic at once (title=%s uniqueId=%s)",
-        tostring(model.title), tostring(animal.uniqueId))
+    -- The tick announces at symptom onset, but this transition happens inside the roll, which runs
+    -- after progression, so no tick sees it and the announcement is made here instead.
+    animal:addMessage("DISEASE_CONTRACTED", { model.name })
+
+    Log:debug("contractDisease: authored zero incubation, symptomatic and announced at once (title=%s "
+        .. "farmId=%s uniqueId=%s)", tostring(model.title), tostring(animal.farmId), tostring(animal.uniqueId))
 
 end
 

@@ -79,6 +79,12 @@ carriers. If you want to cull carriers, pick them manually from the detail panel
 > In an active herd that is usually the same in-game day; in a small, static pen it can take
 > considerably longer. The server always has the correct state.
 
+### Incubating animals read as healthy everywhere
+
+A newly infected animal shows nothing at first - no status icon, no entry in the detail panel, the
+HUD or the Diseases dialog, and no message. The disease appears on all of them, with a "Contracted"
+message, on the day the animal shows symptoms.
+
 ---
 
 ## Mastitis
