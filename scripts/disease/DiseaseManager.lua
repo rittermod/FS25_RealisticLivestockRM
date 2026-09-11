@@ -3,12 +3,11 @@
     The disease registry: loads `xml/diseases.xml` through `RLDiseaseDefinition`, keeps
     the title-keyed model map, and resolves a persisted or transmitted title back to it.
 
-    `onDayChanged` is LIVE: it rolls spontaneous infection per animal per tick against the
-    authored per-month curve and constructs the record. `setGeneticDiseasesForSaleAnimal`
-    and `calculateTransmission` are still SWITCHED OFF and refuse unconditionally rather
-    than keying on `diseasesEnabled`, and `collectTransmissionSources` is inert with no
-    production caller. The slice that re-arms the transmission pass must ADD a guard rather
-    than restore one.
+    `onDayChanged` rolls spontaneous infection per animal per tick against the authored
+    per-month curve. `calculateTransmission` COMPUTES a pen's spread plan through
+    `RLDiseaseSpread` and constructs nothing: the pen calls it above its progression loop
+    and applies the plan below it through `contractDisease`, the one applier both
+    producers share. `setGeneticDiseasesForSaleAnimal` is still switched off.
 ]]
 
 DiseaseManager = {}
@@ -282,6 +281,42 @@ function DiseaseManager:getSortedTitles()
 end
 
 
+-- Keyed on the registry TABLE like `getSortedTitles`. Genetic titles ride along: a rate-0
+-- title never fires a strict draw, and gating them is the genetics system's call.
+--- The spread pass's per-title entries, rebuilt only when the registry table changes.
+---@return table entries title -> `{ model, maxLifespanMonths, incubationTicks }`; the manager's own, do not mutate
+function DiseaseManager:getSpreadEntries()
+
+    if self.spreadEntriesFor == self.diseases then return self.spreadEntries end
+
+    local entries = {}
+    local count = 0
+
+    for title, model in pairs(self.diseases) do
+
+        -- The lifespan is the DISEASE-level bound (the shortest-lived affected species),
+        -- never an animal's own span.
+        entries[title] = {
+            ["model"] = model,
+            ["maxLifespanMonths"] = RLDiseaseTransmission.diseaseLifespanMonths(model.animals),
+            ["incubationTicks"] = model.incubationTicks
+        }
+
+        count = count + 1
+
+    end
+
+    self.spreadEntries = entries
+    self.spreadEntriesFor = self.diseases
+
+    Log:debug("getSpreadEntries: rebuilt the spread entries for a new registry (%s title(s))",
+        tostring(count))
+
+    return entries
+
+end
+
+
 -- Authored per MONTH, rolled per TICK, so lifetime risk no longer moves with days-per-month.
 -- Titles are walked SORTED: the registry is a title-keyed map and draw order is an outcome.
 --- Roll spontaneous infection for one animal against every disease it is eligible for.
@@ -429,9 +464,9 @@ function DiseaseManager:onDayChanged(animal, ctx)
 end
 
 
--- `incubationTicksFor` floors at MIN_INCUBATION_TICKS, so the seeder cannot express zero: an
--- authored 0 transitions straight to INFECTIOUS. Fail-loud, no rollback - `addDisease` has
--- already flagged and inserted by the time this runs.
+-- The applier both producers share: the spontaneous roll and the pen's transmission apply.
+-- `incubationTicksFor` floors at MIN_INCUBATION_TICKS, so an authored 0 skips the seeder and
+-- transitions straight to INFECTIOUS. Fail-loud, no rollback - `addDisease` already inserted.
 --- Attach a fresh record in its authored starting state, announcing it only when it starts symptomatic.
 ---@param animal table the animal that just contracted the disease
 ---@param model table the parsed `<model>` entry it contracted
@@ -485,8 +520,8 @@ function DiseaseManager:contractDisease(animal, model)
 
     end
 
-    -- The tick announces at symptom onset, but this transition happens inside the roll, which runs
-    -- after progression, so no tick sees it and the announcement is made here instead.
+    -- The tick announces at symptom onset, but this transition happens inside the roll or the
+    -- transmission apply, both after progression, so no tick sees it and it is announced here.
     animal:addMessage("DISEASE_CONTRACTED", { model.name })
 
     Log:debug("contractDisease: authored zero incubation, symptomatic and announced at once (title=%s "
@@ -511,104 +546,71 @@ function DiseaseManager:setGeneticDiseasesForSaleAnimal(animal)
 end
 
 
---- Collect the contagious disease sources across a pen.
----
---- INERT, and with NO production caller: the gate it applies per record reads a key the
---- shipped model entry does not carry, so it returns an empty source set for any input.
---- The slice that wires spread replaces the whole body with a delegation to
---- `RLDiseaseSpread` rather than re-answering the shedding question here.
----
---- Call it with the DOT form. DiseaseManager carries a `Class()` metatable, so a colon
---- call passes the manager itself as `animals` and the walk RAISES on `animal.isDead`.
---- @see RLFilterFieldCatalog.FIELDS hasAnyDisease
---- @see Animal.getHasAnyDisease
---- @see DiseaseManager.resolveRecordType
----
----@param animals table|nil the pen's animals; nil yields no sources rather than raising
----@return table sources keyed by disease title -> { type = <model entry>, amount = <integer> }; ALWAYS a table, and ALWAYS empty while the gate below is unsatisfiable
----@return boolean hasSources true when at least one record was counted; always false today
----@return table stats { curedSkipped, deadSkipped, animals }. The two skip counters are
---- DIFFERENT UNITS: `curedSkipped` counts RECORDS and `deadSkipped` counts ANIMALS,
---- because a corpse is skipped whole before its records are read. `curedSkipped` can no
---- longer move at all, so it reports a real zero.
-function DiseaseManager.collectTransmissionSources(animals)
-
-	local sources = {}
-	local hasSources = false
-	local stats = { curedSkipped = 0, deadSkipped = 0, animals = 0 }
-
-	if animals == nil then
-
-		Log:trace("collectTransmissionSources: nil animals table, no sources")
-
-		return sources, hasSources, stats
-
-	end
-
-	for _, animal in pairs(animals) do
-
-		stats.animals = stats.animals + 1
-
-		if animal.isDead then
-
-			stats.deadSkipped = stats.deadSkipped + 1
-
-			Log:trace("collectTransmissionSources: skipped dead animal, reason=dead (uniqueId=%s)", tostring(animal.uniqueId))
-
-			continue
-
-		end
-
-		if animal.diseases == nil then
-
-			Log:trace("collectTransmissionSources: skipped animal, reason=no diseases table (uniqueId=%s)", tostring(animal.uniqueId))
-
-			continue
-
-		end
-
-		for _, disease in pairs(animal.diseases) do
-
-			local model = disease.model
-
-			-- THIS GATE NOW SHORT-CIRCUITS EVERY RECORD: a model entry carries its
-			-- authored spread figure under a different name and no `transmission` key at
-			-- all, so the walk reaches this `continue` for every record.
-			if model.transmission == nil or model.transmission <= 0 then continue end
-
-			-- Reads NO record field beyond the title, deliberately: deciding what sheds
-			-- is the spread module's contract, and answering it a second time here would
-			-- make this a sixth predicate over the same records.
-			if sources[disease.title] == nil then
-				sources[disease.title] = { ["type"] = model, ["amount"] = 0 }
-				hasSources = true
-			end
-
-			sources[disease.title].amount = sources[disease.title].amount + 1
-
-		end
-
-	end
-
-	return sources, hasSources, stats
-
-end
-
-
---- Refuse one pen's transmission pass: the legacy engine is switched off, so no animal
---- catches anything from a pen mate until the SEIR spread pass lands.
----
---- THE ONLY ENTRY POINT to the transmission pass, called once per pen from the DAILY
---- tick, ABOVE that tick's per-animal progression loop.
----
---- This body reads no setting. The pen's own `diseasesEnabled` gate is what stops the
---- call, so a second entry point here would walk straight past it.
+-- The pass READS here, above the pen's progression loop; the pen applies the plan below it.
+-- Every path returns `plan`'s two values - the refusals through `plan(animals, nil)` - so the
+-- pen reads nil as "the compute did not return", never as "nothing to infect".
+--- Compute one pen's transmission plan for this tick. Constructs nothing.
 --- @see RLSettings.applyChange
----@param animals table the pen's animals. Unread while the engine is off.
+---@param animals table the pen's animals, as the progression loop walks them
 ---@param penName string|nil the husbandry's display name, for log attribution only
-function DiseaseManager:calculateTransmission(animals, penName)
+---@param ctx table REQUIRED `{ daysPerPeriod, rng }`; `rng` is a test seam defaulting to `math.random`
+---@return table infections `{ animal, title }` entries in animal-major, title-sorted order
+---@return table stats the spread pass's seven-field stats table, forwarded unchanged
+function DiseaseManager:calculateTransmission(animals, penName, ctx)
 
-	Log:trace("calculateTransmission [%s]: refused, reason=legacy engine off", tostring(penName))
+    if g_server == nil then
+
+        Log:trace("calculateTransmission [%s]: refused, reason=not the authority", tostring(penName))
+
+        return RLDiseaseSpread.plan(animals, nil)
+
+    end
+
+    if not self.diseasesEnabled then
+
+        Log:trace("calculateTransmission [%s]: refused, reason=diseases disabled", tostring(penName))
+
+        return RLDiseaseSpread.plan(animals, nil)
+
+    end
+
+    local infections, stats = RLDiseaseSpread.plan(animals, {
+        ["diseases"] = self:getSpreadEntries(),
+        ["daysPerPeriod"] = ctx.daysPerPeriod,
+        ["rng"] = ctx.rng
+    })
+
+    local shedTitles = {}
+
+    for title in pairs(stats.shedders) do shedTitles[#shedTitles + 1] = title end
+
+    table.sort(shedTitles)
+
+    local shedders, saturated = {}, {}
+
+    for _, title in ipairs(shedTitles) do
+
+        shedders[#shedders + 1] = string.format("%s=%s", tostring(title), tostring(stats.shedders[title]))
+
+        -- A clamped monthly rate of exactly 1 is the saturation tell the per-tick rate cannot give.
+        if stats.monthly[title] == 1 then saturated[#saturated + 1] = tostring(title) end
+
+    end
+
+    if #shedTitles > 0 then
+
+        Log:debug("calculateTransmission [%s]: population=%s shedders=[%s] rolls=%s planned=%s saturated=[%s]",
+            tostring(penName), tostring(stats.population), table.concat(shedders, " "),
+            tostring(stats.rolls), tostring(#infections), table.concat(saturated, " "))
+
+    else
+
+        Log:trace("calculateTransmission [%s]: population=%s, nothing shedding - empty plan",
+            tostring(penName), tostring(stats.population))
+
+    end
+
+    return infections, stats
 
 end
 

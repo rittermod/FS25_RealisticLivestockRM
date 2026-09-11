@@ -386,14 +386,25 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onDayChanged()
 
         local totalTreatmentCost, diseaseDeaths = 0, 0
 
+        -- The spread plan, held across the loop. nil means the compute did not run or raised.
+        local transmissionPlan = nil
+
         if diseasesOn then
-            -- ABOVE the per-animal loop, and that placement is the contract: an animal
-            -- contagious during this tick sheds to its pen mates before its own record
-            -- advances. ONE evaluation of the prefix gate, bound to a single local, so the
-            -- gate cannot disagree with itself about whether this is a test run.
+            -- The pass READS above the per-animal loop, and that placement is the contract: an
+            -- animal contagious during this tick sheds to its pen mates before its own record
+            -- advances. It WRITES below the loop, so a new record keeps its hidden tick.
             if RealisticLivestock.testAnimalPrefix == nil then
                 Log:trace("onDayChanged [%s]: pre-progression transmission pass", penName)
-                g_diseaseManager:calculateTransmission(animals, penName)
+
+                local computed = RmSafeUtils.safeCall("calculateTransmission [" .. penName .. "]", function()
+                    transmissionPlan = g_diseaseManager:calculateTransmission(animals, penName,
+                        { ["daysPerPeriod"] = daysPerPeriod })
+                end)
+
+                if not computed then
+                    Log:warning("onDayChanged [%s]: the transmission pass raised - transmission is skipped "
+                        .. "for this tick", penName)
+                end
             else
                 Log:trace("onDayChanged [%s]: test-prefix run - skipping disease transmission", penName)
             end
@@ -512,6 +523,63 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onDayChanged()
 
         local tLoopMs = (getTimeSec() - tLoopStart) * 1000
         local tPostStart = getTimeSec()
+
+        -- After progression, so a new record keeps its hidden tick; before the flush, so the
+        -- array still holds this tick's corpses for the revalidation to refuse.
+        if transmissionPlan ~= nil then
+
+            local applied, refused, failed = 0, 0, 0
+
+            for _, entry in ipairs(transmissionPlan) do
+
+                local outcome = RmSafeUtils.safeAnimalCall(entry.animal, "transmissionApply", function()
+
+                    local animal = entry.animal
+                    local model = g_diseaseManager:getDiseaseByTitle(entry.title)
+
+                    -- The plan was read above the loop, which can since have killed the
+                    -- recipient or given it this title through the roll.
+                    if animal.numAnimals <= 0 or animal.isDead then
+                        Log:trace("onDayChanged [%s]: transmission apply refused title=%s reason=NOT_LIVE "
+                            .. "(farmId=%s uniqueId=%s)", penName, tostring(entry.title),
+                            tostring(animal.farmId), tostring(animal.uniqueId))
+                        return "NOT_LIVE"
+                    end
+
+                    local eligible, reason = RLDiseaseSpread.isEligible(animal, entry.title, model)
+
+                    if not eligible then
+                        Log:trace("onDayChanged [%s]: transmission apply refused title=%s reason=%s "
+                            .. "(farmId=%s uniqueId=%s)", penName, tostring(entry.title), tostring(reason),
+                            tostring(animal.farmId), tostring(animal.uniqueId))
+                        return tostring(reason)
+                    end
+
+                    g_diseaseManager:contractDisease(animal, model)
+
+                    Log:debug("onDayChanged [%s]: transmission applied title=%s (farmId=%s uniqueId=%s)",
+                        penName, tostring(entry.title), tostring(animal.farmId), tostring(animal.uniqueId))
+
+                    return "APPLIED"
+
+                end, { "FAILED" })
+
+                if outcome == "APPLIED" then
+                    applied = applied + 1
+                elseif outcome == "FAILED" then
+                    failed = failed + 1
+                else
+                    refused = refused + 1
+                end
+
+            end
+
+            if #transmissionPlan > 0 then
+                Log:debug("onDayChanged [%s]: transmission apply planned=%s applied=%s refused=%s failed=%s",
+                    penName, tostring(#transmissionPlan), tostring(applied), tostring(refused), tostring(failed))
+            end
+
+        end
 
         if self.isServer then
 
