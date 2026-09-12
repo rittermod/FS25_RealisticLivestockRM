@@ -140,7 +140,7 @@ function DiseaseDialog:onClickOk()
 end
 
 
---- Offer the course for one listed row: enabled only for a treatable symptomatic record.
+--- Offer the course for one listed row: enabled only for a treatable symptomatic record, labelled by its status.
 ---@param index number|nil The row's index in the open-time list.
 function DiseaseDialog:onClickListItem(index)
 
@@ -160,7 +160,15 @@ function DiseaseDialog:onClickListItem(index)
     end
 
     self.yesButton:setDisabled(false)
-    self.yesButton:setText(g_i18n:getText("rl_ui_" .. (disease.treatmentRunning and "stop" or (disease.treatmentMonthsRemaining > 0 and "resume" or "start")) .. "Treatment"))
+
+    -- Read at call time: this file is sourced before RLDiseaseStatus.
+    local KEY = RLDiseaseStatus.KEY
+    local statusKey = RLDiseaseStatus.resolve(disease).statusKey
+    local label = statusKey == KEY.BEING_TREATED and "stop"
+        or (statusKey == KEY.TREATMENT_PAUSED and "resume" or "start")
+
+    Log:trace("DiseaseDialog:onClickListItem: button enabled, label=%s (index=%s)", label, tostring(index))
+    self.yesButton:setText(g_i18n:getText("rl_ui_" .. label .. "Treatment"))
 
 end
 

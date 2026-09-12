@@ -3,6 +3,8 @@
     What one disease record tells the player: whether a naming surface lists it, its status
     label key, the whole months of an immune label, its card icon token, and whether it groups
     the animal as diseased. An incubating non-carrier record resolves exactly as a healthy animal does.
+    isDiseased and iconOf are the per-record rules the Animal display predicates and the filter
+    catalog read; resolve composes them.
 
     Pure: no setting, no g_*, no GUI - callers gate diseasesEnabled. Reads Disease.isVisibleToPlayer,
     RLDiseaseRecord.STATE and RLDiseaseProgression.COMPLETION_EPSILON at CALL time only; nothing
@@ -64,6 +66,30 @@ function RLDiseaseStatus.wholeMonthsElapsed(months)
 end
 
 
+--- Whether one record groups its animal as diseased: INFECTIOUS only. Unlogged: per-comparison callers.
+---@param record table A disease record.
+---@return boolean diseased True iff the record is at INFECTIOUS.
+function RLDiseaseStatus.isDiseased(record)
+    return record.state == RLDiseaseRecord.STATE.INFECTIOUS
+end
+
+
+--- The card icon token for one record, carrier first; nil when it lights none. Unlogged: per-comparison callers.
+---@param record table A disease record.
+---@return string|nil icon An `ICON` token, or nil.
+function RLDiseaseStatus.iconOf(record)
+    local ICON = RLDiseaseStatus.ICON
+
+    if record.isCarrier then return ICON.CARRIER end
+
+    if record.state == RLDiseaseRecord.STATE.INFECTIOUS then
+        return record.treatmentRunning and ICON.TREATED or ICON.UNTREATED
+    end
+
+    return nil
+end
+
+
 -- The label arms keep the shipped order: a running course, RECOVERED, a paused course, a carrier,
 -- then the fallback. The icon is carrier-first and ignores a pause, so card and pane can differ.
 --- Resolve what one record tells the player. A fresh table every call. Unlogged: per-frame callers.
@@ -76,11 +102,10 @@ function RLDiseaseStatus.resolve(record)
 
     local STATE = RLDiseaseRecord.STATE
     local KEY = RLDiseaseStatus.KEY
-    local ICON = RLDiseaseStatus.ICON
 
     local presentation = {
         ["visible"] = true,
-        ["diseased"] = record.state == STATE.INFECTIOUS
+        ["diseased"] = RLDiseaseStatus.isDiseased(record)
     }
 
     if record.treatmentRunning then
@@ -97,11 +122,7 @@ function RLDiseaseStatus.resolve(record)
         presentation.statusKey = KEY.NOT_TREATED
     end
 
-    if record.isCarrier then
-        presentation.icon = ICON.CARRIER
-    elseif record.state == STATE.INFECTIOUS then
-        presentation.icon = record.treatmentRunning and ICON.TREATED or ICON.UNTREATED
-    end
+    presentation.icon = RLDiseaseStatus.iconOf(record)
 
     return presentation
 end

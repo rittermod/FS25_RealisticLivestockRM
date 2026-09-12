@@ -152,12 +152,8 @@ RLFilterFieldCatalog.FIELDS = {
         type        = "bool",
         cmps        = BOOL_CMPS,
         animalTypes = "all",
-        -- Both branches implement the SAME symptomatic rule - only an INFECTIOUS record
-        -- counts - and both return a strict boolean, the evaluator type-gating a nil into
-        -- a silent no-match. Keep the plain-table fallback in lockstep, gate included.
-        --
-        -- RLDiseaseRecord is read INSIDE the closure, which frees this file's load
-        -- position: a file-scope alias would capture a nil.
+        -- Both branches answer through RLDiseaseStatus.isDiseased and return a strict boolean.
+        -- RLDiseaseStatus is read INSIDE the closure: a file-scope alias would capture a nil.
         getter      = function(animal)
             if animal.getHasAnyDisease ~= nil then return animal:getHasAnyDisease() == true end
             if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled
@@ -165,7 +161,7 @@ RLFilterFieldCatalog.FIELDS = {
                 return false
             end
             for _, disease in ipairs(animal.diseases) do
-                if disease.state == RLDiseaseRecord.STATE.INFECTIOUS then return true end
+                if RLDiseaseStatus.isDiseased(disease) then return true end
             end
             return false
         end,

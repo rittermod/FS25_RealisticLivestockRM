@@ -1867,32 +1867,17 @@ function Animal:getCanBeInseminatedByAnimal(animal) return AnimalReproduction.ge
 
 function Animal:setInsemination(animal) AnimalReproduction.setInsemination(self, animal) end
 
---- Whether this animal currently carries a SYMPTOMATIC disease record - one at INFECTIOUS.
----
---- A GAMEPLAY predicate, not a display helper, and that is why the rule is a decision rather
---- than a default. It backs the saved-filter field the herdsman planner evaluates to decide
---- what it autonomously sells, so what counts as "diseased" here decides what a rule the
---- player wrote about sick animals actually acts on.
----
---- INFECTIOUS ONLY. An incubating animal is deliberately invisible - the design withholds that
---- early warning, and letting it through here would hand it back through the filter. A
---- recovered animal is immune rather than sick, and its record is what blocks re-infection, so
---- it must stay attached while reading healthy. Both would otherwise be auto-sold.
----
---- Strict boolean contract: never nil (the filter evaluator type-gates and
---- would silently match nothing) and never raises on a nil diseases table.
---- Deliberately unlogged: the three list sort comparators call this per
---- comparison, so a per-call trace would dominate the log at TRACE.
----@return boolean hasActiveDisease true iff diseases are enabled AND at least one attached
----        record is INFECTIOUS; false whenever the manager is absent, diseases are disabled,
----        or the animal carries no diseases table
+-- A GAMEPLAY predicate: the saved-filter field the herdsman sells on reads it, as do the list sorts
+-- and the "Diseased Animals" grouping. The per-record rule's one home is RLDiseaseStatus.isDiseased.
+--- Whether diseases are on and at least one record groups this animal as diseased. Unlogged: per-comparison callers.
+---@return boolean hasActiveDisease A strict boolean; false with no manager, diseases off or no diseases table.
 function Animal:getHasAnyDisease()
     if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled or self.diseases == nil then
         return false
     end
 
     for _, disease in ipairs(self.diseases) do
-        if disease.state == RLDiseaseRecord.STATE.INFECTIOUS then
+        if RLDiseaseStatus.isDiseased(disease) then
             return true
         end
     end
@@ -1920,46 +1905,29 @@ function Animal:getDiseaseMultipliers(caller)
     return RLDiseaseEffects.resolve(self.diseases, g_diseaseManager.diseases)
 end
 
---- Resolve the three display flags the animal-list cards render as status icons.
---- Gating mirrors getHasAnyDisease exactly: an absent manager, disabled diseases
---- or an absent diseases table all yield three falses, so turning diseases off
---- clears the icons the same way it clears every other disease surface.
----
---- "Untreated" and "treated" describe SYMPTOMATIC records only - those at INFECTIOUS - so an
---- incubating or a recovered record contributes nothing whatever its treatment flag says.
---- Carrier is keyed on isCarrier alone, whatever the state, because it marks a lifelong
---- carried gene rather than a point in the disease's course.
----
---- WITHIN one record the three are exclusive - a carrier record can never also
---- report untreated or treated. ACROSS records they are independent, which is
---- how an animal carrying a gene and running an active infection lights two
---- icons. A degenerate record (no fields set) lights NOTHING, matching what
---- getHasAnyDisease does with the same input - the rule demands a state the record
---- does not carry, so it fails closed, which is the safe direction for a predicate
---- the herdsman auto-sells on.
----
---- Iterates with ipairs to match the list predicate: a sparse diseases table has
---- to be read the same way by both, or the icons and the section grouping would
---- disagree about the same animal.
----@return boolean untreated true iff at least one SYMPTOMATIC record has no course running
----@return boolean treated true iff at least one SYMPTOMATIC record has a course running
----@return boolean carrier true iff at least one record carries the gene
+-- Each record's token comes from RLDiseaseStatus.iconOf, the per-record rule's one home. The flags
+-- OR across records, so a carrier running an active infection lights two icons.
+--- Resolve the three display flags the animal-list cards render as status icons, behind the diseases gate.
+---@return boolean untreated true iff at least one record's token is UNTREATED
+---@return boolean treated true iff at least one record's token is TREATED
+---@return boolean carrier true iff at least one record's token is CARRIER
 function Animal:getDiseaseStatusFlags()
     if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled or self.diseases == nil then
         return false, false, false
     end
 
+    local ICON = RLDiseaseStatus.ICON
     local untreated, treated, carrier = false, false, false
 
     for _, disease in ipairs(self.diseases) do
-        if disease.isCarrier then
+        local icon = RLDiseaseStatus.iconOf(disease)
+
+        if icon == ICON.CARRIER then
             carrier = true
-        elseif disease.state == RLDiseaseRecord.STATE.INFECTIOUS then
-            if disease.treatmentRunning then
-                treated = true
-            else
-                untreated = true
-            end
+        elseif icon == ICON.TREATED then
+            treated = true
+        elseif icon == ICON.UNTREATED then
+            untreated = true
         end
     end
 
