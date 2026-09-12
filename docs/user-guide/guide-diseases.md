@@ -251,7 +251,7 @@ With pig litters of 11-16 piglets, a PED outbreak in a maternity pen can kill mo
 
 LPAI is short for low-pathogenic avian influenza - the milder, survivable strain.
 
-Avian Flu has **no treatment**. Infected chickens stop producing eggs entirely and have a high fatality rate. It is less contagious than its reputation suggests: a bird recovers after about a month, so an outbreak normally burns out instead of sweeping the coop. The danger is the fatality, not the spread.
+Avian Flu has **no treatment**. Egg production drops to about 40% of normal while a bird is sick, and infected chickens have a high fatality rate. It is less contagious than its reputation suggests: a bird recovers after about a month, so an outbreak normally burns out instead of sweeping the coop. The danger is the fatality, not the spread.
 
 | Parameter | Value |
 |-----------|-------|
@@ -265,7 +265,7 @@ Avian Flu has **no treatment**. Infected chickens stop producing eggs entirely a
 
 | Impact | Effect |
 |--------|--------|
-| Eggs | **Completely stopped** |
+| Eggs | Drops to about 40% of normal while a bird is sick |
 | Sell price | Severe reduction |
 
 ### Fatality Over Time
@@ -283,8 +283,7 @@ Avian Flu has **no treatment**. Infected chickens stop producing eggs entirely a
 - **No treatment** - you can only wait for natural recovery (1 month)
 - **Cases keep appearing** - birds mostly catch it on their own rather than from each other, so a large flock sees new cases over time rather than one contained outbreak
 - **High initial fatality** - many infected chickens die before recovering
-- **Complete egg loss** - surviving infected chickens produce zero eggs
-- Even survivors lose a month of egg production while sick
+- **Reduced egg output** - egg production drops to about 40% of normal while a bird is sick
 
 ### Management Tips
 

@@ -1568,8 +1568,37 @@ function Animal:updateInput()
     end
 end
 
+-- The disease multipliers resolve once per call, only for an animal holding records and only
+-- while diseases are enabled; an animal without records skips the resolver and its disease lines.
+--- Recompute this animal's per-hour output for every fill type its subtype produces.
+---@param temp number The day's minimum temperature, read by the wool cold gate.
+---@return nil
 function Animal:updateOutput(temp)
     local subType = self:getSubType()
+
+    -- Declared above the gate so the fill-type loop reads the same locals it assigns.
+    local multipliers, contributors
+
+    if self.diseases ~= nil and next(self.diseases) ~= nil then
+        if g_diseaseManager ~= nil and g_diseaseManager.diseasesEnabled then
+            multipliers, contributors = RLDiseaseEffects.resolve(self.diseases, g_diseaseManager.diseases)
+
+            if contributors > 0 then
+                Log:trace("updateOutput: animal=%s/%s disease multipliers milk=%s pallets=%s manure=%s liquidManure=%s (contributors=%s)",
+                    tostring(self.farmId), tostring(self.uniqueId), tostring(multipliers.milk),
+                    tostring(multipliers.pallets), tostring(multipliers.manure),
+                    tostring(multipliers.liquidManure), tostring(contributors))
+            else
+                Log:trace("updateOutput: animal=%s/%s holds disease records but none contributes "
+                    .. "(not symptomatic, or an unregistered title), output unscaled",
+                    tostring(self.farmId), tostring(self.uniqueId))
+            end
+        else
+            Log:trace("updateOutput: animal=%s/%s disease multipliers skipped, reason=%s",
+                tostring(self.farmId), tostring(self.uniqueId),
+                g_diseaseManager == nil and "no disease manager" or "diseases off")
+        end
+    end
 
     for fillType, output in pairs(subType.output) do
         local litersPerDay = 0
@@ -1592,6 +1621,9 @@ function Animal:updateOutput(temp)
 
             if fillTypeIndex == FillType.WOOL then
                 if temp < 12 then litersPerDay = 0 end
+
+                Log:trace("updateOutput[wool]: animal=%s/%s temp=%s coldGateClosed=%s",
+                    tostring(self.farmId), tostring(self.uniqueId), tostring(temp), tostring(temp < 12))
             elseif fillTypeIndex == FillType.GOATMILK then
                 local monthsSinceLastBirth = self.monthsSinceLastBirth or 12
                 local factor = 0.8
@@ -1605,16 +1637,17 @@ function Animal:updateOutput(temp)
                 end
 
                 litersPerDay = litersPerDay * factor
+
+                Log:trace("updateOutput[goatmilk]: animal=%s/%s months=%s isLactating=%s isParent=%s factor=%s",
+                    tostring(self.farmId), tostring(self.uniqueId), tostring(monthsSinceLastBirth),
+                    tostring(self.isLactating), tostring(self.isParent), tostring(factor))
             end
 
             litersPerDay = litersPerDay * productivity
         end
 
-        -- Milk diagnostics: capture the milk gate breakdown here, but defer the
-        -- logging until AFTER the disease modifier below - a sick cow is zeroed by
-        -- disease:modifyOutput, not by the lactation gate, and the two are
-        -- indistinguishable from the husbandry side (both read 0). Carrying these in
-        -- loop-body locals lets the post-disease log split "gate failure" from "disease".
+        -- Milk diagnostics: capture the gate breakdown here and log it AFTER the disease multiplier,
+        -- because a disease zeroing milk and a lactation-gate failure both read 0 from the husbandry side.
         local isMilk = fillType == "milk"
         local milkCurve, milkFactor, milkProductivity, milkPreDisease
 
@@ -1637,16 +1670,17 @@ function Animal:updateOutput(temp)
             milkCurve, milkFactor, milkProductivity, milkPreDisease = curveLitersPerDay, factor, productivity, litersPerDay
         end
 
-        for _, disease in pairs(self.diseases) do litersPerDay = disease:modifyOutput(fillType, litersPerDay) end
+        if multipliers ~= nil then litersPerDay = litersPerDay * multipliers[fillType] end
 
         if isMilk then
             -- litersPerDay is now the FINAL value (post lactation gate AND disease).
             -- TRACE the full breakdown for every cow every recompute; there is no
             -- debugger, so this is the only way to see why a lactating cow yields no milk.
-            Log:trace("updateOutput[milk]: animal=%s/%s subType=%s age=%d curve(l/day)=%.3f isLactating=%s isParent=%s months=%s factor=%.3f productivity=%.3f diseases=%d -> preDisease l/h=%.4f final l/h=%.4f",
+            Log:trace("updateOutput[milk]: animal=%s/%s subType=%s age=%d curve(l/day)=%.3f isLactating=%s isParent=%s months=%s factor=%.3f productivity=%.3f diseases=%d diseaseMilk=%s -> preDisease l/h=%.4f final l/h=%.4f",
                 tostring(self.farmId), tostring(self.uniqueId), tostring(subType.name), self.age or -1,
                 milkCurve, tostring(self.isLactating), tostring(self.isParent),
                 tostring(self.monthsSinceLastBirth), milkFactor, milkProductivity, #self.diseases,
+                tostring(multipliers ~= nil and multipliers.milk or nil),
                 milkPreDisease / 24, litersPerDay / 24)
 
             -- Smoking-gun DEBUG: client shows "lactating" but the FINAL server output is 0.

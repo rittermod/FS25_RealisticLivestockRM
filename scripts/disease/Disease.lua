@@ -5,10 +5,10 @@
     both codecs and the player-facing labels.
 
     Progression is LIVE and runs off the pen's daily tick, deciding through
-    `RLDiseaseProgression` and applying nothing itself. The three remaining legacy
-    behaviour methods - reproduction, sale value and output - still refuse
-    unconditionally rather than keying on `diseasesEnabled`, so they stay off even in a
-    save with diseases switched on.
+    `RLDiseaseProgression` and applying nothing itself. The two remaining legacy
+    behaviour methods - reproduction and sale value - still refuse unconditionally
+    rather than keying on `diseasesEnabled`, so they stay off even in a save with
+    diseases switched on.
 ]]
 
 Disease = {}
@@ -255,25 +255,6 @@ end
 function Disease:modifyValue(value)
 
 	Log:trace("Disease:modifyValue: refused, reason=legacy engine off")
-
-	return value
-
-end
-
-
---- Refuse to scale a production output: the legacy multiplier is off, so a diseased
---- animal produces at its undiseased rate.
----
---- STAYS NEUTERED for `modifyValue`'s reason plus one specific to this body: the old one
---- read a carrier output map, and a model entry carries one at an IDENTICAL path shape
---- with cvm authored at `milk = 1.5`, so a repoint would silently grant a milk bonus
---- that has never applied in any shipped build.
----@param type any The fill type being produced. Unread.
----@param value number The undiseased output.
----@return number `value`, always and unconditionally.
-function Disease:modifyOutput(type, value)
-
-	Log:trace("Disease:modifyOutput: refused, reason=legacy engine off")
 
 	return value
 
