@@ -76,7 +76,7 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 
 | Setting | Default | Options | Description |
 |---------|---------|---------|-------------|
-| **Diseases Enabled** | On | Off / On | Toggles the entire disease system. When off, new infections, disease spread, and disease effects are suspended. Already-infected animals are not cured; their diseases resume when the system is re-enabled. |
+| **Diseases Enabled** | On | Off / On | Toggles the entire disease system. When off, new infections, disease spread, and disease effects are suspended. Already-infected animals are not cured; their diseases resume when the system is re-enabled. Existing diseases are hidden while the system is off. |
 
 *Disabling diseases suspends Mastitis, CVM, Foot & Mouth, PED, and Avian Flu (LPAI) - it stops new infections, spread, and effects but does not cure already-infected animals; their diseases resume when re-enabled.*
 

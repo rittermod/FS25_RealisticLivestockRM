@@ -269,12 +269,12 @@ function Disease.isVisibleToPlayer(record)
 end
 
 
+--- Add this record's HUD line: its name with the whole months elapsed, and its status. Unlogged: per-frame.
+---@param box table The HUD key/value box being filled.
 function Disease:showInfo(box)
 
 	local time
-	-- A floor over a domain that cannot go below it, kept because this renders whatever a
-	-- codec produced and a hand-edited save is the one shape that can hand it a negative.
-	local elapsed = math.max(self.monthsElapsed, 0)
+	local elapsed = RLDiseaseStatus.wholeMonthsElapsed(self.monthsElapsed)
 	local years = math.floor(elapsed / 12)
 	local months = elapsed - years * 12
 
@@ -291,40 +291,17 @@ function Disease:showInfo(box)
 end
 
 
---- This record's player-facing status label.
----
---- CRUDE BUT TRUTHFUL, and deliberately temporary - the display slice replaces this
---- whole function, so do not invest in the wording. The fallback arm is load-bearing:
---- the alternative is a nil passed straight into `box:addLine` two lines up.
----
---- Add NO logging in here - this is a per-frame formatter, so a TRACE in any arm emits
---- continuously while a player stands near a diseased animal.
----@return string localised status label
+-- Every production caller filters out a record `Disease.isVisibleToPlayer` hides; the Not-treated
+-- fallback exists so a direct call on such a record still returns a label, never nil.
+--- This record's player-facing status label. No logging: a per-frame formatter.
+---@return string localised status label, with whole months for an immune record
 function Disease:getStatus()
+    local presentation = RLDiseaseStatus.resolve(self)
+    local label = g_i18n:getText(presentation.statusKey or RLDiseaseStatus.KEY.NOT_TREATED)
 
-	local status
+    if presentation.months ~= nil then
+        return string.format("%s (%s)", label, RLTimeFormat.formatAge(presentation.months))
+    end
 
-	if self.treatmentRunning then
-		status = g_i18n:getText("rl_ui_beingTreated")
-	elseif self.state == RLDiseaseRecord.STATE.RECOVERED then
-
-		status = string.format("%s (%s)", g_i18n:getText("rl_ui_immune"), RLTimeFormat.formatAge(self.immunityMonthsRemaining))
-
-	elseif (self.treatmentMonthsRemaining or 0) > 0 then
-
-		-- The paused arm keys on the record's own counter ALONE: the question is whether
-		-- THIS record holds unfinished progress, which the model cannot answer. `or 0` is
-		-- nil tolerance for a partially-deserialized record, not type safety.
-		status = g_i18n:getText("rl_ui_treatmentPaused")
-
-	elseif self.isCarrier then
-
-		status = g_i18n:getText("rl_ui_carrier")
-
-	else
-		status = g_i18n:getText("rl_ui_notTreated")
-	end
-
-	return status
-
+    return label
 end

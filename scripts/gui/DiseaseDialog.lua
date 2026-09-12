@@ -204,8 +204,8 @@ function DiseaseDialog:populateCellForItemInSection(list, section, index, cell)
     -- nil-treatment arm must stay short-circuited: two shipped diseases carry no treatment
     -- block, so the duration term below may not be evaluated for them.
     cell:getAttribute("duration"):setText(treatment == nil and "N/A"
-        or RealisticLivestock.formatAge(
-            disease.treatmentMonthsRemaining > 0 and disease.treatmentMonthsRemaining or treatment.months))
+        or RealisticLivestock.formatAge(disease.treatmentMonthsRemaining > 0
+            and RLDiseaseStatus.wholeMonthsRemaining(disease.treatmentMonthsRemaining) or treatment.months))
     cell:getAttribute("fee"):setText(treatment == nil and "N/A" or string.format(g_i18n:getText("rl_ui_feePerMonth"), g_i18n:formatMoney(treatment.cost, 2, true, true)))
     cell:getAttribute("status"):setText(disease:getStatus())
 
