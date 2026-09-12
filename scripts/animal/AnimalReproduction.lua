@@ -32,6 +32,7 @@ end
 --- @param animal table Animal instance
 --- @param month number Current month
 --- @param year number Current year
+--- @return nil
 local function resolveInsemination(animal, month, year)
     local insemination = animal.insemination
 
@@ -43,7 +44,7 @@ local function resolveInsemination(animal, month, year)
     Log:trace("resolveInsemination: animal=%s insemination from %s/%s",
         animal.uniqueId or "?", tostring(insemination.farmId), tostring(insemination.uniqueId))
 
-    local fertility = animal.genetics.fertility
+    local fertility = AnimalReproduction.getConceptionFertility(animal)
     local childNum = animal:generateRandomOffspring()
 
     if childNum > 0
@@ -65,13 +66,13 @@ local function resolveInsemination(animal, month, year)
             ["productivity"] = insemination.genetics.productivity,
         })
 
-        Log:trace("  insemination success, pregnancy created")
+        Log:trace("  insemination success, pregnancy created (fertility=%s)", tostring(fertility))
     else
         animal:addMessage("INSEMINATION_FAIL")
         g_server:broadcastEvent(AnimalInseminationResultEvent.new(
             animal.clusterSystem.owner, animal, false))
 
-        Log:trace("  insemination failed (childNum=%d)", childNum)
+        Log:trace("  insemination failed (childNum=%d, fertility=%s)", childNum, tostring(fertility))
     end
 
     animal.insemination = nil
@@ -162,7 +163,7 @@ local function advancePregnancy(animal, spec, day, month, year, isSaleAnimal)
 
     elseif g_server ~= nil and not isSaleAnimal and animal:getCanReproduce() then
         -- Natural conception attempt
-        local fertility = animal.genetics.fertility
+        local fertility = AnimalReproduction.getConceptionFertility(animal)
         local childNum = animal:generateRandomOffspring()
 
         Log:trace("advancePregnancy: animal=%s natural conception attempt fertility=%.2f childNum=%d",
@@ -233,6 +234,28 @@ end
 --- @return number factor Reproduction progress (0.0-1.0)
 function AnimalReproduction.getReproductionFactor(animal)
     return animal.reproduction / 100
+end
+
+-- Read by the two (2 - fertility) conception rolls only. The offspring draw, the age curve, the
+-- sterility gates and the sire keep the genetic value; a sick sire changes nothing.
+--- The fertility a conception roll reads: the genetic value times the disease fertility multiplier.
+--- @param animal table Animal instance (the female whose roll this is)
+--- @return number fertility The genetic fertility, scaled while the animal holds a symptomatic record
+function AnimalReproduction.getConceptionFertility(animal)
+    local genetic = animal.genetics.fertility
+    local multipliers, contributors = animal:getDiseaseMultipliers("conception")
+
+    if multipliers == nil then return genetic end
+
+    local fertility = genetic * multipliers.fertility
+
+    if contributors > 0 then
+        Log:trace("getConceptionFertility: animal=%s/%s genetic=%s disease fertility=%s -> %s (contributors=%s)",
+            tostring(animal.farmId), tostring(animal.uniqueId), tostring(genetic),
+            tostring(multipliers.fertility), tostring(fertility), tostring(contributors))
+    end
+
+    return fertility
 end
 
 --- Check if this animal's subtype supports reproduction.

@@ -1149,6 +1149,11 @@ function Animal:getCanReproduce() return AnimalReproduction.getCanReproduce(self
 
 function Animal:updateHealth(foodFactor) AnimalHealth.updateHealth(self, foodFactor) end
 
+-- The disease multiplier scales positive growth only: an age-driven loss and the decrease terms
+-- stay exactly as a healthy animal's.
+--- Advance this animal's weight by one hour of growth, overweight regression and starvation.
+---@param foodFactor number The pen's 0..1 food factor
+---@return nil
 function Animal:updateWeight(foodFactor)
     local subType = self:getSubType()
     local minWeight = subType.minWeight
@@ -1161,7 +1166,13 @@ function Animal:updateWeight(foodFactor)
     local increase = baseIncrease * (self.gender == "female" and 0.6 or 1.0) * (1 + ((adultMonth - self.age) / 75)) *
     math.min(foodFactor * 1.25, 1)
 
-    if increase < 0 then metabolism = 1 + (1 - metabolism) end
+    if increase < 0 then
+        metabolism = 1 + (1 - metabolism)
+
+        Log:trace("updateWeight: animal=%s/%s age-driven loss (age=%s adultMonth=%s), metabolism inverted to %s",
+            tostring(self.farmId), tostring(self.uniqueId), tostring(self.age), tostring(adultMonth),
+            tostring(metabolism))
+    end
 
     increase = increase * metabolism
 
@@ -1170,10 +1181,28 @@ function Animal:updateWeight(foodFactor)
     if self.clusterSystem ~= nil and self.clusterSystem.owner ~= nil and self.clusterSystem.owner.spec_husbandryMilk ~= nil and self.isLactating then increase =
         increase * 0.75 end
 
+    if increase > 0 then
+        local multipliers, contributors = self:getDiseaseMultipliers("updateWeight")
+
+        if multipliers ~= nil then
+            local healthyIncrease = increase
+            increase = increase * multipliers.weightGain
+
+            if contributors > 0 then
+                Log:trace("updateWeight: animal=%s/%s disease weightGain=%s increase %s -> %s (contributors=%s)",
+                    tostring(self.farmId), tostring(self.uniqueId), tostring(multipliers.weightGain),
+                    tostring(healthyIncrease), tostring(increase), tostring(contributors))
+            end
+        end
+    end
+
     local decrease = 0
     if weight > targetWeight then decrease = (weight - targetWeight) / (metabolism * 25) end
 
     if foodFactor == 0 then
+        Log:trace("updateWeight: animal=%s/%s starving, weight=%s targetWeight=%s",
+            tostring(self.farmId), tostring(self.uniqueId), tostring(weight), tostring(targetWeight))
+
         if weight < targetWeight then
             decrease = (targetWeight - weight) / ((1 - (metabolism - 1)) * 150)
         elseif weight > targetWeight then
@@ -1568,35 +1597,28 @@ function Animal:updateInput()
     end
 end
 
--- The disease multipliers resolve once per call, only for an animal holding records and only
--- while diseases are enabled; an animal without records skips the resolver and its disease lines.
+-- The disease multipliers come from getDiseaseMultipliers once per call, above the fill-type loop;
+-- it answers nil for an animal without records or with diseases off, and output then stays unscaled.
 --- Recompute this animal's per-hour output for every fill type its subtype produces.
 ---@param temp number The day's minimum temperature, read by the wool cold gate.
 ---@return nil
 function Animal:updateOutput(temp)
     local subType = self:getSubType()
 
-    -- Declared above the gate so the fill-type loop reads the same locals it assigns.
-    local multipliers, contributors
+    -- Resolved above the fill-type loop so every fill type reads the same multipliers.
+    local multipliers, contributors = self:getDiseaseMultipliers("updateOutput")
 
-    if self.diseases ~= nil and next(self.diseases) ~= nil then
-        if g_diseaseManager ~= nil and g_diseaseManager.diseasesEnabled then
-            multipliers, contributors = RLDiseaseEffects.resolve(self.diseases, g_diseaseManager.diseases)
-
-            if contributors > 0 then
-                Log:trace("updateOutput: animal=%s/%s disease multipliers milk=%s pallets=%s manure=%s liquidManure=%s (contributors=%s)",
-                    tostring(self.farmId), tostring(self.uniqueId), tostring(multipliers.milk),
-                    tostring(multipliers.pallets), tostring(multipliers.manure),
-                    tostring(multipliers.liquidManure), tostring(contributors))
-            else
-                Log:trace("updateOutput: animal=%s/%s holds disease records but none contributes "
-                    .. "(not symptomatic, or an unregistered title), output unscaled",
-                    tostring(self.farmId), tostring(self.uniqueId))
-            end
+    if multipliers ~= nil then
+        if contributors > 0 then
+            Log:trace("updateOutput: animal=%s/%s disease multipliers milk=%s pallets=%s manure=%s "
+                .. "liquidManure=%s (contributors=%s)",
+                tostring(self.farmId), tostring(self.uniqueId), tostring(multipliers.milk),
+                tostring(multipliers.pallets), tostring(multipliers.manure),
+                tostring(multipliers.liquidManure), tostring(contributors))
         else
-            Log:trace("updateOutput: animal=%s/%s disease multipliers skipped, reason=%s",
-                tostring(self.farmId), tostring(self.uniqueId),
-                g_diseaseManager == nil and "no disease manager" or "diseases off")
+            Log:trace("updateOutput: animal=%s/%s holds disease records but none contributes "
+                .. "(not symptomatic, or an unregistered title), output unscaled",
+                tostring(self.farmId), tostring(self.uniqueId))
         end
     end
 
@@ -1876,6 +1898,26 @@ function Animal:getHasAnyDisease()
     end
 
     return false
+end
+
+-- The one gate for every sub-lethal consumer (output, growth, conception) and the only resolve
+-- caller. Silent for an animal without records - the hot path. The display predicates keep theirs.
+--- Resolve this animal's sub-lethal disease multipliers for one consumer, behind the diseases setting.
+---@param caller string Label naming the consumer, used only by the refusal TRACE
+---@return table|nil multipliers The resolver's six-key table; nil with no records or diseases off
+---@return number|nil contributors How many records resolved; nil alongside a nil table
+function Animal:getDiseaseMultipliers(caller)
+    if self.diseases == nil or next(self.diseases) == nil then return nil end
+
+    if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled then
+        Log:trace("getDiseaseMultipliers: animal=%s/%s caller=%s skipped, reason=%s",
+            tostring(self.farmId), tostring(self.uniqueId), tostring(caller),
+            g_diseaseManager == nil and "no disease manager" or "diseases off")
+
+        return nil
+    end
+
+    return RLDiseaseEffects.resolve(self.diseases, g_diseaseManager.diseases)
 end
 
 --- Resolve the three display flags the animal-list cards render as status icons.
