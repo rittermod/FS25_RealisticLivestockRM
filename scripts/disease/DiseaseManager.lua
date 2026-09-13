@@ -9,6 +9,9 @@
     and applies the plan below it through `contractDisease`, the one applier both
     producers share. A genetic record has its own applier, `contractGenetic`, reached by
     the dealer seeding in `setGeneticDiseasesForSaleAnimal` and by inheritance at conception.
+
+    The active difficulty preset (`diseaseDifficulty`, stored by `onDifficultyChanged` on every
+    peer) scales the roll, the seed and the spread entries; `diseasesEnabled` is derived from it.
 ]]
 
 DiseaseManager = {}
@@ -29,8 +32,12 @@ function DiseaseManager.new()
 	-- not an array, so `#` on it is always 0.
 	self.diseases = {}
 	self.diseasesEnabled = true
+    self.diseaseDifficulty = RLDiseaseDifficulty.DEFAULT_INDEX
 
 	self:loadDiseases()
+
+    Log:debug("DiseaseManager.new: constructed with preset %s, diseasesEnabled=%s",
+        tostring(self.diseaseDifficulty), tostring(self.diseasesEnabled))
 
 	return self
 
@@ -282,13 +289,17 @@ function DiseaseManager:getSortedTitles()
 end
 
 
--- Keyed on the registry TABLE like `getSortedTitles`. Genetic titles ride along and are never
--- priced: the spread pass counts no genetic record as a shedder.
---- The spread pass's per-title entries, rebuilt only when the registry table changes.
+-- Keyed on the registry TABLE like `getSortedTitles`, and on the preset. Each entry carries the
+-- EFFECTIVE window a record seeded under the active preset serves, so the priced R0 holds.
+--- The spread pass's per-title entries under the active preset, rebuilt when the registry or the preset changes.
 ---@return table entries title -> `{ model, maxLifespanMonths, incubationTicks }`; the manager's own, do not mutate
 function DiseaseManager:getSpreadEntries()
 
-    if self.spreadEntriesFor == self.diseases then return self.spreadEntries end
+    if self.spreadEntriesFor == self.diseases and self.spreadEntriesPreset == self.diseaseDifficulty then
+        return self.spreadEntries
+    end
+
+    local preset = RLDiseaseDifficulty.getPreset(self.diseaseDifficulty)
 
     local entries = {}
     local count = 0
@@ -296,11 +307,12 @@ function DiseaseManager:getSpreadEntries()
     for title, model in pairs(self.diseases) do
 
         -- The lifespan is the DISEASE-level bound (the shortest-lived affected species),
-        -- never an animal's own span.
+        -- never an animal's own span. Genetic titles ride along and are never priced.
         entries[title] = {
-            ["model"] = model,
+            ["model"] = RLDiseaseDifficulty.spreadModel(model, preset.spread),
             ["maxLifespanMonths"] = RLDiseaseTransmission.diseaseLifespanMonths(model.animals),
-            ["incubationTicks"] = model.incubationTicks
+            ["incubationTicks"] = RLDiseaseDifficulty.effectiveIncubationTicks(model.incubationTicks,
+                preset.incubation)
         }
 
         count = count + 1
@@ -309,9 +321,10 @@ function DiseaseManager:getSpreadEntries()
 
     self.spreadEntries = entries
     self.spreadEntriesFor = self.diseases
+    self.spreadEntriesPreset = self.diseaseDifficulty
 
-    Log:debug("getSpreadEntries: rebuilt the spread entries for a new registry (%s title(s))",
-        tostring(count))
+    Log:debug("getSpreadEntries: rebuilt the spread entries (%s title(s), preset=%s spread=%s incubation=%s)",
+        tostring(count), tostring(preset.key), tostring(preset.spread), tostring(preset.incubation))
 
     return entries
 
@@ -324,6 +337,7 @@ end
 ---@param animal table the animal rolling; mutated only through `Animal:addDisease` on a hit
 ---@param ctx table `{ daysPerPeriod, rng }`, built by each call site; `rng` returns `[0, 1)` and
 --- defaults to `math.random`. A nil `daysPerPeriod` raises on the conversion, deliberately.
+---@return nil
 function DiseaseManager:onDayChanged(animal, ctx)
 
     -- No call site is contractually server-only, so the authority guard lives here
@@ -373,6 +387,9 @@ function DiseaseManager:onDayChanged(animal, ctx)
     local ageMonths = animal.age
     local typeName = resolveAnimalTypeName(animal)
     local rng = ctx.rng or math.random
+
+    -- Resolved ONCE per call and reused for every log argument below.
+    local preset = RLDiseaseDifficulty.getPreset(self.diseaseDifficulty)
 
     for _, title in ipairs(titles) do
 
@@ -430,27 +447,40 @@ function DiseaseManager:onDayChanged(animal, ctx)
 
                 else
 
-                    local pTick = RLDiseaseRates.perTick(pMonth, ctx.daysPerPeriod)
+                    -- The preset scales the MONTHLY chance; the per-tick conversion runs last.
+                    local scaled = RLDiseaseDifficulty.scaleInfectionChance(pMonth, preset.infection)
 
-                    -- Eligibility runs BEFORE the draw, so a refused animal consumes no
-                    -- randomness and the draw budget is a pure function of the collection.
-                    -- STRICTLY below, never at, which makes a rate of 0 never fire.
-                    local draw = rng()
+                    if not (scaled > 0) then
 
-                    if draw < pTick then
-
-                        Log:debug("DiseaseManager:onDayChanged: CONTRACTED title=%s farmId=%s uniqueId=%s "
-                            .. "ageMonths=%s pMonth=%s pTick=%s daysPerPeriod=%s draw=%s",
-                            tostring(title), tostring(animal.farmId), tostring(animal.uniqueId),
-                            tostring(ageMonths), tostring(pMonth), tostring(pTick),
-                            tostring(ctx.daysPerPeriod), tostring(draw))
-
-                        self:contractDisease(animal, model)
+                        Log:trace("DiseaseManager:onDayChanged: skipped title=%s, reason=the preset scaled the "
+                            .. "chance to 0 (preset=%s pMonth=%s uniqueId=%s)", tostring(title),
+                            tostring(preset.key), tostring(pMonth), tostring(animal.uniqueId))
 
                     else
 
-                        Log:trace("DiseaseManager:onDayChanged: missed title=%s, draw=%s pTick=%s (uniqueId=%s)",
-                            tostring(title), tostring(draw), tostring(pTick), tostring(animal.uniqueId))
+                        local pTick = RLDiseaseRates.perTick(scaled, ctx.daysPerPeriod)
+
+                        -- Eligibility runs BEFORE the draw, so a refused animal consumes no
+                        -- randomness and the draw budget is a pure function of the collection.
+                        -- STRICTLY below, never at, which makes a rate of 0 never fire.
+                        local draw = rng()
+
+                        if draw < pTick then
+
+                            Log:debug("DiseaseManager:onDayChanged: CONTRACTED title=%s farmId=%s uniqueId=%s "
+                                .. "ageMonths=%s pMonth=%s preset=%s scaledPMonth=%s pTick=%s daysPerPeriod=%s "
+                                .. "draw=%s", tostring(title), tostring(animal.farmId), tostring(animal.uniqueId),
+                                tostring(ageMonths), tostring(pMonth), tostring(preset.key), tostring(scaled),
+                                tostring(pTick), tostring(ctx.daysPerPeriod), tostring(draw))
+
+                            self:contractDisease(animal, model)
+
+                        else
+
+                            Log:trace("DiseaseManager:onDayChanged: missed title=%s, draw=%s pTick=%s (uniqueId=%s)",
+                                tostring(title), tostring(draw), tostring(pTick), tostring(animal.uniqueId))
+
+                        end
 
                     end
 
@@ -466,11 +496,12 @@ end
 
 
 -- The applier both producers share: the spontaneous roll and the pen's transmission apply.
--- `incubationTicksFor` floors at MIN_INCUBATION_TICKS, so an authored 0 skips the seeder and
--- transitions straight to INFECTIOUS. Fail-loud, no rollback - `addDisease` already inserted.
+-- The seed is the authored window times the preset, floored by the record module; an authored 0 skips
+-- the seeder and goes straight to INFECTIOUS at every preset. Fail-loud, no rollback - `addDisease` already inserted.
 --- Attach a fresh record in its authored starting state, announcing it only when it starts symptomatic.
 ---@param animal table the animal that just contracted the disease
 ---@param model table the parsed `<model>` entry it contracted
+---@return nil
 function DiseaseManager:contractDisease(animal, model)
 
     animal:addDisease(model)
@@ -488,20 +519,24 @@ function DiseaseManager:contractDisease(animal, model)
 
     if model.incubationTicks > 0 then
 
-        local outcome = RLDiseaseRecord.seedIncubation(record, model.incubationTicks)
+        local preset = RLDiseaseDifficulty.getPreset(self.diseaseDifficulty)
+
+        local outcome = RLDiseaseRecord.seedIncubation(record, model.incubationTicks * preset.incubation)
 
         if outcome ~= RLDiseaseRecord.APPLIED then
 
             Log:warning("contractDisease: seedIncubation returned %s, the window stays zero (title=%s "
-                .. "ticks=%s farmId=%s uniqueId=%s)", tostring(outcome), tostring(model.title),
-                tostring(model.incubationTicks), tostring(animal.farmId), tostring(animal.uniqueId))
+                .. "ticks=%s preset=%s farmId=%s uniqueId=%s)", tostring(outcome), tostring(model.title),
+                tostring(model.incubationTicks * preset.incubation), tostring(preset.key),
+                tostring(animal.farmId), tostring(animal.uniqueId))
 
             return
 
         end
 
-        Log:trace("contractDisease: seeded a %s-tick hidden window (title=%s uniqueId=%s)",
-            tostring(model.incubationTicks), tostring(model.title), tostring(animal.uniqueId))
+        Log:trace("contractDisease: seeded a %s-tick hidden window from a scaled %s (title=%s preset=%s uniqueId=%s)",
+            tostring(record.incubationTicksRemaining), tostring(model.incubationTicks * preset.incubation),
+            tostring(model.title), tostring(preset.key), tostring(animal.uniqueId))
 
         return
 
@@ -724,8 +759,30 @@ function DiseaseManager:calculateTransmission(animals, penName, ctx)
 end
 
 
-function DiseaseManager.onSettingChanged(name, state)
+-- Runs on EVERY peer, from the settings full-set, a single-row change and applyDefaultSettings,
+-- often inside an unprotected loop over every row - so it must never raise, and it neither
+-- persists nor broadcasts. An invalid value resolves to Normal.
+--- Settings callback for the `diseaseDifficulty` row: store the preset and derive `diseasesEnabled` from it.
+---@param name string the setting key, for log attribution only
+---@param value any the preset index the row's values carry; never raises for any input
+---@return nil
+function DiseaseManager.onDifficultyChanged(name, value)
 
-	if g_diseaseManager ~= nil then g_diseaseManager[name] = state end
+    if g_diseaseManager == nil then
+
+        Log:trace("DiseaseManager.onDifficultyChanged: no manager yet, nothing to derive (name=%s value=%s)",
+            tostring(name), tostring(value))
+
+        return
+
+    end
+
+    local preset = RLDiseaseDifficulty.getPreset(value)
+
+    g_diseaseManager.diseaseDifficulty = value
+    g_diseaseManager.diseasesEnabled = RLDiseaseDifficulty.isEnabled(value)
+
+    Log:debug("DiseaseManager.onDifficultyChanged: %s=%s -> preset=%s diseasesEnabled=%s",
+        tostring(name), tostring(value), tostring(preset.key), tostring(g_diseaseManager.diseasesEnabled))
 
 end

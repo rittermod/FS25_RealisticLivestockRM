@@ -238,15 +238,13 @@ RLSettings.SETTINGS = {
 		}
 	},
 
-	["diseasesEnabled"] = {
+	["diseaseDifficulty"] = {
 		["index"] = 3,
 		["adminOnly"] = true,
-		["type"] = "BinaryOption",
-		["dynamicTooltip"] = true,
-		["default"] = 2,
-		["binaryType"] = "offOn",
-		["values"] = { false, true },
-		["callback"] = DiseaseManager.onSettingChanged
+		["type"] = "MultiTextOption",
+		["default"] = 3,
+		["values"] = { 1, 2, 3, 4 },
+		["callback"] = DiseaseManager.onDifficultyChanged
 	},
 
 	["foodScale"] = {
@@ -445,6 +443,7 @@ RLSettings.SETTINGS = {
 --- warning.
 --- @param xmlFile table Open XMLFile document carrying the settings
 --- @param key string Root element key ("rm_RlSettings", or "settings" for the legacy file)
+--- @return nil
 function RLSettings.readSettingStates(xmlFile, key)
 
 	for name, setting in pairs(RLSettings.SETTINGS) do
@@ -482,7 +481,27 @@ function RLSettings.readSettingStates(xmlFile, key)
 
 		else
 
-			setting.state = xmlFile:getInt(key .. "." .. name .. "#value", setting.default)
+			if name == "diseaseDifficulty" and not xmlFile:hasProperty(key .. ".diseaseDifficulty#value") then
+
+				-- The retired binary row migrates once: presence of the new key decides, and the next
+				-- save writes only the new key.
+				local legacy = xmlFile:getInt(key .. ".diseasesEnabled#value")
+
+				setting.state = RLDiseaseDifficulty.fromLegacyEnabledState(legacy)
+
+				if legacy ~= nil then
+					Log:info("RLSettings.readSettingStates: legacy diseasesEnabled=%s -> diseaseDifficulty=%s (%s)",
+						tostring(legacy), tostring(setting.state), tostring(RLDiseaseDifficulty.PRESETS[setting.state].key))
+				else
+					Log:trace("RLSettings.readSettingStates: no diseaseDifficulty or legacy element, default state %s",
+						tostring(setting.state))
+				end
+
+			else
+
+				setting.state = xmlFile:getInt(key .. "." .. name .. "#value", setting.default)
+
+			end
 
 			if setting.state > #setting.values then setting.state = #setting.values end
 

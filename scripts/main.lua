@@ -300,6 +300,8 @@ source(modDirectory .. "scripts/disease/RLDiseaseRates.lua")
 -- so sourcing the parser first raises on a nil global. The headless env sources the record
 -- itself, so only the in-game run covers this ordering.
 source(modDirectory .. "scripts/disease/RLDiseaseRecord.lua")
+-- Reads RLDiseaseRecord at call time only.
+source(modDirectory .. "scripts/disease/RLDiseaseDifficulty.lua")
 source(modDirectory .. "scripts/disease/RLDiseaseDefinition.lua")
 -- Reads RLConstants at file scope, so it must follow SECTION 2c.
 source(modDirectory .. "scripts/disease/RLDiseaseVulnerability.lua")
