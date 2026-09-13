@@ -7,10 +7,10 @@
     live animal references, and constructs nothing.
     PREVALENCE IS A RATIO OVER THE LIVE POPULATION - `count / population`, never the raw
     count - which makes a herd behave the same in one pen or in forty, and it multiplies
-    the MONTHLY rate, never the converted one. Shedding is the record STATE alone,
-    EXPOSED or INFECTIOUS. ANY record of a title refuses the recipient whatever its
-    state, which is where immunity lives. Both walks are ORDERED and the title list
-    SORTED, because draw order is part of the outcome.
+    the MONTHLY rate, never the converted one. Shedding is the record STATE, EXPOSED or
+    INFECTIOUS, and a genetic record never sheds. ANY record of a title refuses the
+    recipient whatever its state, which is where immunity lives. Both walks are ORDERED
+    and the title list SORTED, because draw order is part of the outcome.
 ]]
 
 RLDiseaseSpread = {}
@@ -72,8 +72,11 @@ function RLDiseaseSpread.collectShedders(animals)
                         Log:debug("RLDiseaseSpread.collectShedders: skipped a record whose "
                             .. "title is a %s, not a string - it cannot key the source set",
                             type(title))
+                    elseif record.archetype == "genetic" then
+                        -- An inherited record is never caught from a pen mate, so it sheds in
+                        -- no state, is never counted and costs no draw.
                     elseif record.state == STATE.EXPOSED or record.state == STATE.INFECTIOUS then
-                        -- THE WHOLE SHEDDING PREDICATE, and it reads STATE alone.
+                        -- THE SHEDDING PREDICATE: the STATE of every record the arm above admits.
                         counts[title] = (counts[title] or 0) + 1
                     end
 

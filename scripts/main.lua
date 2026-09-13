@@ -304,6 +304,7 @@ source(modDirectory .. "scripts/disease/RLDiseaseDefinition.lua")
 -- Reads RLConstants at file scope, so it must follow SECTION 2c.
 source(modDirectory .. "scripts/disease/RLDiseaseVulnerability.lua")
 source(modDirectory .. "scripts/disease/RLDiseaseFatality.lua")
+source(modDirectory .. "scripts/disease/RLDiseaseGenetics.lua")
 source(modDirectory .. "scripts/disease/RLDiseaseTransmission.lua")
 source(modDirectory .. "scripts/disease/RLDiseaseSpread.lua")
 source(modDirectory .. "scripts/disease/RLDiseaseEffects.lua")

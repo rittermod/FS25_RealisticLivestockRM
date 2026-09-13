@@ -20,15 +20,6 @@
 	</disease>
 
 	<disease title="cvm" animals="COW">
-		<!-- The two blocks below sit outside the model element and are read by nothing.
-		     They are retained deliberately, so the authored genetics and carrier values
-		     survive until the schema grows a home for them. -->
-		<carrier>
-			<output>
-				<fillType type="milk" modifier="1.5"/>
-			</output>
-		</carrier>
-		<genetic recessive="true" saleChance="0.005"/>
 		<model archetype="genetic" endpoint="terminal" cullRequired="true"
 			incubationTicks="0" r0="0" chronicMonthsToDeath="2"
 			caseFatality="1" immunityMonths="0" salePrice="0.75">
@@ -36,6 +27,7 @@
 				<key ageMonths="0" perMonth="0"/>
 			</infection>
 			<effects weightGain="1" fertility="1"/>
+			<genetic recessive="true" dominant="false" saleChance="0.005"/>
 			<carrier>
 				<effects>
 					<output type="milk" modifier="1.5"/>

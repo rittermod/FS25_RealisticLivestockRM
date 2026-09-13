@@ -5,7 +5,8 @@
     `DiseaseManager:loadDiseases` is the thin wrapper that renders them. Being a MAP,
     emptiness is `next(registry) == nil` and a count is a walk - `#` silently reads 0.
 
-    ONE FORMAT, ALL OR NOTHING: an absent or refused `<model>` drops the whole disease.
+    ONE FORMAT, ALL OR NOTHING: an absent or refused `<model>` drops the whole disease. A
+    `genetic` archetype REQUIRES a `<model><genetic>` block and every other one FORBIDS it.
     WARNINGS ARE RETURNED, NEVER LOGGED HERE, as structured `{ title, rule, detail }`
     values in document order, because a logger spy is banned portfolio-wide and that is
     what makes every authoring rule a value assertion.
@@ -421,6 +422,70 @@ local function readModelTreatment(xmlFile, modelKey, model, title, warnings)
 end
 
 
+-- REQUIRED on a `genetic` archetype and FORBIDDEN on every other one. The forbidden half is tested
+-- by PRESENCE, so a declared block is refused even where its own reads below would fail.
+--- Read the `<model><genetic>` block onto `model`, or refuse the disease.
+---@param xmlFile table open XMLFile document
+---@param modelKey string the `<model>` element key
+---@param model table the model entry being built, carrying its `archetype`
+---@param title string the owning disease
+---@param warnings table the accumulator
+---@return boolean ok false when the disease must be dropped
+local function readModelGenetic(xmlFile, modelKey, model, title, warnings)
+
+    local geneticKey = modelKey .. ".genetic"
+    local declared = xmlFile:hasProperty(geneticKey)
+
+    if model.archetype ~= "genetic" then
+
+        if declared then
+            warn(warnings, title, "genetic-block-forbidden",
+                string.format("archetype %s forbids a <model><genetic> block, which is declared; "
+                    .. "disease dropped", tostring(model.archetype)))
+            return false
+        end
+
+        return true
+
+    end
+
+    if not declared then
+        warn(warnings, title, "genetic-missing-block",
+            "archetype genetic requires a <model><genetic> block, which is missing; disease dropped")
+        return false
+    end
+
+    local saleChance = readProbability(xmlFile, geneticKey .. "#saleChance", "genetic saleChance",
+        title, warnings)
+
+    -- "missing OR REFUSED": an out-of-range value reaches here as nil too, and has said why already.
+    if saleChance == nil then
+        warn(warnings, title, "genetic-missing-sale-chance",
+            "<genetic> is missing or refused required attribute #saleChance; disease dropped")
+        return false
+    end
+
+    local recessive = xmlFile:getBool(geneticKey .. "#recessive", false)
+    local dominant = xmlFile:getBool(geneticKey .. "#dominant", false)
+
+    if recessive == dominant then
+        warn(warnings, title, "genetic-mode-invalid",
+            string.format("<genetic> must set exactly one of #recessive and #dominant true "
+                .. "(recessive=%s dominant=%s); disease dropped", tostring(recessive), tostring(dominant)))
+        return false
+    end
+
+    model.genetic = {
+        ["recessive"] = recessive,
+        ["dominant"] = dominant,
+        ["saleChance"] = saleChance
+    }
+
+    return true
+
+end
+
+
 --- Build the registry entry for one disease, or nil where the disease is dropped.
 ---
 --- EVERY nil return here drops the whole disease. The animal rules run FIRST, so a
@@ -535,6 +600,8 @@ local function buildModelEntry(xmlFile, key, title, deps, warnings)
             string.format("archetype %s is not one of infectious/genetic/management; "
                 .. "carried through verbatim", tostring(model.archetype)))
     end
+
+    if not readModelGenetic(xmlFile, modelKey, model, title, warnings) then return nil end
 
     -- The endpoint gates the pairing rule below, so an unrecognised one is refused
     -- HERE and the pairing never runs: it has no required attribute to select, and

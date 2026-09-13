@@ -1248,7 +1248,7 @@ end
 -- ONE setDirty per animal per tick however many transitions land, because the flag is
 -- per-container and the countdown between transitions deliberately does not replicate.
 -- It leads every write this function makes; the driver's own writes precede it.
---- Advance every non-genetic record on this animal by one daily tick and apply the result.
+--- Advance each non-genetic record one daily tick, roll an affected genetic record's death, and apply the result.
 ---@param daysPerPeriod number The environment's configured days per period, 1..28.
 ---@return boolean died True when a record killed this animal on this tick.
 ---@return number treatmentCost The pen's share of this animal's treatment fees this tick.
@@ -1273,11 +1273,41 @@ function Animal:onDiseaseTick(daysPerPeriod)
     for i = #self.diseases, 1, -1 do
         local disease = self.diseases[i]
 
-        -- The record's own copy, which is what every other SEIR consumer reads. A skipped
-        -- record never leaves EXPOSED and is never removed. GENETIC only: the archetype
-        -- vocabulary also admits `management`, which no shipped disease uses.
+        -- The record's own copy, which is what every other SEIR consumer reads. A genetic record
+        -- skips the driver, so its state never moves and it is never removed. GENETIC only: the
+        -- archetype vocabulary also admits `management`, which no shipped disease uses.
         if disease.archetype == "genetic" then
             geneticSkips = geneticSkips + 1
+
+            -- An affected record rolls its own death and a carrier never does; deaths off SKIPS the roll.
+            if disease.isCarrier ~= true and self.deathEnabled then
+                local result, hazard = RLDiseaseGenetics.rollAffectedDeath(disease.model, daysPerPeriod)
+
+                if result == RLDiseaseGenetics.DEATH_RESULT.DIED then
+                    flagOnce()
+                    died = true
+
+                    Log:debug("onDiseaseTick: an affected genetic record killed the animal (disease=%s "
+                        .. "hazard=%s farmId=%s uniqueId=%s)", tostring(disease.title), tostring(hazard),
+                        tostring(self.farmId), tostring(self.uniqueId))
+
+                    self:die("rl_death_disease")
+
+                    -- The fee accrued earlier in this loop is KEPT, as on the SEIR death exit below.
+                    return died, totalTreatmentCost
+                end
+
+                Log:trace("onDiseaseTick: an affected genetic record survived its roll (disease=%s "
+                    .. "hazard=%s farmId=%s uniqueId=%s)", tostring(disease.title), tostring(hazard),
+                    tostring(self.farmId), tostring(self.uniqueId))
+            elseif disease.isCarrier ~= true then
+                Log:trace("onDiseaseTick: deaths off, skipping the affected genetic roll (disease=%s "
+                    .. "farmId=%s uniqueId=%s)", tostring(disease.title), tostring(self.farmId),
+                    tostring(self.uniqueId))
+            else
+                Log:trace("onDiseaseTick: a genetic carrier never rolls a death (disease=%s farmId=%s "
+                    .. "uniqueId=%s)", tostring(disease.title), tostring(self.farmId), tostring(self.uniqueId))
+            end
         else
             local stateBefore = disease.state
             local runningBefore = disease.treatmentRunning
@@ -1887,10 +1917,11 @@ end
 
 -- The one gate for every sub-lethal consumer (output, growth, conception) and the only resolve
 -- caller. Silent for an animal without records - the hot path. The display predicates keep theirs.
+-- A carrier's output profile folds in HERE, into the resolver's own table, so it shares this gate.
 --- Resolve this animal's sub-lethal disease multipliers for one consumer, behind the diseases setting.
----@param caller string Label naming the consumer, used only by the refusal TRACE
----@return table|nil multipliers The resolver's six-key table; nil with no records or diseases off
----@return number|nil contributors How many records resolved; nil alongside a nil table
+---@param caller string Label naming the consumer, used only by the refusal and fold TRACEs
+---@return table|nil multipliers The resolver's table with carrier profiles folded; nil with no records or diseases off
+---@return number|nil contributors Records resolved plus carrier records folded; nil alongside a nil table
 function Animal:getDiseaseMultipliers(caller)
     if self.diseases == nil or next(self.diseases) == nil then return nil end
 
@@ -1902,7 +1933,20 @@ function Animal:getDiseaseMultipliers(caller)
         return nil
     end
 
-    return RLDiseaseEffects.resolve(self.diseases, g_diseaseManager.diseases)
+    local multipliers, contributors = RLDiseaseEffects.resolve(self.diseases, g_diseaseManager.diseases)
+    local carrier, carriers = RLDiseaseGenetics.carrierOutputs(self.diseases, g_diseaseManager.diseases)
+
+    if carriers > 0 then
+        for _, name in ipairs(RLDiseaseEffects.OUTPUT_CHANNELS) do
+            multipliers[name] = multipliers[name] * carrier[name]
+        end
+
+        Log:trace("getDiseaseMultipliers: animal=%s/%s caller=%s folded %s carrier record(s), milk=%s",
+            tostring(self.farmId), tostring(self.uniqueId), tostring(caller), tostring(carriers),
+            tostring(multipliers.milk))
+    end
+
+    return multipliers, contributors + carriers
 end
 
 -- Each record's token comes from RLDiseaseStatus.iconOf, the per-record rule's one home. The flags

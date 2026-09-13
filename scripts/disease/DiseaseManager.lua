@@ -7,7 +7,8 @@
     per-month curve. `calculateTransmission` COMPUTES a pen's spread plan through
     `RLDiseaseSpread` and constructs nothing: the pen calls it above its progression loop
     and applies the plan below it through `contractDisease`, the one applier both
-    producers share. `setGeneticDiseasesForSaleAnimal` is still switched off.
+    producers share. A genetic record has its own applier, `contractGenetic`, reached by
+    the dealer seeding in `setGeneticDiseasesForSaleAnimal` and by inheritance at conception.
 ]]
 
 DiseaseManager = {}
@@ -281,8 +282,8 @@ function DiseaseManager:getSortedTitles()
 end
 
 
--- Keyed on the registry TABLE like `getSortedTitles`. Genetic titles ride along: a rate-0
--- title never fires a strict draw, and gating them is the genetics system's call.
+-- Keyed on the registry TABLE like `getSortedTitles`. Genetic titles ride along and are never
+-- priced: the spread pass counts no genetic record as a shedder.
 --- The spread pass's per-title entries, rebuilt only when the registry table changes.
 ---@return table entries title -> `{ model, maxLifespanMonths, incubationTicks }`; the manager's own, do not mutate
 function DiseaseManager:getSpreadEntries()
@@ -530,18 +531,126 @@ function DiseaseManager:contractDisease(animal, model)
 end
 
 
---- Refuse to seed a genetic record onto a freshly generated sale animal: the legacy
---- engine is switched off, so dealer stock carries no carrier and no `genes`.
----
---- This is the only one of the five refusals whose body had no `diseasesEnabled` guard,
---- so its draws ran even with the setting OFF. Removing them re-rolls every later draw in
---- sale-animal generation, so dealer stock differs from a pre-slice save at the same seed.
---- That is expected, not a defect.
----@param animal table The sale animal that would have been seeded. Read for log identity only.
+-- The one applier for a genetic record: a carrier keeps the EXPOSED `Disease.new` builds, an affected
+-- record moves to INFECTIOUS at once. Neither is announced, and `addDisease` already flagged the animal.
+--- Attach a genetic record: a carrier at EXPOSED for life, an affected animal at INFECTIOUS.
+---@param animal table the animal receiving the record
+---@param model table the genetic disease's parsed model entry
+---@param genes number copies held, 1 or 2
+---@param isCarrier boolean true for a single recessive copy
+function DiseaseManager:contractGenetic(animal, model, genes, isCarrier)
+
+    animal:addDisease(model, isCarrier, genes)
+
+    if not isCarrier then
+
+        local outcome = RLDiseaseRecord.transition(animal:getDisease(model.title),
+            RLDiseaseRecord.STATE.INFECTIOUS)
+
+        -- Fail-loud with no rollback, like `contractDisease`'s zero-incubation arm.
+        if outcome ~= RLDiseaseRecord.APPLIED then
+
+            Log:warning("contractGenetic: the affected transition returned %s, the record stays EXPOSED "
+                .. "(title=%s genes=%s farmId=%s uniqueId=%s)", tostring(outcome), tostring(model.title),
+                tostring(genes), tostring(animal.farmId), tostring(animal.uniqueId))
+
+            return
+
+        end
+
+    end
+
+    Log:debug("contractGenetic: title=%s genes=%s carrier=%s farmId=%s uniqueId=%s",
+        tostring(model.title), tostring(genes), tostring(isCarrier), tostring(animal.farmId),
+        tostring(animal.uniqueId))
+
+end
+
+
+-- The spontaneous roll's three guards, in its order. Only `createNewSaleAnimal` calls this, so an AI
+-- stud is never seeded. Titles walk SORTED, and a refused title consumes no draw.
+--- Seed a freshly generated sale animal with each genetic disease its type can carry, at the authored chance.
+---@param animal table the sale animal `createNewSaleAnimal` just built
 function DiseaseManager:setGeneticDiseasesForSaleAnimal(animal)
 
-	Log:trace("DiseaseManager:setGeneticDiseasesForSaleAnimal: refused, reason=legacy engine off (uniqueId=%s)",
-		tostring(animal and animal.uniqueId or nil))
+    if g_server == nil then
+        Log:trace("DiseaseManager:setGeneticDiseasesForSaleAnimal: refused, reason=not the authority (uniqueId=%s)",
+            tostring(animal.uniqueId))
+        return
+    end
+
+    if not self.diseasesEnabled then
+        Log:trace("DiseaseManager:setGeneticDiseasesForSaleAnimal: refused, reason=diseases disabled (uniqueId=%s)",
+            tostring(animal.uniqueId))
+        return
+    end
+
+    if RealisticLivestock.testAnimalPrefix ~= nil then
+        Log:trace("DiseaseManager:setGeneticDiseasesForSaleAnimal: refused, reason=test-prefix run (uniqueId=%s)",
+            tostring(animal.uniqueId))
+        return
+    end
+
+    local typeName = resolveAnimalTypeName(animal)
+
+    for _, title in ipairs(self:getSortedTitles()) do
+
+        local model = self.diseases[title]
+
+        if model.archetype ~= "genetic" then
+
+            Log:trace("DiseaseManager:setGeneticDiseasesForSaleAnimal: skipped title=%s, reason=not genetic "
+                .. "(uniqueId=%s)", tostring(title), tostring(animal.uniqueId))
+
+        else
+
+            -- Fail CLOSED on an unresolvable type, exactly as the spontaneous roll does.
+            local bound = false
+
+            if typeName ~= nil then
+                for i = 1, #model.animals do
+                    if model.animals[i] == typeName then
+                        bound = true
+                        break
+                    end
+                end
+            end
+
+            if not bound then
+
+                Log:trace("DiseaseManager:setGeneticDiseasesForSaleAnimal: skipped title=%s, reason=type not "
+                    .. "affected (type=%s uniqueId=%s)", tostring(title), tostring(typeName),
+                    tostring(animal.uniqueId))
+
+            elseif animal:getDisease(title) ~= nil then
+
+                Log:trace("DiseaseManager:setGeneticDiseasesForSaleAnimal: skipped title=%s, reason=holds a "
+                    .. "record (uniqueId=%s)", tostring(title), tostring(animal.uniqueId))
+
+            else
+
+                local genes, isCarrier = RLDiseaseGenetics.seedForSale(model.genetic)
+
+                if genes == nil then
+
+                    Log:trace("DiseaseManager:setGeneticDiseasesForSaleAnimal: missed title=%s (uniqueId=%s)",
+                        tostring(title), tostring(animal.uniqueId))
+
+                else
+
+                    Log:debug("DiseaseManager:setGeneticDiseasesForSaleAnimal: SEEDED title=%s genes=%s "
+                        .. "carrier=%s farmId=%s uniqueId=%s", tostring(title), tostring(genes),
+                        tostring(isCarrier), tostring(animal.farmId), tostring(animal.uniqueId))
+
+                    self:contractGenetic(animal, model, genes, isCarrier)
+
+                end
+
+            end
+
+        end
+
+    end
 
 end
 

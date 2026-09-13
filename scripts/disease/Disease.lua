@@ -5,10 +5,10 @@
     both codecs and the player-facing labels.
 
     Progression is LIVE and runs off the pen's daily tick, deciding through
-    `RLDiseaseProgression` and applying nothing itself. The two remaining legacy
-    behaviour methods - reproduction and sale value - still refuse unconditionally
-    rather than keying on `diseasesEnabled`, so they stay off even in a save with
-    diseases switched on.
+    `RLDiseaseProgression` and applying nothing itself; a genetic record skips it.
+    `affectReproduction` passes a genetic record's copies to the unborn calf at conception through
+    `RLDiseaseGenetics`. The sale-value method still refuses unconditionally, even in a
+    save with diseases switched on.
 ]]
 
 Disease = {}
@@ -48,8 +48,8 @@ function Disease.new(model, isCarrier, genes)
 
 	self.treatmentRunning = false
 
-	-- Genetics-system markers rather than SEIR state. Nothing in the SEIR pipeline reads
-	-- either; they persist and stream so the genetics slice inherits them intact.
+	-- Genetics-system markers rather than SEIR state: `affectReproduction` reads the copies; the
+	-- carrier fold, the affected death roll, RLDiseaseStatus and Disease.isVisibleToPlayer read isCarrier.
 	self.isCarrier = isCarrier or false
 	self.genes = genes or 0
 
@@ -226,18 +226,49 @@ function Disease:onDayChanged(animal, deathEnabled, daysPerPeriod)
 end
 
 
---- Refuse to pass this record's genetics to a newborn: the legacy inheritance path is
---- off, so a child is born carrying no record and no `genes`.
----
---- The Mendelian fold's `math.random` draws go with it - between zero and two per call,
---- one per parent holding a single affected gene, and none for a type declaring no
---- `genetic` block.
----@param child table The newborn. Never mutated while the engine is off.
----@param otherParent table|nil The second parent. Unread while the engine is off.
+-- A straw, an insemination and a conception with no live sire arrive with no other parent, and a sire
+-- holding no record of this title counts as 0 copies too. Only the genetics module draws.
+--- Pass this genetic record's copies, with the other parent's, to the unborn child through the genetic applier.
+---@param child table The unborn child, built at conception; given a record through `DiseaseManager:contractGenetic`.
+---@param otherParent table|nil The second parent, or nil when there is none.
 function Disease:affectReproduction(child, otherParent)
 
-	Log:trace("Disease:affectReproduction: refused, reason=legacy engine off (disease=%s)",
-		tostring(self.title))
+    if not g_diseaseManager.diseasesEnabled then
+        Log:trace("Disease:affectReproduction: refused, reason=diseases disabled (disease=%s)",
+            tostring(self.title))
+        return
+    end
+
+    if self.archetype ~= "genetic" then
+        Log:trace("Disease:affectReproduction: refused, reason=not genetic (disease=%s)",
+            tostring(self.title))
+        return
+    end
+
+    local otherGenes = 0
+
+    if otherParent ~= nil then
+        for _, record in ipairs(otherParent.diseases) do
+            if record.title == self.title then
+                otherGenes = record.genes
+                break
+            end
+        end
+    end
+
+    local genes, isCarrier = RLDiseaseGenetics.inherit(self.genes, otherGenes, self.model.genetic)
+
+    if genes == 0 then
+        Log:trace("Disease:affectReproduction: nothing inherited (disease=%s parents=%s+%s uniqueId=%s)",
+            tostring(self.title), tostring(self.genes), tostring(otherGenes), tostring(child.uniqueId))
+        return
+    end
+
+    Log:debug("Disease:affectReproduction: inherited title=%s genes=%s carrier=%s (parents=%s+%s "
+        .. "farmId=%s uniqueId=%s)", tostring(self.title), tostring(genes), tostring(isCarrier),
+        tostring(self.genes), tostring(otherGenes), tostring(child.farmId), tostring(child.uniqueId))
+
+    g_diseaseManager:contractGenetic(child, self.model, genes, isCarrier)
 
 end
 
@@ -269,24 +300,34 @@ function Disease.isVisibleToPlayer(record)
 end
 
 
---- Add this record's HUD line: its name with the whole months elapsed, and its status. Unlogged: per-frame.
+--- Add this record's HUD line: its name, with whole months elapsed unless genetic, and its status. Unlogged: per-frame.
 ---@param box table The HUD key/value box being filled.
 function Disease:showInfo(box)
 
-	local time
-	local elapsed = RLDiseaseStatus.wholeMonthsElapsed(self.monthsElapsed)
-	local years = math.floor(elapsed / 12)
-	local months = elapsed - years * 12
+    -- A genetic record's elapsed counter never advances, so its line names the disease alone.
+    if self.archetype == "genetic" then
+        box:addLine(self.model.name, self:getStatus())
+        return
+    end
 
-	if years == 0 then
-		time = string.format("%d %s", months, months == 1 and g_i18n:getText("rl_ui_month") or g_i18n:getText("rl_ui_months"))
-	elseif months == 0 then
-		time = string.format("%d %s", years, years == 1 and g_i18n:getText("rl_ui_year") or g_i18n:getText("rl_ui_years"))
-	else
-		time = string.format("%d %s, %d %s", years, years == 1 and g_i18n:getText("rl_ui_year") or g_i18n:getText("rl_ui_years"), months, months == 1 and g_i18n:getText("rl_ui_month") or g_i18n:getText("rl_ui_months"))
-	end
+    local time
+    local elapsed = RLDiseaseStatus.wholeMonthsElapsed(self.monthsElapsed)
+    local years = math.floor(elapsed / 12)
+    local months = elapsed - years * 12
 
-	box:addLine(string.format("%s (%s)", self.model.name, time), self:getStatus())
+    if years == 0 then
+        time = string.format("%d %s", months,
+            months == 1 and g_i18n:getText("rl_ui_month") or g_i18n:getText("rl_ui_months"))
+    elseif months == 0 then
+        time = string.format("%d %s", years,
+            years == 1 and g_i18n:getText("rl_ui_year") or g_i18n:getText("rl_ui_years"))
+    else
+        time = string.format("%d %s, %d %s",
+            years, years == 1 and g_i18n:getText("rl_ui_year") or g_i18n:getText("rl_ui_years"),
+            months, months == 1 and g_i18n:getText("rl_ui_month") or g_i18n:getText("rl_ui_months"))
+    end
+
+    box:addLine(string.format("%s (%s)", self.model.name, time), self:getStatus())
 
 end
 
