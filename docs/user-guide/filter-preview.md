@@ -44,7 +44,7 @@ block as a sibling of the settings entries:
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <rm_RlSettings version="1">
     <deathEnabled value="2"/>
-    <diseasesEnabled value="2"/>
+    <diseaseDifficulty value="3"/>
     <!-- ... other settings ... -->
     <filters>
         <filter id="my_first_filter" name="My first filter" animalType="COW" farmId="1" version="1">

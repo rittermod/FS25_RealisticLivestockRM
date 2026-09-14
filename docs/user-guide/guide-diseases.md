@@ -1,6 +1,6 @@
 # Disease Guide
 
-Realistic Livestock RM includes five diseases that can infect, spread between, and kill your animals. Each disease affects specific species and has different transmission rates, fatality, and treatment options. Diseases can be toggled off entirely in settings.
+Realistic Livestock RM includes five diseases that can infect, spread between, and kill your animals. Each disease affects specific species and has different transmission rates, fatality, and treatment options. The **Diseases** setting sets how often animals fall ill and how fast diseases spread - **Off**, **Easy**, **Normal** (the default), or **Hard** - see [Disease Settings](#disease-settings).
 
 > **Note:** This documentation was generated with AI assistance and may contain inaccuracies. If you spot an error, please [open an issue](https://github.com/rittermod/FS25_RealisticLivestockRM/issues).
 
@@ -40,7 +40,7 @@ of health and non-health icons at once.
 An animal can show more than one health icon - a cow carrying CVM that also catches mastitis shows
 both the DNA strand and a medical bag. A recovered animal serving out its immunity shows no health
 icon at all, though a recovered CVM carrier still shows the DNA strand, because the carried gene is
-for life. With diseases turned off in the settings, no card shows any health icon.
+for life. With the **Diseases** setting on **Off**, no card shows any health icon.
 
 If you start a treatment and then stop it part-way, the course keeps the progress it has already
 made - resuming picks up where it left off instead of starting the course again. The animal's
@@ -241,7 +241,7 @@ With pig litters of 11-16 piglets, a PED outbreak in a maternity pen can kill mo
 - Natural recovery takes 3 months, during which piglets continue dying
 - Consider separating pregnant sows from infected animals
 - Adult pigs rarely catch PED on their own - focus protection on newborns and on stopping outbreaks early
-- If PED keeps recurring, consider the diseases toggle in settings
+- If PED keeps recurring, consider a lower **Diseases** setting
 
 ---
 
@@ -301,6 +301,6 @@ One setting controls diseases globally:
 
 | Setting | Default | Range | Effect |
 |---------|---------|-------|--------|
-| **Diseases Enabled** | On | On/Off | Toggles entire disease system |
+| **Diseases** | Normal | Off / Easy / Normal / Hard | **Easy**: animals fall ill less often and diseases spread more slowly. **Normal**: diseases strike and spread at their standard rates. **Hard**: animals fall ill more often, diseases spread faster, and symptoms take longer to show. **Off**: see below. Admin only in multiplayer. |
 
-*Disabling diseases suspends them - no new infections, spread, or effects; animals already infected are not cured, and their diseases resume if you re-enable the setting.*
+*Choosing **Off** stops new infections and all disease progression, spread, and effects, and no calf inherits CVM and no dealer animal is stocked carrying it. Animals already infected are not cured - their diseases resume where they stopped when a level is chosen again - and existing diseases are hidden and a CVM carrier's extra milk stops while the setting is **Off**.*

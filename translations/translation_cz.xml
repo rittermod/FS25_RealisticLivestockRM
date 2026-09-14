@@ -455,9 +455,10 @@
         <text name="rl_settings_messageSummary_tooltip_1" text="Vypnuto: Jednotlivé zprávy pro každou událost"/>
         <text name="rl_settings_messageSummary_tooltip_2" text="Zapnuto: Denní shrnutí podle chovu (snižuje zahlcení logu)"/>
 
-        <text name="rl_settings_diseasesEnabled_label" text="Nemoci zapnuty"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_1" text="Zvířata nemohou onemocnět ani zdědit nemoci"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_2" text="Zvířata mohou onemocnět i zdědit nemoci"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Zvířata nemohou onemocnět ani zdědit nemoci"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="Použít vlastní zvířata"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Použít modely zvířat z RealisticLivestock (vyžaduje restart)"/>

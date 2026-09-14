@@ -175,6 +175,6 @@ Pig litters are the largest of any animal - typically around 12 piglets, and up 
 
 3. **Berkshire for profit, Black Pied for volume.** Berkshire piglets sell for noticeably more but eat more. Black Pied are cheaper to maintain for large-scale operations.
 
-4. **Watch for PED.** A single PED outbreak in a pen full of newborn piglets can kill most of them. Isolating young piglets or disabling diseases in settings can protect your investment.
+4. **Watch for PED.** A single PED outbreak in a pen full of newborn piglets can kill most of them. Isolating young piglets or choosing a lower **Diseases** setting can protect your investment.
 
 5. **Pen capacity matters.** If a pen is full when piglets are born, the excess are automatically sold. Make sure you have room for those 11-16 piglet litters.

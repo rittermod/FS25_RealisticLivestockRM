@@ -412,9 +412,10 @@
         <text name="rl_settings_maxNumMessages_label" text="Maks. antal beskeder"/>
         <text name="rl_settings_maxNumMessages_tooltip" text="Et højere antal vil resultere i, at dit save game optager mere plads. Når denne grænse er nået, slettes de tidligste beskeder."/>
 
-        <text name="rl_settings_diseasesEnabled_label" text="Sygdomme aktiveret"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_1" text="Dyrerne kan ikke blive smittet med eller arve sygdomme"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_2" text="Dyrerne kan blive smittet med eller arve sygdomme"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Dyrerne kan ikke blive smittet med eller arve sygdomme"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="Brug brugerdefinerede dyr"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Brug Realistisk Dyrhold dyremodeller (kræver genstart)"/>

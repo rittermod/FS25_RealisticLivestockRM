@@ -455,9 +455,10 @@
         <text name="rl_settings_messageSummary_tooltip_1" text="Off: Individual messages for each event"/>
         <text name="rl_settings_messageSummary_tooltip_2" text="On: Daily summaries per husbandry (reduces log noise)"/>
 
-        <text name="rl_settings_diseasesEnabled_label" text="Diseases Enabled"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_1" text="Animals cannot catch or inherit diseases"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_2" text="Animals can catch or inherit diseases"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Animals cannot catch or inherit diseases"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="Use Custom Animals"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Use RealisticLivestock animal models (requires restart)"/>

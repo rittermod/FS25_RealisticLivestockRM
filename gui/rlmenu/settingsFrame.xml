@@ -56,11 +56,11 @@
                 <GuiElement size="100% 20px" name="sectionHeader"/>
 
                 <!-- 2. Health & Disease -->
-                <Bitmap profile="fs25_multiTextOptionContainer" id="rlmenuSettingRow_diseasesEnabled">
-                    <BinaryOption profile="fs25_settingsBinaryOption" id="rlmenuSetting_diseasesEnabled" onClick="onClickGeneralSetting">
+                <Bitmap profile="fs25_multiTextOptionContainer" id="rlmenuSettingRow_diseaseDifficulty">
+                    <MultiTextOption profile="fs25_settingsMultiTextOption" id="rlmenuSetting_diseaseDifficulty" onClick="onClickGeneralSetting">
                         <Text profile="fs25_multiTextOptionTooltip" name="tooltip"/>
-                    </BinaryOption>
-                    <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_settings_diseasesEnabled_label"/>
+                    </MultiTextOption>
+                    <Text profile="fs25_settingsMultiTextOptionTitle" text="$l10n_rl_diseases"/>
                 </Bitmap>
 
                 <GuiElement size="100% 20px" name="sectionHeader"/>

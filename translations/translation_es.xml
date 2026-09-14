@@ -432,9 +432,10 @@
         <text name="rl_settings_messageSummary_tooltip_1" text="Desactivado: mensajes individuales para cada evento"/>
         <text name="rl_settings_messageSummary_tooltip_2" text="Activado: resúmenes diarios por explotación (reduce el ruido del registro)"/>
 
-        <text name="rl_settings_diseasesEnabled_label" text="Enfermedades activadas"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_1" text="Los animales no pueden contraer ni heredar enfermedades"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_2" text="Los animales pueden contraer o heredar enfermedades"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Los animales no pueden contraer ni heredar enfermedades"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="Usar animales personalizados"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Usar modelos de animales de RealisticLivestock (requiere reinicio)"/>

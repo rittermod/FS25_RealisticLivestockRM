@@ -420,9 +420,10 @@
         <text name="rl_settings_maxNumMessages_label" text="Maximale Anzahl von Nachrichten"/>
         <text name="rl_settings_maxNumMessages_tooltip" text="Ein höherer Wert führt dazu, dass Ihr Speicherordner mehr Speicherplatz beansprucht. Sobald diese Grenze erreicht ist, werden die ältesten Nachrichten gelöscht."/>
 
-        <text name="rl_settings_diseasesEnabled_label" text="Aktivierte Krankheiten"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_1" text="Tiere können keine Krankheiten bekommen oder vererben."/>
-        <text name="rl_settings_diseasesEnabled_tooltip_2" text="Tiere können Krankheiten bekommen oder vererben."/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Tiere können keine Krankheiten bekommen oder vererben."/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="Benutzerdefinierte Tiere verwenden"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Verwenden Sie RealisticLivestock-Tiermodelle (erfordert Neustart)"/>

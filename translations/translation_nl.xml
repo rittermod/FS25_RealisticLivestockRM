@@ -426,9 +426,10 @@
         <text name="rl_settings_maxNumMessages_label" text="Maximaal aantal berichten"/>
         <text name="rl_settings_maxNumMessages_tooltip" text="Een hoger aantal zorgt ervoor dat je savegame-map meer ruimte inneemt. Als dit maximum bereikt is, worden de oudste berichten verwijderd."/>
 
-        <text name="rl_settings_diseasesEnabled_label" text="Ziektes ingeschakeld"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_1" text="Dieren kunnen geen ziektes oplopen of erven"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_2" text="Dieren kunnen ziektes oplopen of erven"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Dieren kunnen geen ziektes oplopen of erven"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="Aangepaste dieren gebruiken"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Gebruik RealisticLivestock-diermodellen (herstart vereist)"/>

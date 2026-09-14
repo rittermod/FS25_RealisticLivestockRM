@@ -244,6 +244,24 @@ RLSettings.SETTINGS = {
 		["type"] = "MultiTextOption",
 		["default"] = 3,
 		["values"] = { 1, 2, 3, 4 },
+		["dynamicTooltip"] = true,
+		-- The labels reuse the Off key the on/off rows show and the game's own difficulty keys; the
+		-- array order is the preset index.
+		--- Build the preset option labels, Off / Easy / Normal / Hard.
+		--- @return table Option texts indexed by preset
+		["getTexts"] = function()
+			local texts = {
+				g_i18n:getText("rl_settings_off"),
+				g_i18n:getText("button_easy"),
+				g_i18n:getText("button_normal"),
+				g_i18n:getText("button_hard")
+			}
+
+			Log:debug("RLSettings.diseaseDifficulty.getTexts: option texts '%s' / '%s' / '%s' / '%s'",
+				texts[1], texts[2], texts[3], texts[4])
+
+			return texts
+		end,
 		["callback"] = DiseaseManager.onDifficultyChanged
 	},
 

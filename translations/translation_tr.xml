@@ -455,9 +455,10 @@
         <text name="rl_settings_messageSummary_tooltip_1" text="Kapalı: Her etkinlik için ayrı mesajlar"/>
         <text name="rl_settings_messageSummary_tooltip_2" text="Açık: Ağıl başına günlük özetler (günlük gürültüsünü azaltır)"/>
 
-        <text name="rl_settings_diseasesEnabled_label" text="Hastalıklar Açık"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_1" text="Hayvanlar hastalığa yakalanamaz veya kalıtsal yolla geçiremez"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_2" text="Hayvanlar hastalığa yakalanabilir veya kalıtsal yolla geçirebilir"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Hayvanlar hastalığa yakalanamaz veya kalıtsal yolla geçiremez"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="Özel Hayvanları Kullan"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="RealisticLivestock hayvan modellerini kullanın (yeniden başlatma gerektirir)"/>

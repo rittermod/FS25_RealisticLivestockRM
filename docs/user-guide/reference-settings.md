@@ -15,7 +15,7 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 | **Animal Death** | On | Off / On | Toggles all death mechanics (old age, low health, accidents, birth complications, and fatal diseases). When off, animals live indefinitely. The ModHub build labels this setting "Animal Removal". |
 | **Accident Chance** | 100% | 0% - 200% (10% steps) | Scales the probability of random accident deaths. 0% disables accidents entirely. 200% doubles the chance. Only available when Death is enabled. |
 
-*With death disabled, animals never die from any cause - but diseases can still make them sick if diseases are enabled.*
+*With death disabled, animals never die from any cause - but diseases can still make them sick unless the **Diseases** setting is **Off**.*
 
 ---
 
@@ -76,9 +76,9 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 
 | Setting | Default | Options | Description |
 |---------|---------|---------|-------------|
-| **Diseases Enabled** | On | Off / On | Toggles the entire disease system. When off, new infections, disease spread, and disease effects are suspended. Already-infected animals are not cured; their diseases resume when the system is re-enabled. Existing diseases are hidden while the system is off. |
+| **Diseases** | Normal | Off / Easy / Normal / Hard | How often animals fall ill and how fast diseases spread. **Easy**: animals fall ill less often and diseases spread more slowly. **Normal**: diseases strike and spread at their standard rates. **Hard**: animals fall ill more often, diseases spread faster, and symptoms take longer to show. **Off**: no new infections and no disease progression, spread, or effects; no calf inherits CVM and no dealer animal is stocked carrying it. Admin only in multiplayer. |
 
-*Disabling diseases suspends Mastitis, CVM, Foot & Mouth, PED, and Avian Flu (LPAI) - it stops new infections, spread, and effects but does not cure already-infected animals; their diseases resume when re-enabled.*
+*Choosing **Off** suspends Mastitis, CVM, Foot & Mouth, PED, and Avian Flu (LPAI) but does not cure animals already infected: their diseases resume where they stopped when a level is chosen again, and existing diseases are hidden and a CVM carrier's extra milk stops while the setting is **Off**.*
 
 ---
 

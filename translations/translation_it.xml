@@ -431,9 +431,10 @@
         <text name="rl_settings_messageSummary_tooltip_1" text="Disattivato: messaggi individuali per ogni evento"/>
         <text name="rl_settings_messageSummary_tooltip_2" text="Attivato: riepiloghi giornalieri per allevamento (riduce il rumore del log)"/>
 
-        <text name="rl_settings_diseasesEnabled_label" text="Malattie attivate"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_1" text="Gli animali non possono contrarre o ereditare malattie"/>
-        <text name="rl_settings_diseasesEnabled_tooltip_2" text="Gli animali possono contrarre o ereditare malattie"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Gli animali non possono contrarre o ereditare malattie"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="Usa animali personalizzati"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Usa i modelli animali di RealisticLivestock (richiede riavvio)"/>
