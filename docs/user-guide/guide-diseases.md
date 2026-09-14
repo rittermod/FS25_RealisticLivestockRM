@@ -65,7 +65,8 @@ everywhere else:
   countdown runs (12 or 24 months depending on the disease). The animal sits in its normal
   breed section, carries no status icon, and matches the "Healthy" filter. A recovered animal
   stops spreading the disease from the month after it recovers, so an outbreak burns itself out
-  as the survivors build up.
+  as the survivors build up. A "Cured from" message posts on the day the animal recovers, whether
+  a treatment cured it or it got better on its own.
 - **CVM carriers.** A carrier cow keeps its CVM entry for life, but it is not sick - it sits in
   its normal section and matches "Healthy" too. It does carry the grey DNA icon, so you can spot
   carriers from the list rather than opening each detail panel.
@@ -74,10 +75,8 @@ This also applies to herdsman rules built on the disease filter: a "sell animals
 disease" rule sells only actively sick animals - it no longer selects cured animals or CVM
 carriers. If you want to cull carriers, pick them manually from the detail panel.
 
-> **Multiplayer note:** on a client, a fresh cure can keep showing as sick until the pen next
-> syncs - which happens whenever an animal is bought, sold, moved, born, or dies in that pen.
-> In an active herd that is usually the same in-game day; in a small, static pen it can take
-> considerably longer. The server always has the correct state.
+> **Multiplayer note:** on a client, a cure - like any other disease change - shows moments after
+> the server's daily update, when the pen syncs. The server always has the correct state.
 
 ### Incubating animals read as healthy everywhere
 

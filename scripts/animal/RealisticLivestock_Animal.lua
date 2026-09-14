@@ -1355,6 +1355,16 @@ function Animal:onDiseaseTick(daysPerPeriod)
                         .. "farmId=%s uniqueId=%s)", tostring(disease.title), tostring(disease.state),
                         tostring(self.farmId), tostring(self.uniqueId))
                 end
+
+                -- Keyed on the transition, so an immune record announces once rather than every
+                -- tick; a completed cure and a natural recovery both land here.
+                if disease.state == STATE.RECOVERED then
+                    self:addMessage("DISEASE_CURED", { disease.model.name })
+
+                    Log:debug("onDiseaseTick: record recovered, DISEASE_CURED posted (disease=%s from=%s "
+                        .. "farmId=%s uniqueId=%s)", tostring(disease.title), tostring(stateBefore),
+                        tostring(self.farmId), tostring(self.uniqueId))
+                end
             end
 
             if instruction == INSTRUCTION.REMOVE then
