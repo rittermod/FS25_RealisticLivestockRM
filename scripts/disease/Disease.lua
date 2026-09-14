@@ -7,8 +7,7 @@
     Progression is LIVE and runs off the pen's daily tick, deciding through
     `RLDiseaseProgression` and applying nothing itself; a genetic record skips it.
     `affectReproduction` passes a genetic record's copies to the unborn calf at conception through
-    `RLDiseaseGenetics`. The sale-value method still refuses unconditionally, even in a
-    save with diseases switched on.
+    `RLDiseaseGenetics`. `modifyValue` scales a sale price while the record reads as sick.
 ]]
 
 Disease = {}
@@ -273,22 +272,31 @@ function Disease:affectReproduction(child, otherParent)
 end
 
 
---- Refuse to scale a sale price: the legacy multiplier is off, so a diseased animal
---- sells for the undiseased price.
----
---- STAYS NEUTERED, a decision rather than unfinished work: repointing this body at
---- `model.salePrice` would duplicate a contract the sub-lethal resolver already holds,
---- and wiring a consumer to that resolver afterwards would apply every modifier TWICE.
---- The TRACE passes no FORMAT arguments deliberately - this runs per record per
---- `getSellPrice`, and Lua evaluates a log call's arguments before the level is tested.
----@param value number The undiseased price.
----@return number `value`, always and unconditionally.
+-- An incubating, recovered or carrier-only record sells at the undiseased price. The sub-lethal
+-- resolver has no sale channel; this is the only term in `Animal:getSellPrice` that reads a disease record.
+--- Scale a sale price by this record's `salePrice` while it reads as sick, behind the diseases setting.
+---@param value number The price so far.
+---@return number The price scaled by `salePrice` for an INFECTIOUS record with diseases on, else `value`.
 function Disease:modifyValue(value)
+    if g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled then
+        Log:trace(g_diseaseManager == nil and "Disease:modifyValue: refused, reason=no disease manager"
+            or "Disease:modifyValue: refused, reason=diseases off")
+        return value
+    end
 
-	Log:trace("Disease:modifyValue: refused, reason=legacy engine off")
+    if not RLDiseaseStatus.isDiseased(self) then
+        Log:trace("Disease:modifyValue: unchanged, reason=not diseased")
+        return value
+    end
 
-	return value
+    local scaled = value * self.model.salePrice
 
+    if Log.level >= RmLogging.LOG_LEVEL.TRACE then
+        Log:trace("Disease:modifyValue: applied, disease=%s salePrice=%s price=%s -> %s",
+            tostring(self.title), tostring(self.model.salePrice), tostring(value), tostring(scaled))
+    end
+
+    return scaled
 end
 
 
