@@ -1346,8 +1346,8 @@ function Animal:onDiseaseTick(daysPerPeriod)
                     tostring(self.farmId), tostring(self.uniqueId))
 
                 -- Symptom onset is when a player first learns of the disease, so the contraction
-                -- message posts here. It precedes the death dispatch below, so a record that
-                -- surfaces and kills on one tick still announces.
+                -- message posts here. It posts in this record's own iteration, so it precedes a
+                -- death that a record processed later in this loop causes.
                 if stateBefore == STATE.EXPOSED and disease.state ~= STATE.EXPOSED then
                     self:addMessage("DISEASE_CONTRACTED", { disease.model.name })
 

@@ -6,6 +6,7 @@
     IT DECIDES AND IT NEVER APPLIES: the entry points return an instruction plus a
     detail table and touch nothing outside the record they were handed.
       1 stepIncubation  2 stepFatality  3 stepTreatment  4 stepMonth  5 stepImmunity
+    The call that SURFACES a record stops after step 1.
 
     ONE CALL IS ONE TICK, AND THE TICK IS DAILY - the delegates already committed to
     it. TWO ENTRY POINTS, ONE BODY: `advance` rolls fatality, `advanceWithoutFatality`
@@ -213,6 +214,10 @@ local function runSteps(record, model, ctx, rollsFatality)
     end
 
     detail.surfaced = RLDiseaseProgression.stepIncubation(record)
+
+    -- A player can act only between ticks, so the call that makes a record visible stops
+    -- here: its first fatality roll, treatment tick and elapsed month all come on the next.
+    if detail.surfaced then return finish(INSTRUCTION.KEEP) end
 
     -- Step 5 belongs to a record that ENTERED recovered. One that recovers later in THIS
     -- call returns before reaching it, which is what keeps a seeded counter exact.
