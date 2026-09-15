@@ -78,11 +78,15 @@ carriers. If you want to cull carriers, pick them manually from the detail panel
 > **Multiplayer note:** on a client, a cure - like any other disease change - shows moments after
 > the server's daily update, when the pen syncs. The server always has the correct state.
 
-### Incubating animals read as healthy everywhere
+### Incubating animals look healthy but produce less
 
-A newly infected animal shows nothing at first - no status icon, no entry in the detail panel, the
-HUD or the Diseases dialog, and no message. The disease appears on all of them, with a "Contracted"
-message, on the day the animal shows symptoms.
+A newly infected animal shows no sign of the disease at first - no status icon, no entry in the
+detail panel, the HUD or the Diseases dialog, and no message. The disease appears on all of them,
+with a "Contracted" message, on the day the animal shows symptoms. Until then its production
+already takes about half the hit the disease will cause once symptoms show - less milk, goat milk,
+eggs, wool or manure, and a pig with PED makes noticeably more liquid manure. An animal with an
+active monitor shows this in its output rows, most clearly on a milking cow; without a monitor you
+see it only as a drop in the pen's production.
 
 ---
 

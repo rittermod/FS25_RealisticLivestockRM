@@ -119,7 +119,8 @@ end
 
 
 -- Folded WHATEVER the record's state: a carrier sits at EXPOSED for life, and its profile is a
--- carried gene rather than a symptom, so the resolver's INFECTIOUS gate does not apply to it.
+-- carried gene rather than a symptom, so the resolver's state gate, which skips a genetic EXPOSED
+-- record, does not apply.
 --- Fold every carrier record's output profile into a fresh four-channel table seeded at 1.0.
 ---@param records table An ORDERED ARRAY of disease records; the order is the caller's obligation.
 ---@param models table The title-keyed model map the definition parser returns.

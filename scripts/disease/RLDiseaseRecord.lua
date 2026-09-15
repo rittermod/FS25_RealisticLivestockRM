@@ -6,7 +6,7 @@
 
       SUSCEPTIBLE  no record. Expressible so the enum has a `from` and a `to`, but
                    never HELD: `transition` returns REMOVE rather than writing it
-      EXPOSED      infected, contagious, INVISIBLE to the player, no production loss
+      EXPOSED      infected, contagious, INVISIBLE to the player, slightly reduced output
       INFECTIOUS   symptomatic, contagious, production penalty, rolls fatality
       RECOVERED    immune for its window, blocks reinfection, sheds nothing
       DEAD         died OF THIS DISEASE, never "the animal is dead"

@@ -5,10 +5,10 @@
     `liquidManure`, authored inside `<model><effects><output>`, plus `weightGain`
     and `fertility`, authored as attributes on `<effects>`.
 
-    Only an INFECTIOUS record contributes, so incubation stays invisible. The fold
-    is multiplicative across records AND across channels, and a value above 1 is
-    carried through UNCLAMPED - an authored effect may raise a channel rather than
-    cut it, so a clamp would silently delete one.
+    A three-way state gate: an INFECTIOUS record folds all six authored effects; a
+    non-genetic EXPOSED record folds only the four output channels, at EXPOSED_SHARE of
+    each effect's distance from 1; every other record folds nothing. The fold is
+    multiplicative across records AND channels, and a value above 1 is carried UNCLAMPED.
 
     Pure data-in / data-out. RECORD ORDER is the caller's obligation: this module walks
     `ipairs` and does not sort.
@@ -33,6 +33,12 @@ RLDiseaseEffects.OUTPUT_CHANNELS = { "milk", "pallets", "manure", "liquidManure"
 RLDiseaseEffects.ANIMAL_CHANNELS = { "weightGain", "fertility" }
 
 
+-- Strictly between 0 and 1, so an incubating animal loses output well short of the symptomatic
+-- effect, and each effect keeps its direction: one above 1 still raises its channel.
+--- Share of each output effect's distance from 1 that a non-genetic EXPOSED record folds. READ-ONLY.
+RLDiseaseEffects.EXPOSED_SHARE = 0.5
+
+
 --- A fresh six-key multiplier table, every channel at 1.0.
 ---
 --- Built by WALKING the two ordered lists rather than from a literal, so a channel
@@ -48,8 +54,7 @@ local function newIdentity()
 end
 
 
---- Resolve an animal's sub-lethal multipliers from its records, folding each
---- INFECTIOUS record's authored effects into a fresh six-key table seeded at 1.0.
+--- Resolve an animal's sub-lethal multipliers from its records into a fresh six-key table at 1.0.
 --- @param records table|nil An ORDERED ARRAY of SEIR records, each carrying `title`
 ---        and `state`. Type-guarded at the TOP LEVEL only; the ORDER is the caller's
 ---        obligation.
@@ -57,9 +62,9 @@ end
 ---        returns. Same guard, and trusted BELOW its first level.
 --- @return table multipliers Six keys, always, always fresh, never nil-valued, never
 ---         clamped
---- @return number contributors How many records RESOLVED - INFECTIOUS, title known,
----         model carrying effects. The only thing separating "nothing contributed"
----         from "everything contributed exactly 1.0"
+--- @return number contributors How many records took a folding arm - INFECTIOUS, or
+---         non-genetic EXPOSED - with a title resolving to a model. The only thing
+---         separating "nothing contributed" from "everything contributed exactly 1.0"
 function RLDiseaseEffects.resolve(records, models)
     local result = newIdentity()
     local contributors = 0
@@ -81,9 +86,11 @@ function RLDiseaseEffects.resolve(records, models)
         return result, contributors
     end
 
-    -- Read through the record module's own vocabulary, so the five state names keep
-    -- one home and a rename reaches the comparison and the diagnostic together.
+    -- Read through the record module's own vocabulary, so the state names keep one
+    -- home and a rename reaches the comparisons and the diagnostics together.
     local INFECTIOUS = RLDiseaseRecord.STATE.INFECTIOUS
+    local EXPOSED = RLDiseaseRecord.STATE.EXPOSED
+    local share = RLDiseaseEffects.EXPOSED_SHARE
 
     local walked = 0
 
@@ -91,21 +98,30 @@ function RLDiseaseEffects.resolve(records, models)
 
         walked = walked + 1
 
-        if type(record) ~= "table" then
+        local isTable = type(record) == "table"
+        local infectious = isTable and record.state == INFECTIOUS
+        -- A genetic record's EXPOSED state marks a lifelong carrier, not an incubation window.
+        local incubating = isTable and record.state == EXPOSED and record.archetype ~= "genetic"
+
+        if not isTable then
             Log:debug("RLDiseaseEffects.resolve: skipped element %s - it is a %s, not a "
                 .. "record table", tostring(walked), type(record))
-        elseif record.state ~= INFECTIOUS then
-            -- ONE guard covering the four other states and any an older codec retired.
-            Log:trace("RLDiseaseEffects.resolve: skipped title=%s - state is %s, not %s",
-                tostring(record.title), tostring(record.state), tostring(INFECTIOUS))
+        elseif not infectious and not incubating then
+            -- ONE guard covering the other states, any an older codec retired, and a
+            -- genetic record at EXPOSED.
+            Log:trace("RLDiseaseEffects.resolve: skipped title=%s - state is %s, archetype=%s; "
+                .. "only %s, or a non-genetic %s, folds",
+                tostring(record.title), tostring(record.state), tostring(record.archetype),
+                tostring(INFECTIOUS), tostring(EXPOSED))
         else
             local title = record.title
 
             if title == nil then
                 -- Indexing the map with a nil KEY would be a safe read, so this line is
                 -- what makes the skip visible rather than what makes it safe.
-                Log:debug("RLDiseaseEffects.resolve: skipped an INFECTIOUS record at "
-                    .. "index %s - it carries no title", tostring(walked))
+                Log:debug("RLDiseaseEffects.resolve: skipped an %s record at index %s - it "
+                    .. "carries no title", tostring(incubating and EXPOSED or INFECTIOUS),
+                    tostring(walked))
             else
                 local model = models[title]
 
@@ -122,16 +138,33 @@ function RLDiseaseEffects.resolve(records, models)
                     -- carries an effects table whose output map is always a table.
                     local outputs = effects.output
 
-                    -- Multiply only where the value is non-nil, so a model declaring
-                    -- neither scalar contributes nothing rather than zeroing a channel.
-                    for _, name in ipairs(RLDiseaseEffects.ANIMAL_CHANNELS) do
-                        local value = effects[name]
-                        if value ~= nil then result[name] = result[name] * value end
-                    end
+                    if incubating then
+                        -- Each authored output channel moves the share of the way from 1 toward
+                        -- its effect; weight gain and fertility stay symptomatic only.
+                        for _, name in ipairs(RLDiseaseEffects.OUTPUT_CHANNELS) do
+                            local value = outputs[name]
+                            if value ~= nil then
+                                result[name] = result[name] * (1 + share * (value - 1))
+                            end
+                        end
 
-                    for _, name in ipairs(RLDiseaseEffects.OUTPUT_CHANNELS) do
-                        local value = outputs[name]
-                        if value ~= nil then result[name] = result[name] * value end
+                        Log:trace("RLDiseaseEffects.resolve: title=%s folded the incubation dip "
+                            .. "at share=%s", tostring(title), tostring(share))
+                    else
+                        -- Multiply only where the value is non-nil, so a model declaring
+                        -- neither scalar contributes nothing rather than zeroing a channel.
+                        for _, name in ipairs(RLDiseaseEffects.ANIMAL_CHANNELS) do
+                            local value = effects[name]
+                            if value ~= nil then result[name] = result[name] * value end
+                        end
+
+                        for _, name in ipairs(RLDiseaseEffects.OUTPUT_CHANNELS) do
+                            local value = outputs[name]
+                            if value ~= nil then result[name] = result[name] * value end
+                        end
+
+                        Log:trace("RLDiseaseEffects.resolve: title=%s folded its authored effects",
+                            tostring(title))
                     end
 
                     contributors = contributors + 1
@@ -162,4 +195,4 @@ function RLDiseaseEffects.resolve(records, models)
 end
 
 
-Log:info("RLDiseaseEffects loaded")
+Log:info("RLDiseaseEffects loaded (EXPOSED_SHARE=%s)", tostring(RLDiseaseEffects.EXPOSED_SHARE))

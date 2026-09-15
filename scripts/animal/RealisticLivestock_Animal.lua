@@ -1657,7 +1657,7 @@ function Animal:updateOutput(temp)
                 tostring(multipliers.liquidManure), tostring(contributors))
         else
             Log:trace("updateOutput: animal=%s/%s holds disease records but none contributes "
-                .. "(not symptomatic, or an unregistered title), output unscaled",
+                .. "(none symptomatic or incubating, or an unregistered title), output unscaled",
                 tostring(self.farmId), tostring(self.uniqueId))
         end
     end
