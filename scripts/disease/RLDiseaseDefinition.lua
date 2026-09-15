@@ -20,16 +20,6 @@ RLDiseaseDefinition = {}
 local Log = RmLogging.getLogger("RLRM")
 
 
---- The four output channels the design archive locks. A typo outside this set is
---- otherwise a permanently inert multiplier, which is exactly the silent failure
---- the archetype warning also exists to prevent.
-local OUTPUT_CHANNELS = {
-    ["milk"] = true,
-    ["pallets"] = true,
-    ["manure"] = true,
-    ["liquidManure"] = true
-}
-
 --- Archetype is an OPEN vocabulary: an unknown value warns and is carried through
 --- verbatim rather than rejected, so a future kind needs no schema churn, and the
 --- warning is what stops a typo becoming a silent third archetype. `management` covers
@@ -142,6 +132,20 @@ local function warn(warnings, title, rule, detail)
 end
 
 
+-- Read at CALL time, never captured at file scope: this file is sourced before the resolver,
+-- so a load-time read of its list would index nil.
+--- Whether `channel` is one of the output channels `RLDiseaseEffects.OUTPUT_CHANNELS` names.
+---@param channel string the `#type` read off an `<output>` row
+---@return boolean true when the resolver's list carries the name
+local function isOutputChannel(channel)
+    for _, name in ipairs(RLDiseaseEffects.OUTPUT_CHANNELS) do
+        if name == channel then return true end
+    end
+
+    return false
+end
+
+
 --- Read one non-negative scalar.
 ---
 --- Negativity is ONE rule rather than a per-field matrix - no scalar in this schema
@@ -202,8 +206,7 @@ local function readProbability(xmlFile, path, label, title, warnings)
 end
 
 
---- Read a `<output type modifier>` list, refusing an unknown channel, an
---- incomplete row and a negative multiplier.
+--- Read an `<output>` list against `RLDiseaseEffects.OUTPUT_CHANNELS`; refuse unlisted, incomplete, negative rows.
 ---
 --- The carrier profile and the base effects profile are read by THIS function
 --- against different base keys, which is what makes the class of bug it repairs -
@@ -232,10 +235,10 @@ local function readModelOutputs(xmlFile, baseKey, title, warnings)
             return
         end
 
-        if not OUTPUT_CHANNELS[channel] then
+        if not isOutputChannel(channel) then
             warn(warnings, title, "output-unknown-channel",
-                string.format("output channel %s is not one of milk/pallets/manure/"
-                    .. "liquidManure; row skipped", tostring(channel)))
+                string.format("output channel %s is not one of %s; row skipped",
+                    tostring(channel), table.concat(RLDiseaseEffects.OUTPUT_CHANNELS, "/")))
             return
         end
 
@@ -250,6 +253,9 @@ local function readModelOutputs(xmlFile, baseKey, title, warnings)
         end
 
         output[channel] = modifier
+
+        Log:trace("RLDiseaseDefinition.readModelOutputs: title=%s channel=%s modifier=%s",
+            tostring(title), tostring(channel), tostring(modifier))
 
     end)
 

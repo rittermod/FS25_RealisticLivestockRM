@@ -19,11 +19,10 @@ RLDiseaseEffects = {}
 local Log = RmLogging.getLogger("RLRM")
 
 
+-- The ONE home of the output-channel names: every consumer, the definition parser's allowlist
+-- included, reads it at call time. READ-ONLY by contract, and DISJOINT from `ANIMAL_CHANNELS`,
+-- since the union of the two seeds the result table.
 --- The four channels that multiply what leaves the pen, in fold order.
----
---- MUST stay DISJOINT from `ANIMAL_CHANNELS`, whose union seeds the result table, and
---- READ-ONLY by contract. `RLDiseaseDefinition` holds its own allowlist of the same
---- four names; a fifth added there and not here parses and is then silently dropped.
 RLDiseaseEffects.OUTPUT_CHANNELS = { "milk", "pallets", "manure", "liquidManure" }
 
 
@@ -32,17 +31,6 @@ RLDiseaseEffects.OUTPUT_CHANNELS = { "milk", "pallets", "manure", "liquidManure"
 --- Authored as attributes rather than output rows, because the four output names
 --- cannot express them. READ-ONLY by contract, and disjoint from `OUTPUT_CHANNELS`.
 RLDiseaseEffects.ANIMAL_CHANNELS = { "weightGain", "fertility" }
-
-
---- The OUTPUT channel names as a SET, for the unknown-channel alarm's membership test.
----
---- The alarm cannot test against the RESULT table, which is seeded from BOTH lists: a
---- mis-nested `output.weightGain` would then fold nothing and report nothing too.
-local OUTPUT_CHANNEL_SET = {}
-
-for _, name in ipairs(RLDiseaseEffects.OUTPUT_CHANNELS) do
-    OUTPUT_CHANNEL_SET[name] = true
-end
 
 
 --- A fresh six-key multiplier table, every channel at 1.0.
@@ -144,16 +132,6 @@ function RLDiseaseEffects.resolve(records, models)
                     for _, name in ipairs(RLDiseaseEffects.OUTPUT_CHANNELS) do
                         local value = outputs[name]
                         if value ~= nil then result[name] = result[name] * value end
-                    end
-
-                    -- THE ONE `pairs` WALK IN THIS MODULE, and it exists only to log:
-                    -- the runtime half of the parser-drift alarm.
-                    for name in pairs(outputs) do
-                        if not OUTPUT_CHANNEL_SET[name] then
-                            Log:debug("RLDiseaseEffects.resolve: title=%s authors output "
-                                .. "channel %s, which this module does not carry - the "
-                                .. "value is IGNORED", tostring(title), tostring(name))
-                        end
                     end
 
                     contributors = contributors + 1
