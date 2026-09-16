@@ -50,11 +50,11 @@ local RECORD_ENDPOINT = RLDiseaseRecord.ENDPOINT
 --- CLOSED, unlike `ARCHETYPES`, and membership is tested with `~= nil` rather than
 --- for truthiness - `false` is a legal entry and the clockless pair would otherwise
 --- read as unknown. The two durations are NOT interchangeable and must never be
---- merged: `durationMonths` is a fractional SPAN, `chronicMonthsToDeath` a MEDIAN its
---- consumer converts into a hazard, so merging them turns a geometric tail into a
---- deterministic death at the clock boundary, with plausible numbers on either side.
+--- merged: `durationMonths` is a fractional MINIMUM before a recovery draw at a per-month chance,
+--- `chronicMonthsToDeath` a MEDIAN its consumer converts into a hazard, so merging them
+--- reads one as the other, with plausible numbers on either side.
 local ENDPOINTS = {
-    -- the span elapses and the animal recovers naturally
+    -- the minimum elapses, then a per-month chance ends it naturally
     [RECORD_ENDPOINT.recovers] = "durationMonths",
     -- the hazard kills on its own clock; only a completed, successful curative
     -- course ends it any other way (see `RLDiseaseRecord.RECOVERY_EXITS`)
@@ -115,7 +115,8 @@ local PREREQUISITE_VALUE_TYPES = {
 --- default in a contract the later slices read is worse than a warning, and the
 --- design archive names the endpoint specifically as a field that must be declared
 --- rather than inferred from absence - an absent attribute is indistinguishable
---- from a typo. The duration pair is required separately, selected by `endpoint`.
+--- from a typo. The duration pair and the recovery chance are required separately,
+--- selected by `endpoint`.
 local MODEL_REQUIRED_SCALARS = {
     "archetype", "endpoint", "cullRequired", "incubationTicks",
     "r0", "caseFatality", "immunityMonths", "salePrice"
@@ -402,22 +403,6 @@ local function readModelTreatment(xmlFile, modelKey, model, title, warnings)
         return
     end
 
-    -- The archive's real rule, and it holds for exactly ONE cell of the endpoint x
-    -- outcome table. Its reason - the animal recovers naturally before the course
-    -- completes, so treating is pointless - is true only where recovery is what
-    -- ends the illness AND the course is trying to beat it there. Against a
-    -- `terminal` model the course races a median rather than a deadline, and a
-    -- `relief` course is not trying to clear anything, so neither is pointless at
-    -- any length. Both fields are DECLARED, so this gate reads no absence.
-    if model.endpoint == RECORD_ENDPOINT.recovers and outcome == "cure"
-        and months >= model.durationMonths then
-        warn(warnings, title, "treatment-not-shorter-than-illness",
-            string.format("treatment runs %s month(s) against a %s-month illness; the "
-                .. "course must be strictly shorter; treatment skipped",
-                tostring(months), tostring(model.durationMonths)))
-        return
-    end
-
     model.treatment = {
         ["months"] = months,
         ["cost"] = cost,
@@ -486,6 +471,55 @@ local function readModelGenetic(xmlFile, modelKey, model, title, warnings)
         ["dominant"] = dominant,
         ["saleChance"] = saleChance
     }
+
+    return true
+
+end
+
+
+-- REQUIRED on `recovers`, FORBIDDEN (by PRESENCE) elsewhere; read with `getFloat` so a defect warns once.
+--- Read `#recoveryChancePerMonth` onto `model`, or refuse the disease.
+---@param xmlFile table open XMLFile document
+---@param modelKey string the `<model>` element key
+---@param model table the model entry being built, carrying a validated `endpoint`
+---@param title string the owning disease
+---@param warnings table the accumulator
+---@return boolean ok false when the disease must be dropped
+local function readModelRecoveryChance(xmlFile, modelKey, model, title, warnings)
+
+    local path = modelKey .. "#recoveryChancePerMonth"
+
+    if model.endpoint ~= RECORD_ENDPOINT.recovers then
+
+        if xmlFile:hasProperty(path) then
+            warn(warnings, title, "model-recovery-chance-forbidden",
+                string.format("endpoint %s forbids #recoveryChancePerMonth, which is declared; "
+                    .. "disease dropped", tostring(model.endpoint)))
+            return false
+        end
+
+        return true
+
+    end
+
+    local chance = xmlFile:getFloat(path)
+
+    if chance == nil then
+        warn(warnings, title, "model-recovery-chance-missing",
+            "endpoint recovers requires #recoveryChancePerMonth, which is missing or unreadable; "
+                .. "disease dropped")
+        return false
+    end
+
+    -- Inverted so a NaN refuses too: a chance outside (0, 1] would silently make the illness lifelong.
+    if not (chance > 0) or chance > 1 then
+        warn(warnings, title, "model-recovery-chance-out-of-range",
+            string.format("endpoint recovers: #recoveryChancePerMonth is %s, outside (0, 1]; disease dropped",
+                tostring(chance)))
+        return false
+    end
+
+    model.recoveryChancePerMonth = chance
 
     return true
 
@@ -666,6 +700,8 @@ local function buildModelEntry(xmlFile, key, title, deps, warnings)
         end
 
     end
+
+    if not readModelRecoveryChance(xmlFile, modelKey, model, title, warnings) then return nil end
 
     local infection = {}
     local lastAge = nil

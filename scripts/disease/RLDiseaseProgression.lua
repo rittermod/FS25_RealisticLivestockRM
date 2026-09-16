@@ -6,7 +6,8 @@
     IT DECIDES AND IT NEVER APPLIES: the entry points return an instruction plus a
     detail table and touch nothing outside the record they were handed.
       1 stepIncubation  2 stepFatality  3 stepTreatment  4 stepMonth  5 stepImmunity
-    The call that SURFACES a record stops after step 1.
+    The call that SURFACES a record stops after step 1. Natural recovery is a MINIMUM,
+    then a per-tick draw at the authored per-month chance.
 
     ONE CALL IS ONE TICK, AND THE TICK IS DAILY - the delegates already committed to
     it. TWO ENTRY POINTS, ONE BODY: `advance` rolls fatality, `advanceWithoutFatality`
@@ -92,13 +93,10 @@ function RLDiseaseProgression.stepTreatment(record, model, ctx)
 end
 
 
---- STEP 4 - advance the elapsed month and resolve a natural recovery.
----
---- A model with no authored span forms no comparison at all, so a record on either
---- clockless endpoint never recovers naturally.
+--- STEP 4 - advance the elapsed month; from the authored minimum on, draw a natural recovery.
 ---@param record table A symptomatic record.
----@param model table The parsed model entry; `durationMonths` may be absent.
----@param ctx table Carries `daysPerPeriod`.
+---@param model table The parsed model entry; with no `durationMonths` nothing is drawn or recovered.
+---@param ctx table Carries `daysPerPeriod` and an optional `rng`.
 ---@return boolean recovered True only on the call that reached RECOVERED
 function RLDiseaseProgression.stepMonth(record, model, ctx)
     record.monthsElapsed = record.monthsElapsed + 1 / ctx.daysPerPeriod
@@ -110,8 +108,22 @@ function RLDiseaseProgression.stepMonth(record, model, ctx)
         return false
     end
 
+    -- The minimum is a GATE, never a term in the draw. Past it every call draws once against the
+    -- per-tick chance, converted before the draw so a missing chance raises with no draw spent.
+    local chance = RLDiseaseRates.perTick(model.recoveryChancePerMonth, ctx.daysPerPeriod)
+    local draw = (ctx.rng or math.random)()
+
+    if not (draw < chance) then
+        Log:trace("RLDiseaseProgression.stepMonth: no recovery title=%s elapsed=%s minimum=%s "
+            .. "chance=%s draw=%s",
+            tostring(record.title), tostring(record.monthsElapsed),
+            tostring(model.durationMonths), tostring(chance), tostring(draw))
+
+        return false
+    end
+
     -- Asked, then applied, in that order. The gate is currently unfalsifiable - only the
-    -- endpoint carrying a span also declares this exit legal - and is composed anyway,
+    -- endpoint carrying a minimum also declares this exit legal - and is composed anyway,
     -- because every cell of that table is DECLARED rather than inferred elsewhere.
     if not RLDiseaseRecord.canRecover(record.endpoint,
         RLDiseaseRecord.EXIT_REASON.NATURAL) then
@@ -134,10 +146,11 @@ function RLDiseaseProgression.stepMonth(record, model, ctx)
     local clearedTreatmentMonths = record.treatmentMonthsRemaining
     record.treatmentMonthsRemaining = 0
 
-    Log:debug("RLDiseaseProgression: recovered naturally title=%s - elapsed %s of %s "
-        .. "month(s), seeded immunity at %s month(s), cleared a treatment counter of %s",
+    Log:debug("RLDiseaseProgression: recovered naturally title=%s - elapsed %s of minimum %s "
+        .. "month(s) at a per-tick chance of %s, seeded immunity at %s month(s), cleared a "
+        .. "treatment counter of %s",
         tostring(record.title), tostring(record.monthsElapsed),
-        tostring(model.durationMonths), tostring(model.immunityMonths),
+        tostring(model.durationMonths), tostring(chance), tostring(model.immunityMonths),
         tostring(clearedTreatmentMonths))
 
     return true
@@ -274,7 +287,7 @@ end
 ---@param model table|nil The parsed model entry for this record's disease. Same handling.
 ---@param ctx table|nil `{ daysPerPeriod, vulnerability, treatmentRunning, rng }`. Same
 ---       handling. `treatmentRunning` is the caller's flag; `rng` is a zero-argument
----       generator threaded to BOTH delegates so they cannot default independently.
+---       generator threaded to all three draws so they cannot default independently.
 ---@return string instruction An INSTRUCTION value
 ---@return table detail Six fields, always present
 function RLDiseaseProgression.advance(record, model, ctx)

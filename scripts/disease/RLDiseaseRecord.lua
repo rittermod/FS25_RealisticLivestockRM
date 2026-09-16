@@ -156,7 +156,7 @@ RLDiseaseRecord.TRANSITIONS = {
 --- Every `false` is DECLARED, including the cells the parser already refuses to
 --- produce. READ-ONLY by contract, like `STATE` and `TRANSITIONS`.
 RLDiseaseRecord.RECOVERY_EXITS = {
-    -- The authored span ends it naturally, and a completed cure ends it early.
+    -- A recovery draw past the authored minimum ends it naturally, and a completed cure ends it early.
     ["recovers"] = { ["NATURAL"] = true, ["CURE"] = true },
     -- No span is authorable, so the hazard is the only NATURAL end - but a completed,
     -- successful course beats the death clock.

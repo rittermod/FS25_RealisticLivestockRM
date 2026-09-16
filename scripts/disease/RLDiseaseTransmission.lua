@@ -8,7 +8,8 @@
     the per-tick conversion happens LAST:
         beta = r0 / contagiousMonths ; monthly = beta * prevalence  -- both per MONTH
         pTick = perTick(min(monthly, 1), daysPerPeriod)
-    EXPOSED SHEDS, so the hidden window counts in full. The shedding cap is
+    EXPOSED SHEDS, so the hidden window counts in full; the symptomatic window is a
+    minimum plus a memoryless tail, discounted by death. The shedding cap is
     DISEASE-level - the shortest-lived affected species - which is the OPPOSITE
     reading from the vulnerability module's animal-level age term. Pure data-in /
     data-out; the clamp at 1 voids the R0 guarantee above saturation.
@@ -68,10 +69,24 @@ function RLDiseaseTransmission.diseaseLifespanMonths(animalTypeNames)
 end
 
 
---- The expected number of months a case spends shedding SYMPTOMATICALLY.
----
---- Solves the flat-hazard window over the endpoint's span - a case that dies stops
---- shedding - then caps it by the disease-level species lifespan.
+--- The window of a case no death hazard ends, and the recovery rate it formed.
+--- @param span number|nil The authored minimum, or nil for an endpoint nothing clocks.
+--- @param model table The parsed model entry; read only where `span` is set.
+--- @return number months The minimum plus the tail's mean, or `math.huge` when unbounded
+--- @return number|nil recoveryRate `-log(1 - p)`, or nil where no minimum was authored
+local function windowWithoutDeath(span, model)
+    if span == nil then return math.huge, nil end
+
+    local recoveryRate = -math.log(1 - model.recoveryChancePerMonth)
+
+    -- A vanishing chance converts to exactly 0: the tail never ends, and the division stays off it.
+    if not (recoveryRate > 0) then return math.huge, recoveryRate end
+
+    return span + 1 / recoveryRate, recoveryRate
+end
+
+
+--- Months a case sheds SYMPTOMATICALLY: minimum plus recovery tail, cut short by death, capped by lifespan.
 --- @param model table|nil A parsed model entry. TRUSTED INTERNAL input; a nil or
 ---        non-table returns 0 rather than raising.
 --- @param maxLifespanMonths number|nil The DISEASE-level bound, as
@@ -107,6 +122,7 @@ function RLDiseaseTransmission.expectedSheddingMonths(model, maxLifespanMonths)
     -- The UNSCALED authored rate: the window is a disease-level property, so the
     -- per-animal vulnerability factor does not enter it.
     local hazard = RLDiseaseFatality.monthlyHazard(model)
+    local recoveryRate = nil
     local raw
 
     -- ONE branch chain assigning `raw` and never returning from inside it, so the
@@ -117,7 +133,7 @@ function RLDiseaseTransmission.expectedSheddingMonths(model, maxLifespanMonths)
         -- both solve arms compute `x / inf = 0` anyway.
         raw = 0
     elseif not (hazard > 0) then
-        raw = span or math.huge
+        raw, recoveryRate = windowWithoutDeath(span, model)
     else
         local rate = -math.log(1 - hazard)
 
@@ -125,11 +141,15 @@ function RLDiseaseTransmission.expectedSheddingMonths(model, maxLifespanMonths)
             -- The underflow arm, and it sits ABOVE both divisions on purpose:
             -- `-log(1 - h)` is exactly 0 for any h at or below about 5.55e-17, which
             -- the parser's probability read accepts.
-            raw = span or math.huge
+            raw, recoveryRate = windowWithoutDeath(span, model)
         elseif span == nil then
             raw = 1 / rate
         else
-            raw = (1 - (1 - hazard) ^ span) / rate
+            -- A survivor of the minimum sheds on until recovery or death ends the tail, so the
+            -- two rates add; the sum is positive because `rate` is.
+            local survivesMinimum = (1 - hazard) ^ span
+            recoveryRate = -math.log(1 - model.recoveryChancePerMonth)
+            raw = (1 - survivesMinimum) / rate + survivesMinimum / (rate + recoveryRate)
         end
     end
 
@@ -137,8 +157,9 @@ function RLDiseaseTransmission.expectedSheddingMonths(model, maxLifespanMonths)
     -- `math.min` would launder a NaN window into a plausible finite lifespan.
     if not (raw > 0) then
         Log:trace("RLDiseaseTransmission.expectedSheddingMonths: endpoint=%s hazard=%s "
-            .. "span=%s raw=%s -> 0 (non-positive or NaN window)",
-            tostring(endpoint), tostring(hazard), tostring(span), tostring(raw))
+            .. "span=%s recoveryRate=%s raw=%s -> 0 (non-positive or NaN window)",
+            tostring(endpoint), tostring(hazard), tostring(span), tostring(recoveryRate),
+            tostring(raw))
 
         return 0
     end
@@ -146,9 +167,9 @@ function RLDiseaseTransmission.expectedSheddingMonths(model, maxLifespanMonths)
     local capped = math.min(raw, maxLifespanMonths or math.huge)
 
     Log:trace("RLDiseaseTransmission.expectedSheddingMonths: endpoint=%s hazard=%s "
-        .. "span=%s raw=%s cap=%s -> %s",
-        tostring(endpoint), tostring(hazard), tostring(span), tostring(raw),
-        tostring(maxLifespanMonths), tostring(capped))
+        .. "span=%s recoveryRate=%s raw=%s cap=%s -> %s",
+        tostring(endpoint), tostring(hazard), tostring(span), tostring(recoveryRate),
+        tostring(raw), tostring(maxLifespanMonths), tostring(capped))
 
     return capped
 end
