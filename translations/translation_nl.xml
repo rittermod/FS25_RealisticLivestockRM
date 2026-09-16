@@ -499,6 +499,9 @@
         <text name="rl_disease_ped" text="Varkensdiarree (PED)"/>
 
         <text name="rl_disease_avianFluLPAI" text="Vogelgriep (LPAI)"/>
+        <text name="rl_disease_avianFluHPAI" text="Avian Flu (HPAI)"/>
+        <text name="rl_disease_brd" text="BRD"/>
+        <text name="rl_disease_clostridial" text="Pulpy Kidney"/>
 
 
 

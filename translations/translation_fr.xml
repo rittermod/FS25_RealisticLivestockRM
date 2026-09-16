@@ -542,6 +542,9 @@
         <text name="rl_disease_ped" text="Diarrhée épidémique porcine"/>
 
         <text name="rl_disease_avianFluLPAI" text="Grippe aviaire (LPAI)"/>
+        <text name="rl_disease_avianFluHPAI" text="Avian Flu (HPAI)"/>
+        <text name="rl_disease_brd" text="BRD"/>
+        <text name="rl_disease_clostridial" text="Pulpy Kidney"/>
 
 
 

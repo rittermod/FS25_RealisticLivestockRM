@@ -3,7 +3,7 @@
 	<disease title="mastitis" animals="COW SHEEP">
 		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="1.2" durationMonths="2"
-			caseFatality="0.01" immunityMonths="12" salePrice="0.85">
+			caseFatality="0.00501256" immunityMonths="12" salePrice="0.85">
 			<infection>
 				<key ageMonths="0" perMonth="0"/>
 				<key ageMonths="12" perMonth="0.012"/>
@@ -39,7 +39,7 @@
 	<disease title="footAndMouth" animals="COW SHEEP PIG">
 		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="6.0" durationMonths="2"
-			caseFatality="0.06" immunityMonths="24" salePrice="0.5">
+			caseFatality="0.030464" immunityMonths="24" salePrice="0.5">
 			<infection>
 				<key ageMonths="0" perMonth="0"/>
 				<key ageMonths="6" perMonth="0.0015"/>
@@ -55,7 +55,7 @@
 	<disease title="ped" animals="PIG">
 		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="2.5" durationMonths="2"
-			caseFatality="0.22" immunityMonths="12" salePrice="0.65">
+			caseFatality="0.0834849" immunityMonths="12" salePrice="0.65">
 			<infection>
 				<key ageMonths="0" perMonth="0.06"/>
 				<key ageMonths="6" perMonth="0.02"/>
@@ -71,14 +71,58 @@
 
 	<disease title="avianFluLPAI" animals="CHICKEN">
 		<model archetype="infectious" endpoint="recovers" cullRequired="false"
-			incubationTicks="1" r0="2.5" durationMonths="2"
-			caseFatality="0.06" immunityMonths="12" salePrice="0.25">
+			incubationTicks="1" r0="3.0" durationMonths="2"
+			caseFatality="0.0151142" immunityMonths="12" salePrice="0.25">
 			<infection>
-				<key ageMonths="0" perMonth="0.013"/>
+				<key ageMonths="0" perMonth="0.02"/>
 			</infection>
-			<treatment months="1" cost="40" efficacy="1" outcome="cure"/>
+			<treatment months="1" cost="5" efficacy="1" outcome="cure"/>
 			<effects weightGain="0.9" fertility="1">
 				<output type="pallets" modifier="0.4"/>
+			</effects>
+		</model>
+	</disease>
+
+	<disease title="avianFluHPAI" animals="CHICKEN">
+		<model archetype="infectious" endpoint="recovers" cullRequired="true"
+			incubationTicks="0" r0="6.0" durationMonths="0.5"
+			caseFatality="0.9975" immunityMonths="24" salePrice="0.25">
+			<infection>
+				<key ageMonths="0" perMonth="0.0038"/>
+			</infection>
+			<effects weightGain="1" fertility="1"/>
+		</model>
+	</disease>
+
+	<disease title="brd" animals="COW">
+		<model archetype="infectious" endpoint="recovers" cullRequired="false"
+			incubationTicks="1" r0="2.5" durationMonths="2"
+			caseFatality="0.0780456" immunityMonths="12" salePrice="0.7">
+			<infection>
+				<key ageMonths="6" perMonth="0.02"/>
+				<key ageMonths="24" perMonth="0.01"/>
+				<key ageMonths="9999" perMonth="0.007"/>
+			</infection>
+			<treatment months="1" cost="300" efficacy="1" outcome="cure"/>
+			<effects weightGain="0.8" fertility="1">
+				<output type="milk" modifier="0.7"/>
+				<output type="pallets" modifier="0.7"/>
+				<output type="manure" modifier="0.8"/>
+			</effects>
+		</model>
+	</disease>
+
+	<disease title="clostridial" animals="SHEEP">
+		<model archetype="infectious" endpoint="recovers" cullRequired="false"
+			incubationTicks="1" r0="0" durationMonths="2"
+			caseFatality="0.367544" immunityMonths="12" salePrice="0.6">
+			<infection>
+				<key ageMonths="12" perMonth="0.018"/>
+				<key ageMonths="9999" perMonth="0.0085"/>
+			</infection>
+			<treatment months="1" cost="150" efficacy="0.5" outcome="cure"/>
+			<effects weightGain="0.6" fertility="1">
+				<output type="pallets" modifier="0.5"/>
 			</effects>
 		</model>
 	</disease>

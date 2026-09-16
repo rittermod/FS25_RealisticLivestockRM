@@ -538,6 +538,9 @@
         <text name="rl_disease_footAndMouth" text="Şap Hastalığı"/>
         <text name="rl_disease_ped" text="Domuz Epidemik İshali"/>
         <text name="rl_disease_avianFluLPAI" text="Kuş Gribi (LPAI)"/>
+        <text name="rl_disease_avianFluHPAI" text="Avian Flu (HPAI)"/>
+        <text name="rl_disease_brd" text="BRD"/>
+        <text name="rl_disease_clostridial" text="Pulpy Kidney"/>
 
 
 

@@ -513,6 +513,9 @@
         <text name="rl_disease_ped" text="猪流行性腹泻"/>
 
         <text name="rl_disease_avianFluLPAI" text="禽流感 (LPAI)"/>
+        <text name="rl_disease_avianFluHPAI" text="Avian Flu (HPAI)"/>
+        <text name="rl_disease_brd" text="BRD"/>
+        <text name="rl_disease_clostridial" text="Pulpy Kidney"/>
 
 
 
