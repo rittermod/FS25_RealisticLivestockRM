@@ -1,6 +1,6 @@
 <modDesc descVersion="110">
     <author>Ritter</author>
-    <version>1.4.0.0-dev.2</version>
+    <version>1.4.0.0-dev.3</version>
     <title>
         <en>Realistic Livestock - Ritter version</en>
         <it>Allevamento Realistico - Versione Ritter</it>
@@ -24,6 +24,19 @@ Documentation: https://rittermod.github.io/FS25_RealisticLivestockRM
 Source code and issue tracker: https://github.com/rittermod/FS25_RealisticLivestockRM
 
 Changelog
+
+1.4.0.0-dev.3:
+- Added disease spread between animals in the same pen.
+- Added CVM back as an inherited cattle disease: some dealer cattle carry it and calves inherit it; carriers give 50% more milk, and an affected animal shows as sick and, with animal deaths on, dies of it within a few months.
+- Brought back illness effects on production - less milk, goat milk, eggs, wool and manure, and PED raises liquid manure - in full while an animal shows symptoms and about half as strongly while it is still incubating.
+- Added three diseases - avian flu (HPAI) for chickens, BRD for cattle and pulpy kidney for sheep - and retuned the infectious diseases' rates; HPAI cannot be treated, so sell a bird that shows it straight away to stop it spreading through the flock.
+- Added illness effects on growth and breeding - most illnesses slow weight gain while an animal shows symptoms, and mastitis and foot and mouth also lower its chance of conceiving.
+- Brought back the "Cured from" message: it posts on the day an animal recovers from a disease, whether a treatment cured it or it got better on its own.
+- Brought back the lower sale price for sick animals - an animal sells for less while it shows symptoms and at full price once it recovers.
+- Turned the Diseases setting into a difficulty choice - Off, Easy, Normal, Hard or Very hard: on Easy and Normal, the default, diseases are rare or strike now and then and show symptoms at once, while on Hard and Very hard they strike more often, spread faster and most take a while to show; an existing save lands on Normal, or Off if diseases were off.
+- Changed natural recovery so an untreated animal that survives stays sick for at least its illness's minimum length and then recovers on a daily chance - some animals now stay sick longer than others.
+- Fixed immunity and treatment times showing long decimals, and the HUD reading "1 months", when a month lasts more than one day.
+- Fixed an animal being able to die of a disease on the day its symptoms first show, before you could start treatment - treatment started that day now gives the same protection at every month length.
 
 1.4.0.0-dev.2:
 - Dropped all disease infections, immunities and part-way treatments from existing saves - the new record format cannot read the old ones.
