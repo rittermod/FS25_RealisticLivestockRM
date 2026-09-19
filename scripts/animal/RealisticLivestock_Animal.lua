@@ -1814,7 +1814,7 @@ end
 
 -- The flag leads the insert, for `removeDisease`'s reason. Safe only because `setDirty` defers the flush to the
 -- placeable's next update: never flush synchronously between them. Sale, dealer and AI animals have no cluster
--- system, so their flag goes nowhere. No message: the record announces when it surfaces.
+-- system, so their flag goes nowhere. No message: the surfacing tick or `contractDisease` announces the record.
 --- Attach a new disease record to this animal.
 ---@param model table Disease model entry from the disease manager's registry.
 ---@param isCarrier boolean|nil True for an asymptomatic carrier record.

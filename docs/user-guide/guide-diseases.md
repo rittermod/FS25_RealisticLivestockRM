@@ -1,6 +1,6 @@
 # Disease Guide
 
-Realistic Livestock RM includes five diseases that can infect, spread between, and kill your animals. Each disease affects specific species and has different transmission rates, fatality, and treatment options. The **Diseases** setting sets how often animals fall ill and how fast diseases spread - **Off**, **Easy**, **Normal** (the default), or **Hard** - see [Disease Settings](#disease-settings).
+Realistic Livestock RM includes five diseases that can infect, spread between, and kill your animals. Each disease affects specific species and has different transmission rates, fatality, and treatment options. The **Diseases** setting sets how often animals fall ill and how fast diseases spread - **Off**, **Easy**, **Normal** (the default), **Hard** or **Very hard** - see [Disease Settings](#disease-settings).
 
 > **Note:** This documentation was generated with AI assistance and may contain inaccuracies. If you spot an error, please [open an issue](https://github.com/rittermod/FS25_RealisticLivestockRM/issues).
 
@@ -80,13 +80,16 @@ carriers. If you want to cull carriers, pick them manually from the detail panel
 
 ### Incubating animals look healthy but produce less
 
-A newly infected animal shows no sign of the disease at first - no status icon, no entry in the
-detail panel, the HUD or the Diseases dialog, and no message. The disease appears on all of them,
-with a "Contracted" message, on the day the animal shows symptoms. Until then its production
-already takes about half the hit the disease will cause once symptoms show - less milk, goat milk,
-eggs, wool or manure, and a pig with PED makes noticeably more liquid manure. An animal with an
-active monitor shows this in its output rows, most clearly on a milking cow; without a monitor you
+On **Hard** and **Very hard**, a newly infected animal shows no sign of most diseases at first - no
+status icon, no entry in the detail panel, the HUD or the Diseases dialog, and no message. The disease
+appears on all of them, with a "Contracted" message, on the day the animal shows symptoms. Until then
+its production already takes about half the hit the disease will cause once symptoms show - less milk,
+goat milk, eggs, wool or manure, and a pig with PED makes noticeably more liquid manure. An animal with
+an active monitor shows this in its output rows, most clearly on a milking cow; without a monitor you
 see it only as a drop in the pen's production.
+
+On **Easy** and **Normal** there is no hidden stage: a disease shows on every surface, and is
+announced, on the day the animal falls ill.
 
 ---
 
@@ -304,6 +307,6 @@ One setting controls diseases globally:
 
 | Setting | Default | Range | Effect |
 |---------|---------|-------|--------|
-| **Diseases** | Normal | Off / Easy / Normal / Hard | **Easy**: animals fall ill less often and diseases spread more slowly. **Normal**: diseases strike and spread at their standard rates. **Hard**: animals fall ill more often, diseases spread faster, and symptoms take longer to show. **Off**: see below. Admin only in multiplayer. |
+| **Diseases** | Normal | Off / Easy / Normal / Hard / Very hard | **Easy**: diseases are rare, spread slowly and show symptoms at once. **Normal**: diseases strike now and then, spread at a moderate pace and show symptoms at once. **Hard**: diseases strike often, spread fast and most take a while to show symptoms. **Very hard**: diseases strike very often, spread very fast and most take even longer to show symptoms. **Off**: see below. Admin only in multiplayer. |
 
 *Choosing **Off** stops new infections and all disease progression, spread, and effects, and no calf inherits CVM and no dealer animal is stocked carrying it. Animals already infected are not cured - their diseases resume where they stopped when a level is chosen again - and existing diseases are hidden and a CVM carrier's extra milk stops while the setting is **Off**.*

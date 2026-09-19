@@ -76,7 +76,7 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 
 | Setting | Default | Options | Description |
 |---------|---------|---------|-------------|
-| **Diseases** | Normal | Off / Easy / Normal / Hard | How often animals fall ill and how fast diseases spread. **Easy**: animals fall ill less often and diseases spread more slowly. **Normal**: diseases strike and spread at their standard rates. **Hard**: animals fall ill more often, diseases spread faster, and symptoms take longer to show. **Off**: no new infections and no disease progression, spread, or effects; no calf inherits CVM and no dealer animal is stocked carrying it. Admin only in multiplayer. |
+| **Diseases** | Normal | Off / Easy / Normal / Hard / Very hard | How often animals fall ill and how fast diseases spread. **Easy**: diseases are rare, spread slowly and show symptoms at once. **Normal**: diseases strike now and then, spread at a moderate pace and show symptoms at once. **Hard**: diseases strike often, spread fast and most take a while to show symptoms. **Very hard**: diseases strike very often, spread very fast and most take even longer to show symptoms. **Off**: no new infections and no disease progression, spread, or effects; no calf inherits CVM and no dealer animal is stocked carrying it. Admin only in multiplayer. |
 
 *Choosing **Off** suspends Mastitis, CVM, Foot & Mouth, PED, and Avian Flu (LPAI) but does not cure animals already infected: their diseases resume where they stopped when a level is chosen again, and existing diseases are hidden and a CVM carrier's extra milk stops while the setting is **Off**.*
 

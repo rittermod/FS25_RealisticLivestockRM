@@ -82,7 +82,7 @@ Death mechanics can be fully disabled or adjusted in the mod settings.
 
 Almost everything can be tuned to your preference:
 
-- Toggle death on/off and set the **Diseases** difficulty (**Off** / **Easy** / **Normal** / **Hard**)
+- Toggle death on/off and set the **Diseases** difficulty (**Off** / **Easy** / **Normal** / **Hard** / **Very hard**)
 - Scale food consumption up or down
 - Adjust accident probability
 - Control dealer stock size

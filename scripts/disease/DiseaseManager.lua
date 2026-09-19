@@ -496,9 +496,9 @@ end
 
 
 -- The applier both producers share: the spontaneous roll and the pen's transmission apply.
--- The seed is the authored window times the preset, floored by the record module; an authored 0 skips
--- the seeder and goes straight to INFECTIOUS at every preset. Fail-loud, no rollback - `addDisease` already inserted.
---- Attach a fresh record in its authored starting state, announcing it only when it starts symptomatic.
+-- One branch key, the EFFECTIVE window: a positive one is seeded, a zero one (an authored 0 or a zero preset
+-- scale) goes straight to INFECTIOUS and is announced here. Fail-loud, no rollback - `addDisease` already inserted.
+--- Attach a fresh record in the active preset's starting state, announcing it only when it starts symptomatic.
 ---@param animal table the animal that just contracted the disease
 ---@param model table the parsed `<model>` entry it contracted
 ---@return nil
@@ -517,26 +517,26 @@ function DiseaseManager:contractDisease(animal, model)
 
     end
 
-    if model.incubationTicks > 0 then
+    local preset = RLDiseaseDifficulty.getPreset(self.diseaseDifficulty)
+    local ticks = RLDiseaseDifficulty.effectiveIncubationTicks(model.incubationTicks, preset.incubation)
 
-        local preset = RLDiseaseDifficulty.getPreset(self.diseaseDifficulty)
+    if ticks > 0 then
 
-        local outcome = RLDiseaseRecord.seedIncubation(record, model.incubationTicks * preset.incubation)
+        local outcome = RLDiseaseRecord.seedIncubation(record, ticks)
 
         if outcome ~= RLDiseaseRecord.APPLIED then
 
             Log:warning("contractDisease: seedIncubation returned %s, the window stays zero (title=%s "
                 .. "ticks=%s preset=%s farmId=%s uniqueId=%s)", tostring(outcome), tostring(model.title),
-                tostring(model.incubationTicks * preset.incubation), tostring(preset.key),
-                tostring(animal.farmId), tostring(animal.uniqueId))
+                tostring(ticks), tostring(preset.key), tostring(animal.farmId), tostring(animal.uniqueId))
 
             return
 
         end
 
-        Log:trace("contractDisease: seeded a %s-tick hidden window from a scaled %s (title=%s preset=%s uniqueId=%s)",
-            tostring(record.incubationTicksRemaining), tostring(model.incubationTicks * preset.incubation),
-            tostring(model.title), tostring(preset.key), tostring(animal.uniqueId))
+        Log:trace("contractDisease: seeded a %s-tick hidden window (authored %s, preset=%s, title=%s uniqueId=%s)",
+            tostring(record.incubationTicksRemaining), tostring(model.incubationTicks), tostring(preset.key),
+            tostring(model.title), tostring(animal.uniqueId))
 
         return
 
@@ -560,8 +560,9 @@ function DiseaseManager:contractDisease(animal, model)
     -- transmission apply, both after progression, so no tick sees it and it is announced here.
     animal:addMessage("DISEASE_CONTRACTED", { model.name })
 
-    Log:debug("contractDisease: authored zero incubation, symptomatic and announced at once (title=%s "
-        .. "farmId=%s uniqueId=%s)", tostring(model.title), tostring(animal.farmId), tostring(animal.uniqueId))
+    Log:debug("contractDisease: zero effective incubation (authored %s, preset=%s), symptomatic and announced "
+        .. "at once (title=%s farmId=%s uniqueId=%s)", tostring(model.incubationTicks), tostring(preset.key),
+        tostring(model.title), tostring(animal.farmId), tostring(animal.uniqueId))
 
 end
 

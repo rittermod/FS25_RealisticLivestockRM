@@ -101,9 +101,8 @@ RLDiseaseRecord.REFUSED = "REFUSED"
 RLDiseaseRecord.REMOVE = "REMOVE"
 
 
---- The hidden window's floor, in ticks - every disease hides for at least one tick and
---- no difficulty scale can remove it. Public and read at CALL time so a suite can pin
---- it; a code constant on every peer, never persisted and never sent.
+-- Public and read at CALL time so a suite can pin it; a code constant on every peer, never persisted or sent.
+--- The floor, in ticks, of every SEEDED hidden window (a zero effective window seeds none).
 RLDiseaseRecord.MIN_INCUBATION_TICKS = 1
 
 

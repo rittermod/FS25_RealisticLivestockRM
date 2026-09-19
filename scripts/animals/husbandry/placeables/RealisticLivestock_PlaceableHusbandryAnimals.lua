@@ -390,9 +390,9 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onDayChanged()
         local transmissionPlan = nil
 
         if diseasesOn then
-            -- The pass READS above the per-animal loop, and that placement is the contract: an
-            -- animal contagious during this tick sheds to its pen mates before its own record
-            -- advances. It WRITES below the loop, so a new record keeps its hidden tick.
+            -- The pass READS above the per-animal loop, and that placement is the contract: an animal
+            -- contagious during this tick sheds to its pen mates before its own record advances. It
+            -- WRITES below the loop, so a new record is neither advanced nor rolled on the tick that built it.
             if RealisticLivestock.testAnimalPrefix == nil then
                 Log:trace("onDayChanged [%s]: pre-progression transmission pass", penName)
 
@@ -508,9 +508,9 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onDayChanged()
                     end
                 end
 
-                -- LAST, and after progression in the same iteration: a record this roll creates
-                -- must not be advanced by the driver on the tick that created it, or a one-tick
-                -- incubation surfaces the same day. The isDead re-read is fresh, not the outer one.
+                -- LAST, and after progression in the same iteration: a record this roll creates is
+                -- not advanced on the tick that built it - a seeded one keeps its hidden tick, a
+                -- born-INFECTIOUS one gets no fatality roll or month. The isDead re-read is fresh, not the outer one.
                 if not animal.isDead then
                     RmSafeUtils.safeAnimalCall(animal, "diseaseRoll", function()
                         g_diseaseManager:onDayChanged(animal, { ["daysPerPeriod"] = daysPerPeriod })
@@ -524,8 +524,8 @@ function RealisticLivestock_PlaceableHusbandryAnimals:onDayChanged()
         local tLoopMs = (getTimeSec() - tLoopStart) * 1000
         local tPostStart = getTimeSec()
 
-        -- After progression, so a new record keeps its hidden tick; before the flush, so the
-        -- array still holds this tick's corpses for the revalidation to refuse.
+        -- After progression, so a new record is neither advanced nor rolled on the tick that built
+        -- it; before the flush, so the array still holds this tick's corpses for the revalidation.
         if transmissionPlan ~= nil then
 
             local applied, refused, failed = 0, 0, 0

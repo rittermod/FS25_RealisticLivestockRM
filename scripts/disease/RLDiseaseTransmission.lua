@@ -185,7 +185,7 @@ end
 ---        any nonzero incubation.
 --- @param maxLifespanMonths number|nil The DISEASE-level shedding bound.
 --- @param incubationTicks number The EFFECTIVE tick count an animal serves - the
----        authored value after the difficulty scale and the record module's floor,
+---        authored value after the difficulty scale, floored when non-zero (a zero scale yields 0),
 ---        composed by the caller. TRUSTED INTERNAL input; a nil RAISES.
 --- @param daysPerPeriod number Ticks in one period. TRUSTED INTERNAL input - a nil
 ---        RAISES on the guard below. Read it at call time; never cache it.

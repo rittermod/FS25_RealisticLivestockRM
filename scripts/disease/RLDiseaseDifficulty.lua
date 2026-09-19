@@ -1,13 +1,14 @@
 --[[
     RLDiseaseDifficulty.lua
-    The disease difficulty ladder (Off / Easy / Normal / Hard) and the three scaling helpers
-    `DiseaseManager` applies where each quantity enters the model: the infection chance, the
-    incubation window and R0.
+    The disease difficulty ladder (Off / Easy / Normal / Hard / Very hard) and the three scaling
+    helpers `DiseaseManager` applies where each quantity enters the model: the infection chance,
+    the incubation window and R0.
 
     Pure data-in / data-out: no setting read, no g_*, no XML. `PRESETS` is append-only and a
-    row's array index IS the persisted setting value. Normal is an exact identity. Off keeps
-    identity scales, since nothing reads a scale while diseases are off. `RLDiseaseRecord` is
-    read at call time only.
+    row's array index IS the persisted setting value. Hard is the exact identity: it plays the
+    disease file as authored. A ZERO incubation scale means no hidden window; any other scale
+    multiplies, then floors at one tick. Off keeps identity scales, since nothing reads a scale
+    while diseases are off. `RLDiseaseRecord` is read at call time only.
 ]]
 
 RLDiseaseDifficulty = {}
@@ -18,10 +19,11 @@ RLDiseaseDifficulty.OFF_INDEX = 1
 RLDiseaseDifficulty.DEFAULT_INDEX = 3
 
 RLDiseaseDifficulty.PRESETS = {
-    [1] = { key = "off",    enabled = false, infection = 1.0, incubation = 1.0, spread = 1.0 },
-    [2] = { key = "easy",   enabled = true,  infection = 0.5, incubation = 0.0, spread = 0.6 },
-    [3] = { key = "normal", enabled = true,  infection = 1.0, incubation = 1.0, spread = 1.0 },
-    [4] = { key = "hard",   enabled = true,  infection = 2.0, incubation = 2.0, spread = 1.5 }
+    [1] = { key = "off",      enabled = false, infection = 1.0,  incubation = 1.0, spread = 1.0 },
+    [2] = { key = "easy",     enabled = true,  infection = 0.25, incubation = 0.0, spread = 0.3 },
+    [3] = { key = "normal",   enabled = true,  infection = 0.5,  incubation = 0.0, spread = 0.6 },
+    [4] = { key = "hard",     enabled = true,  infection = 1.0,  incubation = 1.0, spread = 1.0 },
+    [5] = { key = "veryHard", enabled = true,  infection = 2.0,  incubation = 2.0, spread = 1.5 }
 }
 
 RLDiseaseDifficulty.PRESET_COUNT = #RLDiseaseDifficulty.PRESETS
@@ -119,15 +121,23 @@ function RLDiseaseDifficulty.scaleInfectionChance(pMonth, scale)
 end
 
 
---- The hidden window a record seeded under `scale` serves: an authored 0 stays 0, anything else floors at 1 tick.
+--- The hidden window a record contracted under `scale` serves: 0 for an authored 0 or a zero scale, else >= 1 tick.
 ---@param authoredTicks number the model's authored `incubationTicks`. TRUSTED INTERNAL input
 ---@param scale number the preset's `incubation` multiplier. TRUSTED INTERNAL input
 ---@return number ticks the effective integer window
 function RLDiseaseDifficulty.effectiveIncubationTicks(authoredTicks, scale)
-    -- The floor bounds a SCALE, never an AUTHOR: an authored 0 means visible at once.
+    -- An authored 0 means visible at once, at every scale.
     if not (authoredTicks > 0) then
         Log:trace("RLDiseaseDifficulty.effectiveIncubationTicks: authored %s -> 0 (no hidden window)",
             tostring(authoredTicks))
+
+        return 0
+    end
+
+    -- A zero scale means no hidden window; the one-tick floor bounds a non-zero scale only.
+    if not (scale > 0) then
+        Log:trace("RLDiseaseDifficulty.effectiveIncubationTicks: authored %s scale %s -> 0 (no hidden window)",
+            tostring(authoredTicks), tostring(scale))
 
         return 0
     end

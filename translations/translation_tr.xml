@@ -398,6 +398,7 @@
 
         <text name="rl_settings_off" text="Kapalı"/>
         <text name="rl_settings_on" text="Açık"/>
+        <text name="rl_settings_veryHard" text="Very hard"/>
 
         <text name="rl_settings_deathEnabled_label" text="Hayvanın Kaldırılması"/>
         <text name="rl_settings_deathEnabled_label_github" text="Hayvanın Ölümü"/>
@@ -456,9 +457,10 @@
         <text name="rl_settings_messageSummary_tooltip_2" text="Açık: Ağıl başına günlük özetler (günlük gürültüsünü azaltır)"/>
 
         <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Hayvanlar hastalığa yakalanamaz veya kalıtsal yolla geçiremez"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Diseases are rare, spread slowly and show symptoms at once"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike now and then, spread at a moderate pace and show symptoms at once"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Diseases strike often, spread fast and most take a while to show symptoms"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_5" text="Diseases strike very often, spread very fast and most take even longer to show symptoms"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="Özel Hayvanları Kullan"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="RealisticLivestock hayvan modellerini kullanın (yeniden başlatma gerektirir)"/>

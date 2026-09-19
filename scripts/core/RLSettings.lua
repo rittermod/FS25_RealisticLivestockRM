@@ -243,22 +243,23 @@ RLSettings.SETTINGS = {
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 3,
-		["values"] = { 1, 2, 3, 4 },
+		["values"] = { 1, 2, 3, 4, 5 },
 		["dynamicTooltip"] = true,
-		-- The labels reuse the Off key the on/off rows show and the game's own difficulty keys; the
-		-- array order is the preset index.
-		--- Build the preset option labels, Off / Easy / Normal / Hard.
+		-- The labels reuse the Off key the on/off rows show, the game's own difficulty keys and the
+		-- mod's `rl_settings_veryHard`; the array order is the preset index.
+		--- Build the preset option labels, Off / Easy / Normal / Hard / Very hard.
 		--- @return table Option texts indexed by preset
 		["getTexts"] = function()
 			local texts = {
 				g_i18n:getText("rl_settings_off"),
 				g_i18n:getText("button_easy"),
 				g_i18n:getText("button_normal"),
-				g_i18n:getText("button_hard")
+				g_i18n:getText("button_hard"),
+				g_i18n:getText("rl_settings_veryHard")
 			}
 
-			Log:debug("RLSettings.diseaseDifficulty.getTexts: option texts '%s' / '%s' / '%s' / '%s'",
-				texts[1], texts[2], texts[3], texts[4])
+			Log:debug("RLSettings.diseaseDifficulty.getTexts: option texts '%s' / '%s' / '%s' / '%s' / '%s'",
+				texts[1], texts[2], texts[3], texts[4], texts[5])
 
 			return texts
 		end,

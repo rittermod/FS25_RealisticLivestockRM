@@ -386,6 +386,7 @@
 
         <text name="rl_settings_off" text="关闭"/>
         <text name="rl_settings_on" text="开启"/>
+        <text name="rl_settings_veryHard" text="Very hard"/>
 
         <text name="rl_settings_deathEnabled_label" text="动物移除"/>
         <text name="rl_settings_deathEnabled_label_github" text="动物死亡"/>
@@ -440,9 +441,10 @@
         <text name="rl_settings_messageSummary_tooltip_2" text="On: Daily summaries per husbandry (reduces log noise)"/>
 
         <text name="rl_settings_diseaseDifficulty_tooltip_1" text="动物不会感染或遗传疾病"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Diseases are rare, spread slowly and show symptoms at once"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike now and then, spread at a moderate pace and show symptoms at once"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Diseases strike often, spread fast and most take a while to show symptoms"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_5" text="Diseases strike very often, spread very fast and most take even longer to show symptoms"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="使用自定义动物"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="使用真实畜牧动物模型（需要重启）"/>

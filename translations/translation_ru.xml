@@ -381,6 +381,7 @@
 
         <text name="rl_settings_off" text="Off"/>
         <text name="rl_settings_on" text="On"/>
+        <text name="rl_settings_veryHard" text="Very hard"/>
 
         <text name="rl_settings_deathEnabled_label" text="Animal Removal"/>
         <text name="rl_settings_deathEnabled_tooltip_1" text="Animals will not be removed due to pregnancy, health, age or accidents"/>
@@ -419,9 +420,10 @@
         <text name="rl_settings_maxNumMessages_tooltip" text="A higher amount will result in your save folder taking up more space. After this limit is reached, the earliest messages will be deleted."/>
 
         <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Animals cannot catch or inherit diseases"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Diseases are rare, spread slowly and show symptoms at once"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike now and then, spread at a moderate pace and show symptoms at once"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Diseases strike often, spread fast and most take a while to show symptoms"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_5" text="Diseases strike very often, spread very fast and most take even longer to show symptoms"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="Use Custom Animals"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Use RealisticLivestock animal models (requires restart)"/>

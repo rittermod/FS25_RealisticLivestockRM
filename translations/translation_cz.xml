@@ -398,6 +398,7 @@
 
         <text name="rl_settings_off" text="Vypnuto"/>
         <text name="rl_settings_on" text="Zapnuto"/>
+        <text name="rl_settings_veryHard" text="Very hard"/>
 
         <text name="rl_settings_deathEnabled_label" text="Odstranění zvířat"/>
         <text name="rl_settings_deathEnabled_label_github" text="Úhyn zvířat"/>
@@ -456,9 +457,10 @@
         <text name="rl_settings_messageSummary_tooltip_2" text="Zapnuto: Denní shrnutí podle chovu (snižuje zahlcení logu)"/>
 
         <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Zvířata nemohou onemocnět ani zdědit nemoci"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Animals fall ill less often and diseases spread more slowly"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike and spread at their standard rates"/>
-        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Animals fall ill more often, diseases spread faster and symptoms take longer to show"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Diseases are rare, spread slowly and show symptoms at once"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Diseases strike now and then, spread at a moderate pace and show symptoms at once"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Diseases strike often, spread fast and most take a while to show symptoms"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_5" text="Diseases strike very often, spread very fast and most take even longer to show symptoms"/>
 
         <text name="rl_settings_useCustomAnimals_label" text="Použít vlastní zvířata"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Použít modely zvířat z RealisticLivestock (vyžaduje restart)"/>
