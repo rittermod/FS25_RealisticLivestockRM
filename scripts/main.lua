@@ -81,6 +81,7 @@ source(modDirectory .. "scripts/events/HusbandryMessageDeleteEvent.lua")
 source(modDirectory .. "scripts/events/ReturnStrawEvent.lua")
 source(modDirectory .. "scripts/events/TakeStrawEvent.lua")
 source(modDirectory .. "scripts/events/DiseaseTreatmentToggleEvent.lua")
+source(modDirectory .. "scripts/events/DiseaseCullEvent.lua")
 
 -- SECTION 10: Farms
 source(modDirectory .. "scripts/farms/FarmManager.lua")
@@ -312,6 +313,7 @@ source(modDirectory .. "scripts/disease/RLDiseaseSpread.lua")
 source(modDirectory .. "scripts/disease/RLDiseaseEffects.lua")
 source(modDirectory .. "scripts/disease/RLDiseaseProgression.lua")
 source(modDirectory .. "scripts/disease/RLDiseaseStatus.lua")
+source(modDirectory .. "scripts/disease/RLDiseaseCull.lua")
 source(modDirectory .. "scripts/disease/Disease.lua")
 source(modDirectory .. "scripts/disease/DiseaseManager.lua")
 

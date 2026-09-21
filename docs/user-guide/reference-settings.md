@@ -12,10 +12,10 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 
 | Setting | Default | Options | Description |
 |---------|---------|---------|-------------|
-| **Animal Death** | On | Off / On | Toggles all death mechanics (old age, low health, accidents, birth complications, and fatal diseases). When off, animals live indefinitely. The ModHub build labels this setting "Animal Removal". |
+| **Animal Death** | On | Off / On | Toggles all death mechanics (old age, low health, accidents, birth complications, and fatal diseases). When off, animals live indefinitely unless you cull one. The ModHub build labels this setting "Animal Removal". |
 | **Accident Chance** | 100% | 0% - 200% (10% steps) | Scales the probability of random accident deaths. 0% disables accidents entirely. 200% doubles the chance. Only available when Death is enabled. |
 
-*With death disabled, animals never die from any cause - but diseases can still make them sick unless the **Diseases** setting is **Off**.*
+*With death disabled, no animal dies on its own - only a cull from the Diseases dialog removes one - but diseases can still make them sick unless the **Diseases** setting is **Off**.*
 
 ---
 

@@ -526,6 +526,8 @@
         <text name="rl_ui_startTreatment" text="Commencer le traitement"/>
         <text name="rl_ui_resumeTreatment" text="Reprendre le traitement"/>
         <text name="rl_ui_stopTreatment" text="Arrêter le traitement"/>
+        <text name="rl_ui_cull" text="Cull"/>
+        <text name="rl_ui_cullConfirm" text="Cull %s? It is removed from your herd for good, and you receive %s in compensation."/>
         <text name="rl_ui_duration" text="Durée"/>
         <text name="rl_ui_beingTreated" text="En traitement"/>
         <text name="rl_ui_notTreated" text="Non traité"/>
@@ -640,6 +642,7 @@
         <text name="rl_death_age" text="vieillesse"/>
         <text name="rl_death_accident" text="un accident"/>
         <text name="rl_death_disease" text="a disease"/>
+        <text name="rl_death_cull" text="culling"/>
 
         <text name="rl_ui_dependencies_missing" text="RealisticLivestock nécessite les dépendances suivantes :"/>
         <text name="rl_ui_dependency_missing_notInstalled" text="- %s (Non installé)"/>

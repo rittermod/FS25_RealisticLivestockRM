@@ -941,7 +941,14 @@ function RLMenuInfoFrame:onClickDiseases()
 
     Log:debug("RLMenuInfoFrame:onClickDiseases: farmId=%s uniqueId=%s opening dialog",
         tostring(animal.farmId), tostring(animal.uniqueId))
-    DiseaseDialog.show(animal, self.refreshAfterMutation, self)
+    DiseaseDialog.show(animal, self.onDiseasesClosed, self)
+end
+
+--- The Diseases dialog's close callback: re-query the list and the pen count, since a cull removes the animal.
+function RLMenuInfoFrame:onDiseasesClosed()
+    Log:trace("RLMenuInfoFrame:onDiseasesClosed: reloading the animal list and the pen display")
+    self:reloadAnimalList()
+    self:updatePenDisplay()
 end
 
 ---Open insemination dialog.

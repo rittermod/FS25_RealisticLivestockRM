@@ -61,6 +61,7 @@ function DiseaseDialog.show(animal, onCloseCallback, onCloseTarget)
 end
 
 
+--- Load the list, then set the treatment and Cull buttons for the animal being shown.
 function DiseaseDialog:onOpen()
 
     DiseaseDialog:superClass().onOpen(self)
@@ -68,6 +69,10 @@ function DiseaseDialog:onOpen()
     self.diseaseList:reloadData()
 
     self:onClickListItem(1)
+
+    self:updateCullButton()
+
+    Log:trace("DiseaseDialog:onOpen: opened (uniqueId=%s)", tostring(self.animal ~= nil and self.animal.uniqueId))
 
 end
 
@@ -169,6 +174,81 @@ function DiseaseDialog:onClickListItem(index)
 
     Log:trace("DiseaseDialog:onClickListItem: button enabled, label=%s (index=%s)", label, tostring(index))
     self.yesButton:setText(g_i18n:getText("rl_ui_" .. label .. "Treatment"))
+
+end
+
+
+-- The Cull button is animal-level: it reads the one cull rule, never the selected row. Every
+-- RLDiseaseCull read in this file is at call time, since this file is sourced before that module.
+--- Enable the Cull button only while the animal passes the cull rule.
+function DiseaseDialog:updateCullButton()
+
+    local ok, reason = RLDiseaseCull.check(self.animal)
+
+    self.cullButton:setDisabled(not ok)
+    Log:trace("DiseaseDialog:updateCullButton: %s (reason=%s uniqueId=%s)", ok and "enabled" or "disabled",
+        tostring(reason), tostring(self.animal.uniqueId))
+
+end
+
+
+--- Ask the player to confirm a cull, naming the animal and the salvage it pays.
+function DiseaseDialog:onClickCull()
+
+    local animal = self.animal
+    local ok, reason = RLDiseaseCull.check(animal)
+
+    if not ok then
+        Log:debug("DiseaseDialog:onClickCull: refused, reason=%s (uniqueId=%s)", tostring(reason),
+            tostring(animal.uniqueId))
+        self:updateCullButton()
+        return
+    end
+
+    -- The label the single-animal sell confirm shows: the type, then the name when one is set.
+    local label = RLAnimalSellService.getAnimalTypeTitle(animal)
+    local name = RLAnimalSellService.getAnimalName(animal)
+    if name ~= "" then label = label .. ", " .. name end
+
+    local salvage = RLDiseaseCull.salvageFor(animal)
+    local text = string.format(g_i18n:getText("rl_ui_cullConfirm"), label,
+        g_i18n:formatMoney(salvage, 0, true, true))
+
+    Log:debug("DiseaseDialog:onClickCull: confirming uniqueId=%s farmId=%s salvage=%s", tostring(animal.uniqueId),
+        tostring(animal.farmId), tostring(salvage))
+    YesNoDialog.show(self.onCullConfirmed, self, text, g_i18n:getText("ui_attention"), nil, nil,
+        DialogElement.TYPE_WARNING)
+
+end
+
+
+--- The confirm's answer: on Yes cull through the event and close; on No leave this dialog open.
+---@param yes boolean True when the player confirmed.
+function DiseaseDialog:onCullConfirmed(yes)
+
+    local animal = self.animal
+
+    if not yes then
+        Log:trace("DiseaseDialog:onCullConfirmed: declined (uniqueId=%s)", tostring(animal.uniqueId))
+        return
+    end
+
+    -- Checked again: the animal can have died or recovered while the confirm was open.
+    local ok, reason = RLDiseaseCull.check(animal)
+
+    if not ok then
+        Log:debug("DiseaseDialog:onCullConfirmed: refused, reason=%s (uniqueId=%s)", tostring(reason),
+            tostring(animal.uniqueId))
+    elseif animal.clusterSystem == nil or animal.clusterSystem.owner == nil then
+        Log:warning("DiseaseDialog:onCullConfirmed: the animal is in no pen, nothing culled "
+            .. "(uniqueId=%s clusterSystem=%s)", tostring(animal.uniqueId), tostring(animal.clusterSystem))
+    else
+        local accepted = DiseaseCullEvent.sendEvent(animal.clusterSystem.owner, animal)
+        Log:debug("DiseaseDialog:onCullConfirmed: sent uniqueId=%s accepted=%s", tostring(animal.uniqueId),
+            tostring(accepted))
+    end
+
+    self:close()
 
 end
 

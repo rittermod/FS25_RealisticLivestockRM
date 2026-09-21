@@ -39,6 +39,8 @@
 		<BoxLayout profile="fs25_dialogButtonBox" id="buttonsPC">
 			<Button profile="buttonOK" text="$l10n_rl_ui_startTreatment" onClick="onClickOk" id="yesButton"/>
 			<Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+			<Button profile="buttonCancel" text="$l10n_rl_ui_cull" onClick="onClickCull" id="cullButton"/>
+			<Bitmap profile="fs25_dialogButtonBoxSeparator"/>
 			<Button profile="buttonBack" text="$l10n_rl_button_cancel" onClick="onClickBack" id="noButton"/>
 		</BoxLayout>
 	</GuiElement>

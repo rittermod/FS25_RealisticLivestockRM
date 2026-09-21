@@ -74,7 +74,7 @@ everywhere else:
 
 This also applies to herdsman rules built on the disease filter: a "sell animals with any
 disease" rule sells only actively sick animals - it no longer selects cured animals or CVM
-carriers. If you want to cull carriers, pick them manually from the detail panel.
+carriers. The Cull button is only for animals showing symptoms; to remove a carrier, sell it.
 
 > **Multiplayer note:** on a client, a cure - like any other disease change - shows moments after
 > the server's daily update, when the pen syncs. The server always has the correct state.
@@ -91,6 +91,14 @@ see it only as a drop in the pen's production.
 
 On **Easy** and **Normal** there is no hidden stage: a disease shows on every surface, and is
 announced, on the day the animal falls ill.
+
+## Culling a sick animal
+
+The **Diseases** dialog has a **Cull** button. It is enabled only while the animal shows symptoms -
+never for an animal that is only a carrier, is immune, or is still incubating. Culling asks for
+confirmation first. A culled animal leaves the pen at once and stops spreading the disease from the
+next day. It pays 33% of the animal's current sale price, which the disease has already lowered; a
+chicken returns nothing.
 
 ---
 
@@ -287,7 +295,7 @@ Avian Flu has **no treatment**. Egg production drops to about 40% of normal whil
 
 ### Why Avian Flu Is Dangerous
 
-- **No treatment** - you can only wait for natural recovery (1 month)
+- **No treatment** - wait for natural recovery (1 month), or cull a sick bird from the Diseases dialog (a culled chicken pays nothing)
 - **Cases keep appearing** - birds mostly catch it on their own rather than from each other, so a large flock sees new cases over time rather than one contained outbreak
 - **High initial fatality** - many infected chickens die before recovering
 - **Reduced egg output** - egg production drops to about 40% of normal while a bird is sick

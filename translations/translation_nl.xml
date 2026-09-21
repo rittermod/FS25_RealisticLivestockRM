@@ -483,6 +483,8 @@
         <text name="rl_ui_startTreatment" text="Behandeling starten"/>
         <text name="rl_ui_resumeTreatment" text="Behandeling hervatten"/>
         <text name="rl_ui_stopTreatment" text="Behandeling stoppen"/>
+        <text name="rl_ui_cull" text="Cull"/>
+        <text name="rl_ui_cullConfirm" text="Cull %s? It is removed from your herd for good, and you receive %s in compensation."/>
         <text name="rl_ui_duration" text="Duur"/>
         <text name="rl_ui_beingTreated" text="Wordt behandeld"/>
         <text name="rl_ui_notTreated" text="Niet behandeld"/>
@@ -582,6 +584,7 @@
         <text name="rl_death_age" text="ouderdom"/>
         <text name="rl_death_accident" text="een ongeluk"/>
         <text name="rl_death_disease" text="a disease"/>
+        <text name="rl_death_cull" text="culling"/>
 
 
 
