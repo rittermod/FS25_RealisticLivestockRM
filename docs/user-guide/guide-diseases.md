@@ -1,6 +1,6 @@
 # Disease Guide
 
-Realistic Livestock RM includes five diseases that can infect, spread between, and kill your animals. Each disease affects specific species and has different transmission rates, fatality, and treatment options. The **Diseases** setting sets how often animals fall ill and how fast diseases spread - **Off**, **Easy**, **Normal** (the default), **Hard** or **Very hard** - see [Disease Settings](#disease-settings).
+Realistic Livestock RM has diseases that can infect, spread between, and kill your animals; six of the mod's nine diseases are documented here. Each disease affects specific species and has different transmission rates, fatality, and treatment options. The **Diseases** setting sets how often animals fall ill and how fast diseases spread - **Off**, **Easy**, **Normal** (the default), **Hard** or **Very hard** - see [Disease Settings](#disease-settings).
 
 > **Note:** This documentation was generated with AI assistance and may contain inaccuracies. If you spot an error, please [open an issue](https://github.com/rittermod/FS25_RealisticLivestockRM/issues).
 
@@ -15,6 +15,7 @@ Realistic Livestock RM includes five diseases that can infect, spread between, a
 | **Foot & Mouth** | Cow, Sheep, Goat, Pig | High | Yes | Yes ($250/mo) | Major reduction |
 | **PED** | Pig only | Low | Devastating to newborns | Yes ($150) | Significant reduction |
 | **Avian Flu (LPAI)** | Chicken only | Limited | Yes, high fatality | No | Severe reduction |
+| **Colic** | Horse only | None | Yes, moderate | Yes ($500) | Major reduction |
 
 ---
 
@@ -298,6 +299,37 @@ Avian Flu has **no treatment**. Egg production drops to about 40% of normal whil
 - Keep smaller flocks in separate pens to limit outbreak damage
 - Survivors gain 24-month immunity - while it lasts they cannot catch avian flu again, cannot die of it, and stop spreading it from the month after they recover, though birds hatched or bought later have no such protection
 - Chickens that survive gain immunity and will be your most valuable layers
+
+---
+
+## Colic
+
+**Affects:** Horses
+
+Colic is a painful digestive condition. It is not caught from other horses - each case starts on its own, and a horse of any age can get it - a foal that does is more at risk than a grown horse. It shows symptoms at once.
+
+| Parameter | Value |
+|-----------|-------|
+| Spread | None - never passes between horses |
+| Fatality | Moderate - a real risk until the horse recovers |
+| Treatment | $500 for a 1-month course, which works about half the time |
+| Natural recovery | At least 2 months without treatment, sometimes longer |
+| Immunity after recovery | 6 months |
+
+### Impact on Production
+
+| Impact | Effect |
+|--------|--------|
+| Manure | Reduced |
+| Growth | Slower weight gain in a growing horse |
+| Sell price | Major reduction |
+
+### Management Tips
+
+- Start treatment as soon as colic shows - a treated horse dies less often than an untreated one
+- If a course does not cure it, start another - each course is a fresh chance
+- A sick horse sells for much less, so there is little to gain from selling it mid-illness
+- After recovery, the horse cannot get colic again for 6 months
 
 ---
 

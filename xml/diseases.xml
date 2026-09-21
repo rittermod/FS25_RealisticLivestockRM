@@ -127,4 +127,19 @@
 		</model>
 	</disease>
 
+	<disease title="colic" animals="HORSE">
+		<model archetype="management" endpoint="recovers" cullRequired="false"
+			incubationTicks="0" r0="0" durationMonths="2" recoveryChancePerMonth="0.75"
+			caseFatality="0.10138996221942853" immunityMonths="6" salePrice="0.5">
+			<infection>
+				<key ageMonths="11" perMonth="0.003"/>
+				<key ageMonths="12" perMonth="0.006"/>
+			</infection>
+			<treatment months="1" cost="500" efficacy="0.5" outcome="cure"/>
+			<effects weightGain="0.8" fertility="1">
+				<output type="manure" modifier="0.5"/>
+			</effects>
+		</model>
+	</disease>
+
 </diseases>

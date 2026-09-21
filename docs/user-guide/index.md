@@ -63,7 +63,7 @@ Per-species reference with breeds, production, prices, breeding, and lifespan da
 - [Cattle](factsheet-cattle.md) - 7 breeds including dairy, beef, and highland
 - [Pigs](factsheet-pigs.md) - 3 breeds with large litter mechanics
 - [Sheep & Goats](factsheet-sheep.md) - 4 sheep breeds plus goats covering wool, meat, and goat milk
-- [Horses](factsheet-horses.md) - 8 colour variants, no diseases
+- [Horses](factsheet-horses.md) - 8 colour variants with riding, fitness and cleanliness
 - [Chickens](factsheet-chickens.md) - Hens and roosters with egg production curves
 
 ### Guides

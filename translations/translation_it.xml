@@ -519,6 +519,7 @@
         <text name="rl_disease_avianFluHPAI" text="Avian Flu (HPAI)"/>
         <text name="rl_disease_brd" text="BRD"/>
         <text name="rl_disease_clostridial" text="Pulpy Kidney"/>
+        <text name="rl_disease_colic" text="Colic"/>
 
         <!-- MESSAGES -->
 

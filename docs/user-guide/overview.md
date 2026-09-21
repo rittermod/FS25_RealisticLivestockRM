@@ -54,7 +54,7 @@ Individual animals can be monitored, marked, and castrated:
 
 ### Diseases
 
-Five diseases can affect your animals:
+Six of the mod's nine diseases are listed here:
 
 | Disease | Affects | Treatable? | Key Impact |
 |---------|---------|------------|------------|
@@ -63,6 +63,7 @@ Five diseases can affect your animals:
 | Foot & Mouth | Cows, Sheep, Pigs | Yes (slow) | Major milk and price reduction |
 | PED | Pigs | Yes | Devastating to newborn piglets |
 | Avian Flu (LPAI) | Chickens | No | Egg production drops to about 40% of normal while a bird is sick |
+| Colic | Horses | Yes | Major price loss; never spreads |
 
 Diseases can spread between animals in the same pen. Some diseases grant immunity after recovery.
 

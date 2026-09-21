@@ -1274,8 +1274,8 @@ function Animal:onDiseaseTick(daysPerPeriod)
         local disease = self.diseases[i]
 
         -- The record's own copy, which is what every other SEIR consumer reads. A genetic record
-        -- skips the driver, so its state never moves and it is never removed. GENETIC only: the
-        -- archetype vocabulary also admits `management`, which no shipped disease uses.
+        -- skips the driver, so its state never moves and it is never removed. GENETIC only: a
+        -- `management` record rides along as SEIR like an infectious one.
         if disease.archetype == "genetic" then
             geneticSkips = geneticSkips + 1
 

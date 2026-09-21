@@ -50,6 +50,7 @@ Horse sell prices use a unique system heavily influenced by the animal's conditi
 | **Dirt** | Penalty | Dirty horses lose value |
 | Quality genetics | Multiplier | Better genetics -> higher base value |
 | Weight | Multiplier | Over/underweight affects price |
+| Diseases | Penalty | Can substantially reduce price |
 
 A well-maintained horse (healthy, ridden, fit, clean) with good genetics can sell for significantly more than typical price. A neglected horse can be worth very little.
 
@@ -143,7 +144,11 @@ A mare stays fertile across her whole breeding life. With average genetics her c
 
 ## Diseases
 
-**Horses have no diseases** in Realistic Livestock RM. They are the only species completely immune to all disease mechanics.
+| Disease | Spread | Fatal? | Treatment | Impact |
+|---------|--------|--------|-----------|--------|
+| **Colic** | None | Yes, moderate | 1 month, $500 (works about half the time) | Major price loss, less manure, slower growth |
+
+> **Colic:** a horse gets it on its own rather than from other horses, and it shows at once. Treat straight away - a treated horse dies less often, and a course that fails can be started again. See the [Disease Guide](guide-diseases.md).
 
 ---
 
