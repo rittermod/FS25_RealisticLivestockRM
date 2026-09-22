@@ -84,7 +84,7 @@ Bulls consistently sell for more than cows at all ages. Beef breeds (Angus, Limo
 | **Water Buffalo** | Cow | 150 | 1,500 | 1,500 | 1,000 |
 | | Bull | 200 | 1,750 | 2,000 | 1,250 |
 
-*These are typical prices for an average, healthy animal. Actual prices vary widely - well-bred healthy animals sell for significantly more, while sick or poor-quality animals can sell for far less.*
+*These are typical prices for an average, healthy animal. Actual prices vary widely - well-bred healthy animals sell for significantly more, poor-quality animals can sell for far less, and a sick animal is worth less while sick.*
 
 ### What Affects Sell Price
 

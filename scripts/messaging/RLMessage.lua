@@ -252,6 +252,18 @@ RLMessage = {
 		["title"] = "aiManager",
 		["importance"] = 3
 	},
+	-- Herdsman move sick-skip (EPP butcher destinations): animals showing symptoms stay in the pen.
+	-- Same shape as the age-skip pair: count-only, INDIVIDUAL, beside or instead of the moved message.
+	["AI_MANAGER_MOVE_SKIPPED_SICK_SINGLE"] = {
+		["text"] = "aiManager_moveSkippedSick_single",
+		["title"] = "aiManager",
+		["importance"] = 3
+	},
+	["AI_MANAGER_MOVE_SKIPPED_SICK_MULTIPLE"] = {
+		["text"] = "aiManager_moveSkippedSick_multiple",
+		["title"] = "aiManager",
+		["importance"] = 3
+	},
 	-- Daily summary message types
 	["DAILY_BIRTHS_SUMMARY"] = {
 		["text"] = "dailyBirthsSummary",

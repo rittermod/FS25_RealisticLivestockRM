@@ -6,7 +6,7 @@
     controller fires - mutation parity, never a new event class.
 
     Moves run through the legacy AnimalScreenTrailerFarm bulk filter pipeline: per-animal
-    AnimalMoveEvent.validate, a destination EPP age-gate, then a running-count capacity
+    AnimalMoveEvent.validate, the destination EPP sick and age gates, then a running-count capacity
     check, building a survivor list; only survivors are dispatched.
 
     Broadcast invariant: exactly one MOVED_ANIMALS_* RLMessage per move. The server
@@ -17,6 +17,9 @@
 local Log = RmLogging.getLogger("RLRM")
 
 RLAnimalMoveService = {}
+
+--- Client-only code: a sick animal refused for a butcher before dispatch; never sent on the wire.
+RLAnimalMoveService.ERROR_ANIMAL_SICK = -2
 
 --- Error code to i18n key mapping for move operations.
 --- MOVE_ERROR_INVALID_CLUSTER maps to the generic "not supported" text: there is no
@@ -125,7 +128,7 @@ end
 
 
 --- Filter a single-type animal list to the subset that may move: skip a nil subtype, run
---- the validator, apply the destination age-gate for an EPP, then a running-count capacity
+--- the validator, apply the destination sick and age gates for an EPP, then a running-count capacity
 --- check that rejects unless free slots STRICTLY exceed the survivors queued so far.
 --- @param source table Move source endpoint (pen/trailer/EPP placeable)
 --- @param target table Move destination endpoint (pen/trailer/EPP placeable); capacity is read from it
@@ -155,7 +158,11 @@ function RLAnimalMoveService.filterMovableAnimals(source, target, animals, owner
             else
                 local rejected = false
 
-                if eppTypeData ~= nil then
+                if eppTypeData ~= nil and not RLDiseaseSaleGate.check(animal) then
+                    if firstErrorCode == nil then firstErrorCode = RLAnimalMoveService.ERROR_ANIMAL_SICK end
+                    Log:debug("RLAnimalMoveService.filterMovableAnimals: '%s' rejected, sick (butcher destination)", tostring(label))
+                    rejected = true
+                elseif eppTypeData ~= nil then
                     local age = animal.age or 0
                     local minAge = eppTypeData.minimumAge or 0
                     local maxAge = eppTypeData.maximumAge or 60
@@ -357,6 +364,10 @@ function RLAnimalMoveService.getErrorText(errorCode)
     if errorCode == RLAnimalEventRequest.TIMEOUT_CODE then
         Log:trace("RLAnimalMoveService.getErrorText: synthetic timeout code -> rl_ui_tradeRequestTimeout")
         return g_i18n:getText("rl_ui_tradeRequestTimeout")
+    end
+    if errorCode == RLAnimalMoveService.ERROR_ANIMAL_SICK then
+        Log:trace("RLAnimalMoveService.getErrorText: client-only sick code -> rl_ui_moveErrorSick")
+        return g_i18n:getText("rl_ui_moveErrorSick")
     end
     local key = RLAnimalMoveService.ERROR_CODE_MAPPING[errorCode]
     if key ~= nil then

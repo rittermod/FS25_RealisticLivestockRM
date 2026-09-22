@@ -8,7 +8,7 @@ Realistic Livestock RM has diseases that can infect, spread between, and kill yo
 
 ## Disease Summary
 
-| Disease | Species | Spread | Fatal | Treatable | Sell Price Impact |
+| Disease | Species | Spread | Fatal | Treatable | Value While Sick |
 |---------|---------|--------|-------|-----------|-------------------|
 | **Mastitis** | Cow, Goat | Slow | No | Yes ($200) | Small reduction |
 | **CVM** | Cow only | Genetic | Almost always (calves) | No | Moderate reduction |
@@ -72,9 +72,10 @@ everywhere else:
   its normal section and matches "Healthy" too. It does carry the grey DNA icon, so you can spot
   carriers from the list rather than opening each detail panel.
 
-This also applies to herdsman rules built on the disease filter: a "sell animals with any
-disease" rule sells only actively sick animals - it no longer selects cured animals or CVM
-carriers. The Cull button is only for animals showing symptoms; to remove a carrier, sell it.
+This also applies to herdsman rules built on the disease filter: a rule for animals with any
+disease selects only actively sick animals - never cured animals or CVM carriers. A sick animal
+cannot be sold, so a herdsman sell rule for animals with any disease sells none, and in mark mode
+marks none. The Cull button is only for animals showing symptoms; to remove a carrier, sell it.
 
 > **Multiplayer note:** on a client, a cure - like any other disease change - shows moments after
 > the server's daily update, when the pen syncs. The server always has the correct state.
@@ -100,6 +101,9 @@ confirmation first. A culled animal leaves the pen at once and stops spreading t
 next day. It pays 33% of the animal's current sale price, which the disease has already lowered; a
 chicken returns nothing.
 
+A sick animal cannot be sold or taken to a butcher - by you or by the herdsman - so treat it or cull
+it. One on a trailer has to be unloaded into a pen first.
+
 ---
 
 ## Mastitis
@@ -121,7 +125,7 @@ Mastitis is an udder infection that stops all milk production. It only affects a
 | Impact | Effect |
 |--------|--------|
 | Milk / Goat milk | **Completely stopped** |
-| Sell price | Small reduction |
+| Value while sick | Small reduction |
 
 ### Management Tips
 
@@ -169,7 +173,7 @@ CVM carriers appear healthy and suffer no ill effects. In fact, **CVM carrier co
 
 **Affects:** Cows, Sheep, Goats, Pigs
 
-Foot & Mouth is the most widespread disease, affecting three species, and the only one that reliably spreads through a herd. An infected animal never recovers on its own, so it keeps infecting pen mates for as long as it stays sick - treat it or sell it. Fatality is highest in the first months after infection.
+Foot & Mouth is the most widespread disease, affecting three species, and the only one that reliably spreads through a herd. An infected animal never recovers on its own, so it keeps infecting pen mates for as long as it stays sick - treat it or cull it. Fatality is highest in the first months after infection.
 
 | Parameter | Value |
 |-----------|-------|
@@ -185,7 +189,7 @@ Foot & Mouth is the most widespread disease, affecting three species, and the on
 |--------|--------|
 | Milk (cow) | **Severely reduced** (about two-thirds less) |
 | Wool / Goat milk | Slightly reduced |
-| Sell price | **Major reduction** |
+| Value while sick | **Major reduction** |
 
 ### Fatality Over Time
 
@@ -208,7 +212,7 @@ Foot & Mouth is the most widespread disease, affecting three species, and the on
   to die
 - No natural recovery means untreated animals stay sick indefinitely
 - Milk drops severely - devastating for dairy operations
-- Sell price is greatly reduced - selling infected animals is a significant loss
+- An infected animal cannot be sold, and its value - which sets what culling pays - is greatly reduced while it is sick
 - 24-month immunity after recovery provides long-term protection
 - Can spread across cows, sheep, and pigs in adjacent pens (same husbandry)
 
@@ -234,7 +238,7 @@ PED is devastating to young piglets - almost always fatal in newborns. Older pig
 |--------|--------|
 | Liquid manure | **Drastically increased** (diarrhea symptom) |
 | Manure | Severely reduced |
-| Sell price | Significant reduction |
+| Value while sick | Significant reduction |
 
 ### Fatality Over Time
 
@@ -281,7 +285,7 @@ Avian Flu has **no treatment**. Egg production drops to about 40% of normal whil
 | Impact | Effect |
 |--------|--------|
 | Eggs | Drops to about 40% of normal while a bird is sick |
-| Sell price | Severe reduction |
+| Value while sick | Severe reduction |
 
 ### Fatality Over Time
 
@@ -303,7 +307,7 @@ Avian Flu has **no treatment**. Egg production drops to about 40% of normal whil
 ### Management Tips
 
 - There is no treatment - prevention is the only strategy
-- Sell infected birds quickly to limit spread and recover some value
+- Sick birds cannot be sold - cull them from the Diseases dialog to stop them spreading it
 - Keep smaller flocks in separate pens to limit outbreak damage
 - Survivors gain 24-month immunity - while it lasts they cannot catch avian flu again, cannot die of it, and stop spreading it from the month after they recover, though birds hatched or bought later have no such protection
 - Chickens that survive gain immunity and will be your most valuable layers
@@ -330,13 +334,13 @@ Colic is a painful digestive condition. It is not caught from other horses - eac
 |--------|--------|
 | Manure | Reduced |
 | Growth | Slower weight gain in a growing horse |
-| Sell price | Major reduction |
+| Value while sick | Major reduction |
 
 ### Management Tips
 
 - Start treatment as soon as colic shows - a treated horse dies less often than an untreated one
 - If a course does not cure it, start another - each course is a fresh chance
-- A sick horse sells for much less, so there is little to gain from selling it mid-illness
+- A sick horse cannot be sold until it recovers
 - After recovery, the horse cannot get colic again for 6 months
 
 ---

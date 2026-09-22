@@ -1196,39 +1196,24 @@ function RLMenuSellFrame:clearPendingSellState()
 end
 
 
---- Trailer-at-dealer sell flow: filter survivors and confirm the SURVIVOR count and
---- price before the dialog. The transport fee is forced to 0 - there is no transport leg.
+--- Leave refused animals out of a sale and confirm the survivors; only sick omissions get a count line.
+--- @param source table The sell source (the selected pen, or the held trailer)
 --- @param animals table Array of cluster refs the user selected (single = {animal})
-function RLMenuSellFrame:startTrailerSellFlow(animals)
-    local trailer = self:getTrailerDealerContext()
-    if trailer == nil then
-        Log:warning("RLMenuSellFrame:startTrailerSellFlow: trailer context resolved nil, clearing pending state")
-        self:clearPendingSellState()
-        return
-    end
-
+--- @param isTrailer boolean True on the trailer-at-dealer path (no transport fee)
+function RLMenuSellFrame:startSellFlow(source, animals, isTrailer)
     local originalCount = (animals ~= nil) and #animals or 0
-
-    -- The validate adapter gates on getCanBeSold - exact parity with the
-    -- authoritative server leg (AnimalSellEvent:run gates per-animal on
-    -- getCanBeSold + permission only). The headless suite injects a mock instead.
-    local validate = function(_source, animal)
-        if animal ~= nil and animal.getCanBeSold ~= nil and not animal:getCanBeSold() then
-            return AnimalSellEvent.SELL_ERROR_CANNOT_BE_SOLD
-        end
-        return nil
+    local result = RLAnimalSellService.filterSellableAnimals(source, animals, RLAnimalSellService.validateForSale)
+    local validCount = #result.valid
+    local sickCount = 0
+    for _, r in ipairs(result.rejected) do
+        if r.reason == RLAnimalSellService.ERROR_ANIMAL_SICK then sickCount = sickCount + 1 end
     end
 
-    local result = RLAnimalSellService.filterSellableAnimals(trailer, animals, validate)
-    local validCount    = #result.valid
-    local rejectedCount  = #result.rejected
-
-    Log:debug("RLMenuSellFrame:startTrailerSellFlow: trailer='%s' %d valid, %d rejected (of %d), firstErrorCode=%s",
-        tostring(trailer.getName and trailer:getName()),
-        validCount, rejectedCount, originalCount, tostring(result.firstErrorCode))
+    Log:debug("RLMenuSellFrame:startSellFlow: source='%s' trailer=%s %d valid, %d sick-rejected, %d other-rejected (of %d)",
+        tostring(source ~= nil and source.getName ~= nil and source:getName()), tostring(isTrailer),
+        validCount, sickCount, #result.rejected - sickCount, originalCount)
 
     if validCount == 0 then
-        -- Specific error when a validate gate fired (legacy parity); generic otherwise.
         if result.firstErrorCode ~= nil then
             InfoDialog.show(RLAnimalSellService.getErrorText(result.firstErrorCode))
         else
@@ -1238,32 +1223,41 @@ function RLMenuSellFrame:startTrailerSellFlow(animals)
         return
     end
 
-    if rejectedCount > 0 then
-        Log:warning("RLMenuSellFrame:startTrailerSellFlow: %d of %d animals skipped (firstErrorCode=%s)",
-            rejectedCount, originalCount, tostring(result.firstErrorCode))
-    end
+    -- Priced over the survivors only, so the price sent is what is sold.
+    local price, fee = RLAnimalSellService.computeBulkTotal(result.valid)
+    if isTrailer then fee = 0 end
 
-    -- Gross survivor price; fee forced 0 (no transport leg). computeBulkTotal's
-    -- FIRST return is the sum of getSellPrice over the survivors.
-    local grossPrice = RLAnimalSellService.computeBulkTotal(result.valid)
-
-    self.pendingSellAnimals   = result.valid
-    self.pendingSellPrice     = grossPrice
-    self.pendingSellFee       = 0
-    self.pendingSellIsTrailer = true
-    self.pendingSellWasBulk   = originalCount > 1
-
-    -- Confirm the ACTUAL survivors the client will dispatch (the server remains
-    -- authoritative and re-validates at run time). Reuses the existing builders -
-    -- no new i18n key.
     local confirmText
     if validCount == 1 then
-        confirmText = RLAnimalSellService.buildSingleConfirmationText(result.valid[1], grossPrice, 0)
+        confirmText = RLAnimalSellService.buildSingleConfirmationText(result.valid[1], price, fee)
     else
-        confirmText = RLAnimalSellService.buildBulkConfirmationText(validCount, grossPrice, 0)
+        confirmText = RLAnimalSellService.buildBulkConfirmationText(validCount, price, fee)
+    end
+    if sickCount > 0 then
+        confirmText = confirmText .. "\n" .. RLAnimalSellService.buildSickSkippedLine(sickCount)
     end
 
+    self.pendingSellAnimals   = result.valid
+    self.pendingSellPrice     = price
+    self.pendingSellFee       = fee
+    self.pendingSellIsTrailer = isTrailer == true
+    self.pendingSellWasBulk   = originalCount > 1
+
     YesNoDialog.show(self.onSellConfirmed, self, confirmText, g_i18n:getText("ui_attention"))
+end
+
+
+--- Trailer-at-dealer sell flow: the held trailer is the source and there is no transport fee.
+--- @param animals table Array of cluster refs the user selected (single = {animal})
+function RLMenuSellFrame:startTrailerSellFlow(animals)
+    local trailer = self:getTrailerDealerContext()
+    if trailer == nil then
+        Log:warning("RLMenuSellFrame:startTrailerSellFlow: trailer context resolved nil, clearing pending state")
+        self:clearPendingSellState()
+        return
+    end
+
+    self:startSellFlow(trailer, animals, true)
 end
 
 
@@ -1288,18 +1282,9 @@ function RLMenuSellFrame:onClickSell()
         return
     end
 
-    local price, fee, _ = RLAnimalSellService.computeSellPrice(animal)
-    local confirmText = RLAnimalSellService.buildSingleConfirmationText(animal, price, fee)
-
-    Log:debug("RLMenuSellFrame:onClickSell: single sell for farmId=%s uniqueId=%s price=%.0f fee=%.0f",
-        tostring(animal.farmId), tostring(animal.uniqueId), price, fee)
-
-    -- Store pending state for confirmation callback
-    self.pendingSellAnimals = { animal }
-    self.pendingSellPrice = price
-    self.pendingSellFee = fee
-
-    YesNoDialog.show(self.onSellConfirmed, self, confirmText, g_i18n:getText("ui_attention"))
+    Log:debug("RLMenuSellFrame:onClickSell: own-pen single sell for farmId=%s uniqueId=%s",
+        tostring(animal.farmId), tostring(animal.uniqueId))
+    self:startSellFlow(self.selectedHusbandry, { animal }, false)
 end
 
 
@@ -1336,18 +1321,8 @@ function RLMenuSellFrame:onClickSellSelected()
         return
     end
 
-    local totalPrice, totalFee, _, count = RLAnimalSellService.computeBulkTotal(animals)
-    local confirmText = RLAnimalSellService.buildBulkConfirmationText(count, totalPrice, totalFee)
-
-    Log:debug("RLMenuSellFrame:onClickSellSelected: bulk sell %d animals, price=%.0f fee=%.0f",
-        count, totalPrice, totalFee)
-
-    -- Store pending state for confirmation callback
-    self.pendingSellAnimals = animals
-    self.pendingSellPrice = totalPrice
-    self.pendingSellFee = totalFee
-
-    YesNoDialog.show(self.onSellConfirmed, self, confirmText, g_i18n:getText("ui_attention"))
+    Log:debug("RLMenuSellFrame:onClickSellSelected: own-pen bulk sell, %d animals checked", #animals)
+    self:startSellFlow(self.selectedHusbandry, animals, false)
 end
 
 
@@ -1400,9 +1375,9 @@ function RLMenuSellFrame:onSellConfirmed(clickYes)
         self.dispatchedTrailer = nil
     end
 
-    -- Applied ONLY on an accepted dispatch, so a rejected sale keeps its selection. The
-    -- trailer path keys off the ORIGINAL bulk flag, since survivors may be down to one.
-    local clearAll = isTrailer and wasBulk or (not isTrailer and #animals > 1)
+    -- Applied ONLY on an accepted dispatch, so a rejected sale keeps its selection. Both
+    -- paths key off the ORIGINAL bulk flag, since survivors may be down to one.
+    local clearAll = wasBulk
 
     self:clearPendingSellState()
 

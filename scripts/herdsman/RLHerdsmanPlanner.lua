@@ -7,7 +7,8 @@
 -- - sequential state threading across rules - is isolated here in one headless module: data in,
 -- data out. It reads no `g_*` and MUST NOT mutate `rules`, `ctx` or any animal / dewar table. The
 -- only engine calls are the REAL primitives reached through the injected ctx and the passed-in
--- Animal: the price path, the deterministic naming list, and the AI eligibility predicate. The
+-- Animal: the price path, the deterministic naming list, the AI eligibility predicate, and the
+-- display predicate the sale gate reads. The
 -- animal mutations and event dispatch belong to RLHerdsmanExecutor.
 --
 -- ctx contract (the day-tick builds it in-game; tests fabricate it from real Animals):
@@ -292,9 +293,10 @@ end
 ---      emit an action when at least one animal was selected.
 ---
 --- Per-operation selection:
----   * Sell: shortlist = filter-match AND `getCanBeSold()`; price DESC with a toKey tie-break; take
----     the top `maxAnimals`; CLAIM the selected set globally, mark or exec alike; an executed sell
----     credits its proceeds to the farm ledger and its count to the husbandry's slot ledger.
+---   * Sell: shortlist = filter-match AND `getCanBeSold()` AND `RLDiseaseSaleGate.check`; price DESC
+---     with a toKey tie-break; take the top `maxAnimals`; CLAIM the selected set globally, mark or
+---     exec alike; an executed sell credits its proceeds to the farm ledger and its count to the
+---     husbandry's slot ledger.
 ---   * Buy: budget resolved against the running ledger (fail closed on bad params or a nil balance);
 ---     shortlist = filter-match AND affordable at the buy markup; price ASC; consume cheapest until
 ---     the next price exceeds the remaining budget, `maxAnimals`, or the free slots; claim from the
@@ -714,15 +716,21 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                         if h ~= nil then
                             local pool = ownedPool(uid)
                             local candidates = #pool
-                            -- Shortlist = filter-matched AND sellable; a nil getCanBeSold counts as a
-                            -- skip. S is the pre-cap shortlist size, the wage's `min(S, n*5)` operand.
+                            -- Shortlist = filter-matched AND sellable AND not sick; a nil getCanBeSold
+                            -- counts as a skip. It feeds exec and mark alike, so a sick animal is never
+                            -- marked either. S is the pre-cap shortlist size, the wage's `min(S, n*5)` operand.
                             local matched = matchFromPool(pool, filter, false, claimed)
                             local shortlist = {}
                             for _, a in ipairs(matched) do
                                 if not isPriceableAnimal(a, true) then
                                     warnNotPriceable(a)
                                 elseif a:getCanBeSold() then
-                                    shortlist[#shortlist + 1] = { animal = a, price = priceOf(a, SELL_MARKUP), key = animalKey(a) }
+                                    if RLDiseaseSaleGate.check(a) then
+                                        shortlist[#shortlist + 1] = { animal = a, price = priceOf(a, SELL_MARKUP), key = animalKey(a) }
+                                    else
+                                        Log:debug("%s rule=%s op=sell husbandry=%s: excluded sick animal uniqueId=%s farmId=%s",
+                                            LOG_PREFIX, tostring(rule.id), tostring(uid), tostring(a.uniqueId), tostring(a.farmId))
+                                    end
                                 end
                             end
                             local S = #shortlist

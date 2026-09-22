@@ -59,7 +59,7 @@ Chicken prices are low and identical for hens and roosters:
 | Newborn | $3 | $2 |
 | Adult (36 mo) | $30 | $25 |
 
-*Actual sell prices vary - well-bred healthy chickens sell for more, while sick birds sell for less. Even at peak value chickens are worth very little. Their value is in egg production.*
+*Actual sell prices vary - well-bred healthy chickens sell for more, and a sick bird is worth less while sick. Even at peak value chickens are worth very little. Their value is in egg production.*
 
 ### What Affects Sell Price
 
@@ -153,7 +153,7 @@ A successful hatch is typically around 5 chicks, and can reach up to 12 from a h
 
 2. **Peak production is 12-48 months.** Buy young hens and plan to replace them before they hit 48 months (4 years) when production starts declining.
 
-3. **Avian Flu is devastating.** No treatment exists. Sell infected birds quickly to limit spread and recover some value. Keeping smaller flocks in separate pens also limits outbreak damage.
+3. **Avian Flu is devastating.** No treatment exists, and sick birds cannot be sold - cull them from the Diseases dialog to limit spread. Keeping smaller flocks in separate pens also limits outbreak damage.
 
 4. **Cheap but productive.** At $3 per chick and up to 9 eggs/day at peak, chickens have the best return-on-investment for small farms. The initial cost is negligible.
 

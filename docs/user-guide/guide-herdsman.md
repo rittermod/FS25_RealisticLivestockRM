@@ -39,8 +39,8 @@ So selling happens before buying - a "sell old cows, then buy young ones" pair d
 
 ## The operations
 
-- **Sell** - sells matching animals back to the dealer.
-- **Move** - moves matching animals to another of your pens, or delivers them to a **butcher** (an Extended Production Point). Animals outside the butcher's accepted age range are skipped and reported.
+- **Sell** - sells matching animals back to the dealer. It never sells or marks an animal showing symptoms of a disease - treat or cull those yourself.
+- **Move** - moves matching animals to another of your pens, or delivers them to a **butcher** (an Extended Production Point). Animals outside the butcher's accepted age range, and sick animals, are skipped and reported.
 - **Buy** - buys animals from the dealer into the chosen pen, up to a daily budget or count.
 - **Castrate** - castrates matching males. Not available for chickens.
 - **Naming** - gives unnamed animals names, either at random or alphabetically. No filter needed.

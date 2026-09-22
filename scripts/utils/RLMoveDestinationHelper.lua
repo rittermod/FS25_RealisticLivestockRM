@@ -112,7 +112,12 @@ function RLMoveDestinationHelper.buildMoveValidationResult(animals, destination,
         local age = animal.age or 0
         local rejected = false
 
-        if destination.isEPP and destination.minAge ~= nil and destination.maxAge ~= nil then
+        -- Keyed on isEPP alone, so a butcher missing an age bound still refuses a sick animal.
+        if destination.isEPP and not RLDiseaseSaleGate.check(animal) then
+            table.insert(result.rejected, { animal = animal, reason = "SICK" })
+            Log:trace("  rejected '%s': SICK", tostring(animal.name or animal.uniqueId or "?"))
+            rejected = true
+        elseif destination.isEPP and destination.minAge ~= nil and destination.maxAge ~= nil then
             local minAge = destination.minAge
             local maxAge = destination.maxAge
 

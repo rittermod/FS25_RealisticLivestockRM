@@ -166,6 +166,10 @@
         <text name="rl_ui_moveBulkConfirmTitle" text="Verschiebe Tiere"/>
         <text name="rl_ui_moveErrorNoPermission" text="Du hast keine Erlaubnis Tiere hierhin zu verschieben."/>
         <text name="rl_ui_moveErrorNotSupported" text="Dieser Zielort unterstützt diese Tierart nicht."/>
+        <text name="rl_ui_sellErrorSick" text="Sick animals cannot be sold. Treat or cull them from the Diseases dialog - an animal on a trailer must be unloaded into a pen first."/>
+        <text name="rl_ui_sellSkippedSick" text="%d sick animal(s) left out: sick animals cannot be sold." tag="format"/>
+        <text name="rl_ui_moveErrorSick" text="Sick animals cannot go to the butcher."/>
+        <text name="rl_ui_moveRejectedSick" text="%d animal(s) skipped: sick animals cannot go to the butcher" tag="format"/>
         <text name="rl_ui_moveErrorNoSpace" text="Nicht genug Platz am Zielort."/>
         <text name="rl_ui_tradeRequestInProgress" text="Es wird bereits ein Handel ausgeführt. Bitte warten."/>
         <text name="rl_ui_tradeRequestTimeout" text="Der Server hat nicht geantwortet. Bitte versuche es erneut."/>
@@ -566,6 +570,8 @@
         <text name="rl_message_aiManager_mark_move_multiple" text="Herdsman marked %s animals for moving"/>
         <text name="rl_message_aiManager_moveSkippedAge_single" text="Herdsman skipped 1 animal (wrong age for the butcher)"/>
         <text name="rl_message_aiManager_moveSkippedAge_multiple" text="Herdsman skipped %s animals (wrong age for the butcher)"/>
+        <text name="rl_message_aiManager_moveSkippedSick_single" text="Herdsman skipped 1 animal (sick animals cannot go to the butcher)"/>
+        <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
 

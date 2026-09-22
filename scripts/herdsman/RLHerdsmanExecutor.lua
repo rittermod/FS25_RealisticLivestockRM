@@ -42,8 +42,10 @@
 --   amountSpent, dispatched, skipReason }. `dispatched` is true iff the broadcast or direct mutation
 --   was applied; `skipReason` is nil when dispatched, else one of "no-space" | "no-money" |
 --   "mark-mode" | "missing-placeable" | "missing-dest" | "bad-data" | "not-in-husbandry" |
---   "defer-failed". Every skipReason except "mark-mode", "no-space" and "no-money" means no wage was
---   charged. On a guarded direct-mutation leg `count` is the count ACTUALLY mutated or marked and
+--   "defer-failed" | "all-age-ineligible" | "all-sick". The wage follows each leg's chargeWage, not
+--   the reason: "missing-dest" and "defer-failed" never charge, "bad-data" and "missing-placeable"
+--   charge only where the leg says so (a validate rejection does, a data-skip does not), and every other
+--   reason charges. On a guarded direct-mutation leg `count` is the count ACTUALLY mutated or marked and
 --   `skippedCount` the membership-skip count; the unguarded legs report the planned count with
 --   skippedCount 0. An exec leg whose animals ALL skip membership reports "not-in-husbandry"; a mark
 --   leg whose animals all skip keeps "mark-mode", whose identity the message layer depends on.
@@ -321,8 +323,8 @@ function RLHerdsmanExecutor._executeOne(action, ctx, summary, wageFarmOrder)
     -- the wage is charged independently of dispatch. A guarded direct-mutation leg adds a 4th value
     -- (the count ACTUALLY mutated or marked) and a 5th (its own membership-skip count), both nil from
     -- the unguarded legs. `extra` is the SCALING-FREE row channel: only the move EPP leg returns it,
-    -- a { movedCount, skippedAge } table merged onto the row without touching actualCount, so its
-    -- wage stays planned.
+    -- a { movedCount, skippedAge, skippedSick } table merged onto the row without touching
+    -- actualCount, so its wage stays planned.
     local op = action.operation
     local chargeWage, dispatched, skipReason, actualCount, skippedCount, extra
     if op == "sell" then
@@ -356,10 +358,12 @@ function RLHerdsmanExecutor._executeOne(action, ctx, summary, wageFarmOrder)
     end
 
     -- movedCount = animals dispatched to the butcher, falling back to count for husbandry rows;
-    -- skippedAge = animals filtered out for age. Husbandry-move and non-move rows carry no extra.
+    -- skippedAge / skippedSick = animals filtered out for age / for showing symptoms. Husbandry-move
+    -- and non-move rows carry no extra.
     if type(extra) == "table" then
         result.movedCount = extra.movedCount
         result.skippedAge = extra.skippedAge
+        result.skippedSick = extra.skippedSick
     end
 
     if chargeWage then
@@ -925,9 +929,11 @@ end
 ---      ANIMAL_NOT_SUPPORTED with the wage charged.
 ---   2. age filter over action.animals against typeData.minimumAge/.maximumAge; out-of-window animals
 ---      are skipped-for-age.
----   3. eligible == 0 -> no dispatch, skipReason "all-age-ineligible", wage charged.
+---   2b. sick filter over the age-eligible (RLDiseaseSaleGate); a sick animal is skipped-for-sickness.
+---   3. eligible == 0 -> no dispatch, skipReason "all-sick" when any was sick else
+---      "all-age-ineligible", wage charged.
 ---   4. space/subtype validate on the ELIGIBLE count; a reject skips the WHOLE dispatch with the wage
----      charged, and the skipped-age count still surfaces.
+---      charged, and both skip counts still surface.
 ---   5. dispatch the eligible only, with the EPP PLACEABLE as targetObject.
 --- Counts ride the SCALING-FREE extra channel, so the wage stays planned.
 --- @see RLHerdsmanExecutor._executeOne for the merge.
@@ -943,7 +949,7 @@ end
 ---@return string|nil skipReason
 ---@return nil actualCount always nil (the EPP move never scales the wage)
 ---@return nil skippedCount always nil
----@return table extra { movedCount, skippedAge }
+---@return table extra { movedCount, skippedAge, skippedSick }
 function RLHerdsmanExecutor._doMoveToEPP(action, ctx, placeable, dest, pp, farmId, count)
     -- 1. The source pen is single-type, and its type index keys the butcher's animalsTypeData.
     local typeIndex = placeable.getAnimalTypeIndex ~= nil and placeable:getAnimalTypeIndex() or nil
@@ -970,11 +976,34 @@ function RLHerdsmanExecutor._doMoveToEPP(action, ctx, placeable, dest, pp, farmI
     Log:info("%s rule=%s op=move husbandry=%s farm=%s: butcher age filter (window %d-%d) -> %d eligible, %d skipped-age of %d",
         LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), minAge, maxAge, #eligible, skippedAge, count)
 
-    -- 3. All eligible filtered out: no dispatch, wage charged, skipped-age still surfaced.
+    -- 2b. The sick gate over the age-eligible only, so skippedAge stays exactly the age count.
+    local skippedSick = 0
+    if #eligible > 0 then
+        local healthy = {}
+        for _, animal in ipairs(eligible) do
+            if RLDiseaseSaleGate.check(animal) then
+                healthy[#healthy + 1] = animal
+            else
+                skippedSick = skippedSick + 1
+                Log:debug("%s rule=%s op=move husbandry=%s farm=%s: skipping sick animal uniqueId=%s for the butcher",
+                    LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), tostring(animal.uniqueId))
+            end
+        end
+        eligible = healthy
+        Log:debug("%s rule=%s op=move husbandry=%s farm=%s: butcher sick filter -> %d eligible, %d skipped-sick",
+            LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), #eligible, skippedSick)
+    end
+
+    -- 3. All eligible filtered out: no dispatch, wage charged, both skip counts still surfaced.
     if #eligible == 0 then
+        if skippedSick > 0 then
+            Log:warning("%s rule=%s op=move husbandry=%s farm=%s: no animal left for the butcher, %d sick - dispatch skipped (wage charged)",
+                LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), skippedSick)
+            return true, false, "all-sick", nil, nil, { movedCount = 0, skippedAge = skippedAge, skippedSick = skippedSick }
+        end
         Log:warning("%s rule=%s op=move husbandry=%s farm=%s: all %d animal(s) age-ineligible for the butcher - dispatch skipped (wage charged)",
             LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), count)
-        return true, false, "all-age-ineligible", nil, nil, { movedCount = 0, skippedAge = skippedAge }
+        return true, false, "all-age-ineligible", nil, nil, { movedCount = 0, skippedAge = skippedAge, skippedSick = 0 }
     end
 
     -- 4. The representative subtype is the FIRST ELIGIBLE animal's, not action.animals[1], which
@@ -989,17 +1018,17 @@ function RLHerdsmanExecutor._doMoveToEPP(action, ctx, placeable, dest, pp, farmI
     if errorCode == AnimalMoveEvent.MOVE_ERROR_NOT_ENOUGH_SPACE then
         Log:warning("%s rule=%s op=move husbandry=%s farm=%s: butcher has no room for %d eligible (ALL-OR-NOTHING) - dispatch skipped (wage charged)",
             LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), #eligible)
-        return true, false, "no-space", nil, nil, { movedCount = 0, skippedAge = skippedAge }
+        return true, false, "no-space", nil, nil, { movedCount = 0, skippedAge = skippedAge, skippedSick = skippedSick }
     elseif errorCode ~= nil then
         Log:warning("%s rule=%s op=move husbandry=%s farm=%s: butcher validate rejected (errorCode=%s) - dispatch skipped (wage charged)",
             LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), tostring(errorCode))
-        return true, false, "bad-data", nil, nil, { movedCount = 0, skippedAge = skippedAge }
+        return true, false, "bad-data", nil, nil, { movedCount = 0, skippedAge = skippedAge, skippedSick = skippedSick }
     end
 
     -- 5. Dispatch the eligible only. targetObject is the EPP PLACEABLE, an MP-stable node object; the
     -- event unwraps the production point and delivers via the shipped player-path primitive.
     ctx.server:broadcastEvent(AIAnimalMoveEvent.new(placeable, dest, eligible), true)
-    Log:debug("%s rule=%s op=move husbandry=%s farm=%s: broadcast AIAnimalMoveEvent to butcher dest=%s eligible=%d skippedAge=%d",
-        LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), tostring(action.destinationHusbandry), #eligible, skippedAge)
-    return true, true, nil, nil, nil, { movedCount = #eligible, skippedAge = skippedAge }
+    Log:debug("%s rule=%s op=move husbandry=%s farm=%s: broadcast AIAnimalMoveEvent to butcher dest=%s eligible=%d skippedAge=%d skippedSick=%d",
+        LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), tostring(action.destinationHusbandry), #eligible, skippedAge, skippedSick)
+    return true, true, nil, nil, nil, { movedCount = #eligible, skippedAge = skippedAge, skippedSick = skippedSick }
 end

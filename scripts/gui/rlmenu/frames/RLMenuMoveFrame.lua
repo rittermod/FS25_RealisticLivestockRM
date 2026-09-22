@@ -959,13 +959,16 @@ function RLMenuMoveFrame:onMoveDestinationSelected(entry)
         self.pendingMoveAnimals, entry, animalTypeIndex)
 
     -- Count rejections by reason
-    local ageTooYoung, ageTooOld, noCapacity = 0, 0, 0
+    local ageTooYoung, ageTooOld, noCapacity, sick = 0, 0, 0, 0
     for _, r in ipairs(validationResult.rejected) do
         if r.reason == "AGE_TOO_YOUNG" then ageTooYoung = ageTooYoung + 1
         elseif r.reason == "AGE_TOO_OLD" then ageTooOld = ageTooOld + 1
+        elseif r.reason == "SICK" then sick = sick + 1
         elseif r.reason == "NO_CAPACITY" then noCapacity = noCapacity + 1
         end
     end
+    Log:debug("RLMenuMoveFrame:onMoveDestinationSelected: rejected age=%d sick=%d capacity=%d",
+        ageTooYoung + ageTooOld, sick, noCapacity)
 
     -- All rejected: show reason and abort
     if #validationResult.valid == 0 then
@@ -973,6 +976,9 @@ function RLMenuMoveFrame:onMoveDestinationSelected(entry)
         if ageTooYoung + ageTooOld > 0 and entry.minAge ~= nil and entry.maxAge ~= nil then
             table.insert(lines, string.format(g_i18n:getText("rl_ui_moveRejectedAge"),
                 ageTooYoung + ageTooOld, entry.minAge, entry.maxAge))
+        end
+        if sick > 0 then
+            table.insert(lines, string.format(g_i18n:getText("rl_ui_moveRejectedSick"), sick))
         end
         if noCapacity > 0 then
             table.insert(lines, string.format(g_i18n:getText("rl_ui_moveRejectedCapacity"), noCapacity))
@@ -995,6 +1001,9 @@ function RLMenuMoveFrame:onMoveDestinationSelected(entry)
         if ageTooYoung + ageTooOld > 0 and entry.minAge ~= nil and entry.maxAge ~= nil then
             table.insert(confirmLines, string.format(g_i18n:getText("rl_ui_moveRejectedAge"),
                 ageTooYoung + ageTooOld, entry.minAge, entry.maxAge))
+        end
+        if sick > 0 then
+            table.insert(confirmLines, string.format(g_i18n:getText("rl_ui_moveRejectedSick"), sick))
         end
         if noCapacity > 0 then
             table.insert(confirmLines, string.format(g_i18n:getText("rl_ui_moveRejectedCapacity"), noCapacity))

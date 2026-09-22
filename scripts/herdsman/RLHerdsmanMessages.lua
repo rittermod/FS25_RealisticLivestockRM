@@ -123,8 +123,8 @@ RLHerdsmanMessages.ID_FAMILY       = ID_FAMILY
 --- record.count stays numeric.
 ---
 --- Independently of that chain, a move row (mark=false) with skippedAge>0 ALSO emits an
---- AI_MANAGER_MOVE_SKIPPED_AGE_* record regardless of `dispatched` - it can accompany the moved
---- record or stand alone.
+--- AI_MANAGER_MOVE_SKIPPED_AGE_* record, and one with skippedSick>0 an AI_MANAGER_MOVE_SKIPPED_SICK_*
+--- record after it, regardless of `dispatched` - each can accompany the moved record or stand alone.
 ---@see RLHerdsmanExecutor._doSell
 ---@see RLHerdsmanExecutor._doBuy
 ---@param results table|nil executor summary.results (array of result rows)
@@ -227,6 +227,22 @@ function RLHerdsmanMessages.buildMessages(results, formatMoney)
                         args        = single and {} or { string.format("%d", sa) },
                         mark        = false,
                         count       = sa,
+                        warn        = nil,
+                    }
+                end
+
+                -- Skipped-for-sickness, same shape, after the age record when both fire.
+                local skippedSick = tonumber(row.skippedSick)
+                if skippedSick ~= nil and skippedSick >= 1 then
+                    local ss = math.floor(skippedSick)
+                    local single = ss == 1
+                    local id = single and "AI_MANAGER_MOVE_SKIPPED_SICK_SINGLE" or "AI_MANAGER_MOVE_SKIPPED_SICK_MULTIPLE"
+                    records[#records + 1] = {
+                        husbandryId = row.husbandryId,
+                        id          = id,
+                        args        = single and {} or { string.format("%d", ss) },
+                        mark        = false,
+                        count       = ss,
                         warn        = nil,
                     }
                 end

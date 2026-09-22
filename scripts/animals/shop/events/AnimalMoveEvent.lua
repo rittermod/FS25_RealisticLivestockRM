@@ -223,6 +223,8 @@ function AnimalMoveEvent:writeStream(streamId, connection)
 end
 
 
+--- Client: publish the reply code. Server: validate, skip EPP-refused animals, then move the rest.
+---@param connection table The sender's connection (a client when this runs on the server)
 function AnimalMoveEvent:run(connection)
 
 	if connection:getIsServer() then
@@ -286,6 +288,7 @@ function AnimalMoveEvent:run(connection)
 		-- animals at this stage keeps them out of both pending queues entirely.
 		local targetClusterSystem = self.targetObject:getClusterSystem()
 		local transferList = {}
+		local skippedSick = 0
 		for i, animal in pairs(self.animals) do
 			Log:trace("AnimalMoveEvent:run: processing animal %d id='%s' age=%s",
 				i, tostring(animal.uniqueId), tostring(animal.age))
@@ -305,13 +308,22 @@ function AnimalMoveEvent:run(connection)
 			if not skip then
 				local clusterId = RLAnimalUtil.toKey(animal.farmId, animal.uniqueId, animal.birthday.country)
 				local sourceCluster = clusterSystemSource:getClusterById(clusterId)
-				if sourceCluster ~= nil then
-					table.insert(transferList, { animal = animal, sourceCluster = sourceCluster })
-				else
+				if sourceCluster == nil then
 					Log:warning("AnimalMoveEvent:run: source cluster not found for clusterId='%s' (skipping)",
 						tostring(clusterId))
+				elseif eppTypeData ~= nil and not RLDiseaseSaleGate.check(sourceCluster) then
+					-- Read the live server animal, never the payload copy: the client's view can be stale.
+					skippedSick = skippedSick + 1
+					Log:debug("AnimalMoveEvent:run: skipping sick animal uniqueId=%s farmId=%s (butcher target=%s)",
+						tostring(sourceCluster.uniqueId), tostring(sourceCluster.farmId),
+						tostring(self.targetObject.getName and self.targetObject:getName()))
+				else
+					table.insert(transferList, { animal = animal, sourceCluster = sourceCluster })
 				end
 			end
+		end
+		if skippedSick > 0 then
+			Log:debug("AnimalMoveEvent:run: %d sick animal(s) left in source, %d to deliver", skippedSick, #transferList)
 		end
 
 		-- Pass 2: ordering depends on target type.

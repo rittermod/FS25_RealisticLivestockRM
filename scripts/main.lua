@@ -314,6 +314,7 @@ source(modDirectory .. "scripts/disease/RLDiseaseEffects.lua")
 source(modDirectory .. "scripts/disease/RLDiseaseProgression.lua")
 source(modDirectory .. "scripts/disease/RLDiseaseStatus.lua")
 source(modDirectory .. "scripts/disease/RLDiseaseCull.lua")
+source(modDirectory .. "scripts/disease/RLDiseaseSaleGate.lua")
 source(modDirectory .. "scripts/disease/Disease.lua")
 source(modDirectory .. "scripts/disease/DiseaseManager.lua")
 

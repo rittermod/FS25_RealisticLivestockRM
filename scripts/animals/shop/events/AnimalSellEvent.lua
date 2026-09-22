@@ -63,6 +63,8 @@ function AnimalSellEvent:writeStream(streamId, connection)
 end
 
 
+--- Client: publish the reply code. Server: validate the whole batch, then remove and pay for it.
+---@param connection table The sender's connection (a client when this runs on the server)
 function AnimalSellEvent:run(connection)
 
 	if connection:getIsServer() then
@@ -107,6 +109,15 @@ function AnimalSellEvent:run(connection)
 					return
 				end
 				if animal ~= nil then
+					-- The client leaves sick animals out, but its disease view can be stale.
+					local saleOk, saleReason = RLDiseaseSaleGate.check(animal)
+					if not saleOk then
+						Log:warning("SellEvent:run blocked sick animal (uniqueId=%s farmId=%s reason=%s userId=%s object=%s)",
+							tostring(animal.uniqueId), tostring(animal.farmId), tostring(saleReason), tostring(userId),
+							tostring(self.object.getName ~= nil and self.object:getName() or self.object))
+						connection:sendEvent(AnimalSellEvent.newServerToClient(AnimalSellEvent.SELL_ERROR_CANNOT_BE_SOLD))
+						return
+					end
 					table.insert(validatedClusters, animal)
 				end
 			end

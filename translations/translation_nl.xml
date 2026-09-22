@@ -166,6 +166,10 @@
         <text name="rl_ui_moveBulkConfirmTitle" text="Dieren verplaatsen"/>
         <text name="rl_ui_moveErrorNoPermission" text="Je hebt geen toestemming om hier dieren te verplaatsen."/>
         <text name="rl_ui_moveErrorNotSupported" text="Deze bestemming ondersteunt dit dierentype niet."/>
+        <text name="rl_ui_sellErrorSick" text="Sick animals cannot be sold. Treat or cull them from the Diseases dialog - an animal on a trailer must be unloaded into a pen first."/>
+        <text name="rl_ui_sellSkippedSick" text="%d sick animal(s) left out: sick animals cannot be sold." tag="format"/>
+        <text name="rl_ui_moveErrorSick" text="Sick animals cannot go to the butcher."/>
+        <text name="rl_ui_moveRejectedSick" text="%d animal(s) skipped: sick animals cannot go to the butcher" tag="format"/>
         <text name="rl_ui_moveErrorNoSpace" text="Niet genoeg ruimte op de bestemming."/>
         <text name="rl_ui_tradeRequestInProgress" text="Er loopt al een transactie. Even geduld a.u.b."/>
         <text name="rl_ui_tradeRequestTimeout" text="De server reageerde niet. Probeer het opnieuw."/>
@@ -571,6 +575,8 @@
         <text name="rl_message_aiManager_mark_move_multiple" text="Veehoeder markeerde %s dieren om te verplaatsen"/>
         <text name="rl_message_aiManager_moveSkippedAge_single" text="Veehoeder sloeg 1 dier over (verkeerde leeftijd voor de slachter)"/>
         <text name="rl_message_aiManager_moveSkippedAge_multiple" text="Veehoeder sloeg %s dieren over (verkeerde leeftijd voor de slachter)"/>
+        <text name="rl_message_aiManager_moveSkippedSick_single" text="Herdsman skipped 1 animal (sick animals cannot go to the butcher)"/>
+        <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Veehoeder verzorgde 1 paard"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Veehoeder verzorgde %s paarden"/>
 

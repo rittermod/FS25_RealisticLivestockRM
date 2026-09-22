@@ -113,19 +113,26 @@ function AIAnimalMoveEvent:run(connection)
 
             local eligible = {}
             local skippedAge = 0
+            local skippedSick = 0
             for _, entry in ipairs(transferList) do
                 local age = (entry.animal ~= nil and entry.animal.age) or 0
                 if age >= minAge and age <= maxAge then
-                    eligible[#eligible + 1] = entry
+                    if RLDiseaseSaleGate.check(entry.animal) then
+                        eligible[#eligible + 1] = entry
+                    else
+                        skippedSick = skippedSick + 1
+                        Log:debug("AIAnimalMoveEvent:run: EPP sick backstop skipping uniqueId=%s farmId=%s (target=%s)",
+                            tostring(entry.animal.uniqueId), tostring(entry.animal.farmId), tostring(self.targetObject))
+                    end
                 else
                     skippedAge = skippedAge + 1
                     Log:trace("AIAnimalMoveEvent:run: EPP age backstop skipping uniqueId=%s age=%s (window %d-%d)",
                         tostring(entry.animal ~= nil and entry.animal.uniqueId), tostring(age), minAge, maxAge)
                 end
             end
-            if skippedAge > 0 then
-                Log:debug("AIAnimalMoveEvent:run: EPP age backstop removed %d of %d resolved animal(s) (window %d-%d)",
-                    skippedAge, #transferList, minAge, maxAge)
+            if skippedAge > 0 or skippedSick > 0 then
+                Log:debug("AIAnimalMoveEvent:run: EPP backstop removed %d age + %d sick of %d resolved animal(s) (window %d-%d)",
+                    skippedAge, skippedSick, #transferList, minAge, maxAge)
             end
 
             local okTarget, errTarget, deliveredList = AnimalMoveEvent._dispatchTargetDelivery(targetPP, eligible, nil)
@@ -136,8 +143,8 @@ function AIAnimalMoveEvent:run(connection)
 
             if okTarget and ok1 and ok2 then
                 local farmId = self.targetObject.getOwnerFarmId ~= nil and self.targetObject:getOwnerFarmId() or nil
-                Log:debug("AIAnimalMoveEvent:run: delivered %d animal(s) to EPP butcher farmId=%s (skippedAge=%d)",
-                    #(deliveredList or {}), tostring(farmId), skippedAge)
+                Log:debug("AIAnimalMoveEvent:run: delivered %d animal(s) to EPP butcher farmId=%s (skippedAge=%d skippedSick=%d)",
+                    #(deliveredList or {}), tostring(farmId), skippedAge, skippedSick)
             else
                 Log:error("AIAnimalMoveEvent:run: EPP transfer failed delivered=%d target=%s sourceFlush=%s sourceUpdate=%s",
                     #(deliveredList or {}), tostring(errTarget), tostring(err1), tostring(err2))

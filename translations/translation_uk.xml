@@ -152,6 +152,10 @@
         <text name="rl_ui_moveBulkConfirmTitle" text="Переміщення тварин"/>
         <text name="rl_ui_moveErrorNoPermission" text="У вас немає прав для переміщення тварин сюди."/>
         <text name="rl_ui_moveErrorNotSupported" text="Це місце призначення не підтримує цей тип тварин."/>
+        <text name="rl_ui_sellErrorSick" text="Sick animals cannot be sold. Treat or cull them from the Diseases dialog - an animal on a trailer must be unloaded into a pen first."/>
+        <text name="rl_ui_sellSkippedSick" text="%d sick animal(s) left out: sick animals cannot be sold." tag="format"/>
+        <text name="rl_ui_moveErrorSick" text="Sick animals cannot go to the butcher."/>
+        <text name="rl_ui_moveRejectedSick" text="%d animal(s) skipped: sick animals cannot go to the butcher" tag="format"/>
         <text name="rl_ui_moveErrorNoSpace" text="Недостатньо місця у місці призначення."/>
         <text name="rl_ui_tradeRequestInProgress" text="Торгівля вже виконується. Будь ласка, зачекайте."/>
         <text name="rl_ui_tradeRequestTimeout" text="Сервер не відповів. Будь ласка, спробуйте ще раз."/>
@@ -545,6 +549,8 @@
         <text name="rl_message_aiManager_mark_move_multiple" text="Пастух позначив %s тварин для переміщення"/>
         <text name="rl_message_aiManager_moveSkippedAge_single" text="Пастух пропустив 1 тварину (невідповідний вік для бійні)"/>
         <text name="rl_message_aiManager_moveSkippedAge_multiple" text="Пастух пропустив %s тварин (невідповідний вік для бійні)"/>
+        <text name="rl_message_aiManager_moveSkippedSick_single" text="Herdsman skipped 1 animal (sick animals cannot go to the butcher)"/>
+        <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Пастух доглянув 1 коня"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Пастух доглянув %s коней"/>
 

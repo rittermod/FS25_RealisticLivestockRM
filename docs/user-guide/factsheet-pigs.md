@@ -33,7 +33,7 @@ Pig prices peak at 24 months and stay at that level for older animals (unlike ca
 | **Black Pied** | Sow | 35 | 375 | 1,200 |
 | | Boar | 45 | 450 | 1,500 |
 
-*These are typical prices for an average, healthy animal. Actual prices vary widely - well-bred healthy animals sell for significantly more, while sick or poor-quality animals can sell for far less.*
+*These are typical prices for an average, healthy animal. Actual prices vary widely - well-bred healthy animals sell for significantly more, poor-quality animals can sell for far less, and a sick animal is worth less while sick.*
 
 ### What Affects Sell Price
 
