@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0.0-dev.4:
+
+- Added colic, the first horse disease: a horse can fall ill with it on its own (it never spreads), cannot be sold while sick, grows more slowly if it is still young, and can die of it; a $500 treatment course cures it about half the time.
+- Added a Cull button to the Diseases dialog for an animal showing symptoms: it removes the animal from your herd for good and pays 33% of its current sale price, or nothing for a chicken.
+- Added Choose Diseases to the RL Menu settings: switch individual diseases off so no new cases of them start; animals that already have one - ill, incubating, a CVM carrier, or a calf conceived before the change - keep it until it runs its course.
+- Stopped sick animals being sold or taken to a butcher while they show symptoms - by you or by the herdsman: treat them, or cull them from the Diseases dialog. A herdsman sell rule for animals with any disease now sells none, and in mark mode marks none. A herdsman move to a butcher leaves sick animals in the pen and tells you how many it skipped.
+- Added a credit to Renfordt's Enhanced Livestock: changes to the disease system are inspired by it, with some parts converted directly from it.
+
 ## 1.4.0.0-dev.3:
 
 - Added disease spread between animals in the same pen.
