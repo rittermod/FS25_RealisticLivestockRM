@@ -416,6 +416,8 @@
         <text name="rl_settings_dealerSale_label" text="Kies dieren te koop"/>
         <text name="rl_settings_dealerSale_tooltip" text="Kies welke dieren en leeftijdsgroepen de handelaar te koop aanbiedt. Deze instelling wijzigen vult de voorraad van de handelaar opnieuw aan."/>
         <text name="rl_settings_dealerSale_text" text="Kies dieren te koop"/>
+        <text name="rl_settings_diseaseSelection_label" text="Choose Diseases"/>
+        <text name="rl_settings_diseaseSelection_tooltip" text="Choose which diseases can appear. Switching one off stops new cases; animals already ill with it recover or die as usual."/>
 
         <text name="rl_settings_tagColour_label" text="Wijzig Tag kleur"/>
         <text name="rl_settings_tagColour_tooltip" text="Wijzig de kleur van de oor tags"/>

@@ -202,6 +202,7 @@ local function fixInGameMenu(frame, pageName, uvs, position, predicateFunc)
 end
 
 
+--- Mission start: re-bind the AnimalScreen GUI, read the visual-animal cap and register every RLRM dialog.
 function RealisticLivestock_FSBaseMission:onStartMission()
 
     -- Re-load the BASE AnimalScreen GUI so its callback bindings re-snapshot.
@@ -247,6 +248,7 @@ function RealisticLivestock_FSBaseMission:onStartMission()
     RLHerdsmanHusbandryPickerDialog.register()
     RLHerdsmanDestinationPickerDialog.register()
     RLDealerSaleSelectorDialog.register()
+    RLDiseaseSelectorDialog.register()
     RmMigrationDialog.register()
 
     -- Mod-compatibility detection runs on every peer, g_modIsLoaded being per-peer
@@ -312,6 +314,8 @@ end
 FSBaseMission.onStartMission = Utils.prependedFunction(FSBaseMission.onStartMission, RealisticLivestock_FSBaseMission.onStartMission)
 
 
+--- Push the server's full RLRM state (settings, animals, messages, filters, rules, dealer and disease overrides) to a joining client.
+---@param connection table the joining client's connection
 function RealisticLivestock_FSBaseMission:sendInitialClientState(connection, _, _)
 
     local animalSystem = g_currentMission.animalSystem
@@ -412,6 +416,17 @@ function RealisticLivestock_FSBaseMission:sendInitialClientState(connection, _, 
             #overrides)
     else
         Log:warning("RealisticLivestock_FSBaseMission:sendInitialClientState: g_rlDealerSaleRegistry is nil; new client will have empty dealer override state")
+    end
+
+    -- The switched-off disease titles, sent even when empty so a client reconstructs to empty.
+    -- Only the admin dialog reads it on a client; every producer gate is server-side.
+    if g_rlDiseaseOverrideRegistry ~= nil then
+        local diseaseOverrides = g_rlDiseaseOverrideRegistry:enumerate()
+        RLDiseaseOverrideStateEvent.sendEvent(diseaseOverrides, connection)
+        Log:debug("RealisticLivestock_FSBaseMission:sendInitialClientState: sent RLDiseaseOverrideStateEvent with %d disease override(s) to new client",
+            #diseaseOverrides)
+    else
+        Log:warning("RealisticLivestock_FSBaseMission:sendInitialClientState: g_rlDiseaseOverrideRegistry is nil; new client will have empty disease override state")
     end
 
 end

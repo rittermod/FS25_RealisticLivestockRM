@@ -425,6 +425,8 @@
         <text name="rl_settings_dealerSale_label" text="Choose Animals For Sale"/>
         <text name="rl_settings_dealerSale_tooltip" text="Choose which animals and age groups the dealer offers for sale. Changing this restocks the dealer."/>
         <text name="rl_settings_dealerSale_text" text="Choose Animals For Sale"/>
+        <text name="rl_settings_diseaseSelection_label" text="Choose Diseases"/>
+        <text name="rl_settings_diseaseSelection_tooltip" text="Choose which diseases can appear. Switching one off stops new cases; animals already ill with it recover or die as usual."/>
 
         <text name="rl_settings_tagColour_label" text="Muuta merkin väriä"/>
         <text name="rl_settings_tagColour_tooltip" text="Muuta korvamerkin väriä"/>

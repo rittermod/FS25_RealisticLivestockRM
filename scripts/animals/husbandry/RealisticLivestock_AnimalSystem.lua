@@ -1102,9 +1102,14 @@ function AnimalSystem:loadColourConfigurations()
 end
 
 
+--- Load the savegame's dealer farms and sale animals, running the RLRM settings-registry loaders first.
+---@return boolean|nil false when neither animal-system file exists, nil with no savegame directory
 function AnimalSystem:loadFromXMLFile()
 
-    if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then return end
+    if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then
+        Log:trace("AnimalSystem:loadFromXMLFile: no savegame directory; nothing loaded")
+        return
+    end
 
     local savegameDir = g_currentMission.missionInfo.savegameDirectory
 
@@ -1128,10 +1133,14 @@ function AnimalSystem:loadFromXMLFile()
     RLSettings.loadFiltersFromXMLFile()
     RLSettings.loadRulesFromXMLFile()
     RLSettings.loadDealerSaleFromXMLFile()
+    RLSettings.loadDiseaseOverridesFromXMLFile()
     RLDealerSaleApply.resetBaseline()
     RLDealerSaleApply.applyToLiveSubTypes()
 
-    if xmlFile == nil then return false end
+    if xmlFile == nil then
+        Log:trace("AnimalSystem:loadFromXMLFile: no rm_RlAnimalSystem.xml or animalSystem.xml; registries loaded, no animal data")
+        return false
+    end
 
 
     local hasData = false

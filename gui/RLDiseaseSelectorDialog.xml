@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8" standalone="no" ?>
+<!--
+    RLDiseaseSelectorDialog.xml
+    Choose Diseases: a flat checkbox list, one row per defined disease - its name, the animal
+    types it affects, and a checkbox (checked = can start new cases). OK returns the checked
+    titles; Back returns nil. Row and button profiles are local to this file; element-level
+    `with=` is ignored by the GUI loader, so every trait lives on a profile below.
+-->
+<GUI onOpen="onOpen" onClose="onClose" onCreate="onCreate">
+    <GuiElement profile="newLayer"/>
+    <Bitmap profile="dialogFullscreenBg" id="dialogBg"/>
+    <GuiElement profile="fs25_dialogBg" id="dialogElement" size="950px 700px">
+        <ThreePartBitmap profile="fs25_dialogBgMiddle"/>
+        <ThreePartBitmap profile="fs25_dialogBgTop"/>
+        <ThreePartBitmap profile="fs25_dialogBgBottom"/>
+        <GuiElement profile="fs25_dialogContentContainer">
+
+            <Text profile="fs25_dialogTitle" id="dialogTitleElement"
+                  position="0px -30px"
+                  text="$l10n_rl_diseases"/>
+
+            <SmoothList profile="rl_diseaseSelectorList" id="diseaseList"
+                        position="50px -80px"
+                        size="820px 500px"
+                        focusInit="onOpen"
+                        focusChangeTop="nil"
+                        focusChangeBottom="nil"
+                        onClick="onListClick">
+                <ListItem profile="rl_diseaseSelectorListItem" name="defaultCell">
+                    <Text profile="rl_diseaseSelectorName" position="10px 0px" size="300px 55px" name="name"/>
+                    <Text profile="rl_diseaseSelectorTypes" position="320px 0px" size="420px 55px" name="types"/>
+                    <Button profile="rlMenu_checkboxButton" name="checkbox" position="-45px -15px">
+                        <ThreePartBitmap profile="rlMenu_checkboxBox"/>
+                        <Bitmap profile="rlMenu_checkbox" name="check"/>
+                    </Button>
+                </ListItem>
+            </SmoothList>
+
+            <ThreePartBitmap profile="fs25_listSliderBox" id="diseaseSliderBox"
+                             position="-30px -17px"
+                             size="12px 500px">
+                <Slider profile="fs25_listSlider" size="6px 492px" dataElementId="diseaseList"/>
+            </ThreePartBitmap>
+
+        </GuiElement>
+
+        <BoxLayout profile="fs25_dialogButtonBox" id="buttonsPC">
+            <Button profile="rlButtonSelect" text="$l10n_button_select"
+                    onClick="onClickSelect" id="selectButton"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="rlButtonMenuActivate" text="$l10n_rl_ui_selectAll"
+                    onClick="onClickSelectAll" id="selectAllButton"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="buttonOK" text="$l10n_button_ok"
+                    onClick="onClickOk" id="okButton"/>
+            <Bitmap profile="fs25_dialogButtonBoxSeparator"/>
+            <Button profile="buttonBack" text="$l10n_button_back"
+                    onClick="onClickBack" id="backButton"/>
+        </BoxLayout>
+    </GuiElement>
+
+    <GUIProfiles>
+        <Profile name="rl_diseaseSelectorList" extends="emptyPanel" with="anchorStretchingYLeft pivotTopLeft">
+        </Profile>
+
+        <Profile name="rl_diseaseSelectorListItem" extends="baseReference" with="anchorTopStretchingX alternating">
+            <height value="55px"/>
+            <imageColor value="$preset_fs25_colorGrey"/>
+            <imageSelectedColor value="$preset_fs25_colorMainHighlight"/>
+            <alternateBackgroundColor value="$preset_fs25_colorGreyDark_50"/>
+        </Profile>
+
+        <Profile name="rl_diseaseSelectorName" extends="baseReference" with="anchorMiddleLeft">
+            <textBold value="true"/>
+            <textSize value="18px"/>
+            <textAlignment value="left"/>
+            <textMaxNumLines value="1"/>
+            <textColor value="$preset_fs25_colorMainLight"/>
+            <textSelectedColor value="$preset_fs25_colorMainDark"/>
+        </Profile>
+
+        <!-- The types label is the longest text in the row and varies by language: an overflow
+             shrinks the font rather than clipping. -->
+        <Profile name="rl_diseaseSelectorTypes" extends="baseReference" with="anchorMiddleLeft">
+            <textBold value="false"/>
+            <textSize value="16px"/>
+            <textAlignment value="left"/>
+            <textMaxNumLines value="1"/>
+            <textMaxWidth value="420px"/>
+            <textLayoutMode value="resize"/>
+            <textColor value="$preset_fs25_colorMainLight"/>
+            <textSelectedColor value="$preset_fs25_colorMainDark"/>
+        </Profile>
+
+        <Profile name="rlButtonMenuActivate" extends="fs25_wideButton" with="touchButton">
+            <inputAction value="MENU_ACTIVATE"/>
+        </Profile>
+
+        <Profile name="rlButtonSelect" extends="fs25_wideButton" with="touchButton">
+            <inputAction value="RL_SELECT"/>
+        </Profile>
+    </GUIProfiles>
+</GUI>

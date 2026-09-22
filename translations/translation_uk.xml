@@ -608,6 +608,8 @@
         <text name="rl_settings_dealerSale_label" text="Вибрати тварин для продажу"/>
         <text name="rl_settings_dealerSale_tooltip" text="Оберіть, яких тварин та вікові групи продавець пропонує на продаж. Зміна цього параметра поповнить асортимент продавця."/>
         <text name="rl_settings_dealerSale_text" text="Вибрати тварин для продажу"/>
+        <text name="rl_settings_diseaseSelection_label" text="Choose Diseases"/>
+        <text name="rl_settings_diseaseSelection_tooltip" text="Choose which diseases can appear. Switching one off stops new cases; animals already ill with it recover or die as usual."/>
         <text name="rl_settings_resetDealer_tooltip" text="Видалити всіх тварин у торговця та поповнити запас новими тваринами"/>
         <text name="rl_ui_meat_github" text="Якість м'яса"/>
         <text name="rl_ui_openAnimalScreen" text="Керування тваринами"/>

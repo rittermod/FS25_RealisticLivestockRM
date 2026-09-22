@@ -244,6 +244,12 @@ function Disease:affectReproduction(child, otherParent)
         return
     end
 
+    if not g_diseaseManager:isTitleEnabled(self.title) then
+        Log:trace("Disease:affectReproduction: refused, reason=disabled (disease=%s)",
+            tostring(self.title))
+        return
+    end
+
     local otherGenes = 0
 
     if otherParent ~= nil then

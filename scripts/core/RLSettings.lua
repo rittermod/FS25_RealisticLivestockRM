@@ -116,6 +116,45 @@ function RLSettings.onDealerSaleConfirmed(catalog, result)
 end
 
 
+--- Open the Choose Diseases selector; the catalog is both its data and its callback target.
+function RLSettings.onClickDiseaseSelection()
+
+	if RLDiseaseSelectorDialog.INSTANCE == nil then
+		Log:error("RLSettings.onClickDiseaseSelection: RLDiseaseSelectorDialog.INSTANCE is nil (eager registration failed?); cannot open dialog")
+		return
+	end
+
+	local catalog = RLDiseaseOverrideCatalog.enumerate()
+
+	Log:debug("RLSettings.onClickDiseaseSelection: opening selector over %d disease(s)", #catalog)
+	RLDiseaseSelectorDialog.show(RLSettings.onDiseaseSelectionConfirmed, catalog, catalog)
+
+end
+
+
+--- Confirm handler for the disease selector: diff the checked titles into ops and send them.
+---@param catalog table the catalog the dialog was opened over
+---@param result table|nil checked rows `{ { title }, ... }`; nil on cancel changes nothing, `{}` switches every listed title off
+function RLSettings.onDiseaseSelectionConfirmed(catalog, result)
+
+	if result == nil then
+		Log:debug("RLSettings.onDiseaseSelectionConfirmed: cancelled; no change")
+		return
+	end
+
+	local ops = RLDiseaseOverrideReconcile.diff(result, catalog)
+
+	if #ops == 0 then
+		Log:debug("RLSettings.onDiseaseSelectionConfirmed: no changes; nothing dispatched")
+		return
+	end
+
+	Log:debug("RLSettings.onDiseaseSelectionConfirmed: dispatching %d disease override op(s)", #ops)
+	RLDiseaseOverrideSetEvent.sendEvent(ops)
+
+end
+
+
 function RLSettings.onClickExportCSV()
 
 	local file = io.open(modSettingsDirectory .. "animals.csv", "w")
@@ -207,10 +246,10 @@ end
 -- each row by its rlmenuSetting_<name> element id. setting.index is consumed by
 -- RLDebugUtils.dumpSettings, which prints state rows in index order (it skips
 -- ignore==true rows), so index must stay a faithful mirror of the XML order below.
--- Keep the two in step when adding or moving a row. Sections (1..20):
--- Mortality (1-2), Health & Disease (3), Husbandry & Economy (4-7),
--- Custom Animals (8-9), Message Log (10-11), Display Preferences (12-15),
--- Tools & Admin (16-19), Visual Animals (20, client-local, no admin gate).
+-- Keep the two in step when adding or moving a row. Sections (1..21):
+-- Mortality (1-2), Health & Disease (3-4), Husbandry & Economy (5-8),
+-- Custom Animals (9-10), Message Log (11-12), Display Preferences (13-16),
+-- Tools & Admin (17-20), Visual Animals (21, client-local, no admin gate).
 RLSettings.SETTINGS = {
 
 	["deathEnabled"] = {
@@ -266,8 +305,17 @@ RLSettings.SETTINGS = {
 		["callback"] = DiseaseManager.onDifficultyChanged
 	},
 
-	["foodScale"] = {
+	-- Opens the Choose Diseases selector; the set event re-checks admin on the server.
+	["diseaseSelection"] = {
 		["index"] = 4,
+		["type"] = "Button",
+		["ignore"] = true,
+		["adminOnly"] = true,
+		["callback"] = RLSettings.onClickDiseaseSelection
+	},
+
+	["foodScale"] = {
+		["index"] = 5,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 2,
@@ -277,7 +325,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["maxDealerAnimals"] = {
-		["index"] = 5,
+		["index"] = 6,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 4,
@@ -294,7 +342,7 @@ RLSettings.SETTINGS = {
 	-- and every reader depend on values[i] == i, which RLSettingsTests pins
 	-- against RLDealerQualityModel.DEFAULT_INDEX / PRESET_COUNT.
 	["dealerQuality"] = {
-		["index"] = 6,
+		["index"] = 7,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 2,
@@ -307,7 +355,7 @@ RLSettings.SETTINGS = {
 	-- and the resolver cannot drift. Option texts are runtime-built (getTexts):
 	-- only "Map default" is localized, country names render in English.
 	["mapCountry"] = {
-		["index"] = 7,
+		["index"] = 8,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 1,
@@ -325,7 +373,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["useCustomAnimals"] = {
-		["index"] = 8,
+		["index"] = 9,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
@@ -335,7 +383,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["animalsXML"] = {
-		["index"] = 9,
+		["index"] = 10,
 		["adminOnly"] = true,
 		["type"] = "Button",
 		["ignore"] = true,
@@ -347,7 +395,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["messageSummary"] = {
-		["index"] = 10,
+		["index"] = 11,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
@@ -358,7 +406,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["maxNumMessages"] = {
-		["index"] = 11,
+		["index"] = 12,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 5,
@@ -368,7 +416,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["geneticsDisplay"] = {
-		["index"] = 12,
+		["index"] = 13,
 		["adminOnly"] = true,
 		["type"] = "MultiTextOption",
 		["default"] = 1,
@@ -376,7 +424,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["geneticsPosition"] = {
-		["index"] = 13,
+		["index"] = 14,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["default"] = 1,
@@ -384,7 +432,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["sortByGenetics"] = {
-		["index"] = 14,
+		["index"] = 15,
 		["adminOnly"] = true,
 		["type"] = "BinaryOption",
 		["dynamicTooltip"] = true,
@@ -394,7 +442,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["tagColour"] = {
-		["index"] = 15,
+		["index"] = 16,
 		["adminOnly"] = true,
 		["type"] = "Button",
 		["ignore"] = true,
@@ -402,7 +450,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["exportCSV"] = {
-		["index"] = 16,
+		["index"] = 17,
 		["adminOnly"] = true,
 		["type"] = "Button",
 		["ignore"] = true,
@@ -410,7 +458,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["resetDealer"] = {
-		["index"] = 17,
+		["index"] = 18,
 		["type"] = "Button",
 		["ignore"] = true,
 		["adminOnly"] = true,
@@ -421,7 +469,7 @@ RLSettings.SETTINGS = {
 	-- dealer offers. Server-authoritative (the Confirm handler writes the override
 	-- registry and regenerates the dealer), hence the admin gate.
 	["dealerSale"] = {
-		["index"] = 18,
+		["index"] = 19,
 		["type"] = "Button",
 		["ignore"] = true,
 		["adminOnly"] = true,
@@ -429,7 +477,7 @@ RLSettings.SETTINGS = {
 	},
 
 	["resetAIAnimals"] = {
-		["index"] = 19,
+		["index"] = 20,
 		["type"] = "Button",
 		["ignore"] = true,
 		["adminOnly"] = true,
@@ -442,7 +490,7 @@ RLSettings.SETTINGS = {
 	-- and out of rm_RlSettings.xml. The dialog persists the value per peer to
 	-- modSettings/Settings.xml.
 	["maxVisualAnimals"] = {
-		["index"] = 20,
+		["index"] = 21,
 		["type"] = "Button",
 		["ignore"] = true,
 		["callback"] = RLSettings.onClickVisualAnimals
@@ -673,6 +721,36 @@ function RLSettings.loadDealerSaleFromXMLFile()
 end
 
 
+--- Server-only: reconstruct the disease override registry (the per-savegame reset) and load it.
+function RLSettings.loadDiseaseOverridesFromXMLFile()
+
+	if g_currentMission.missionInfo == nil or g_currentMission.missionInfo.savegameDirectory == nil then
+		Log:trace("RLSettings.loadDiseaseOverridesFromXMLFile: no savegame directory; skipping")
+		return
+	end
+	if g_server == nil then
+		Log:trace("RLSettings.loadDiseaseOverridesFromXMLFile: not the server; skipping")
+		return
+	end
+
+	g_rlDiseaseOverrideRegistry = RLDiseaseOverrideRegistry.new()
+
+	local path = g_currentMission.missionInfo.savegameDirectory .. "/rm_RlSettings.xml"
+	local xmlFile = XMLFile.loadIfExists("rm_RlSettings", path)
+	if xmlFile == nil then
+		Log:debug("RLSettings.loadDiseaseOverridesFromXMLFile: no rm_RlSettings.xml on disk; no overrides")
+		return
+	end
+
+	local loaded = RLDiseaseOverrideSerialization.loadFromXMLFile(xmlFile,
+		RLDiseaseOverrideSerialization.XML_BASE_KEY, g_rlDiseaseOverrideRegistry)
+	xmlFile:delete()
+
+	Log:debug("RLSettings.loadDiseaseOverridesFromXMLFile: %d disease override(s) loaded%s", loaded,
+		loaded == 0 and " (no overrides)" or "")
+end
+
+
 --- Write every setting state as rm_RlSettings child elements on an
 --- already-open XML document. The codec seam behind the disk wrapper
 --- (saveToXMLFile): takes the document as a dependency so the branches are
@@ -774,6 +852,12 @@ function RLSettings.saveToXMLFile(name, state)
 				RLDealerSaleSerialization.saveToXMLFile(xmlFile, RLDealerSaleSerialization.XML_BASE_KEY, g_rlDealerSaleRegistry)
 			else
 				Log:warning("RLSettings.saveToXMLFile: g_rlDealerSaleRegistry is nil; skipping dealer-sale save (load-order regression?)")
+			end
+
+			if g_rlDiseaseOverrideRegistry ~= nil then
+				RLDiseaseOverrideSerialization.saveToXMLFile(xmlFile, RLDiseaseOverrideSerialization.XML_BASE_KEY, g_rlDiseaseOverrideRegistry)
+			else
+				Log:warning("RLSettings.saveToXMLFile: g_rlDiseaseOverrideRegistry is nil; skipping disease override save (load-order regression?)")
 			end
 
 			local saved = xmlFile:save(false, true)

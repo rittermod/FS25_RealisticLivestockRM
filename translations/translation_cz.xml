@@ -437,6 +437,8 @@
         <text name="rl_settings_dealerSale_label" text="Výběr zvířat k prodeji"/>
         <text name="rl_settings_dealerSale_tooltip" text="Vyberte, která zvířata a věkové skupiny obchodník nabízí k prodeji. Změnou tohoto nastavení se obnoví nabídka obchodníka."/>
         <text name="rl_settings_dealerSale_text" text="Výběr zvířat k prodeji"/>
+        <text name="rl_settings_diseaseSelection_label" text="Choose Diseases"/>
+        <text name="rl_settings_diseaseSelection_tooltip" text="Choose which diseases can appear. Switching one off stops new cases; animals already ill with it recover or die as usual."/>
 
         <text name="rl_settings_resetAIAnimals_label" text="Resetovat zvířata pro AI"/>
         <text name="rl_settings_resetAIAnimals_tooltip" text="Odstraní všechna zvířata dostupná pro umělou inseminaci a doplní je novými náhodně generovanými zvířaty"/>

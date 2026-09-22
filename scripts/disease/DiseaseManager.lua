@@ -12,6 +12,7 @@
 
     The active difficulty preset (`diseaseDifficulty`, stored by `onDifficultyChanged` on every
     peer) scales the roll, the seed and the spread entries; `diseasesEnabled` is derived from it.
+    `isTitleEnabled` is the per-title gate every producer of a NEW record reads.
 ]]
 
 DiseaseManager = {}
@@ -289,42 +290,67 @@ function DiseaseManager:getSortedTitles()
 end
 
 
--- Keyed on the registry TABLE like `getSortedTitles`, and on the preset. Each entry carries the
--- EFFECTIVE window a record seeded under the active preset serves, so the priced R0 holds.
---- The spread pass's per-title entries under the active preset, rebuilt when the registry or the preset changes.
+-- The one per-title producer gate: the roll, the seed, the spread entries and inheritance read it.
+-- Hot path, so silent; the global is bootstrapped at source time, so it takes no guard.
+--- True when a title may produce new cases.
+---@param title string the disease title
+---@return boolean enabled
+function DiseaseManager:isTitleEnabled(title)
+    return g_rlDiseaseOverrideRegistry:isEnabled(title)
+end
+
+
+-- Keyed on the registry TABLE, the preset, and the override registry's identity AND `revision`
+-- (the server mutates it in place). Each entry carries the EFFECTIVE window the preset seeds.
+--- The spread pass's per-title entries under the active preset, omitting disabled titles.
 ---@return table entries title -> `{ model, maxLifespanMonths, incubationTicks }`; the manager's own, do not mutate
 function DiseaseManager:getSpreadEntries()
 
-    if self.spreadEntriesFor == self.diseases and self.spreadEntriesPreset == self.diseaseDifficulty then
+    local overrides = g_rlDiseaseOverrideRegistry
+
+    if self.spreadEntriesFor == self.diseases and self.spreadEntriesPreset == self.diseaseDifficulty
+        and self.spreadEntriesOverrides == overrides and self.spreadEntriesRevision == overrides.revision then
         return self.spreadEntries
     end
 
     local preset = RLDiseaseDifficulty.getPreset(self.diseaseDifficulty)
 
     local entries = {}
-    local count = 0
+    local count, disabled = 0, 0
 
     for title, model in pairs(self.diseases) do
 
-        -- The lifespan is the DISEASE-level bound (the shortest-lived affected species),
-        -- never an animal's own span. Genetic titles ride along and are never priced.
-        entries[title] = {
-            ["model"] = RLDiseaseDifficulty.spreadModel(model, preset.spread),
-            ["maxLifespanMonths"] = RLDiseaseTransmission.diseaseLifespanMonths(model.animals),
-            ["incubationTicks"] = RLDiseaseDifficulty.effectiveIncubationTicks(model.incubationTicks,
-                preset.incubation)
-        }
+        if not self:isTitleEnabled(title) then
 
-        count = count + 1
+            -- No entry: the spread pass then refuses the title as unpriced and draws nothing for it.
+            disabled = disabled + 1
+
+        else
+
+            -- The lifespan is the DISEASE-level bound (the shortest-lived affected species),
+            -- never an animal's own span. Genetic titles ride along and are never priced.
+            entries[title] = {
+                ["model"] = RLDiseaseDifficulty.spreadModel(model, preset.spread),
+                ["maxLifespanMonths"] = RLDiseaseTransmission.diseaseLifespanMonths(model.animals),
+                ["incubationTicks"] = RLDiseaseDifficulty.effectiveIncubationTicks(model.incubationTicks,
+                    preset.incubation)
+            }
+
+            count = count + 1
+
+        end
 
     end
 
     self.spreadEntries = entries
     self.spreadEntriesFor = self.diseases
     self.spreadEntriesPreset = self.diseaseDifficulty
+    self.spreadEntriesOverrides = overrides
+    self.spreadEntriesRevision = overrides.revision
 
-    Log:debug("getSpreadEntries: rebuilt the spread entries (%s title(s), preset=%s spread=%s incubation=%s)",
-        tostring(count), tostring(preset.key), tostring(preset.spread), tostring(preset.incubation))
+    Log:debug("getSpreadEntries: rebuilt the spread entries (%s title(s), %s disabled, preset=%s spread=%s "
+        .. "incubation=%s)", tostring(count), tostring(disabled), tostring(preset.key), tostring(preset.spread),
+        tostring(preset.incubation))
 
     return entries
 
@@ -400,6 +426,12 @@ function DiseaseManager:onDayChanged(animal, ctx)
         if model.archetype == "genetic" then
 
             Log:trace("DiseaseManager:onDayChanged: skipped title=%s, reason=genetic archetype (uniqueId=%s)",
+                tostring(title), tostring(animal.uniqueId))
+
+        elseif not self:isTitleEnabled(title) then
+
+            -- Before eligibility and the draw, so a switched-off title costs no randomness.
+            Log:trace("DiseaseManager:onDayChanged: skipped title=%s, reason=disabled (uniqueId=%s)",
                 tostring(title), tostring(animal.uniqueId))
 
         else
@@ -636,6 +668,11 @@ function DiseaseManager:setGeneticDiseasesForSaleAnimal(animal)
         if model.archetype ~= "genetic" then
 
             Log:trace("DiseaseManager:setGeneticDiseasesForSaleAnimal: skipped title=%s, reason=not genetic "
+                .. "(uniqueId=%s)", tostring(title), tostring(animal.uniqueId))
+
+        elseif not self:isTitleEnabled(title) then
+
+            Log:trace("DiseaseManager:setGeneticDiseasesForSaleAnimal: skipped title=%s, reason=disabled "
                 .. "(uniqueId=%s)", tostring(title), tostring(animal.uniqueId))
 
         else
