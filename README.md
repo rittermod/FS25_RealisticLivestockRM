@@ -1,11 +1,6 @@
 [![Read User Guide](https://img.shields.io/badge/Read-User_Guide-blue?style=for-the-badge&logo=materialformkdocs&logoColor=white)](https://rittermod.github.io/FS25_RealisticLivestockRM/)
 [![Download Latest Release](https://img.shields.io/badge/Download-Latest_Release-orange?style=for-the-badge&logo=github)](https://github.com/rittermod/FS25_RealisticLivestockRM/releases/latest/download/FS25_RealisticLivestockRM.zip)
 
-
-
-> [!NOTE]
-> My version of the awesome [FS25 Realistic Livestock](https://github.com/Arrow-kb/FS25_RealisticLivestock) mod by [Arrow-kb](https://github.com/Arrow-kb).
-
 # FS25 Realistic Livestock - Ritter version
 
 Replaces FS25's simple animal clusters with individually tracked animals - each with unique genetics, breeding, diseases, and production traits. A maintained version of Arrow-kb's [Realistic Livestock](https://github.com/Arrow-kb/FS25_RealisticLivestock) mod.
@@ -60,7 +55,6 @@ RLRM works on virtually any map out of the box. It does not need to be on a list
 
 ## Notes
 
-- Based on Arrow-kb's Realistic Livestock mod (v1.2.0.5), released under GPL-3 license
 - Savegame data from Arrow-kb's original version is automatically migrated on first load
 - Font Library mod is no longer required (functionality has been inlined)
 - Incompatible with FS25_EnhancedLivestock, FS25_MoreVisualAnimals, and FS25_EnhancedAnimalSystem (use FS25_MoreVisualAnimalsRM instead of FS25_MoreVisualAnimals)
@@ -73,6 +67,12 @@ Place `FS25_RealisticLivestockRM.zip` in your mods folder.
 
 ## Changelog
 See the [CHANGELOG](CHANGELOG.md) for a detailed list of changes, fixes, and improvements in this version.
+
+## Credits
+
+My version of the awesome [FS25 Realistic Livestock](https://github.com/Arrow-kb/FS25_RealisticLivestock) mod by [Arrow-kb](https://github.com/Arrow-kb) (v1.2.0.5), released under GPL-3 license.
+
+Changes to the disease system are inspired by Renfordt's [Enhanced Livestock](https://github.com/renfordt/FS25_EnhancedLivestock), also released under GPL-3 license, with some parts converted directly from it.
 
 ## License
 This mod is released under GPL-3 license. See the [LICENSE](LICENSE) file for details.

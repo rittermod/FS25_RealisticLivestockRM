@@ -99,4 +99,4 @@ In-depth explanations of the mod's core systems:
 
 ## Credits
 
-This mod is a fork of [FS25 Realistic Livestock](https://github.com/Arrow-kb/FS25_RealisticLivestock) by [Arrow-kb](https://github.com/Arrow-kb). Released under [GPL-3.0](https://github.com/rittermod/FS25_RealisticLivestockRM/blob/main/LICENSE).
+This mod is a fork of [FS25 Realistic Livestock](https://github.com/Arrow-kb/FS25_RealisticLivestock) by [Arrow-kb](https://github.com/Arrow-kb). Changes to the disease system are inspired by Renfordt's [Enhanced Livestock](https://github.com/renfordt/FS25_EnhancedLivestock), with some parts converted directly from it. Released under [GPL-3.0](https://github.com/rittermod/FS25_RealisticLivestockRM/blob/main/LICENSE).
