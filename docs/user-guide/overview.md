@@ -16,7 +16,7 @@ Each animal you buy or breed is tracked individually. They have a name tag, a bi
 
 Every animal is born with five genetic traits rated from Extremely Low to Extremely High:
 
-- **Health** - Disease resistance and longevity
+- **Health** - Surviving a disease, daily health, and longevity
 - **Fertility** - Breeding success rate
 - **Productivity** - Milk, egg, and wool output (cows, sheep, goats, chickens only)
 - **Quality** - Sell price and meat value
@@ -54,28 +54,32 @@ Individual animals can be monitored, marked, and castrated:
 
 ### Diseases
 
-Six of the mod's nine diseases are listed here:
+All nine of the mod's diseases:
 
 | Disease | Affects | Treatable? | Key Impact |
 |---------|---------|------------|------------|
 | Mastitis | Cows, Goats | Yes | Stops milk production (lactating animals only) |
-| CVM | Cattle (genetic) | No | Carrier cows produce extra milk, but calves may die |
-| Foot & Mouth | Cows, Sheep, Pigs | Yes (slow) | Major milk and price reduction |
-| PED | Pigs | Yes | Devastating to newborn piglets |
-| Avian Flu (LPAI) | Chickens | No | Egg production drops to about 40% of normal while a bird is sick |
-| Colic | Horses | Yes | Major price loss; never spreads |
+| CVM | Cattle (genetic) | No | Carrier cows produce extra milk while **Diseases** is on, but affected animals are sick for life |
+| Foot and Mouth | Cows, Sheep, Goats, Pigs | Yes | Spreads fast; milk severely reduced, major price loss |
+| PED | Pigs | Yes | Worst in young piglets; drastically more liquid manure |
+| Avian Flu (LPAI) | Chickens | Yes | Egg production drops to about 40% of normal while a bird is sick |
+| Avian Flu (HPAI) | Chickens | No | Rare but almost always fatal; cull sick birds |
+| BRD | Cattle | Yes | Worst in calves; less milk |
+| Pulpy Kidney | Sheep, Goats | Yes (cures about half the time) | Never spreads, but high fatality, worst in lambs and kids |
+| Colic | Horses | Yes (cures about half the time) | Major price loss; never spreads |
 
-Diseases can spread between animals in the same pen. Some diseases grant immunity after recovery.
+Diseases can spread between animals in the same pen, but never pass between pens. An animal that recovers from a disease is immune to it for a time.
 
 See the [Disease Guide](guide-diseases.md) for prevention and treatment strategies.
 
 ### Death
 
-Animals can die from three causes:
+Animals can die from:
 
 - **Old age** - Each species has a natural lifespan (chickens ~5-8 years, horses ~25-30 years)
 - **Low health** - Unhealthy animals face increasing death risk
 - **Accidents** - Random events affected by weather conditions
+- **Disease** - A sick animal can die of its disease (see the [Disease Guide](guide-diseases.md#death-risk))
 
 Death mechanics can be fully disabled or adjusted in the mod settings.
 

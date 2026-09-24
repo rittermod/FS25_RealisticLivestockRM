@@ -10,7 +10,7 @@ Every animal in Realistic Livestock RM is born with a unique set of genetic trai
 
 | Trait | In-Game Label | Affects | Applies To |
 |-------|---------------|---------|------------|
-| **Health** | Health | Disease resistance, longevity | All animals |
+| **Health** | Health | Surviving a disease, longevity | All animals |
 | **Fertility** | Fertility | Breeding success rate | All animals |
 | **Productivity** | Milk / Wool / Eggs | Production output amount | Cows, Sheep, Goats, Chickens |
 | **Quality** | Meat | Sell price and meat value | All animals |
@@ -55,7 +55,7 @@ Fertility has one additional rating:
 ### Health
 
 - Affects how quickly health recovers or deteriorates
-- Higher health genetics = more resistant to disease effects
+- Higher health genetics = more likely to survive a disease (they do not make an animal less likely to catch one)
 - Animals below 80% health face monthly death risk - good health genetics help stay above this threshold
 - **Impact:** Survival and longevity
 
@@ -135,27 +135,34 @@ Offspring inherit traits from both parents. The mod calculates the average of bo
 
 ## The CVM Dilemma
 
-CVM (Complex Vertebral Malformation) is a genetic disease unique to cattle. It follows recessive inheritance:
+CVM (Complex Vertebral Malformation) is a genetic disease unique to cattle. It is never caught and never spreads - it follows recessive inheritance, settled at conception:
 
 | Parent Combination | Offspring |
 |-------------------|-----------|
 | Non-carrier × Non-carrier | All non-carrier |
 | Carrier × Non-carrier | 50% carrier, 50% non-carrier |
-| **Carrier × Carrier** | **~25% affected (almost always fatal), 50% carrier, 25% non-carrier** |
+| **Carrier × Carrier** | **25% affected, 50% carrier, 25% non-carrier** |
+
+At conception an affected parent passes the gene to every calf: with a non-carrier every calf is a carrier, and with a carrier half the calves are affected. Artificial insemination, or a conception with no live bull, counts the cow's genes only.
+
+- **Carriers** (one copy) are healthy for life and never sick from CVM.
+- **Affected animals** (two copies) are sick from birth and cannot be treated; with **Animal Death** on they die within a few months.
 
 ### The Trade-Off
 
-**CVM carrier cows produce substantially more milk than normal.** This makes them extremely valuable for dairy operations - but breeding two carriers together risks producing affected calves that will almost certainly die.
+**CVM carrier cows produce considerably more milk than non-carriers** while the **Diseases** setting is on. This makes them valuable for dairy operations - but breeding two carriers together risks producing affected calves.
 
 | Strategy | Benefit | Risk |
 |----------|---------|------|
-| Keep carriers, breed with non-carriers | Much more milk, no affected calves | 50% of offspring are still carriers |
-| Breed carriers together | Maximum milk potential | ~25% of calves die |
+| Keep carriers, breed with non-carriers | More milk, no affected calves | 50% of offspring are still carriers |
+| Breed carriers together | None over carrier × non-carrier - it gives the same 50% carriers | 25% of calves are affected |
 | Remove all carriers | No CVM risk | Lose the milk bonus |
 
-**Identifying carriers:** CVM shows in the animal's disease panel. Carriers show as having CVM but remain healthy and productive. Affected animals are the ones that die.
+**Identifying carriers:** a carrier shows the grey DNA icon on its card, and CVM is listed in its detail panel. Carriers remain healthy and productive; affected animals show the red medical bag and, with **Animal Death** on, are the ones that die.
 
-**Dealer animals:** There's a small chance (about 1 in 200) of any cow purchased from the dealer being a CVM carrier. Check new purchases!
+**Dealer animals:** about 1 in 200 dealer cattle carry the gene - most as carriers, a few affected. Check new purchases!
+
+Inheritance and dealer stock carrying the gene need the **Diseases** setting on and CVM ticked under **Choose Diseases** - see the [Disease Guide](guide-diseases.md#disease-settings).
 
 ---
 

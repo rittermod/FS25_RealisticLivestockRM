@@ -27,7 +27,7 @@ If your version isn't covered and you see a warning dialog, please [open an issu
 
 ## Exotic Animals
 
-Hof Bergmann adds several animal types beyond the base game. The mod gives most of these animals full RLRM treatment: individual tracking, genetics, breeding, lifecycle, aging, and diseases.
+Hof Bergmann adds several animal types beyond the base game. The mod gives most of these animals full RLRM treatment: individual tracking, genetics, breeding, lifecycle, and aging. Ducks are kept as a kind of chicken, so both avian flu strains can reach them; the other exotic animals catch none of the mod's diseases.
 
 Animals on Hof Bergmann carry a **DE (Germany) eartag prefix** to reflect the map's country setting.
 

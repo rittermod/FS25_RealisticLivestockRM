@@ -146,9 +146,11 @@ A mare stays fertile across her whole breeding life. With average genetics her c
 
 | Disease | Spread | Fatal? | Treatment | Impact |
 |---------|--------|--------|-----------|--------|
-| **Colic** | None | Yes, moderate | 1 month, $500 (works about half the time) | Major price loss, less manure, slower growth |
+| **Colic** | None | Moderate | 1 month, $500 (works about half the time) | Major price loss, considerably less manure, slower growth in a horse that is still growing |
 
-> **Colic:** a horse gets it on its own rather than from other horses, and it shows at once. Treat straight away - a treated horse dies less often, and a course that fails can be started again. See the [Disease Guide](guide-diseases.md).
+*The Fatal column holds while **Animal Death** is on.*
+
+> **Colic:** a horse gets it on its own rather than from other horses, and it shows at once. On a valuable horse, treat straight away - a treated horse dies less often, and a course that fails can be started again; on a low-value horse a course can cost more than it saves. See the [Disease Guide](guide-diseases.md).
 
 ---
 

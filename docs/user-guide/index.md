@@ -9,7 +9,7 @@ A Farming Simulator 25 mod that replaces the default animal cluster system with 
 - **Individual animals** - Every animal is unique with its own identity, genetics, and history
 - **Genetics system** - Traits like productivity and size are inherited from parents with natural variation
 - **Realistic breeding** - Gestation periods, offspring genetics, breeding age limits, and pregnancy complications
-- **Disease simulation** - Species-specific diseases that spread, require treatment, and affect production
+- **Disease simulation** - Species-specific diseases that make animals sick and cut production and value - most spread through a pen and can be treated
 - **Lifecycle & aging** - Animals age, peak in productivity, grow old, and eventually die
 - **Herd automation** - Set daily tasks that sell, buy, move, castrate, name, or inseminate animals for you
 - **Saved filters** - Build reusable searches to find and act on exactly the animals you want

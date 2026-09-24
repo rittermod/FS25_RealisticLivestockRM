@@ -44,7 +44,7 @@ Cows produce milk **only while lactating** (10 months after giving birth). Non-l
 | **Limousin** | 20 - 205 | **30 - 320** | 10 - 115 |
 | **Water Buffalo** | 5 - 70 | 5 - 70 | 5 - 70 |
 
-*Genetics and lactation phase cause large variation between individual animals. Most cows produce somewhere in the middle of these ranges. CVM carrier cows produce even more than the upper range.*
+*Genetics and lactation phase cause large variation between individual animals. Most cows produce somewhere in the middle of these ranges. A CVM carrier cow produces considerably more than a non-carrier with the same genetics while the **Diseases** setting is on.*
 
 *Water Buffalo produce **buffalo milk** (a separate product from regular milk) with very low output that stays flat regardless of age.*
 
@@ -246,11 +246,12 @@ Cattle almost always produce a single calf. Twins and triplets can happen, more 
 
 | Disease | Spread | Fatal? | Treatment | Impact on Cows |
 |---------|--------|--------|-----------|----------------|
-| **Mastitis** | Slowly | No | 1 month, $200 | Stops all milk production |
-| **Foot & Mouth** | Moderately | Yes | 3 months, $250/mo ($750) | Severe milk reduction, major price loss |
-| **CVM** | Genetic only | Calves die | None | Carrier cows produce extra milk |
+| **Mastitis** | Slowly | Rarely | 1 month, $200 | Stops all milk production |
+| **CVM** | Genetic only | Affected animals almost always, within a few months | None | Carrier cows produce considerably more milk while **Diseases** is on |
+| **Foot and Mouth** | Rapidly | Low to moderate | 1 month, $250 | Severe milk reduction, major price loss |
+| **BRD** | Moderately | Moderate - worst in calves | 1 month, $300 | Noticeably less milk, moderate price loss |
 
-*Mastitis only affects lactating cows. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*
+*Mastitis only affects lactating cows. The Fatal column holds while **Animal Death** is on. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*
 
 ---
 
@@ -260,7 +261,7 @@ Cattle almost always produce a single calf. Twins and triplets can happen, more 
 
 2. **Beef farming:** Limousin and Angus sell for the highest prices. Highland cattle retain good value even in old age, making them lower-maintenance for long-term herds.
 
-3. **CVM gamble:** CVM carrier cows are exceptional milk producers, but breeding two carriers together risks losing calves. High risk, high reward.
+3. **CVM carriers:** CVM carrier cows give considerably more milk while the **Diseases** setting is on. Breed them with non-carriers: two carriers bred together give no more carrier calves than a carrier and a non-carrier, only about a quarter affected calves on top, which are sick and, with **Animal Death** on, die within a few months.
 
 4. **Water Buffalo** are a niche choice with very low milk output. They require their own breed-specific bull. Not recommended for dairy income.
 

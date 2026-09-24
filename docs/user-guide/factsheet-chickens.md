@@ -68,7 +68,7 @@ Chicken prices are low and identical for hens and roosters:
 | Quality genetics | Better genetics -> noticeably higher price |
 | Weight | Well-fed birds near target weight are worth more |
 | Health | Healthy birds sell for more |
-| Avian Flu (LPAI) | Drastically reduces price |
+| Avian Flu (LPAI or HPAI) | Drastically reduces price |
 
 ---
 
@@ -141,9 +141,12 @@ A successful hatch is typically around 5 chicks, and can reach up to 12 from a h
 
 | Disease | Spread | Fatal? | Treatment | Impact |
 |---------|--------|--------|-----------|--------|
-| **Avian Flu (LPAI)** | Rapidly | Yes, high fatality | **None** | Egg production drops to about 40% of normal while a bird is sick, severe price loss |
+| **Avian Flu (LPAI)** | Moderately | Low | 1 month, $5 | Egg production drops to about 40% of normal while a bird is sick, severe price loss |
+| **Avian Flu (HPAI)** | Rapidly | Almost always fatal | **None** - cull | Rare; eggs unchanged, severe price loss |
 
-> **Avian Flu is untreatable.** It spreads fast and kills many infected birds, and egg production drops to about 40% of normal while a bird is sick. Infected chickens that survive gain immunity for about two years, but an outbreak can devastate a flock. See the [Disease Guide](guide-diseases.md).
+*The Fatal column holds while **Animal Death** is on.*
+
+> **Two strains of avian flu.** LPAI is the common one: cheap to treat and rarely fatal, but egg production drops to about 40% of normal while a bird is sick. HPAI is rare but, with **Animal Death** on, almost always fatal, and it has no treatment - cull a sick bird from the Diseases dialog on the day it shows, because a bird culled that day infects nobody. Survivors are immune for 12 months (LPAI) or 24 months (HPAI). See the [Disease Guide](guide-diseases.md).
 
 ---
 
@@ -153,7 +156,7 @@ A successful hatch is typically around 5 chicks, and can reach up to 12 from a h
 
 2. **Peak production is 12-48 months.** Buy young hens and plan to replace them before they hit 48 months (4 years) when production starts declining.
 
-3. **Avian Flu is devastating.** No treatment exists, and sick birds cannot be sold - cull them from the Diseases dialog to limit spread. Keeping smaller flocks in separate pens also limits outbreak damage.
+3. **Watch for HPAI.** It has no treatment and sick birds cannot be sold at the dealer - cull each case from the Diseases dialog on the day it shows. LPAI, the common strain, is cheap to treat.
 
 4. **Cheap but productive.** At $3 per chick and up to 9 eggs/day at peak, chickens have the best return-on-investment for small farms. The initial cost is negligible.
 

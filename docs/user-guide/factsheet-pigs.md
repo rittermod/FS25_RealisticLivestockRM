@@ -160,10 +160,12 @@ Pig litters are the largest of any animal - typically around 12 piglets, and up 
 
 | Disease | Spread | Fatal? | Treatment | Impact |
 |---------|--------|--------|-----------|--------|
-| **Foot & Mouth** | Moderately | Yes | 3 months, $250/mo ($750) | Major price loss |
-| **PED** | Moderately | Yes, devastating to newborns | 1 month, $150 | Severe diarrhoea (liquid manure drastically increased, solid manure severely reduced) |
+| **Foot and Mouth** | Rapidly | Low to moderate | 1 month, $250 | Major price loss, slower growth |
+| **PED** | Moderately | Moderate - worst in young piglets | 1 month, $150 | Severe diarrhoea (liquid manure drastically increased, solid manure severely reduced) |
 
-> **PED warning:** Porcine Epidemic Diarrhoea is extremely fatal in newborn piglets. In a large herd, a PED outbreak can wipe out an entire generation of offspring. Older pigs rarely catch PED on their own, but any pig infected during an outbreak is in danger - treat quickly. See the [Disease Guide](guide-diseases.md).
+*The Fatal column holds while **Animal Death** is on.*
+
+> **PED warning:** Porcine Epidemic Diarrhoea hits young piglets hardest - newborn piglets in their first month catch it most often, and young piglets are the most at risk from it. Older pigs rarely catch it on their own, but any pig can catch it from a sick pen mate - treat quickly. See the [Disease Guide](guide-diseases.md).
 
 ---
 
@@ -175,6 +177,6 @@ Pig litters are the largest of any animal - typically around 12 piglets, and up 
 
 3. **Berkshire for profit, Black Pied for volume.** Berkshire piglets sell for noticeably more but eat more. Black Pied are cheaper to maintain for large-scale operations.
 
-4. **Watch for PED.** A single PED outbreak in a pen full of newborn piglets can kill most of them. Isolating young piglets or choosing a lower **Diseases** setting can protect your investment.
+4. **Watch for PED.** Newborn piglets catch it most often and young piglets are the most at risk, so treat every case at once ($150). If it keeps recurring, a lower **Diseases** setting can protect your investment.
 
 5. **Pen capacity matters.** If a pen is full when piglets are born, the excess are automatically sold. Make sure you have room for those 11-16 piglet litters.
