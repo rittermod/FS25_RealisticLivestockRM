@@ -277,7 +277,6 @@ source(modDirectory .. "scripts/player/RealisticLivestock_PlayerInputComponent.l
 -- SECTION 19: Vehicles
 source(modDirectory .. "scripts/vehicles/specializations/RealisticLivestock_LivestockTrailer.lua")
 source(modDirectory .. "scripts/vehicles/specializations/Rideable.lua")
-source(modDirectory .. "scripts/vehicles/RealisticLivestock_VehicleSystem.lua")
 
 -- SECTION 20b: Insemination (dewar/straw infrastructure)
 source(modDirectory .. "scripts/insemination/AIStrawUpdater.lua")
