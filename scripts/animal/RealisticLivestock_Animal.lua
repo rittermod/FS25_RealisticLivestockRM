@@ -281,15 +281,12 @@ function Animal.new(config)
     if self.age >= 0 then
         local environment = g_currentMission.environment
 
-        local currentMonth = environment.currentPeriod + 2
-        local currentYear = environment.currentYear
+        local currentMonth, currentYear = RLCalendar.getMonthAndYear(environment)
+        local birthMonth, birthYear = RLCalendar.subtractMonths(currentMonth, currentYear, self.age)
 
-        if currentMonth > 12 then currentMonth = currentMonth - 12 end
-
-        local birthYear = currentYear - math.floor(self.age / 12)
-        local birthMonth = currentMonth - (self.age % 12)
-
-        if birthMonth <= 0 then birthMonth = 12 + birthMonth end
+        Log:trace("Animal.new: birthday derived %s/%s from %s/%s at age %s",
+            tostring(birthMonth), tostring(birthYear), tostring(currentMonth), tostring(currentYear),
+            tostring(self.age))
 
         local birthCountry = math.random() >= 0.01 and RealisticLivestock.getMapCountryIndex() or
         math.random(1, #RLConstants.AREA_CODES)
@@ -1428,6 +1425,23 @@ function Animal:onDiseaseTick(daysPerPeriod)
     return died, totalTreatmentCost
 end
 
+--- One day for this animal: aging, reproduction and death; a nil date reads today's calendar date.
+---@param spec table|nil owning husbandry or trailer spec; nil for a pool animal
+---@param isServer boolean whether this peer is the server
+---@param day number|nil calendar day of the month, or nil to read the environment
+---@param month number|nil calendar month
+---@param year number|nil calendar year
+---@param currentDayInPeriod number|nil environment day within the period
+---@param daysPerPeriod number|nil environment days per period
+---@param isSaleAnimal boolean|nil true for a sale or AI pool animal
+---@return number children
+---@return number deadAnimals
+---@return number childrenSold
+---@return number childrenSoldAmount
+---@return number lowHealthDeath
+---@return number oldDeath
+---@return number randomDeath
+---@return number randomDeathMoney
 function Animal:onDayChanged(spec, isServer, day, month, year, currentDayInPeriod, daysPerPeriod, isSaleAnimal)
     self:setRecentlyBoughtByAI(false)
 
@@ -1435,14 +1449,12 @@ function Animal:onDayChanged(spec, isServer, day, month, year, currentDayInPerio
 
     if day == nil then
         local environment = g_currentMission.environment
-        month = environment.currentPeriod + 2
         currentDayInPeriod = environment.currentDayInPeriod
-
-        if month > 12 then month = month - 12 end
-
         daysPerPeriod = environment.daysPerPeriod
-        day = 1 + math.floor((currentDayInPeriod - 1) * (RLConstants.DAYS_PER_MONTH[month] / daysPerPeriod))
-        year = environment.currentYear
+        day, month, year = RLCalendar.getDate(environment)
+
+        Log:trace("Animal:onDayChanged: no date passed, read %s/%s/%s (farmId=%s uniqueId=%s)",
+            tostring(day), tostring(month), tostring(year), tostring(self.farmId), tostring(self.uniqueId))
     end
 
 

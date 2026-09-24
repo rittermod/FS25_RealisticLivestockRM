@@ -412,9 +412,11 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
 
             if childNum > 0 then
 
-                local month = g_currentMission.environment.currentPeriod + 2
-                if month > 12 then month = month - 12 end
-                local year = g_currentMission.environment.currentYear
+                local month, year = RLCalendar.getMonthAndYear(g_currentMission.environment)
+
+                Log:trace("AnimalPersistence.loadFromXMLFile: pregnancy from reproduction=%s at %s/%s"
+                    .. " (farmId=%s uniqueId=%s)",
+                    tostring(reproduction), tostring(month), tostring(year), tostring(farmId), tostring(id))
 
                 animal:createPregnancy(childNum, month, year)
 

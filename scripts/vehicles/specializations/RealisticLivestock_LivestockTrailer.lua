@@ -137,6 +137,8 @@ LivestockTrailer.onLoadFinished = Utils.appendedFunction(LivestockTrailer.onLoad
 
 
 
+--- The trailer's day tick: ages and breeds the animals in transit on today's calendar date.
+---@param superFunc function the base dayChanged
 function RealisticLivestock_LivestockTrailer:dayChanged(superFunc)
 
     superFunc(self)
@@ -146,14 +148,12 @@ function RealisticLivestock_LivestockTrailer:dayChanged(superFunc)
         local minTemp =  math.floor(g_currentMission.environment.weather.temperatureUpdater.currentMin)
 
         local environment = g_currentMission.environment
-        local month = environment.currentPeriod + 2
         local currentDayInPeriod = environment.currentDayInPeriod
-
-        if month > 12 then month = month - 12 end
-
         local daysPerPeriod = environment.daysPerPeriod
-        local day = 1 + math.floor((currentDayInPeriod - 1) * (RLConstants.DAYS_PER_MONTH[month] / daysPerPeriod))
-        local year = environment.currentYear
+        local day, month, year = RLCalendar.getDate(environment)
+
+        Log:trace("Trailer dayChanged [id=%s]: calendar date %s/%s/%s",
+            tostring(self.id), tostring(day), tostring(month), tostring(year))
 
         local spec = self.spec_livestockTrailer
         local animals = spec.clusterSystem:getAnimals()

@@ -229,16 +229,17 @@ function RLPenFeedForecast.getMonthsRemaining(husbandry, foodTotalLiters)
     -- Environment snapshot used for calendar-keyed birth firing.
     local environment      = (g_currentMission ~= nil) and g_currentMission.environment or nil
     local daysPerPeriod    = (environment ~= nil and environment.daysPerPeriod) or 3
-    local currentPeriod    = (environment ~= nil and environment.currentPeriod) or 0
-    local currentYear      = (environment ~= nil and environment.currentYear) or 0
     local foodScale        = (RealisticLivestock_PlaceableHusbandryFood ~= nil)
         and RealisticLivestock_PlaceableHusbandryFood.foodScale or 1
     local maxNumAnimals    = clusterSystem.maxNumAnimals
 
-    -- Match the in-game "month" formula used elsewhere: currentPeriod + 2 (wrap > 12).
-    local simMonth = currentPeriod + 2
-    local simYear  = currentYear
-    if simMonth > 12 then simMonth = simMonth - 12 end
+    -- The start is a calendar date; the loop below advances it a month at a time.
+    local simMonth, simYear = 2, 0
+    if environment ~= nil then
+        simMonth, simYear = RLCalendar.getMonthAndYear(environment)
+    end
+
+    Log:trace("RLPenFeedForecast.getMonthsRemaining: projection starts %s/%s", tostring(simMonth), tostring(simYear))
 
     -- Build scratch state. Live Animal entities are never mutated below.
     local scratch = {}

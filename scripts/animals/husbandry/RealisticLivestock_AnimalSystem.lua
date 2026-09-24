@@ -1751,12 +1751,10 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
     animal.variation = variationIndex
 
     local environment = g_currentMission.environment
-    local month = environment.currentPeriod + 2
+    local month, year = RLCalendar.getMonthAndYear(environment)
 
-    if month > 12 then month = month - 12 end
-
-    local day = 1 + math.floor((environment.currentDayInPeriod - 1) * (getDaysInMonth(month) / environment.daysPerPeriod))
-    local year = environment.currentYear
+    Log:trace("createNewSaleAnimal: calendar month=%s year=%s (animalTypeIndex=%s)",
+        tostring(month), tostring(year), tostring(animalTypeIndex))
 
 
     animal.diseases = {}
@@ -2464,18 +2462,16 @@ function AnimalSystem:onHourChanged()
 end
 
 
+--- The sale and AI pools' day tick: ages, breeds and ticks disease for pool animals on today's calendar date.
 function AnimalSystem:onDayChanged()
     RmSafeUtils.safeCall("AnimalSystem:onDayChanged", function()
 
         local environment = g_currentMission.environment
-        local month = environment.currentPeriod + 2
         local currentDayInPeriod = environment.currentDayInPeriod
-
-        if month > 12 then month = month - 12 end
-
         local daysPerPeriod = environment.daysPerPeriod
-        local day = 1 + math.floor((currentDayInPeriod - 1) * (getDaysInMonth(month) / daysPerPeriod))
-        local year = environment.currentYear
+        local day, month, year = RLCalendar.getDate(environment)
+
+        Log:trace("AnimalSystem:onDayChanged: calendar date %s/%s/%s", tostring(day), tostring(month), tostring(year))
 
         -- The pen block carries the other copy of this gate. Guarding only one of the two
         -- would let dealer stock progress with the feature switched off.

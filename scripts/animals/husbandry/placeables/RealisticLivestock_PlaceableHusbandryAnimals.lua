@@ -43,7 +43,13 @@ function PlaceableHusbandryAnimals:getRLMessages()
 end
 
 
--- Direct message insertion, bypassing the aggregator
+--- Insert a message directly, bypassing the aggregator; a nil date is stamped with today's calendar date.
+---@param id string message id
+---@param animal table|nil animal identifiers the message names
+---@param args table|nil message arguments, stringified in place
+---@param date string|nil "d/m/yyyy" date, or nil to stamp today
+---@param uniqueId number|nil message uniqueId, or nil to mint the next one
+---@param isLoading boolean true when restoring from the savegame
 function PlaceableHusbandryAnimals:addRLMessageDirect(id, animal, args, date, uniqueId, isLoading)
 
     local spec = self.spec_husbandryAnimals
@@ -53,16 +59,12 @@ function PlaceableHusbandryAnimals:addRLMessageDirect(id, animal, args, date, un
     if date == nil then
 
         local environment = g_currentMission.environment
-        local month = environment.currentPeriod + 2
-        local currentDayInPeriod = environment.currentDayInPeriod
-
-        if month > 12 then month = month - 12 end
-
-        local daysPerPeriod = environment.daysPerPeriod
-        local day = 1 + math.floor((currentDayInPeriod - 1) * (RLConstants.DAYS_PER_MONTH[month] / daysPerPeriod))
-        local year = environment.currentYear
+        local day, month, year = RLCalendar.getDate(environment)
 
         date = string.format("%s/%s/%s", day, month, year + RLConstants.START_YEAR.FULL)
+
+        Log:trace("addRLMessageDirect: stamped id='%s' date=%s (day=%s month=%s year=%s)",
+            tostring(id), tostring(date), tostring(day), tostring(month), tostring(year))
 
     end
 
@@ -358,24 +360,22 @@ function PlaceableHusbandryAnimals:_flushPenDayChange(spec, totalChildren, total
 end
 
 
+--- The pen's day tick: ages, breeds and ticks disease for every animal on today's calendar date.
 function RealisticLivestock_PlaceableHusbandryAnimals:onDayChanged()
     RmSafeUtils.safeCall("PlaceableHusbandryAnimals:onDayChanged", function()
 
         local minTemp = math.floor(g_currentMission.environment.weather.temperatureUpdater.currentMin)
 
         local environment = g_currentMission.environment
-        local month = environment.currentPeriod + 2
         local currentDayInPeriod = environment.currentDayInPeriod
-
-        if month > 12 then month = month - 12 end
-
         local daysPerPeriod = environment.daysPerPeriod
-        local day = 1 + math.floor((currentDayInPeriod - 1) * (RLConstants.DAYS_PER_MONTH[month] / daysPerPeriod))
-        local year = environment.currentYear
+        local day, month, year = RLCalendar.getDate(environment)
 
         local spec = self.spec_husbandryAnimals
         local animals = spec.clusterSystem:getAnimals()
         local penName = tostring(self.getName and self:getName() or self)
+
+        Log:trace("onDayChanged [%s]: calendar date %s/%s/%s", penName, tostring(day), tostring(month), tostring(year))
 
         -- Every disease caller carries its OWN copy of this gate - the sale/AI pool block is
         -- the other - because the pen's day loop is deliberately ungated so aging stays in
