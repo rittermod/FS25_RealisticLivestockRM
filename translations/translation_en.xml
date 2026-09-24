@@ -583,6 +583,7 @@
         <text name="rl_message_diseaseTreatment_start" text="Started treatment for %s at %s"/>
         <text name="rl_message_diseaseTreatment_resume" text="Resumed treatment for %s at %s"/>
         <text name="rl_message_diseaseTreatment_stop" text="Stopped treatment for %s"/>
+        <text name="rl_message_diseaseTreatment_failed" text="Treatment for %s ended without a cure"/>
         <text name="rl_message_nameChange" text="Name changed from '%s' to '%s'"/>
         <text name="rl_message_nameAdded" text="Given name '%s'"/>
         <text name="rl_message_nameDeleted" text="Name '%s' was removed"/>

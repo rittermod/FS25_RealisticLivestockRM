@@ -550,6 +550,7 @@
         <text name="rl_message_diseaseTreatment_start" text="Aloitettiin hoito: %s klo %s"/>
         <text name="rl_message_diseaseTreatment_resume" text="Hoidon jatkaminen: %s klo %s"/>
         <text name="rl_message_diseaseTreatment_stop" text="Hoitotoimenpiteet lopetettu: %s"/>
+        <text name="rl_message_diseaseTreatment_failed" text="Treatment for %s ended without a cure"/>
         <text name="rl_message_nameChange" text="Nimi muutettu: '%s' → '%s'"/>
         <text name="rl_message_nameAdded" text="Annettiin nimi: '%s'"/>
         <text name="rl_message_nameDeleted" text="Nimi '%s' poistettiin"/>

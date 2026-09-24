@@ -540,6 +540,7 @@
         <text name="rl_message_diseaseTreatment_start" text="Behandeling voor %s gestart op %s"/>
         <text name="rl_message_diseaseTreatment_resume" text="Behandeling voor %s hervat op %s"/>
         <text name="rl_message_diseaseTreatment_stop" text="Behandeling voor %s gestopt"/>
+        <text name="rl_message_diseaseTreatment_failed" text="Treatment for %s ended without a cure"/>
         <text name="rl_message_nameChange" text="Naam gewijzigd van '%s' naar '%s'"/>
         <text name="rl_message_nameAdded" text="Naam '%s' gegeven"/>
         <text name="rl_message_nameDeleted" text="Naam '%s' is verwijderd"/>

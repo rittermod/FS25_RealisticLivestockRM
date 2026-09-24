@@ -579,6 +579,7 @@
         <text name="rl_message_diseaseTreatment_start" text="Saat %s'de %s için tedavi başladı"/>
         <text name="rl_message_diseaseTreatment_resume" text="Saat %s'de %s için tedaviye devam edildi"/>
         <text name="rl_message_diseaseTreatment_stop" text="%s için tedavi durduruldu"/>
+        <text name="rl_message_diseaseTreatment_failed" text="Treatment for %s ended without a cure"/>
         <text name="rl_message_nameChange" text="İsim '%s'den '%s'e değiştirildi"/>
         <text name="rl_message_nameAdded" text="'%s' ismi verildi"/>
         <text name="rl_message_nameDeleted" text="'%s' adı kaldırıldı"/>

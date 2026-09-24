@@ -525,6 +525,7 @@
         <text name="rl_message_diseaseTreatment_start" text="Startet behandling for %s ved %s"/>
         <text name="rl_message_diseaseTreatment_resume" text="Genoptog behandling for %s ved %s"/>
         <text name="rl_message_diseaseTreatment_stop" text="Stoppet behandling for %s"/>
+        <text name="rl_message_diseaseTreatment_failed" text="Treatment for %s ended without a cure"/>
         <text name="rl_message_nameChange" text="Navn ændret fra '%s' til '%s'"/>
         <text name="rl_message_nameAdded" text="Fik navn '%s'"/>
         <text name="rl_message_nameDeleted" text="navn '%s' blev fjernet"/>

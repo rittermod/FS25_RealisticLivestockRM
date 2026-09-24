@@ -1313,7 +1313,7 @@ function Animal:onDiseaseTick(daysPerPeriod)
             local runningBefore = disease.treatmentRunning
             local counterBefore = disease.treatmentMonthsRemaining
 
-            local instruction, treatmentCost =
+            local instruction, treatmentCost, treatmentResult =
                 disease:onDayChanged(self, self.deathEnabled, daysPerPeriod)
 
             totalTreatmentCost = totalTreatmentCost + treatmentCost
@@ -1336,6 +1336,22 @@ function Animal:onDiseaseTick(daysPerPeriod)
                     .. "state=%s farmId=%s uniqueId=%s)",
                     tostring(disease.title), tostring(disease.state),
                     tostring(self.farmId), tostring(self.uniqueId))
+
+                -- Keyed on the driver's result: a failed cure and a completed relief look alike on
+                -- the record. A failed course that recovers naturally on the same tick announces as
+                -- a cure below instead.
+                if treatmentResult == RLDiseaseRecord.TREATMENT_RESULT.FAILED
+                    and disease.state == STATE.INFECTIOUS then
+                    self:addMessage("DISEASE_TREATMENT_FAILED", { disease.model.name })
+
+                    Log:debug("onDiseaseTick: treatment course failed, DISEASE_TREATMENT_FAILED posted "
+                        .. "(disease=%s farmId=%s uniqueId=%s)", tostring(disease.title),
+                        tostring(self.farmId), tostring(self.uniqueId))
+                else
+                    Log:trace("onDiseaseTick: course ended, no failure post (result=%s state=%s disease=%s "
+                        .. "farmId=%s uniqueId=%s)", tostring(treatmentResult), tostring(disease.state),
+                        tostring(disease.title), tostring(self.farmId), tostring(self.uniqueId))
+                end
             end
 
             if disease.state ~= stateBefore then

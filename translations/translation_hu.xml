@@ -583,6 +583,7 @@
         <text name="rl_message_diseaseTreatment_start" text="Kezelés megkezdve (%s), költség: %s"/>
         <text name="rl_message_diseaseTreatment_resume" text="Kezelés folytatva (%s), költség: %s"/>
         <text name="rl_message_diseaseTreatment_stop" text="Kezelés leállítva: %s"/>
+        <text name="rl_message_diseaseTreatment_failed" text="Treatment for %s ended without a cure"/>
         <text name="rl_message_nameChange" text="Név megváltoztatva erről: '%s', erre: '%s'"/>
         <text name="rl_message_nameAdded" text="Név megadva: '%s'"/>
         <text name="rl_message_nameDeleted" text="A(z) '%s' név törölve lett"/>

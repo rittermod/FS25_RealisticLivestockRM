@@ -554,6 +554,7 @@
         <text name="rl_message_diseaseTreatment_start" text="开始治疗%s于%s"/>
         <text name="rl_message_diseaseTreatment_resume" text="继续治疗%s于%s"/>
         <text name="rl_message_diseaseTreatment_stop" text="停止治疗%s"/>
+        <text name="rl_message_diseaseTreatment_failed" text="Treatment for %s ended without a cure"/>
         <text name="rl_message_nameChange" text="名称从'%s'更改为'%s'"/>
         <text name="rl_message_nameAdded" text="命名为'%s'"/>
         <text name="rl_message_nameDeleted" text="名称'%s'已被移除"/>

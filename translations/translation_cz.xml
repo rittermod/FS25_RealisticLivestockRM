@@ -582,6 +582,7 @@
         <text name="rl_message_diseaseTreatment_start" text="Zahájena léčba %s za %s"/>
         <text name="rl_message_diseaseTreatment_resume" text="Obnovena léčba %s za %s"/>
         <text name="rl_message_diseaseTreatment_stop" text="Ukončena léčba %s"/>
+        <text name="rl_message_diseaseTreatment_failed" text="Treatment for %s ended without a cure"/>
         <text name="rl_message_nameChange" text="Jméno změněno z „%s“ na „%s“"/>
         <text name="rl_message_nameAdded" text="Přiděleno jméno „%s“"/>
         <text name="rl_message_nameDeleted" text="Jméno „%s“ bylo odebráno"/>

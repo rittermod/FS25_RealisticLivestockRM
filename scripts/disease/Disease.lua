@@ -164,14 +164,15 @@ end
 
 
 -- `deathEnabled` picks the ENTRY POINT, never a discarded return: the roll writes DEAD
--- inside the pure module before returning. Both return values are contract - the caller
--- adds the second to a per-pen total, so a bare `return` makes that `number + nil`.
+-- inside the pure module before returning. All three returns are contract - the caller adds
+-- the second to a per-pen total (a bare `return` makes that `number + nil`) and reads the third.
 --- Advance this record by one daily tick and report what the caller must do with it.
 ---@param animal table Host animal, supplying the vulnerability terms and the log identity.
 ---@param deathEnabled boolean Whether this tick may roll fatality.
 ---@param daysPerPeriod number The environment's configured days per period, 1..28.
 ---@return string instruction An `RLDiseaseProgression.INSTRUCTION` value.
 ---@return number treatmentCost This tick's share of the authored monthly fee; 0 when nothing was served.
+---@return string treatmentResult An `RLDiseaseRecord.TREATMENT_RESULT` value; `NONE` when no course advanced.
 function Disease:onDayChanged(animal, deathEnabled, daysPerPeriod)
 
 	local typeName = resolveAnimalTypeName(animal)
@@ -220,7 +221,7 @@ function Disease:onDayChanged(animal, deathEnabled, daysPerPeriod)
 			tostring(self.title), tostring(animal.farmId), tostring(animal.uniqueId))
 	end
 
-	return instruction, treatmentCost
+	return instruction, treatmentCost, detail.treatment
 
 end
 

@@ -49,6 +49,12 @@ RLMessage = {
 		["title"] = "disease",
 		["importance"] = 3
 	},
+	-- A course that ended without a cure: per animal, INDIVIDUAL (not in RLMessageAggregator.AGGREGATABLE).
+	["DISEASE_TREATMENT_FAILED"] = {
+		["text"] = "diseaseTreatment_failed",
+		["title"] = "disease",
+		["importance"] = 2
+	},
 	["NAME_CHANGE"] = {
 		["text"] = "nameChange",
 		["title"] = "name",

@@ -48,7 +48,7 @@ Avian Flu (HPAI), colic and CVM have no hidden phase on any level, and on **Easy
 
 ### Symptoms and messages
 
-When a disease shows in an animal in one of your pens, a "Contracted" message posts that day and the animal's card gets a status icon (see [Reading the status icons](#reading-the-status-icons)). When it recovers - whether a treatment cured it or it got better on its own - a "Cured from" message posts on that day. CVM posts neither message.
+When a disease shows in an animal in one of your pens, a "Contracted" message posts that day and the animal's card gets a status icon (see [Reading the status icons](#reading-the-status-icons)). When it recovers - whether a treatment cured it or it got better on its own - a "Cured from" message posts on that day. CVM posts neither message. If a course of treatment ends without curing the animal, an "ended without a cure" message posts that day.
 
 ### Treatment
 
@@ -60,7 +60,7 @@ A course that cures ends the illness when it finishes (for the two diseases whos
 
 ### Treatment that fails
 
-A course for pulpy kidney or colic cures only about half the time. A course that fails ends quietly: no message posts, the status goes back to **Not treated** and the red medical bag returns. You can start a new course straight away. For every other treatable disease, a course that runs to the end cures the animal.
+A course for pulpy kidney or colic cures only about half the time. When a course fails, a message says the treatment ended without a cure, the status goes back to **Not treated** and the red medical bag returns. You can start a new course straight away. For every other treatable disease, a course that runs to the end cures the animal.
 
 ### Natural recovery
 
@@ -465,7 +465,7 @@ Pulpy kidney never spreads between animals - every case starts on its own. Lambs
 ### Management Tips
 
 - Start treatment the day it shows
-- A failed course is worth following with another - check the animal after each course, because a failure posts no message and only sets the status back to **Not treated**
+- A failed course is worth following with another - a message tells you when a course ends without a cure
 - After recovery, the animal is immune for 12 months
 
 ---
