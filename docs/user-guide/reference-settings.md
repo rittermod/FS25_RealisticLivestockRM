@@ -66,7 +66,7 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 | Setting | Default | Options | Description |
 |---------|---------|---------|-------------|
 | **Maximum Amount of Messages** | 500 | 100-5,000 | Maximum number of messages stored per husbandry; older messages are removed when the limit is reached. |
-| **Message Log Summaries** | Off | Off / On | When off, each event (birth, death, disease) generates an individual message. When on, events are aggregated into daily summaries. |
+| **Message Log Summaries** | Off | Off / On | When off, every event gets its own message. When on, births, deaths, sales, purchases, newborns sold because the pen was full, and the herdsman's completed tasks are collected per husbandry and posted at the end of each day, one summary message for each kind of event. Every other message still posts on its own, including all disease messages - falling ill, recovering, and starting, stopping, resuming, or failing treatment. An animal that dies of a disease is counted in the day's deaths summary. |
 
 *Summary mode reduces message clutter in large herds but provides less detail per event.*
 
