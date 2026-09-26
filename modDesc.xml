@@ -1,6 +1,6 @@
 <modDesc descVersion="110">
     <author>Ritter</author>
-    <version>1.4.0.0-dev.4</version>
+    <version>1.4.0.0</version>
     <title>
         <en>Realistic Livestock - Ritter version</en>
         <it>Allevamento Realistico - Versione Ritter</it>
@@ -26,45 +26,44 @@ Source code and issue tracker: https://github.com/rittermod/FS25_RealisticLivest
 
 Changelog
 
-1.4.0.0-dev.4:
-- Added colic, the first horse disease: a horse can fall ill with it on its own (it never spreads), cannot be sold while sick, grows more slowly if it is still young, and can die of it; a $500 treatment course cures it about half the time.
+1.4.0.0:
+Heads up before you update:
+- Every disease infection, immunity, part-way treatment and CVM carrier in your save is cleared on first load - the new disease records cannot read the old ones. Your herd starts out disease-free and CVM-free.
+- The Diseases setting becomes a difficulty level: an existing save lands on Normal, or Off if diseases were off. The Disease Chance setting is gone.
+- A sick animal that shows symptoms can no longer be sold or taken to a butcher, by you or by the herdsman. A herdsman sell rule for animals with any disease now sells none - switch it off or change its filter.
+- Foot and mouth treatment is now a one-month course like every other disease, instead of three months.
+
+Added:
+- Added avian flu (HPAI) for chickens, BRD for cattle and pulpy kidney for sheep and goats - HPAI cannot be treated, so cull a bird that shows it straight away to stop it spreading through the flock.
+- Added colic, the first horse disease: a horse can fall ill with it on its own (it never spreads), grows more slowly if it is still young, and can die of it; a $500 treatment course cures it about half the time.
+- Added a hidden phase on Hard and Very hard: a newly infected animal of most diseases shows nothing until its symptoms appear, and on every level the "Contracted" message now arrives on the day symptoms show; an animal still in the hidden phase already spreads its disease.
+- Added illness effects on growth and breeding - most illnesses slow weight gain while an animal shows symptoms, and mastitis and foot and mouth also lower its chance of conceiving.
 - Added a Cull button to the Diseases dialog for an animal showing symptoms: it removes the animal from your herd for good and pays 33% of its current sale price, or nothing for a chicken.
-- Added Choose Diseases to the RL Menu settings: switch individual diseases off so no new cases of them start; animals that already have one - ill, incubating, a CVM carrier, or a calf conceived before the change - keep it until it runs its course.
-- Stopped sick animals being sold or taken to a butcher while they show symptoms - by you or by the herdsman: treat them, or cull them from the Diseases dialog. A herdsman sell rule for animals with any disease now sells none, and in mark mode marks none. A herdsman move to a butcher leaves sick animals in the pen and tells you how many it skipped.
+- Added Choose Diseases to the RL Menu settings: switch individual diseases off so no new cases of them start; animals that already have one keep it until it runs its course.
+- Added a message when a treatment course ends without curing the animal.
 - Added a credit to Renfordt's Enhanced Livestock: changes to the disease system are inspired by it, with some parts converted directly from it.
 
-1.4.0.0-dev.3:
-- Added disease spread between animals in the same pen.
-- Added CVM back as an inherited cattle disease: some dealer cattle carry it and calves inherit it; carriers give 50% more milk, and an affected animal shows as sick and, with animal deaths on, dies of it within a few months.
-- Brought back illness effects on production - less milk, goat milk, eggs, wool and manure, and PED raises liquid manure - in full while an animal shows symptoms and about half as strongly while it is still incubating.
-- Added three diseases - avian flu (HPAI) for chickens, BRD for cattle and pulpy kidney for sheep - and retuned the infectious diseases' rates; HPAI cannot be treated, so sell a bird that shows it straight away to stop it spreading through the flock.
-- Added illness effects on growth and breeding - most illnesses slow weight gain while an animal shows symptoms, and mastitis and foot and mouth also lower its chance of conceiving.
-- Brought back the "Cured from" message: it posts on the day an animal recovers from a disease, whether a treatment cured it or it got better on its own.
-- Brought back the lower sale price for sick animals - an animal sells for less while it shows symptoms and at full price once it recovers.
-- Turned the Diseases setting into a difficulty choice - Off, Easy, Normal, Hard or Very hard: on Easy and Normal, the default, diseases are rare or strike now and then and show symptoms at once, while on Hard and Very hard they strike more often, spread faster and most take a while to show; an existing save lands on Normal, or Off if diseases were off.
+Changed:
+- Rebuilt the disease system to run on the daily tick instead of once a month - catching, spreading, treatment and recovery all move day by day, and each disease's chance of striking is a monthly rate by age, so longer months no longer raise it.
+- Turned the Diseases setting into a difficulty choice - Off, Easy, Normal, Hard or Very hard: on Easy and Normal, the default, diseases are rare or strike now and then and show symptoms at once, while on Hard and Very hard they strike more often, spread faster and most take a while to show.
 - Changed natural recovery so an untreated animal that survives stays sick for at least its illness's minimum length and then recovers on a daily chance - some animals now stay sick longer than others.
-- Fixed immunity and treatment times showing long decimals, and the HUD reading "1 months", when a month lasts more than one day.
-- Fixed an animal being able to die of a disease on the day its symptoms first show, before you could start treatment - treatment started that day now gives the same protection at every month length.
+- Changed every treatable disease to a one-month treatment course, charged day by day while it runs - foot and mouth drops from three months to one.
+- Changed illness effects on production - less milk, goat milk, eggs, wool and manure, and PED raises liquid manure - to apply in full while an animal shows symptoms and about half as strongly while it is still in the hidden phase.
+- Changed the lower sale price for a sick animal to apply only while it shows symptoms - a recovered animal or a CVM carrier now sells at full price.
+- Stopped sick animals being sold or taken to a butcher while they show symptoms - by you or by the herdsman. A herdsman sell rule for animals with any disease now sells none, and in mark mode marks none; a herdsman move to a butcher leaves sick animals in the pen and tells you how many it skipped.
+- Renamed Avian Flu to Avian Flu (LPAI) in every language, to tell it apart from the new HPAI.
 
-1.4.0.0-dev.2:
-- Dropped all disease infections, immunities and part-way treatments from existing saves - the new record format cannot read the old ones.
-- Unlocked the Diseases setting again (admins only in multiplayer) - on by default; illness rates are untuned and diseases do not spread yet.
-- Rebuilt the illness lifecycle: incubation, symptoms, treatment, recovery and immunity now run on the daily tick.
-- Hid an incubating animal's illness until symptoms show, and moved the "Contracted" message to that day.
-- Brought back treatment, its cost and disease deaths (with Deaths on, listed as "a disease").
-- Changed each disease's chance of striking to a monthly rate by age, so longer months no longer raise it.
-- Stopped illness affecting sale price and milk, egg and manure output until the new effects are wired in.
-- Renamed Avian Flu to Avian Flu (LPAI) in every language.
-- Removed the Disease Chance setting, which no longer did anything.
-- Updated the disease guide and chicken factsheet for the new name and the hidden incubation.
+Removed:
+- Removed the Disease Chance setting - the difficulty level replaces it.
 
-1.4.0.0-dev.1:
-- Turned the disease system off while it is rebuilt - animals no longer catch, spread or recover from diseases, and an existing illness stays frozen exactly where it is.
-- Stopped every disease surface showing a frozen illness - the animal's detail pane, the card status icons and the disease HUD box all go quiet, so a sick animal reads as healthy until the new system lands.
-- Greyed out the Diseases setting for everyone, admins included, and disabled the Diseases button on an animal so the treatment dialog cannot be opened.
-- Stopped treatment charging the farm - a course that was part-way through stays exactly where it stopped and bills nothing further.
-- Fixed one bad entry in the disease definition file silently dropping every disease defined after it - five authoring mistakes now warn and skip just the offending entry.
-- Corrected the disease guide's spread claims - foot and mouth is the only disease that sustains an outbreak, and PED and avian flu were both overstated.
+Fixed:
+- Fixed saving while a horse is out of its pen removing vehicles from the save - one per horse out, taken from the start of the vehicle list and sometimes the horse itself.
+- Fixed January and February messages appearing below the previous year's messages in the Messages tab; pregnancy due dates, birthdays and the feed forecast now use the right year in those months too.
+- Fixed one bad entry in the disease definition file silently dropping every disease defined after it - an authoring mistake now warns and skips just the offending entry.
+
+Documentation:
+- Rewrote the disease guide to cover all nine diseases, the hidden phase and the difficulty levels.
+- Corrected the settings reference: disease messages are not collected into daily summaries, though a death from disease still counts in the day's deaths summary.
 
 1.3.2.1:
 - Fixed newborn rabbits on the Witcombe map never gaining health, so many of them died at their first day change - rabbits of every age now eat and drink the amounts the Witcombe support sets.
