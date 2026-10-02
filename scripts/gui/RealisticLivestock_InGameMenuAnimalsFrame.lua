@@ -74,16 +74,48 @@ local function findAnimalPosition(frame, animal)
 end
 
 
+--- Count the frame's HUSBANDRY_ANIMALS_CHANGED subscriptions: 1 while the page is open, 0 once closed.
+--- @param frame table the in-game menu's Animals page
+--- @return integer count
+function RealisticLivestock_InGameMenuAnimalsFrame.countDataChangedSubscriptions(frame)
+    local byType = g_messageCenter.subscribers or {}
+    local count = 0
+    for _, info in ipairs(byType[MessageType.HUSBANDRY_ANIMALS_CHANGED] or {}) do
+        if info.callbackTarget == frame then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+
+--- @param frame table the in-game menu's Animals page
+--- @return boolean shown  true when the in-game menu is on screen with this page current
+local function isShownPage(frame)
+    return g_gui.currentGuiName == "InGameMenu" and g_inGameMenu ~= nil and g_inGameMenu.currentPage == frame
+end
+
+
 -- Per-call counter so consecutive reloadList fires can be distinguished in
 -- the log when triaging menu-refresh churn (a single user action can fan out
 -- to many reloads via the publish chain).
 RealisticLivestock_InGameMenuAnimalsFrame._reloadListCount = 0
 
 
+--- Rebuild the animal list in RLRM order, keeping the selected animal; a page not on screen skips it.
+--- @param superFunc function the base reloadList
 function RealisticLivestock_InGameMenuAnimalsFrame:reloadList(superFunc)
     RealisticLivestock_InGameMenuAnimalsFrame._reloadListCount =
         RealisticLivestock_InGameMenuAnimalsFrame._reloadListCount + 1
     local callId = RealisticLivestock_InGameMenuAnimalsFrame._reloadListCount
+
+    -- The page rebuilds when it opens, so a rebuild while closed is wasted work - and a
+    -- data-changed listener left behind by another mod calls this on every pen change.
+    if not isShownPage(self) then
+        Log:debug("InGameMenuAnimalsFrame:reloadList #%d skipped: page not shown (gui=%s, frame=%s)",
+            callId, tostring(g_gui.currentGuiName), tostring(self))
+        return
+    end
 
     -- No printCallstack() here - it always emits an engine [ERROR] line, which
     -- would surface phantom ERRORs in support logs on this hot path.
@@ -223,10 +255,14 @@ InGameMenuAnimalsFrame.populateCellForItemInSection,
     RealisticLivestock_InGameMenuAnimalsFrame.populateCellForItemInSection)
 
 
--- Add RL_OPEN_ANIMAL_SCREEN to NAV_ACTIONS only while the animals frame is active,
--- so the R key doesn't interfere with other frames (e.g. RemoveContract in contracts frame).
+-- RL_OPEN_ANIMAL_SCREEN is in NAV_ACTIONS only while the Animals page is open, so the R key
+-- does not interfere with other frames (such as RemoveContract on the contracts page).
+
+--- Add the R action to NAV_ACTIONS and log the page's data-changed subscription count.
 function RealisticLivestock_InGameMenuAnimalsFrame:onFrameOpen()
     table.insert(Gui.NAV_ACTIONS, InputAction.RL_OPEN_ANIMAL_SCREEN)
+    Log:debug("InGameMenuAnimalsFrame:onFrameOpen: frame=%s, dataChangedSubscriptions=%d",
+        tostring(self), RealisticLivestock_InGameMenuAnimalsFrame.countDataChangedSubscriptions(self))
 end
 
 InGameMenuAnimalsFrame.onFrameOpen = Utils.appendedFunction(
@@ -234,6 +270,7 @@ InGameMenuAnimalsFrame.onFrameOpen = Utils.appendedFunction(
     RealisticLivestock_InGameMenuAnimalsFrame.onFrameOpen
 )
 
+--- Remove the R action from NAV_ACTIONS and log the page's data-changed subscription count.
 function RealisticLivestock_InGameMenuAnimalsFrame:onFrameClose()
     for i = #Gui.NAV_ACTIONS, 1, -1 do
         if Gui.NAV_ACTIONS[i] == InputAction.RL_OPEN_ANIMAL_SCREEN then
@@ -241,6 +278,8 @@ function RealisticLivestock_InGameMenuAnimalsFrame:onFrameClose()
             break
         end
     end
+    Log:debug("InGameMenuAnimalsFrame:onFrameClose: frame=%s, dataChangedSubscriptions=%d",
+        tostring(self), RealisticLivestock_InGameMenuAnimalsFrame.countDataChangedSubscriptions(self))
 end
 
 InGameMenuAnimalsFrame.onFrameClose = Utils.appendedFunction(
