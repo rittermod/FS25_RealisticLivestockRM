@@ -479,6 +479,7 @@
 
 
         <text name="rl_ui_immune" text="Immun"/>
+        <text name="rl_ui_vaccinated" text="Vaccinated"/>
         <text name="rl_ui_startTreatment" text="Behandlung beginnen"/>
         <text name="rl_ui_resumeTreatment" text="Behandlung fortsetzen"/>
         <text name="rl_ui_stopTreatment" text="Behandlung beenden"/>

@@ -1,8 +1,8 @@
 --[[
     Disease.lua
     One animal's disease record as a live object: the eight SEIR record keys grafted
-    FLAT onto it, plus the treatment-running flag and the two genetics markers, with
-    both codecs and the player-facing labels.
+    FLAT onto it, plus the treatment-running flag, the vaccination flag and the two genetics
+    markers, with both codecs and the player-facing labels.
 
     Progression is LIVE and runs off the pen's daily tick, deciding through
     `RLDiseaseProgression` and applying nothing itself; a genetic record skips it.
@@ -29,8 +29,8 @@ Disease.RECORD_VERSION = 2
 ---
 --- The eight record keys are GRAFTED FLAT rather than nested under `self.record`,
 --- because the spread pass and the sub-lethal resolver already read them flat off
---- `animal.diseases`. The ninth key, the treatment running flag, is assigned here
---- because a paused and a running course are otherwise indistinguishable.
+--- `animal.diseases`. The treatment running flag is assigned here because a paused and a
+--- running course are otherwise indistinguishable; `vaccinated` alone tells a vaccination from a recovery.
 ---@param model table A parsed disease model entry, carrying `title`, `archetype` and `endpoint`.
 ---@param isCarrier boolean|nil True for an asymptomatic genetic carrier record.
 ---@param genes number|nil Count of affected genes inherited, 0 when not genetic.
@@ -46,6 +46,7 @@ function Disease.new(model, isCarrier, genes)
 	self.model = model
 
 	self.treatmentRunning = false
+	self.vaccinated = false
 
 	-- Genetics-system markers rather than SEIR state: `affectReproduction` reads the copies; the
 	-- carrier fold, the affected death roll, RLDiseaseStatus and Disease.isVisibleToPlayer read isCarrier.
@@ -75,6 +76,7 @@ function Disease:loadFromXMLFile(xmlFile, key)
 	self.treatmentMonthsRemaining = xmlFile:getFloat(key .. "#treatmentMonthsRemaining", 0)
 	self.immunityMonthsRemaining = xmlFile:getFloat(key .. "#immunityMonthsRemaining", 0)
 	self.treatmentRunning = xmlFile:getBool(key .. "#treatmentRunning", false)
+	self.vaccinated = xmlFile:getBool(key .. "#vaccinated", false)
 	self.isCarrier = xmlFile:getBool(key .. "#isCarrier", false)
 	self.genes = xmlFile:getInt(key .. "#genes", 0)
 
@@ -97,6 +99,7 @@ function Disease:saveToXMLFile(xmlFile, key)
 	xmlFile:setFloat(key .. "#treatmentMonthsRemaining", self.treatmentMonthsRemaining)
 	xmlFile:setFloat(key .. "#immunityMonthsRemaining", self.immunityMonthsRemaining)
 	xmlFile:setBool(key .. "#treatmentRunning", self.treatmentRunning)
+	xmlFile:setBool(key .. "#vaccinated", self.vaccinated)
 	xmlFile:setBool(key .. "#isCarrier", self.isCarrier)
 	xmlFile:setInt(key .. "#genes", self.genes)
 
@@ -119,6 +122,7 @@ function Disease:writeStream(streamId, connection)
 	streamWriteFloat32(streamId, self.monthsElapsed)
 	streamWriteFloat32(streamId, self.treatmentMonthsRemaining)
 	streamWriteFloat32(streamId, self.immunityMonthsRemaining)
+	streamWriteBool(streamId, self.vaccinated)
 	streamWriteBool(streamId, self.treatmentRunning)
 	streamWriteBool(streamId, self.isCarrier)
 	streamWriteUInt8(streamId, self.genes)
@@ -137,6 +141,7 @@ function Disease:readStream(streamId, connection)
 	self.monthsElapsed = streamReadFloat32(streamId)
 	self.treatmentMonthsRemaining = streamReadFloat32(streamId)
 	self.immunityMonthsRemaining = streamReadFloat32(streamId)
+	self.vaccinated = streamReadBool(streamId)
 	self.treatmentRunning = streamReadBool(streamId)
 	self.isCarrier = streamReadBool(streamId)
 	self.genes = streamReadUInt8(streamId)
@@ -350,7 +355,7 @@ end
 -- Every production caller filters out a record `Disease.isVisibleToPlayer` hides; the Not-treated
 -- fallback exists so a direct call on such a record still returns a label, never nil.
 --- This record's player-facing status label. No logging: a per-frame formatter.
----@return string localised status label, with whole months for an immune record
+---@return string localised status label, with whole months on the immune or vaccinated label
 function Disease:getStatus()
     local presentation = RLDiseaseStatus.resolve(self)
     local label = g_i18n:getText(presentation.statusKey or RLDiseaseStatus.KEY.NOT_TREATED)

@@ -528,6 +528,7 @@
 
 
         <text name="rl_ui_immune" text="Imunní"/>
+        <text name="rl_ui_vaccinated" text="Vaccinated"/>
         <text name="rl_ui_startTreatment" text="Začít léčbu"/>
         <text name="rl_ui_resumeTreatment" text="Obnovit léčbu"/>
         <text name="rl_ui_stopTreatment" text="Ukončit léčbu"/>

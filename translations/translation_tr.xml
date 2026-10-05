@@ -529,6 +529,7 @@
 
 
         <text name="rl_ui_immune" text="Bağışık"/>
+        <text name="rl_ui_vaccinated" text="Vaccinated"/>
         <text name="rl_ui_startTreatment" text="Tedaviyi Başlat"/>
         <text name="rl_ui_resumeTreatment" text="Tedaviye Devam Et"/>
         <text name="rl_ui_stopTreatment" text="Tedaviyi Durdur"/>

@@ -529,6 +529,7 @@
         <!-- MALADIES -->
 
         <text name="rl_ui_immune" text="Immunisé"/>
+        <text name="rl_ui_vaccinated" text="Vaccinated"/>
         <text name="rl_ui_startTreatment" text="Commencer le traitement"/>
         <text name="rl_ui_resumeTreatment" text="Reprendre le traitement"/>
         <text name="rl_ui_stopTreatment" text="Arrêter le traitement"/>

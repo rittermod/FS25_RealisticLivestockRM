@@ -477,6 +477,7 @@
 
 
         <text name="rl_ui_immune" text="Иммунитет"/>
+        <text name="rl_ui_vaccinated" text="Vaccinated"/>
         <text name="rl_ui_startTreatment" text="Начать лечение"/>
         <text name="rl_ui_resumeTreatment" text="Возобновить лечение"/>
         <text name="rl_ui_stopTreatment" text="Прервать лечение"/>

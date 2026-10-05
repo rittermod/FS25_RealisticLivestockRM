@@ -245,8 +245,8 @@ RLDiseaseRecord.ADHERENCE_REASON = {
 --- A record whose state a re-authored model can no longer produce is dropped, never
 --- repaired - it holds no history to repair from. The check ORDER is declared, because
 --- a record can fail two conditions and the reason drives the caller's tally.
---- @param record table|nil The `Disease` object - eight record keys grafted flat plus
----        `treatmentRunning`. TRUSTED INTERNAL input; nothing here raises.
+--- @param record table|nil The `Disease` object - eight record keys grafted flat plus its
+---        flags and genetics markers. TRUSTED INTERNAL input; nothing here raises.
 --- @param model table|nil The parsed `<model>` entry. The endpoint is read from HERE.
 --- @param animalTypeName string|nil Uppercase type name, nil when unresolvable.
 --- @return boolean adherent True when the record still fits the model
@@ -280,8 +280,8 @@ function RLDiseaseRecord.isAdherent(record, model, animalTypeName)
         if not bound then return false, REASON.ANIMAL_TYPE end
     end
 
-    -- Gated on INFECTIOUS because nothing clears the running flag at a cure, so a
-    -- recovered and immune animal legitimately still carries it.
+    -- Gated on INFECTIOUS because a RECOVERED record can still carry the running flag
+    -- until its next daily tick clears it, as one loaded from an older save does.
     if record.state == RLDiseaseRecord.STATE.INFECTIOUS then
         local remaining = record.treatmentMonthsRemaining
         local midCourse = (type(remaining) == "number" and remaining > 0)

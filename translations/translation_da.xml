@@ -471,6 +471,7 @@
 
 
         <text name="rl_ui_immune" text="Immun"/>
+        <text name="rl_ui_vaccinated" text="Vaccinated"/>
         <text name="rl_ui_startTreatment" text="Start behandling"/>
         <text name="rl_ui_resumeTreatment" text="Genoptag behandling"/>
         <text name="rl_ui_stopTreatment" text="Stop behandling"/>

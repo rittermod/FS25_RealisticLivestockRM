@@ -529,6 +529,7 @@
 
 
         <text name="rl_ui_immune" text="Immunis"/>
+        <text name="rl_ui_vaccinated" text="Vaccinated"/>
         <text name="rl_ui_startTreatment" text="Kezelés indítása"/>
         <text name="rl_ui_resumeTreatment" text="Kezelés folytatása"/>
         <text name="rl_ui_stopTreatment" text="Kezelés leállítása"/>

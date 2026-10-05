@@ -1,7 +1,7 @@
 --[[
     RLDiseaseStatus.lua
     What one disease record tells the player: whether a naming surface lists it, its status
-    label key, the whole months of an immune label, its card icon token, and whether it groups
+    label key, the whole months of an immune or vaccinated label, its card icon token, and whether it groups
     the animal as diseased. An incubating non-carrier record resolves exactly as a healthy animal does.
     isDiseased and iconOf are the per-record rules the Animal display predicates and the filter
     catalog read; resolve composes them.
@@ -16,10 +16,11 @@ RLDiseaseStatus = {}
 local Log = RmLogging.getLogger("RLRM")
 
 
---- The five status label keys `resolve` can return. READ-ONLY by contract.
+--- The status label keys `resolve` can return. READ-ONLY by contract.
 RLDiseaseStatus.KEY = {
     ["BEING_TREATED"] = "rl_ui_beingTreated",
     ["IMMUNE"] = "rl_ui_immune",
+    ["VACCINATED"] = "rl_ui_vaccinated",
     ["TREATMENT_PAUSED"] = "rl_ui_treatmentPaused",
     ["CARRIER"] = "rl_ui_carrier",
     ["NOT_TREATED"] = "rl_ui_notTreated"
@@ -90,11 +91,11 @@ function RLDiseaseStatus.iconOf(record)
 end
 
 
--- The label arms keep the shipped order: a running course, RECOVERED, a paused course, a carrier,
--- then the fallback. The icon is carrier-first and ignores a pause, so card and pane can differ.
+-- The label arms keep the shipped order: a running course, RECOVERED (vaccinated or immune), a paused
+-- course, a carrier, then the fallback. The icon is carrier-first and ignores a pause, so card and pane can differ.
 --- Resolve what one record tells the player. A fresh table every call. Unlogged: per-frame callers.
 ---@param record table|nil A disease record, or nil for an animal without one.
----@return table presentation `visible`, `statusKey`, `months` (immune arm only), `icon` and `diseased`.
+---@return table presentation `visible`, `statusKey`, `months` (RECOVERED arm only), `icon` and `diseased`.
 function RLDiseaseStatus.resolve(record)
     if record == nil or not Disease.isVisibleToPlayer(record) then
         return healthy()
@@ -111,7 +112,7 @@ function RLDiseaseStatus.resolve(record)
     if record.treatmentRunning then
         presentation.statusKey = KEY.BEING_TREATED
     elseif record.state == STATE.RECOVERED then
-        presentation.statusKey = KEY.IMMUNE
+        presentation.statusKey = record.vaccinated == true and KEY.VACCINATED or KEY.IMMUNE
         presentation.months = RLDiseaseStatus.wholeMonthsRemaining(record.immunityMonthsRemaining)
     -- This record's own counter alone; `or 0` tolerates a partially-deserialized record.
     elseif (record.treatmentMonthsRemaining or 0) > 0 then
