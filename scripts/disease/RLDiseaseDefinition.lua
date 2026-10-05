@@ -413,6 +413,79 @@ local function readModelTreatment(xmlFile, modelKey, model, title, warnings)
 end
 
 
+-- Field-local and all or nothing: a defect warns, drops the whole block and leaves the disease loaded.
+-- Each attribute is read and checked before the next, so a block warns only for its first defect.
+--- Read the optional `<model><vaccine>` child onto `model`; `#cost` is a price per dose, not a per-month fee.
+---@param xmlFile table open XMLFile document
+---@param modelKey string the `<model>` element key
+---@param model table the model entry being built
+---@param title string the owning disease
+---@param warnings table the accumulator
+local function readModelVaccine(xmlFile, modelKey, model, title, warnings)
+
+    local vaccineKey = modelKey .. ".vaccine"
+
+    if not xmlFile:hasProperty(vaccineKey) then
+        Log:trace("RLDiseaseDefinition.readModelVaccine: title=%s has no vaccine block", tostring(title))
+        return
+    end
+
+    -- Read as a FLOAT, as treatment months are, so a fractional value refuses on both runners. Inverted
+    -- so a NaN refuses too.
+    local protectionMonths = xmlFile:getFloat(vaccineKey .. "#protectionMonths")
+
+    if protectionMonths == nil or not (protectionMonths >= 1)
+        or protectionMonths ~= math.floor(protectionMonths) then
+        warn(warnings, title, "vaccine-months-invalid",
+            string.format("vaccine #protectionMonths is %s; must be a whole number of months, "
+                .. "minimum 1; vaccine skipped", tostring(protectionMonths)))
+        Log:trace("RLDiseaseDefinition.readModelVaccine: title=%s refused protectionMonths=%s",
+            tostring(title), tostring(protectionMonths))
+        return
+    end
+
+    local cost = readNonNegative(xmlFile, vaccineKey .. "#cost", "vaccine cost", title, warnings)
+
+    if cost == nil then
+        warn(warnings, title, "vaccine-incomplete",
+            string.format("vaccine #cost is missing or refused (%s); vaccine skipped", tostring(cost)))
+        Log:trace("RLDiseaseDefinition.readModelVaccine: title=%s refused cost=%s",
+            tostring(title), tostring(cost))
+        return
+    end
+
+    -- Optional, and tested by PRESENCE: a declared but refused value must not read as "no maternal protection".
+    local maternalMonths = nil
+    local maternalPath = vaccineKey .. "#maternalMonths"
+
+    if xmlFile:hasProperty(maternalPath) then
+
+        maternalMonths = xmlFile:getFloat(maternalPath)
+
+        if maternalMonths == nil or not (maternalMonths >= 1)
+            or maternalMonths ~= math.floor(maternalMonths) then
+            warn(warnings, title, "vaccine-maternal-months-invalid",
+                string.format("vaccine #maternalMonths is %s; when declared it must be a whole number "
+                    .. "of months, minimum 1; vaccine skipped", tostring(maternalMonths)))
+            Log:trace("RLDiseaseDefinition.readModelVaccine: title=%s refused maternalMonths=%s",
+                tostring(title), tostring(maternalMonths))
+            return
+        end
+
+    end
+
+    model.vaccine = {
+        ["protectionMonths"] = protectionMonths,
+        ["cost"] = cost,
+        ["maternalMonths"] = maternalMonths
+    }
+
+    Log:trace("RLDiseaseDefinition.readModelVaccine: title=%s protectionMonths=%s cost=%s maternalMonths=%s",
+        tostring(title), tostring(protectionMonths), tostring(cost), tostring(maternalMonths))
+
+end
+
+
 -- REQUIRED on a `genetic` archetype and FORBIDDEN on every other one. The forbidden half is tested
 -- by PRESENCE, so a declared block is refused even where its own reads below would fail.
 --- Read the `<model><genetic>` block onto `model`, or refuse the disease.
@@ -752,6 +825,8 @@ local function buildModelEntry(xmlFile, key, title, deps, warnings)
                 .. "usable; disease dropped")
         return nil
     end
+
+    readModelVaccine(xmlFile, modelKey, model, title, warnings)
 
     model.effects = {
         ["weightGain"] = readNonNegative(xmlFile, modelKey .. ".effects#weightGain",

@@ -9,6 +9,7 @@
 				<key ageMonths="12" perMonth="0.012"/>
 			</infection>
 			<treatment months="1" cost="200" efficacy="1" outcome="cure"/>
+			<vaccine protectionMonths="12" cost="20"/>
 			<effects weightGain="0.85" fertility="0.7">
 				<output type="milk" modifier="0"/>
 				<output type="pallets" modifier="0"/>
@@ -62,6 +63,7 @@
 				<key ageMonths="18" perMonth="0.004"/>
 			</infection>
 			<treatment months="1" cost="150" efficacy="1" outcome="cure"/>
+			<vaccine protectionMonths="6" cost="15" maternalMonths="1"/>
 			<effects weightGain="0.5" fertility="1">
 				<output type="liquidManure" modifier="4"/>
 				<output type="manure" modifier="0.25"/>
@@ -104,6 +106,7 @@
 				<key ageMonths="9999" perMonth="0.007"/>
 			</infection>
 			<treatment months="1" cost="300" efficacy="1" outcome="cure"/>
+			<vaccine protectionMonths="12" cost="30"/>
 			<effects weightGain="0.8" fertility="1">
 				<output type="milk" modifier="0.7"/>
 				<output type="pallets" modifier="0.7"/>
@@ -121,6 +124,7 @@
 				<key ageMonths="9999" perMonth="0.0085"/>
 			</infection>
 			<treatment months="1" cost="150" efficacy="0.5" outcome="cure"/>
+			<vaccine protectionMonths="12" cost="15" maternalMonths="2"/>
 			<effects weightGain="0.6" fertility="1">
 				<output type="pallets" modifier="0.5"/>
 			</effects>
