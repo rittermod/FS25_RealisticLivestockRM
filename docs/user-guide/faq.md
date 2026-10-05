@@ -1,6 +1,6 @@
 # Frequently Asked Questions
 
-Common questions about Realistic Livestock RM, covering genetics, breeding, and mod scope.
+Common questions about Realistic Livestock RM, covering genetics, breeding, diseases, and mod scope.
 
 > **Note:** This documentation was generated with AI assistance and may contain inaccuracies. If you spot an error, please [open an issue](https://github.com/rittermod/FS25_RealisticLivestockRM/issues).
 
@@ -235,6 +235,30 @@ A few things worth knowing:
 - **In multiplayer it is server-wide and admin-only** - other players see the setting but cannot change it.
 
 Don't confuse this with **Genetics Display**, which only changes whether genetics numbers are shown in animal names. It has no effect on what the dealer offers.
+
+---
+
+## How do I protect my animals from diseases?
+
+**Short answer:** vaccinate. Open the animal's **Diseases** dialog (the Diseases button on its Info page), select the disease and press **Vaccinate**. One dose protects it at once: while protected it cannot catch that disease and does not spread it.
+
+Four diseases have a vaccine:
+
+| Disease | Animals | Protection | One dose |
+|---------|---------|------------|----------|
+| Mastitis | Female cows and female goats | 12 months | $20 |
+| PED | Pigs | 6 months | $15 |
+| BRD | Cattle | 12 months | $30 |
+| Pulpy Kidney | Sheep and goats | 12 months | $15 |
+
+A few things worth knowing:
+
+- **Newborns can be born protected.** A sow protected against PED gives her piglets 1 month of protection, and a ewe or doe protected against pulpy kidney gives her lambs and kids 2 months - as long as her own protection still runs on the day she gives birth. Vaccinate the young ones before it runs out.
+- **Recovering protects too.** An animal that recovers from a disease is immune to it for a time, and a mother immune after recovering passes protection to her newborns just as a vaccinated one does.
+- **Vaccinate before the disease shows.** A dose given to an animal that has already caught the disease does nothing, and is still charged.
+- **The rest have no vaccine.** For foot and mouth, treat at once and, on **Easy** and **Normal**, move a new case into an empty pen the day it shows; cull an Avian Flu (HPAI) case the day it shows; breed CVM carriers only with non-carriers.
+
+The **Diseases** setting decides how often animals fall ill in the first place. The [Disease Guide](guide-diseases.md#vaccination) has the full details.
 
 ---
 

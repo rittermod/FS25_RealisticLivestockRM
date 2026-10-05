@@ -94,6 +94,22 @@ To vaccinate an animal, open its **Diseases** dialog (the Diseases button on the
 - A dose given to an animal that has already caught the disease does nothing, and is still charged.
 - A vaccinated animal reads **Vaccinated** with the months left, and reads healthy in the lists. When the protection runs out the entry disappears and the animal can catch the disease again.
 
+#### Protection from the mother
+
+For two diseases, a newborn is born protected when its mother is. What counts is the mother on the day she gives birth: if she is protected against the disease then - vaccinated, or immune after recovering from it - each of her newborns starts out immune for a short time.
+
+| Disease | Newborns | Protected for |
+|---------|----------|---------------|
+| [PED](#porcine-epidemic-diarrhoea-ped) | Piglets | 1 month |
+| [Pulpy Kidney](#pulpy-kidney) | Lambs and kids | 2 months |
+
+Mastitis and BRD pass nothing on.
+
+- The newborn's detail panel lists the disease as **Immune** with the time left, and it reads healthy in the lists. When the protection runs out the entry disappears.
+- The mother's own protection has to last until the birth: a dose that runs out during the pregnancy passes nothing on.
+- Vaccinating a newborn that already has its mother's protection raises it to the vaccine's full length.
+- While the **Diseases** setting is **Off**, newborns get no protection from their mother.
+
 ---
 
 ## Difficulty Levels
@@ -340,6 +356,7 @@ PED is a diarrhoeal disease that hits young piglets hardest. Newborn piglets in 
 | Natural recovery | At least 2 months without treatment, sometimes longer |
 | Immunity after recovery | 12 months |
 | Vaccine | 6 months, $15 a dose |
+| Protection from the mother | 1 month, for the piglets of a protected sow |
 
 ### Impact on Production
 
@@ -355,7 +372,8 @@ PED is a diarrhoeal disease that hits young piglets hardest. Newborn piglets in 
 - Treatment is cheap ($150) and takes 1 month - treat every case at once, piglets first
 - An untreated pig stays sick for at least 2 months, and every sick day carries a risk
 - Watch pens with newborn piglets: they catch it most often
-- Vaccinate young piglets ($15 a dose); the protection lasts 6 months
+- Vaccinate your sows ($15 a dose) so the protection still runs when they farrow: their piglets are then born protected for their first month, when they catch PED most often
+- Vaccinate the piglets themselves before that month runs out; a dose protects for 6 months
 - If PED keeps recurring, consider a lower **Diseases** level
 
 ---
@@ -480,6 +498,7 @@ Pulpy kidney never spreads between animals - every case starts on its own. Lambs
 | Natural recovery | At least 2 months without treatment, sometimes longer |
 | Immunity after recovery | 12 months |
 | Vaccine | 12 months, $15 a dose |
+| Protection from the mother | 2 months, for the lambs and kids of a protected ewe or doe |
 
 ### Impact on Production
 
@@ -492,6 +511,7 @@ Pulpy kidney never spreads between animals - every case starts on its own. Lambs
 ### Management Tips
 
 - Vaccinate lambs and kids ($15): treatment cures only about half the time, a vaccine protects for 12 months
+- A protected ewe or doe passes 2 months of protection to her lambs and kids - vaccinate the young ones before it runs out
 - Start treatment the day it shows
 - A failed course is worth following with another - a message tells you when a course ends without a cure
 - After recovery, the animal is immune for 12 months
@@ -537,11 +557,11 @@ These settings decide how diseases play. The Settings Reference has their full t
 
 Sets the level - **Off**, **Easy**, **Normal** (the default), **Hard** or **Very hard**. What each level changes is under [Difficulty Levels](#difficulty-levels). Admin only in multiplayer.
 
-*Choosing **Off** stops new infections and all disease progression, spread, and effects, and no calf inherits CVM and no dealer animal is stocked carrying it. Animals already infected are not cured - their diseases resume where they stopped when a level is chosen again - and existing diseases are hidden and a CVM carrier's extra milk stops while the setting is **Off**. While it is **Off**, a sick animal reads as healthy, so nothing stops it being sold and it cannot be culled.*
+*Choosing **Off** stops new infections and all disease progression, spread, and effects, and no calf inherits CVM and no dealer animal is stocked carrying it. Animals already infected are not cured - their diseases resume where they stopped when a level is chosen again - and existing diseases are hidden and a CVM carrier's extra milk stops while the setting is **Off**. While it is **Off**, a sick animal reads as healthy, so nothing stops it being sold and it cannot be culled. The Diseases dialog does not open, so no animal can be vaccinated, and no newborn gets [protection from its mother](#protection-from-the-mother).*
 
 ### Choose Diseases
 
-Directly below the **Diseases** row. Untick a disease and no new case of it starts, and it stops spreading - even from animals already ill with it. Existing cases carry on: an animal already ill with it still recovers or dies as usual, treatment still works, and a CVM carrier keeps its extra milk. An animal already in the hidden phase still falls ill and gets the "Contracted" message; the Settings Reference lists every case that keeps a switched-off disease. For CVM, unticking it also means no dealer animal stocked from then on carries it and no calf conceived from then on inherits it. While **Diseases** is **Off**, no disease starts whatever is ticked. Admin only in multiplayer.
+Directly below the **Diseases** row. Untick a disease and no new case of it starts, and it stops spreading - even from animals already ill with it. Existing cases carry on: an animal already ill with it still recovers or dies as usual, treatment still works, and a CVM carrier keeps its extra milk. An animal already in the hidden phase still falls ill and gets the "Contracted" message; the Settings Reference lists every case that keeps a switched-off disease. For CVM, unticking it also means no dealer animal stocked from then on carries it and no calf conceived from then on inherits it. An unticked disease's vaccine still works: you can still vaccinate against it, and newborns still get their mother's protection. While **Diseases** is **Off**, no disease starts whatever is ticked. Admin only in multiplayer.
 
 ### Animal Death
 

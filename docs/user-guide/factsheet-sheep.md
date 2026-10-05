@@ -214,7 +214,7 @@ Sheep and goats usually produce twins - at every age, including first-time mothe
 
 *Sheep never lactate, so mastitis only affects lactating goats, stopping their milk. Pulpy kidney never passes between animals, and lambs and kids up to 12 months old catch it most often. The Fatal column holds while **Animal Death** is on. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*
 
-Sheep and goats can be vaccinated against pulpy kidney, and female goats against mastitis - see [Vaccination](guide-diseases.md#vaccination).
+Sheep and goats can be vaccinated against pulpy kidney, and the lambs and kids of a protected ewe or doe are born protected for 2 months. Female goats can also be vaccinated against mastitis - see [Vaccination](guide-diseases.md#vaccination).
 
 ---
 

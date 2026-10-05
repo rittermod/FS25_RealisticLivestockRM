@@ -276,3 +276,5 @@ Plan your breeding based on gestation periods:
 4. **Budget for lactation costs.** Lactating cows eat noticeably more food and considerably more water. Plan your feed budget for the 10-month lactation window.
 
 5. **Use pen capacity wisely.** A pig sow can produce 13 piglets at once. If your pen only has 5 spaces, 8 piglets get auto-sold at newborn prices. Expand pens before breeding season.
+
+6. **Vaccinate mothers before they give birth.** A sow protected against PED, or a ewe or doe protected against pulpy kidney, gives her newborns a short protection of their own - see [Protection from the mother](guide-diseases.md#protection-from-the-mother).
