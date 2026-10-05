@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.4.1.0-dev.1:
+
+- Added vaccination: from the Diseases dialog, one dose at a time, vaccinate cattle against BRD, pigs against PED, sheep and goats against pulpy kidney, and cows and female goats against mastitis.
+- Added protection from the mother at birth: piglets, lambs and goat kids born in your pens to a sow, ewe or female goat that is immune to PED or pulpy kidney - vaccinated or recovered - start life protected for one month (piglets) or two months (lambs and kids).
+- Changed immunity and vaccination times to show in months, and stopped the info box beside an animal showing how long a past illness lasted.
+- Fixed multi-second freezes when moving animals with some mod combinations: the in-game Animals page no longer rebuilds its animal list while it is closed.
+- Fixed an animal at the dealer or in the artificial insemination catalogue occasionally missing a day of ageing and disease progress when the animal listed before it died that day.
+- Completed the Russian translation (contributed by frezer89).
+- Explained vaccination and protection from the mother in the disease and breeding guides, the FAQ and the pig and sheep factsheets.
+
 ## 1.4.0.0:
 
 ### Heads up before you update
