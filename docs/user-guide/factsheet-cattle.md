@@ -253,6 +253,8 @@ Cattle almost always produce a single calf. Twins and triplets can happen, more 
 
 *Mastitis only affects lactating cows. The Fatal column holds while **Animal Death** is on. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*
 
+Cattle can be vaccinated against BRD, and cows against mastitis - see [Vaccination](guide-diseases.md#vaccination).
+
 ---
 
 ## Tips

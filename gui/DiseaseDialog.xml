@@ -26,7 +26,7 @@
 					<Text profile="rl_husbandryListText" position="5px 0px" name="title"/>
 					<Text profile="rl_husbandryListText" position="135px 0px" name="duration"/>
 					<Text profile="rl_husbandryListText" position="295px 0px" name="fee"/>
-					<Text profile="rl_husbandryListText" position="420px 0px" name="status"/>
+					<Text profile="rl_husbandryListText" position="420px 0px" size="250px 32px" name="status"/>
 				</ListItem>
 			</SmoothList>
 

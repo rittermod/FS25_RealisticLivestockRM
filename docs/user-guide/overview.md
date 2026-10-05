@@ -68,7 +68,7 @@ All nine of the mod's diseases:
 | Pulpy Kidney | Sheep, Goats | Yes (cures about half the time) | Never spreads, but high fatality, worst in lambs and kids |
 | Colic | Horses | Yes (cures about half the time) | Major price loss; never spreads |
 
-Diseases can spread between animals in the same pen, but never pass between pens. An animal that recovers from a disease is immune to it for a time.
+Diseases can spread between animals in the same pen, but never pass between pens. An animal that recovers from a disease is immune to it for a time. Four diseases can be prevented with a vaccine - see [Vaccination](guide-diseases.md#vaccination).
 
 See the [Disease Guide](guide-diseases.md) for prevention and treatment strategies.
 

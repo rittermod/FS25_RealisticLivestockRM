@@ -320,12 +320,14 @@ function Disease.isVisibleToPlayer(record)
 end
 
 
---- Add this record's HUD line: its name, with whole months elapsed unless genetic, and its status. Unlogged: per-frame.
+--- Add this record's HUD line: its name (with whole months elapsed unless genetic or recovered) and its status.
+--- Unlogged: per-frame.
 ---@param box table The HUD key/value box being filled.
 function Disease:showInfo(box)
 
-    -- A genetic record's elapsed counter never advances, so its line names the disease alone.
-    if self.archetype == "genetic" then
+    -- A genetic record's elapsed counter never advances, and a recovered one's illness is over, so
+    -- both lines name the disease alone.
+    if self.archetype == "genetic" or self.state == RLDiseaseRecord.STATE.RECOVERED then
         box:addLine(self.model.name, self:getStatus())
         return
     end
@@ -360,8 +362,10 @@ function Disease:getStatus()
     local presentation = RLDiseaseStatus.resolve(self)
     local label = g_i18n:getText(presentation.statusKey or RLDiseaseStatus.KEY.NOT_TREATED)
 
+    -- Whole months only, never years: the label must fit the dialog's status cell in every locale.
     if presentation.months ~= nil then
-        return string.format("%s (%s)", label, RLTimeFormat.formatAge(presentation.months))
+        local unitKey = presentation.months == 1 and "rl_ui_month" or "rl_ui_months"
+        return string.format("%s (%s %s)", label, presentation.months, g_i18n:getText(unitKey))
     end
 
     return label

@@ -167,6 +167,8 @@ Pig litters are the largest of any animal - typically around 12 piglets, and up 
 
 > **PED warning:** Porcine Epidemic Diarrhoea hits young piglets hardest - newborn piglets in their first month catch it most often, and young piglets are the most at risk from it. Older pigs rarely catch it on their own, but any pig can catch it from a sick pen mate - treat quickly. See the [Disease Guide](guide-diseases.md).
 
+Pigs can be vaccinated against PED - see [Vaccination](guide-diseases.md#vaccination).
+
 ---
 
 ## Tips

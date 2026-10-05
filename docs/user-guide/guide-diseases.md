@@ -76,6 +76,24 @@ Young animals, old animals and animals with poor health genetics are more at ris
 
 An animal that recovers is immune to that disease for a time - between 6 and 24 months depending on the disease (see each disease below). While immune it cannot catch that disease again and does not spread it, and its detail panel lists the disease as **Immune** with the time left. When the immunity runs out the entry disappears and the animal can catch the disease again.
 
+### Vaccination
+
+Four diseases have a vaccine. A dose protects the animal straight away: while protected it cannot catch that disease and does not spread it.
+
+| Disease | Animals | Protection | One dose |
+|---------|---------|------------|----------|
+| [Mastitis](#mastitis) | Female cows and female goats - the animals that can catch it | 12 months | $20 |
+| [PED](#porcine-epidemic-diarrhoea-ped) | Pigs | 6 months | $15 |
+| [BRD](#brd-bovine-respiratory-disease) | Cattle | 12 months | $30 |
+| [Pulpy Kidney](#pulpy-kidney) | Sheep and goats | 12 months | $15 |
+
+To vaccinate an animal, open its **Diseases** dialog (the Diseases button on the animal's Info page), select the disease and press **Vaccinate**, then confirm the price. The dialog lists every vaccine the animal can take: a disease the animal shows no entry for reads **Not vaccinated**, and an animal that is already vaccinated, or immune after recovering, gets a booster from that disease's own row.
+
+- One dose takes at once. There is no course and no second dose to come back for.
+- A booster never shortens the protection: it tops it back up to the full length when less is left.
+- A dose given to an animal that has already caught the disease does nothing, and is still charged.
+- A vaccinated animal reads **Vaccinated** with the months left, and reads healthy in the lists. When the protection runs out the entry disappears and the animal can catch the disease again.
+
 ---
 
 ## Difficulty Levels
@@ -138,6 +156,8 @@ These states can hide a disease record behind an animal that reads as **healthy*
 - **Recovered animals.** After recovery the disease stays listed as "Immune" in the detail panel
   while the immunity runs. The animal sits in its normal breed section, carries no status icon,
   and matches the "Healthy" filter.
+- **Vaccinated animals.** A vaccinated animal lists the disease as "Vaccinated" in the detail
+  panel while the protection runs, and otherwise reads exactly like a recovered animal.
 - **CVM carriers.** A carrier keeps its CVM entry for life, but it is not sick - it sits in its
   normal section and matches "Healthy" too. It does carry the grey DNA icon, so you can spot
   carriers from the list rather than opening each detail panel.
@@ -208,6 +228,7 @@ Mastitis is an udder infection that stops milk production. Only an animal that i
 | Treatment | 1 month, $200 |
 | Natural recovery | At least 2 months without treatment, sometimes longer |
 | Immunity after recovery | 12 months |
+| Vaccine | 12 months, $20 a dose (female cows and goats) |
 
 ### Impact on Production
 
@@ -224,6 +245,7 @@ Mastitis is an udder infection that stops milk production. Only an animal that i
 - After recovery, the animal is immune for 12 months
 - Only a lactating animal can catch it, so your milking herd is where it shows up
 - In a large dairy herd, keep treatment funds available - cases come regularly
+- Vaccinate your cows and does ($20) before they calve or kid: a vaccinated animal cannot catch it for 12 months
 
 ---
 
@@ -317,6 +339,7 @@ PED is a diarrhoeal disease that hits young piglets hardest. Newborn piglets in 
 | Treatment | 1 month, $150 |
 | Natural recovery | At least 2 months without treatment, sometimes longer |
 | Immunity after recovery | 12 months |
+| Vaccine | 6 months, $15 a dose |
 
 ### Impact on Production
 
@@ -332,6 +355,7 @@ PED is a diarrhoeal disease that hits young piglets hardest. Newborn piglets in 
 - Treatment is cheap ($150) and takes 1 month - treat every case at once, piglets first
 - An untreated pig stays sick for at least 2 months, and every sick day carries a risk
 - Watch pens with newborn piglets: they catch it most often
+- Vaccinate young piglets ($15 a dose); the protection lasts 6 months
 - If PED keeps recurring, consider a lower **Diseases** level
 
 ---
@@ -422,6 +446,7 @@ BRD is a respiratory disease that hits calves hardest. Calves up to 6 months old
 | Treatment | 1 month, $300 |
 | Natural recovery | At least 2 months without treatment, sometimes longer |
 | Immunity after recovery | 12 months |
+| Vaccine | 12 months, $30 a dose |
 
 ### Impact on Production
 
@@ -436,6 +461,7 @@ BRD is a respiratory disease that hits calves hardest. Calves up to 6 months old
 
 - Treat every case at once ($300) - calves are the ones most likely to die of it
 - Watch your calf pens: calves up to 6 months old catch it most often
+- Vaccinating a calf ($30) costs a tenth of a course of treatment and protects it for 12 months
 - After recovery, the animal is immune for 12 months
 
 ---
@@ -453,6 +479,7 @@ Pulpy kidney never spreads between animals - every case starts on its own. Lambs
 | Treatment | 1 month, $150, which cures about half the time |
 | Natural recovery | At least 2 months without treatment, sometimes longer |
 | Immunity after recovery | 12 months |
+| Vaccine | 12 months, $15 a dose |
 
 ### Impact on Production
 
@@ -464,6 +491,7 @@ Pulpy kidney never spreads between animals - every case starts on its own. Lambs
 
 ### Management Tips
 
+- Vaccinate lambs and kids ($15): treatment cures only about half the time, a vaccine protects for 12 months
 - Start treatment the day it shows
 - A failed course is worth following with another - a message tells you when a course ends without a cure
 - After recovery, the animal is immune for 12 months
