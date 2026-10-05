@@ -684,10 +684,7 @@ function AnimalReproduction.generateRandomOffspring(animal)
 end
 
 
---- Process birth for a pregnant animal whose reproduction meter reached 100.
---- Handles infant mortality, free slot calculations, auto-selling excess offspring,
---- farm stats, and parent death chance.
---- ASSUMES: called server-side (broadcasts events via g_server)
+--- Server-side birth: mortality, free slots, auto-sale, farm stats, parent death, the dam's maternal protection.
 --- @param animal table Animal instance (mother)
 --- @param spec table Husbandry spec (for maxNumAnimals, getNumOfAnimals, getOwnerFarmId)
 --- @param day number Current day
@@ -930,6 +927,21 @@ function AnimalReproduction.reproduce(animal, spec, day, month, year, isSaleAnim
 
         table.remove(pregnancies, childrenToRemove[i])
 
+    end
+
+    -- Its own containment: a raise here costs the maternal records, never the litter queued below.
+    if g_diseaseManager ~= nil and g_diseaseManager.diseasesEnabled == true then
+        local created = RmSafeUtils.safeAnimalCall(animal, "AnimalReproduction.passMaternal", function()
+            return RLDiseaseVaccination.passMaternal(animal, pregnancies)
+        end, { 0 })
+
+        if created > 0 then
+            Log:debug("reproduce: maternal protection mother=%s farmId=%s created=%d isSaleAnimal=%s",
+                tostring(animal.uniqueId), tostring(animal.farmId), created, tostring(isSaleAnimal))
+        end
+    else
+        Log:trace("reproduce: maternal protection skipped, diseases off (mother=%s farmId=%s)",
+            tostring(animal.uniqueId), tostring(animal.farmId))
     end
 
     local animalSystem = g_currentMission.animalSystem

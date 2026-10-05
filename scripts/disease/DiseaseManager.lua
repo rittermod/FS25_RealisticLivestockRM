@@ -12,7 +12,8 @@
 
     The active difficulty preset (`diseaseDifficulty`, stored by `onDifficultyChanged` on every
     peer) scales the roll, the seed and the spread entries; `diseasesEnabled` is derived from it.
-    `isTitleEnabled` is the per-title gate every producer of a NEW record reads.
+    `isTitleEnabled` is the per-title gate of the four infection and inheritance producers; a
+    vaccine dose and a newborn's maternal protection do not read it.
 ]]
 
 DiseaseManager = {}
