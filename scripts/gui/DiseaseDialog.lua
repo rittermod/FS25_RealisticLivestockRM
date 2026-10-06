@@ -111,6 +111,25 @@ local function offersDose(animal, record, model)
 end
 
 
+--- A dose row's Duration and Fee: the vaccine's protection in whole months, never years, and its price per dose.
+---@param model table The row's registry entry, carrying `vaccine`.
+---@return string duration
+---@return string fee
+local function doseCells(model)
+
+    -- Read at call time: this file is sourced before RLDiseaseStatus.
+    local months = RLDiseaseStatus.wholeMonthsRemaining(model.vaccine.protectionMonths)
+    local unitKey = months == 1 and "rl_ui_month" or "rl_ui_months"
+
+    Log:debug("DiseaseDialog doseCells: title=%s months=%s cost=%s", tostring(model.title), tostring(months),
+        tostring(model.vaccine.cost))
+
+    return string.format("%s %s", months, g_i18n:getText(unitKey)),
+        string.format(g_i18n:getText("rl_ui_feePerDose"), g_i18n:formatMoney(model.vaccine.cost, 2, true, true))
+
+end
+
+
 --- The animal as the confirms name it: the type, then the name when one is set.
 ---@param animal table The animal being shown.
 ---@return string label
@@ -470,7 +489,7 @@ function DiseaseDialog:getTitleForSectionHeader(list, section)
 end
 
 
---- Fill one row's cells: a record row from its record, a vaccine row with the disease name and Not vaccinated.
+--- Fill one row's cells; Duration and Fee show what the row's button acts on, else a dash.
 ---@param list table The dialog's list.
 ---@param section number The one section.
 ---@param index number The row index.
@@ -484,24 +503,35 @@ function DiseaseDialog:populateCellForItemInSection(list, section, index, cell)
         return
     end
 
+    -- Duration and Fee ask the same offersDose rule the button asks, so a dose row shows the vaccine and
+    -- only an INFECTIOUS row with a course shows the treatment. Both cells are written on every arm,
+    -- because list cells are recycled across rows.
+    local duration, fee, arm = "-", "-", "dash"
+
+    if offersDose(self.animal, disease, model) then
+        duration, fee = doseCells(model)
+        arm = "dose"
+    elseif disease ~= nil and disease.state == RLDiseaseRecord.STATE.INFECTIOUS and model.treatment ~= nil then
+        local treatment = model.treatment
+        -- Months remaining once a course is under way, the authored total otherwise. Two shipped
+        -- diseases carry no treatment block, so the model.treatment clause keeps them on the dash arm.
+        duration = RealisticLivestock.formatAge(disease.treatmentMonthsRemaining > 0
+            and RLDiseaseStatus.wholeMonthsRemaining(disease.treatmentMonthsRemaining) or treatment.months)
+        fee = string.format(g_i18n:getText("rl_ui_feePerMonth"), g_i18n:formatMoney(treatment.cost, 2, true, true))
+        arm = "treatment"
+    end
+
+    Log:trace("DiseaseDialog:populateCellForItemInSection: %s cells %s|%s (index=%s title=%s uniqueId=%s)", arm,
+        tostring(duration), tostring(fee), tostring(index), tostring(model.title),
+        tostring(self.animal ~= nil and self.animal.uniqueId or nil))
+
     cell:getAttribute("title"):setText(model.name)
+    cell:getAttribute("duration"):setText(duration)
+    cell:getAttribute("fee"):setText(fee)
 
     if disease == nil then
-        cell:getAttribute("duration"):setText("N/A")
-        cell:getAttribute("fee"):setText("N/A")
         cell:getAttribute("status"):setText(g_i18n:getText("rl_ui_notVaccinated"))
-        Log:trace("DiseaseDialog:populateCellForItemInSection: vaccine row index=%s title=%s", tostring(index),
-            tostring(model.title))
     else
-        local treatment = model.treatment
-
-        -- Months remaining once a course is under way, the authored total otherwise. The
-        -- nil-treatment arm must stay short-circuited: two shipped diseases carry no treatment
-        -- block, so the duration term below may not be evaluated for them.
-        cell:getAttribute("duration"):setText(treatment == nil and "N/A"
-            or RealisticLivestock.formatAge(disease.treatmentMonthsRemaining > 0
-                and RLDiseaseStatus.wholeMonthsRemaining(disease.treatmentMonthsRemaining) or treatment.months))
-        cell:getAttribute("fee"):setText(treatment == nil and "N/A" or string.format(g_i18n:getText("rl_ui_feePerMonth"), g_i18n:formatMoney(treatment.cost, 2, true, true)))
         cell:getAttribute("status"):setText(disease:getStatus())
     end
 

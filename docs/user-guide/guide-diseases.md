@@ -53,7 +53,7 @@ When a disease shows in an animal in one of your pens, a "Contracted" message po
 
 ### Treatment
 
-Treat a sick animal from the **Diseases** dialog: open it from the RL Menu's Info tab, where **D** ("Animal Diseases" in Controls) opens it too. Every treatable disease has a 1-month course. The dialog shows the fee per month, and it is charged day by day while the course runs, so a finished course costs about the listed fee in total.
+Treat a sick animal from the **Diseases** dialog: open it from the RL Menu's Info tab, where **D** ("Animal Diseases" in Controls) opens it too. Every treatable disease has a 1-month course. A sick animal's row in the dialog shows the fee per month, and it is charged day by day while the course runs, so a finished course costs about the listed fee in total.
 
 You can stop a course and resume it later. A stopped course keeps the progress it has made and costs nothing while it is stopped, and the detail panel reads **Treatment paused**.
 
@@ -89,7 +89,7 @@ Five diseases have a vaccine. A dose protects the animal straight away: while pr
 | [Pulpy Kidney](#pulpy-kidney) | Sheep and goats | 12 months | $15 |
 | [Footrot](#footrot) | Cattle, sheep and goats | 6 months | $10 |
 
-To vaccinate an animal, open its **Diseases** dialog (the Diseases button on the animal's Info page), select the disease and press **Vaccinate**, then confirm the price. The dialog lists every vaccine the animal can take: a disease the animal shows no entry for reads **Not vaccinated**, and an animal that is already vaccinated, or immune after recovering, gets a booster from that disease's own row.
+To vaccinate an animal, open its **Diseases** dialog (the Diseases button on the animal's Info page), select the disease and press **Vaccinate**, then confirm the price. The dialog lists every vaccine the animal can take: a disease the animal shows no entry for reads **Not vaccinated**, and an animal that is already vaccinated, or immune after recovering, gets a booster from that disease's own row. A row you can vaccinate from shows how long the vaccine protects and its price per dose.
 
 - One dose takes at once. There is no course and no second dose to come back for.
 - A booster never shortens the protection: it tops it back up to the full length when less is left.

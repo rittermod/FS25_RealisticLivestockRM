@@ -205,6 +205,7 @@
         <text name="rl_ui_output_pallets_goatMilk" text="Kozí mléko"/>
         <text name="rl_ui_amountPerDay" text="%.0f l / den" tag="format"/>
         <text name="rl_ui_feePerMonth" text="%s / měsíc" tag="format"/>
+        <text name="rl_ui_feePerDose" text="%s / dose" tag="format"/>
 
         <text name="rl_ui_animalType" text="Typ"/>
         <text name="rl_ui_amountMonitored" text="Monitorováno"/>

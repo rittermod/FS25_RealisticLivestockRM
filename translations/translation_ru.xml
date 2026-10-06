@@ -189,6 +189,7 @@
         <text name="rl_ui_output_pallets_goatMilk" text="Козье молоко"/>
         <text name="rl_ui_amountPerDay" text="%.0fл / день" tag="format"/>
         <text name="rl_ui_feePerMonth" text="%s / мес." tag="format"/>
+        <text name="rl_ui_feePerDose" text="%s / dose" tag="format"/>
 
         <text name="rl_ui_animalType" text="Вид"/>
         <text name="rl_ui_amountMonitored" text="Под наблюдением"/>

@@ -194,6 +194,7 @@
         <text name="rl_ui_output_pallets_goatMilk" text="羊奶"/>
         <text name="rl_ui_amountPerDay" text="%.0fL / day" tag="format"/>
         <text name="rl_ui_feePerMonth" text="%s / month" tag="format"/>
+        <text name="rl_ui_feePerDose" text="%s / dose" tag="format"/>
 
         <text name="rl_ui_animalType" text="类型"/>
         <text name="rl_ui_amountMonitored" text="已监测"/>
