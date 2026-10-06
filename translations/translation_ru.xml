@@ -508,6 +508,7 @@
         <text name="rl_disease_brd" text="РБР (Респираторная болезнь рогатого скота)"/>
         <text name="rl_disease_clostridial" text="Размягчённая почка (Клостридиоз)"/>
         <text name="rl_disease_colic" text="Колика"/>
+        <text name="rl_disease_footRot" text="Footrot"/>
 
 
 

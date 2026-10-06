@@ -211,10 +211,11 @@ Sheep and goats usually produce twins - at every age, including first-time mothe
 | **Mastitis** | Slowly | Rarely | 1 month, $200 | Stops goat milk (only lactating goats can catch it) |
 | **Foot and Mouth** | Rapidly | Low to moderate | 1 month, $250 | Major price loss; slightly reduces wool/milk while sick |
 | **Pulpy Kidney** | None | High - worst in lambs and kids | 1 month, $150 (cures about half the time) | Major price loss; considerably less wool/milk while sick |
+| **Footrot** | Slowly | Never | 1 month, $100 (cures about 9 times in 10) | Major price loss; considerably less wool/milk while sick, for at least 6 months untreated |
 
 *Sheep never lactate, so mastitis only affects lactating goats, stopping their milk. Pulpy kidney never passes between animals, and lambs and kids up to 12 months old catch it most often. The Fatal column holds while **Animal Death** is on. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*
 
-Sheep and goats can be vaccinated against pulpy kidney, and the lambs and kids of a protected ewe or doe are born protected for 2 months. Female goats can also be vaccinated against mastitis - see [Vaccination](guide-diseases.md#vaccination).
+Sheep and goats can be vaccinated against pulpy kidney, and the lambs and kids of a protected ewe or doe are born protected for 2 months. They can also be vaccinated against footrot (6 months, $10 a dose), which passes nothing to newborns. Female goats can also be vaccinated against mastitis - see [Vaccination](guide-diseases.md#vaccination).
 
 ---
 

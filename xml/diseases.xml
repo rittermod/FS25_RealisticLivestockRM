@@ -146,4 +146,22 @@
 		</model>
 	</disease>
 
+	<disease title="footRot" animals="COW SHEEP">
+		<model archetype="infectious" endpoint="recovers" cullRequired="false"
+			incubationTicks="1" r0="1.5" durationMonths="6" recoveryChancePerMonth="0.5"
+			caseFatality="0" immunityMonths="6" salePrice="0.65">
+			<infection>
+				<key ageMonths="5" perMonth="0"/>
+				<key ageMonths="6" perMonth="0.01"/>
+			</infection>
+			<treatment months="1" cost="100" efficacy="0.9" outcome="cure"/>
+			<vaccine protectionMonths="6" cost="10"/>
+			<effects weightGain="0.85" fertility="1">
+				<output type="milk" modifier="0.7"/>
+				<output type="pallets" modifier="0.6"/>
+				<output type="manure" modifier="0.8"/>
+			</effects>
+		</model>
+	</disease>
+
 </diseases>

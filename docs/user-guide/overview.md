@@ -54,7 +54,7 @@ Individual animals can be monitored, marked, and castrated:
 
 ### Diseases
 
-All nine of the mod's diseases:
+All ten of the mod's diseases:
 
 | Disease | Affects | Treatable? | Key Impact |
 |---------|---------|------------|------------|
@@ -67,8 +67,9 @@ All nine of the mod's diseases:
 | BRD | Cattle | Yes | Worst in calves; less milk |
 | Pulpy Kidney | Sheep, Goats | Yes (cures about half the time) | Never spreads, but high fatality, worst in lambs and kids |
 | Colic | Horses | Yes (cures about half the time) | Major price loss; never spreads |
+| Footrot | Cattle, Sheep, Goats | Yes (cures about 9 times in 10) | Never fatal, but lingers for months untreated and cuts milk and wool |
 
-Diseases can spread between animals in the same pen, but never pass between pens. An animal that recovers from a disease is immune to it for a time. Four diseases can be prevented with a vaccine - see [Vaccination](guide-diseases.md#vaccination).
+Diseases can spread between animals in the same pen, but never pass between pens. An animal that recovers from a disease is immune to it for a time. Five diseases can be prevented with a vaccine - see [Vaccination](guide-diseases.md#vaccination).
 
 See the [Disease Guide](guide-diseases.md) for prevention and treatment strategies.
 

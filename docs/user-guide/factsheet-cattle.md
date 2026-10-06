@@ -250,10 +250,11 @@ Cattle almost always produce a single calf. Twins and triplets can happen, more 
 | **CVM** | Genetic only | Affected animals almost always, within a few months | None | Carrier cows produce considerably more milk while **Diseases** is on |
 | **Foot and Mouth** | Rapidly | Low to moderate | 1 month, $250 | Severe milk reduction, major price loss |
 | **BRD** | Moderately | Moderate - worst in calves | 1 month, $300 | Noticeably less milk, moderate price loss |
+| **Footrot** | Slowly | Never | 1 month, $100 (cures about 9 times in 10) | Noticeably less milk for at least 6 months untreated, major price loss |
 
 *Mastitis only affects lactating cows. The Fatal column holds while **Animal Death** is on. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*
 
-Cattle can be vaccinated against BRD, and cows against mastitis - see [Vaccination](guide-diseases.md#vaccination).
+Cattle can be vaccinated against BRD and footrot, and cows against mastitis - see [Vaccination](guide-diseases.md#vaccination).
 
 ---
 

@@ -242,7 +242,7 @@ Don't confuse this with **Genetics Display**, which only changes whether genetic
 
 **Short answer:** vaccinate. Open the animal's **Diseases** dialog (the Diseases button on its Info page), select the disease and press **Vaccinate**. One dose protects it at once: while protected it cannot catch that disease and does not spread it.
 
-Four diseases have a vaccine:
+Five diseases have a vaccine:
 
 | Disease | Animals | Protection | One dose |
 |---------|---------|------------|----------|
@@ -250,6 +250,7 @@ Four diseases have a vaccine:
 | PED | Pigs | 6 months | $15 |
 | BRD | Cattle | 12 months | $30 |
 | Pulpy Kidney | Sheep and goats | 12 months | $15 |
+| Footrot | Cattle, sheep and goats | 6 months | $10 |
 
 A few things worth knowing:
 

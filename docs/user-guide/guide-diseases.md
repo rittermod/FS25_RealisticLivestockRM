@@ -1,6 +1,6 @@
 # Disease Guide
 
-Realistic Livestock RM has nine diseases that can make your animals sick and, with **Animal Death** on, kill them; most of them also spread through a pen. Each one affects specific animals and differs in whether and how fast it spreads, how dangerous it is and whether it can be treated. The **Diseases** setting sets how often animals fall ill and how fast diseases spread - see [Difficulty Levels](#difficulty-levels).
+Realistic Livestock RM has ten diseases that can make your animals sick and, with **Animal Death** on, kill them; most of them also spread through a pen. Each one affects specific animals and differs in whether and how fast it spreads, how dangerous it is and whether it can be treated. The **Diseases** setting sets how often animals fall ill and how fast diseases spread - see [Difficulty Levels](#difficulty-levels).
 
 > **Note:** This documentation was generated with AI assistance and may contain inaccuracies. If you spot an error, please [open an issue](https://github.com/rittermod/FS25_RealisticLivestockRM/issues).
 
@@ -19,6 +19,7 @@ Realistic Livestock RM has nine diseases that can make your animals sick and, wi
 | **BRD** | Cattle | Moderate | Moderate - worst in calves | 1 month, $300 | Moderate reduction |
 | **Pulpy Kidney** | Sheep, goats | None | High - worst in lambs and kids | 1 month, $150 (cures about half the time) | Major reduction |
 | **Colic** | Horses | None | Moderate | 1 month, $500 (cures about half the time) | Major reduction |
+| **Footrot** | Cattle, sheep, goats | Slow | Never | 1 month, $100 (cures about 9 times in 10) | Major reduction |
 
 *The Fatal column holds while **Animal Death** is on (the ModHub build labels the setting "Animal Removal"). With it off, no animal dies of a disease: every disease but CVM ends in recovery, and an animal affected by CVM stays sick.*
 
@@ -56,15 +57,15 @@ Treat a sick animal from the **Diseases** dialog: open it from the RL Menu's Inf
 
 You can stop a course and resume it later. A stopped course keeps the progress it has made and costs nothing while it is stopped, and the detail panel reads **Treatment paused**.
 
-A course that cures ends the illness when it finishes (for the two diseases whose course can fail, see [Treatment that fails](#treatment-that-fails)); it does not protect the animal before then, so an animal can still die while it is being treated. An animal in the hidden phase cannot be treated.
+A course that cures ends the illness when it finishes (for the three diseases whose course can fail, see [Treatment that fails](#treatment-that-fails)); it does not protect the animal before then, so an animal can still die while it is being treated. An animal in the hidden phase cannot be treated.
 
 ### Treatment that fails
 
-A course for pulpy kidney or colic cures only about half the time. When a course fails, a message says the treatment ended without a cure, the status goes back to **Not treated** and the red medical bag returns. You can start a new course straight away. For every other treatable disease, a course that runs to the end cures the animal.
+A course for pulpy kidney or colic cures only about half the time, and a course for footrot about 9 times in 10. When a course fails, a message says the treatment ended without a cure, the status goes back to **Not treated** and the red medical bag returns. You can start a new course straight away. For every other treatable disease, a course that runs to the end cures the animal.
 
 ### Natural recovery
 
-For every disease but Avian Flu (HPAI) and CVM, an untreated animal stays sick for at least 2 months unless it dies first, and after that has a chance to recover every day - so how long an untreated illness lasts varies. While **Animal Death** is on, a bird with HPAI rarely survives it. CVM never recovers.
+For every disease but Avian Flu (HPAI) and CVM, an untreated animal stays sick for at least 2 months (footrot: at least 6) unless it dies first, and after that has a chance to recover every day - so how long an untreated illness lasts varies. While **Animal Death** is on, a bird with HPAI rarely survives it. CVM never recovers.
 
 ### Death risk
 
@@ -78,7 +79,7 @@ An animal that recovers is immune to that disease for a time - between 6 and 24 
 
 ### Vaccination
 
-Four diseases have a vaccine. A dose protects the animal straight away: while protected it cannot catch that disease and does not spread it.
+Five diseases have a vaccine. A dose protects the animal straight away: while protected it cannot catch that disease and does not spread it.
 
 | Disease | Animals | Protection | One dose |
 |---------|---------|------------|----------|
@@ -86,6 +87,7 @@ Four diseases have a vaccine. A dose protects the animal straight away: while pr
 | [PED](#porcine-epidemic-diarrhoea-ped) | Pigs | 6 months | $15 |
 | [BRD](#brd-bovine-respiratory-disease) | Cattle | 12 months | $30 |
 | [Pulpy Kidney](#pulpy-kidney) | Sheep and goats | 12 months | $15 |
+| [Footrot](#footrot) | Cattle, sheep and goats | 6 months | $10 |
 
 To vaccinate an animal, open its **Diseases** dialog (the Diseases button on the animal's Info page), select the disease and press **Vaccinate**, then confirm the price. The dialog lists every vaccine the animal can take: a disease the animal shows no entry for reads **Not vaccinated**, and an animal that is already vaccinated, or immune after recovering, gets a booster from that disease's own row.
 
@@ -103,7 +105,7 @@ For two diseases, a newborn is born protected when its mother is. What counts is
 | [PED](#porcine-epidemic-diarrhoea-ped) | Piglets | 1 month |
 | [Pulpy Kidney](#pulpy-kidney) | Lambs and kids | 2 months |
 
-Mastitis and BRD pass nothing on.
+Mastitis, BRD and footrot pass nothing on.
 
 - The newborn's detail panel lists the disease as **Immune** with the time left, and it reads healthy in the lists. When the protection runs out the entry disappears.
 - The mother's own protection has to last until the birth: a dose that runs out during the pregnancy passes nothing on.
@@ -546,6 +548,41 @@ Colic is a painful digestive condition. It never passes between horses - every c
 - If a course does not cure a valuable horse, start another - each course is a fresh chance
 - A sick horse cannot be sold at the dealer until it recovers
 - After recovery, the horse cannot get colic again for 6 months
+
+---
+
+## Footrot
+
+**Affects:** Cattle, sheep and goats
+
+Footrot is a contagious hoof infection that lames an animal and cuts what it produces. It never kills, but it lingers: an untreated case lasts at least 6 months, usually about 7. From 6 months old, animals can catch it on their own; younger stock do not, but any animal can still catch it from a sick pen mate. It spreads slowly through a pen.
+
+| Parameter | Value |
+|-----------|-------|
+| Spread | Slow |
+| Fatality | Never |
+| Treatment | 1 month, $100 (cures about 9 times in 10) |
+| Natural recovery | At least 6 months without treatment, usually about 7 |
+| Immunity after recovery | 6 months |
+| Vaccine | 6 months, $10 a dose |
+
+### Impact on Production
+
+| Impact | Effect |
+|--------|--------|
+| Milk | Noticeably reduced |
+| Wool and goat milk | Considerably reduced |
+| Manure | Noticeably reduced |
+| Growth | Slightly slower |
+| Value while sick | Major reduction |
+
+### Management Tips
+
+- Treat a case as soon as it shows ($100): a month of treatment instead of half a year of lost milk or wool, and one fewer animal passing it on
+- A course that fails leaves the animal sick - start another one straight away
+- A sick animal cannot be sold at the dealer until it recovers - untreated, that is at least 6 months
+- Where footrot keeps coming back, vaccinate the herd ($10 a dose, every 6 months); in a herd where it is rare, treating the odd case can be cheaper
+- After recovery, the animal is immune for 6 months
 
 ---
 

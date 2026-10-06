@@ -502,6 +502,7 @@
         <text name="rl_disease_brd" text="BRD"/>
         <text name="rl_disease_clostridial" text="Pulpy Kidney"/>
         <text name="rl_disease_colic" text="Colic"/>
+        <text name="rl_disease_footRot" text="Footrot"/>
 
 
 
