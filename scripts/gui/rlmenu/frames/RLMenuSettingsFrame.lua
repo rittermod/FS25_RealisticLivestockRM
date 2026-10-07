@@ -138,8 +138,8 @@ function RLMenuSettingsFrame.new()
         text = g_i18n:getText("rl_menu_filters_delete_condition"),
         callback = function() self:onDeleteConditionClicked() end,
     }
-    -- Add group: Tier 3 only, on MENU_EXTRA_2. Stub - the callback logs and
-    -- no-ops; sibling-group insertion is not implemented.
+    -- Add group: Tier 3 only, on MENU_EXTRA_2. Stub - the callback shows a
+    -- not-implemented info dialog; sibling-group insertion is not implemented.
     self.addGroupButtonInfo = {
         inputAction = InputAction.MENU_EXTRA_2,
         text = g_i18n:getText("rl_menu_filters_add_group_button"),
