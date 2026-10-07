@@ -743,7 +743,7 @@
         <text name="rl_menu_herdsman_section_buy" text="Покупка"/>
         <text name="rl_menu_herdsman_section_castrate" text="Стерилизация"/>
         <text name="rl_menu_herdsman_section_naming" text="Присвоение имен"/>
-        <text name="rl_menu_herdsman_section_ai" text="Искусственное осеменение"/>
+        <text name="rl_menu_herdsman_section_ai" text="Осеменение"/>
         <text name="rl_menu_herdsman_section_horsecare" text="Уход за лошадьми"/>
         <text name="rl_menu_herdsman_detail_operation" text="Задача"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Включено"/>
