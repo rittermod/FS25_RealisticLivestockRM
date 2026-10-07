@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.1.0-dev.2:
+
+- Added footrot for cattle, sheep and goats, with treatment and a vaccine.
+- Fixed the Diseases dialog to show the vaccine's protection and dose price, not the treatment fee, on rows you vaccinate from.
+- Fixed the Diseases dialog cutting off long disease names and misaligning its column headers.
+- Shortened the Russian insemination label so it fits the herdsman operation selector.
+- Explained footrot in the disease guide, the overview, the FAQ and the cattle and sheep factsheets.
+
 ## 1.4.1.0-dev.1:
 
 - Added vaccination: from the Diseases dialog, one dose at a time, vaccinate cattle against BRD, pigs against PED, sheep and goats against pulpy kidney, and cows and female goats against mastitis.
