@@ -174,4 +174,12 @@
 		<textBold value="true"/>
 	</Profile>
 
+	<Profile name="rl_diseaseListHeaderText" extends="fs25_textDefault" with="anchorStretchingYLeft">
+		<textSize value="18px"/>
+		<textBold value="true"/>
+		<textUpperCase value="true"/>
+		<textAlignment value="left"/>
+		<textColor value="$preset_colorWhite_50"/>
+	</Profile>
+
 </GUIProfiles>

@@ -144,6 +144,57 @@ local function animalLabel(animal)
 end
 
 
+--- One element's absolute x and width in reference pixels, or nil when it has no settled geometry.
+---@param element table|nil
+---@return string|nil span "x/width"
+local function spanOf(element)
+
+    if element == nil or element.absPosition == nil or element.absSize == nil then return nil end
+
+    return string.format("%.1f/%.1f", element.absPosition[1] * g_referenceScreenWidth,
+        element.absSize[1] * g_referenceScreenWidth)
+
+end
+
+
+-- The first row comes from the list's own cell lookup, never from counting its pooled child cells.
+--- Log the measured geometry: dialog, list and header labels, then the first row's four cells when it has them.
+---@param dialog table The open dialog instance.
+local function logGeometry(dialog)
+
+    local list = dialog.diseaseList
+
+    local headers = {}
+    for i, id in ipairs({ "titleHeader", "statusHeader", "durationHeader", "feeHeader" }) do
+        headers[i] = string.format("%s=%s", id, tostring(spanOf(dialog[id])))
+    end
+
+    local cells = "none"
+    local row = list:getItemCount() > 0 and list:getElementAtSectionIndex(1, 1) or nil
+    if row == nil then
+        Log:trace("DiseaseDialog:onOpen: geometry has no first row to measure (items=%s)",
+            tostring(list:getItemCount()))
+    else
+        local parts = {}
+        for _, name in ipairs({ "title", "status", "duration", "fee" }) do
+            local span = spanOf(row:getAttribute(name))
+            if span == nil then
+                Log:trace("DiseaseDialog:onOpen: geometry first row has no settled %s cell", name)
+                parts = nil
+                break
+            end
+            parts[#parts + 1] = string.format("%s=%s", name, span)
+        end
+        if parts ~= nil then cells = table.concat(parts, " ") end
+    end
+
+    Log:debug("DiseaseDialog:onOpen: geometry dialog=%s list=%s headers %s cells %s (uniqueId=%s)",
+        tostring(spanOf(dialog.dialogElement)), tostring(spanOf(list)), table.concat(headers, " "), cells,
+        tostring(dialog.animal ~= nil and dialog.animal.uniqueId or nil))
+
+end
+
+
 -- Refuses while diseases are off, and both callers funnel through here. It does not close a dialog
 -- already open, and the list is an open-time snapshot the next open reads again.
 --- Open the Diseases dialog for one animal; its rows come from `buildRows`.
@@ -173,7 +224,7 @@ function DiseaseDialog.show(animal, onCloseCallback, onCloseTarget)
 end
 
 
---- Load the list, select row 1, then set the OK and Cull buttons for the animal being shown.
+--- Load the list, select row 1, set the OK and Cull buttons for the animal shown, then log the geometry.
 function DiseaseDialog:onOpen()
 
     DiseaseDialog:superClass().onOpen(self)
@@ -186,6 +237,8 @@ function DiseaseDialog:onOpen()
     self:onClickListItem(1)
 
     self:updateCullButton()
+
+    logGeometry(self)
 
     Log:trace("DiseaseDialog:onOpen: opened (uniqueId=%s)", tostring(self.animal ~= nil and self.animal.uniqueId))
 
