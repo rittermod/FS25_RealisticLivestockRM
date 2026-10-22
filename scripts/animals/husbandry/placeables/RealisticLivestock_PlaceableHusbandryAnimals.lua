@@ -7,11 +7,15 @@ RealisticLivestock_PlaceableHusbandryAnimals = {}
 local SLOW_ANIMAL_MS = 50.0
 
 
+--- Register the RL message methods and the pen day-change flush on the husbandry placeable type.
+---@param placeable table placeable type being registered
+---@return nil
 function RealisticLivestock_PlaceableHusbandryAnimals.registerFunctions(placeable)
 	SpecializationUtil.registerFunction(placeable, "setHasUnreadRLMessages", PlaceableHusbandryAnimals.setHasUnreadRLMessages)
 	SpecializationUtil.registerFunction(placeable, "getHasUnreadRLMessages", PlaceableHusbandryAnimals.getHasUnreadRLMessages)
 	SpecializationUtil.registerFunction(placeable, "getRLMessages", PlaceableHusbandryAnimals.getRLMessages)
 	SpecializationUtil.registerFunction(placeable, "addRLMessage", PlaceableHusbandryAnimals.addRLMessage)
+	SpecializationUtil.registerFunction(placeable, "addRLMoneyMessage", PlaceableHusbandryAnimals.addRLMoneyMessage)
 	SpecializationUtil.registerFunction(placeable, "addRLMessageDirect", PlaceableHusbandryAnimals.addRLMessageDirect)
 	SpecializationUtil.registerFunction(placeable, "deleteRLMessage", PlaceableHusbandryAnimals.deleteRLMessage)
 	SpecializationUtil.registerFunction(placeable, "getNextRLMessageUniqueId", PlaceableHusbandryAnimals.getNextRLMessageUniqueId)
@@ -118,6 +122,18 @@ function PlaceableHusbandryAnimals:addRLMessage(id, animal, args, date, uniqueId
         -- Route through aggregator (handles summary mode check)
         RLMessageAggregator.queueMessage(self, id, animal, args, date)
     end
+end
+
+
+--- Money message entry point: the aggregator sums the raw amount its formatted money argument displays.
+---@param id string message id
+---@param animal table|nil animal identifiers the message names
+---@param args table message arguments, the money argument already formatted
+---@param amount number raw amount the money argument displays
+---@return nil
+function PlaceableHusbandryAnimals:addRLMoneyMessage(id, animal, args, amount)
+    Log:trace("addRLMoneyMessage: id='%s' amount=%s", tostring(id), tostring(amount))
+    RLMessageAggregator.queueMoneyMessage(self, id, animal, args, amount)
 end
 
 

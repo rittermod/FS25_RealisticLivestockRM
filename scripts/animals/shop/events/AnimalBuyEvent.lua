@@ -62,6 +62,9 @@ function AnimalBuyEvent:writeStream(streamId, connection)
 end
 
 
+--- Client: publish the reply code. Server: validate the purchase, then add the animals and charge for them.
+---@param connection table The sender's connection (a client when this runs on the server)
+---@return nil
 function AnimalBuyEvent:run(connection)
 
 	if connection:getIsServer() then
@@ -183,17 +186,20 @@ function AnimalBuyEvent:run(connection)
 		connection:sendEvent(AnimalBuyEvent.newServerToClient(AnimalBuyEvent.BUY_SUCCESS))
 
 		-- Object may be a trailer on trailer-based dealer buys; only husbandry
-		-- placeables carry addRLMessage.
-		if self.object.addRLMessage ~= nil then
+		-- placeables carry addRLMoneyMessage.
+		if self.object.addRLMoneyMessage ~= nil then
+			local amount = math.abs(self.buyPrice + self.transportPrice)
+			local money = g_i18n:formatMoney(amount, 2, true, true)
 			if #self.animals == 1 then
-				self.object:addRLMessage("BOUGHT_ANIMALS_SINGLE", nil, { g_i18n:formatMoney(math.abs(self.buyPrice + self.transportPrice), 2, true, true) })
+				self.object:addRLMoneyMessage("BOUGHT_ANIMALS_SINGLE", nil, { money }, amount)
 			elseif #self.animals > 0 then
-				self.object:addRLMessage("BOUGHT_ANIMALS_MULTIPLE", nil, { #self.animals, g_i18n:formatMoney(math.abs(self.buyPrice + self.transportPrice), 2, true, true) })
+				self.object:addRLMoneyMessage("BOUGHT_ANIMALS_MULTIPLE", nil, { #self.animals, money }, amount)
 			end
 		else
-			Log:trace("AnimalBuyEvent:run: skipping addRLMessage (object has no husbandryAnimals spec, likely trailer buy) N=%d", #self.animals)
+			Log:trace("AnimalBuyEvent:run: skipping addRLMoneyMessage"
+				.. " (object has no husbandryAnimals spec, likely trailer buy) N=%d", #self.animals)
 		end
-		Log:trace("AnimalBuyEvent:run phase: addMoney+sendEvent+addRLMessage took %.2fms", phaseDoneMs())
+		Log:trace("AnimalBuyEvent:run phase: addMoney+sendEvent+addRLMoneyMessage took %.2fms", phaseDoneMs())
 
 	end)
 

@@ -1028,7 +1028,10 @@ function AnimalReproduction.reproduce(animal, spec, day, month, year, isSaleAnim
 
     end
 
-    if animalsToSell > 0 then animal:addMessage("PREGNANCY_SOLD", { animalsToSell, g_i18n:formatMoney(totalAnimalPrice, 2, true, true) }) end
+    if animalsToSell > 0 then
+        animal:addMoneyMessage("PREGNANCY_SOLD",
+            { animalsToSell, g_i18n:formatMoney(totalAnimalPrice, 2, true, true) }, totalAnimalPrice)
+    end
 
     if deadChildrenCount > 0 then animal:addMessage("PREGNANCY_DIED", { deadChildrenCount }) end
 

@@ -9,14 +9,14 @@
 --     returns { records, skips } so emit can emit the records and log every dropped row.
 --   * emit(summary, ctx) is the thin in-game wiring: it reads g_i18n and g_server, groups the
 --     records by husbandry in first-seen order, resolves each placeable via
---     ctx.husbandryPlaceablesById, and drives the server-local addRLMessage sink.
+--     ctx.husbandryPlaceablesById, and drives the server-local message sinks.
 --
 -- Message order follows PLAN order within a husbandry, and the multi-rule model can emit more than
 -- one message per husbandry per op - both intended.
 --
--- Every message goes through placeable:addRLMessage, so RLMessageAggregator owns the
--- individual-vs-summary fork and this module is unaware of the mode. MP transport rides the
--- addRLMessageDirect chokepoint's incremental broadcast; emit builds no wire payload.
+-- A money record goes through placeable:addRLMoneyMessage, the rest through addRLMessage;
+-- RLMessageAggregator owns the individual-vs-summary fork. MP transport rides addRLMessageDirect's
+-- incremental broadcast; emit builds no wire payload.
 --
 -- Server-only: emit is called from RLHerdsmanDayTick.run, which returns early when g_server is nil.
 
@@ -87,7 +87,7 @@ local function isFiniteNumber(v)
     return type(v) == "number" and v == v and v ~= math.huge and v ~= -math.huge
 end
 
---- Shallow-copy an args array. In INDIVIDUAL mode placeable:addRLMessage forwards to
+--- Shallow-copy an args array. In INDIVIDUAL mode both placeable sinks forward to
 --- addRLMessageDirect, which tostring-coerces its args IN PLACE, so the record must keep its own
 --- pristine table and the two sinks must never share one.
 ---@param args table
@@ -119,8 +119,8 @@ RLHerdsmanMessages.ID_FAMILY       = ID_FAMILY
 ---   5. else                      -> genuine skip (no record)
 --- then count-normalize: n = tonumber(movedCount or count); nil/non-number or n < 1 -> skip;
 --- floor(n) == 1 -> _SINGLE else _MULTIPLE. Args: sell/buy exec carry money (SINGLE {money},
---- MULTIPLE {count,money}); all others SINGLE {}, MULTIPLE {count}; the count arg is a STRING while
---- record.count stays numeric.
+--- MULTIPLE {count,money}) and the raw `amount` that money formats; all others SINGLE {}, MULTIPLE
+--- {count} and no amount; the count arg is a STRING while record.count stays numeric.
 ---
 --- Independently of that chain, a move row (mark=false) with skippedAge>0 ALSO emits an
 --- AI_MANAGER_MOVE_SKIPPED_AGE_* record, and one with skippedSick>0 an AI_MANAGER_MOVE_SKIPPED_SICK_*
@@ -129,7 +129,8 @@ RLHerdsmanMessages.ID_FAMILY       = ID_FAMILY
 ---@see RLHerdsmanExecutor._doBuy
 ---@param results table|nil executor summary.results (array of result rows)
 ---@param formatMoney fun(amount:number):string injected money formatter (g_i18n:formatMoney closure)
----@return table built { records = {{husbandryId,id,args,mark,count,warn}, ...}, skips = {{row,reason,level}, ...} }
+---@return table built { records = {{husbandryId,id,args,mark,count,amount,warn}, ...},
+---  skips = {{row,reason,level}, ...} }
 function RLHerdsmanMessages.buildMessages(results, formatMoney)
     local records, skips = {}, {}
 
@@ -182,20 +183,18 @@ function RLHerdsmanMessages.buildMessages(results, formatMoney)
                     -- The count rides as a STRING, the canonical RL message arg type: readStream
                     -- reads strings, addRLMessageDirect tostring-coerces, the savegame uses setString.
                     local fmtCount = string.format("%d", count)
-                    local args, warn
+                    local args, amount, warn
 
                     if isMoney then
-                        local amount = row[family.exec.amountField]
-                        local money
-                        if isFiniteNumber(amount) then
-                            money = formatMoney(amount)
-                        else
+                        amount = row[family.exec.amountField]
+                        if not isFiniteNumber(amount) then
                             -- The executor fail-closes non-finite amounts before dispatch, so this is
-                            -- defensive: format 0 and flag it for emit to WARN.
-                            money = formatMoney(0)
+                            -- defensive: carry and format 0 and flag it for emit to WARN.
+                            amount = 0
                             warn = "nil/non-number amount on dispatched " .. tostring(op)
                                 .. " (husbandry=" .. tostring(row.husbandryId) .. ") - formatted 0"
                         end
+                        local money = formatMoney(amount)
                         args = single and { money } or { fmtCount, money }
                     else
                         args = single and {} or { fmtCount }
@@ -207,6 +206,7 @@ function RLHerdsmanMessages.buildMessages(results, formatMoney)
                         args        = args,
                         mark        = mark,
                         count       = count,
+                        amount      = amount,
                         warn        = warn,
                     }
                 end
@@ -257,12 +257,10 @@ end
 -- In-game wiring (reads g_* - the only non-dual-run layer)
 -- =============================================================================
 
---- Emit the day-tick's notifications from the executor summary: build the records with the real
---- g_i18n:formatMoney closure, log every skip, then per husbandry in first-seen plan order resolve
---- the placeable and drive placeable:addRLMessage. Reads no summary fields beyond results and never
---- mutates summary.
----@param summary table|nil executor summary ({ results = {...} })
+--- Emit the day-tick's records: a money record via placeable:addRLMoneyMessage, the rest via addRLMessage.
+---@param summary table|nil executor summary ({ results = {...} }), never mutated
 ---@param ctx table executor ctx; only ctx.husbandryPlaceablesById is read
+---@return nil
 function RLHerdsmanMessages.emit(summary, ctx)
     local results = (summary ~= nil and summary.results) or {}
     -- Bound to g_i18n so formatMoney keeps its `self`.
@@ -304,17 +302,22 @@ function RLHerdsmanMessages.emit(summary, ctx)
         if placeable == nil then
             Log:warning("%s husbandry '%s' not in ctx.husbandryPlaceablesById - %d message(s) dropped, no broadcast",
                 LOG_PREFIX, tostring(husbandryId), #recs)
-        elseif placeable.addRLMessage == nil then
-            Log:warning("%s husbandry '%s' placeable lacks addRLMessage (wrong-type object) - %d message(s) dropped, no broadcast",
+        elseif placeable.addRLMessage == nil or placeable.addRLMoneyMessage == nil then
+            Log:warning("%s husbandry '%s' placeable lacks addRLMessage / addRLMoneyMessage (wrong-type object)"
+                .. " - %d message(s) dropped, no broadcast",
                 LOG_PREFIX, tostring(husbandryId), #recs)
         else
             for _, rec in ipairs(recs) do
-                -- Server-local sink only; copyArgs keeps the record's args pristine because the sink
+                -- Server-local sinks only; copyArgs keeps the record's args pristine because the sink
                 -- coerces in place.
-                placeable:addRLMessage(rec.id, nil, copyArgs(rec.args))
+                if rec.amount ~= nil then
+                    placeable:addRLMoneyMessage(rec.id, nil, copyArgs(rec.args), rec.amount)
+                else
+                    placeable:addRLMessage(rec.id, nil, copyArgs(rec.args))
+                end
 
-                Log:debug("%s emit husbandry=%s id=%s count=%d mark=%s",
-                    LOG_PREFIX, tostring(husbandryId), rec.id, rec.count, tostring(rec.mark))
+                Log:debug("%s emit husbandry=%s id=%s count=%d mark=%s amount=%s",
+                    LOG_PREFIX, tostring(husbandryId), rec.id, rec.count, tostring(rec.mark), tostring(rec.amount))
                 if rec.warn ~= nil then
                     Log:warning("%s %s", LOG_PREFIX, rec.warn)
                 end

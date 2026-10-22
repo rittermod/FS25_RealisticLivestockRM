@@ -1943,6 +1943,22 @@ function Animal:addMessage(id, args)
     self.clusterSystem.owner:addRLMessage(id, self:getIdentifiers(), args)
 end
 
+--- Post a money message to the animal's pen with the raw amount its formatted money argument displays.
+---@param id string message id
+---@param args table message arguments, the money argument already formatted
+---@param amount number raw amount the money argument displays
+---@return nil
+function Animal:addMoneyMessage(id, args, amount)
+    if self.clusterSystem == nil or self.clusterSystem.owner == nil
+        or self.clusterSystem.owner.addRLMoneyMessage == nil then
+        Log:trace("Animal:addMoneyMessage: %s not posted, no pen with a money message entry (uniqueId=%s farmId=%s)",
+            tostring(id), tostring(self.uniqueId), tostring(self.farmId))
+        return
+    end
+
+    self.clusterSystem.owner:addRLMoneyMessage(id, self:getIdentifiers(), args, amount)
+end
+
 function Animal:getIdentifiers()
     return string.format("%s %s %s", RLConstants.AREA_CODES[self.birthday.country].code, self.farmId, self.uniqueId)
 end

@@ -2,6 +2,8 @@
     RLMessageAggregator.lua
     Message aggregation system for consolidating noisy individual messages
     (births, deaths, sales, purchases) into daily summaries per husbandry.
+    Money totals sum the raw amount each producer hands queueMoneyMessage; the formatted
+    money argument is display text only.
 ]]
 
 RLMessageAggregator = {}
@@ -80,6 +82,47 @@ end
 local Log = RmLogging.getLogger("RLRM")
 
 
+--- The raw amount a money message adds to its bucket, or 0 with a WARNING when it carries none.
+---@param husbandry table the husbandry the message belongs to
+---@param id string message id
+---@param amount any the amount the producer passed, nil through queueMessage
+---@return number value the amount to add
+local function moneyValue(husbandry, id, amount)
+    if type(amount) == "number" then
+        return amount
+    end
+    Log:warning("RLMessageAggregator: money message %s at %s carries no numeric amount (%s) - adding 0",
+        tostring(id), tostring(husbandry:getName()), tostring(amount))
+    return 0
+end
+
+
+--- Log one money message's contribution to its day bucket.
+---@param id string message id
+---@param category string bucket category
+---@param value number amount added
+---@param bucket table the bucket after the add
+---@return nil
+local function traceMoney(id, category, value, bucket)
+    Log:trace("RLMessageAggregator: queued %s -> %s amount=%.2f (day count %d, day total %.2f)",
+        tostring(id), category, value, bucket.count, bucket.totalValue)
+end
+
+
+--- Emit one daily money summary for a non-empty bucket, its total formatted once here.
+---@param husbandry table the husbandry the bucket belongs to
+---@param husbandryName string the husbandry's display name
+---@param id string summary message id
+---@param bucket table { count, totalValue }
+---@return nil
+local function emitMoneySummary(husbandry, husbandryName, id, bucket)
+    local moneyStr = g_i18n:formatMoney(bucket.totalValue, 2, true, true)
+    husbandry:addRLMessageDirect(id, nil, { tostring(bucket.count), husbandryName, moneyStr })
+    Log:debug("RLMessageAggregator: daily summary %s count=%d at %s total=%.2f",
+        id, bucket.count, tostring(husbandryName), bucket.totalValue)
+end
+
+
 function RLMessageAggregator.initialize()
     -- Subscribe to day change, defer consolidation to next frame
     -- Timer.createOneshot(0) ensures we run AFTER all day change operations
@@ -100,7 +143,15 @@ function RLMessageAggregator.isSummaryMode()
 end
 
 
-function RLMessageAggregator.queueMessage(husbandry, id, animal, args, date)
+--- Shared body of queueMessage and queueMoneyMessage; amount is nil on the plain entry point.
+---@param husbandry table the husbandry the message belongs to
+---@param id string message id
+---@param animal table|nil animal identifiers the message names
+---@param args table|nil message arguments
+---@param date string|nil message date, nil to stamp today
+---@param amount number|nil raw amount a money message's argument displays
+---@return nil
+local function queue(husbandry, id, animal, args, date, amount)
     -- If summary mode disabled, pass through directly
     if not RLMessageAggregator.isSummaryMode() then
         husbandry:addRLMessageDirect(id, animal, args, date)
@@ -156,55 +207,36 @@ function RLMessageAggregator.queueMessage(husbandry, id, animal, args, date)
         pending.deaths.reasons[reason] = (pending.deaths.reasons[reason] or 0) + 1
 
     elseif category == "sales" then
+        -- The _MULTIPLE ids carry the count in args[1]; a _SINGLE id is one animal.
         local count = 1
-        local value = 0
-
         if id == "SOLD_ANIMALS_MULTIPLE" or id == "AI_MANAGER_SOLD_MULTIPLE" then
-            -- These have format: [count, money]
             count = (args ~= nil and tonumber(args[1])) or 1
-            if args ~= nil and args[2] ~= nil then
-                value = RLMessageAggregator.parseMoneyValue(args[2])
-            end
-        else
-            -- SINGLE messages have format: [money]
-            if args ~= nil and args[1] ~= nil then
-                value = RLMessageAggregator.parseMoneyValue(args[1])
-            end
         end
+        local value = moneyValue(husbandry, id, amount)
 
         pending.sales.count = pending.sales.count + count
         pending.sales.totalValue = pending.sales.totalValue + value
+        traceMoney(id, category, value, pending.sales)
 
     elseif category == "overcrowding" then
-        -- PREGNANCY_SOLD has format: [count, money]
+        -- PREGNANCY_SOLD carries the count in args[1].
         local count = (args ~= nil and tonumber(args[1])) or 1
-        local value = 0
-        if args ~= nil and args[2] ~= nil then
-            value = RLMessageAggregator.parseMoneyValue(args[2])
-        end
+        local value = moneyValue(husbandry, id, amount)
 
         pending.overcrowding.count = pending.overcrowding.count + count
         pending.overcrowding.totalValue = pending.overcrowding.totalValue + value
+        traceMoney(id, category, value, pending.overcrowding)
 
     elseif category == "purchases" then
         local count = 1
-        local value = 0
-
         if id == "BOUGHT_ANIMALS_MULTIPLE" or id == "AI_MANAGER_BOUGHT_MULTIPLE" then
             count = (args ~= nil and tonumber(args[1])) or 1
-            -- Money is in args[2] for MULTIPLE messages
-            if args ~= nil and args[2] ~= nil then
-                value = RLMessageAggregator.parseMoneyValue(args[2])
-            end
-        else
-            -- Money is in args[1] for SINGLE messages
-            if args ~= nil and args[1] ~= nil then
-                value = RLMessageAggregator.parseMoneyValue(args[1])
-            end
         end
+        local value = moneyValue(husbandry, id, amount)
 
         pending.purchases.count = pending.purchases.count + count
         pending.purchases.totalValue = pending.purchases.totalValue + value
+        traceMoney(id, category, value, pending.purchases)
 
     elseif RLMessageAggregator.HERDSMAN_SUMMARY_CATEGORY_SET[category] then
         -- Herdsman count-only categories: the _MULTIPLE ids carry the count in args[1], the _SINGLE
@@ -221,41 +253,27 @@ function RLMessageAggregator.queueMessage(husbandry, id, animal, args, date)
 end
 
 
-function RLMessageAggregator.parseMoneyValue(formattedMoney)
-    -- Parse money from formatted string like "$1,500" or "1.500 EUR"
-    -- This is a best-effort approach - strips non-digit chars except decimal point
-    if formattedMoney == nil then return 0 end
+--- Route a message by mode; a money id queued here has no amount, so it adds its count and 0.
+---@param husbandry table the husbandry the message belongs to
+---@param id string message id
+---@param animal table|nil animal identifiers the message names
+---@param args table|nil message arguments
+---@param date string|nil message date, nil to stamp today
+---@return nil
+function RLMessageAggregator.queueMessage(husbandry, id, animal, args, date)
+    queue(husbandry, id, animal, args, date)
+end
 
-    local str = tostring(formattedMoney)
-    -- Remove currency symbols and thousands separators, keep digits and decimal point
-    -- Handle both "." and "," as potential decimal separators
-    local cleaned = string.gsub(str, "[^%d.,]", "")
 
-    -- If there's both . and ,, assume the last one is the decimal separator
-    local dotPos = string.find(cleaned, "%.", nil) or 0
-    local commaPos = string.find(cleaned, ",", nil) or 0
-
-    if dotPos > 0 and commaPos > 0 then
-        if dotPos > commaPos then
-            -- Format: 1,234.56 - dot is decimal
-            cleaned = string.gsub(cleaned, ",", "")
-        else
-            -- Format: 1.234,56 - comma is decimal
-            cleaned = string.gsub(cleaned, "%.", "")
-            cleaned = string.gsub(cleaned, ",", ".")
-        end
-    elseif commaPos > 0 then
-        -- Only comma present - could be decimal or thousands
-        -- Assume decimal if exactly 2 digits after comma
-        local afterComma = string.sub(cleaned, commaPos + 1)
-        if #afterComma == 2 then
-            cleaned = string.gsub(cleaned, ",", ".")
-        else
-            cleaned = string.gsub(cleaned, ",", "")
-        end
-    end
-
-    return tonumber(cleaned) or 0
+--- Route a money message; Summary mode adds the raw amount its money argument displays.
+---@param husbandry table the husbandry the message belongs to
+---@param id string message id
+---@param animal table|nil animal identifiers the message names
+---@param args table message arguments, the money argument already formatted
+---@param amount number raw amount the money argument displays
+---@return nil
+function RLMessageAggregator.queueMoneyMessage(husbandry, id, animal, args, amount)
+    queue(husbandry, id, animal, args, nil, amount)
 end
 
 
@@ -274,6 +292,8 @@ function RLMessageAggregator.formatDeathReasons(reasons, translate)
 end
 
 
+--- Post the day's summaries for every husbandry with queued messages, then clear the buckets.
+---@return nil
 function RLMessageAggregator.consolidateDay()
     RmSafeUtils.safeCall("RLMessageAggregator.consolidateDay", function()
         for _, pending in pairs(RLMessageAggregator.pending) do
@@ -288,6 +308,8 @@ function RLMessageAggregator.consolidateDay()
                 if pending.births.count > 0 then
                     husbandry:addRLMessageDirect("DAILY_BIRTHS_SUMMARY", nil,
                         { tostring(pending.births.count), husbandryName })
+                    Log:debug("RLMessageAggregator: daily summary DAILY_BIRTHS_SUMMARY count=%d at %s",
+                        pending.births.count, tostring(husbandryName))
                 end
 
                 if pending.deaths.count > 0 then
@@ -296,24 +318,20 @@ function RLMessageAggregator.consolidateDay()
 
                     husbandry:addRLMessageDirect("DAILY_DEATHS_SUMMARY", nil,
                         { tostring(pending.deaths.count), husbandryName, reasonsStr })
+                    Log:debug("RLMessageAggregator: daily summary DAILY_DEATHS_SUMMARY count=%d at %s",
+                        pending.deaths.count, tostring(husbandryName))
                 end
 
                 if pending.sales.count > 0 then
-                    local moneyStr = g_i18n:formatMoney(pending.sales.totalValue, 2, true, true)
-                    husbandry:addRLMessageDirect("DAILY_SALES_SUMMARY", nil,
-                        { tostring(pending.sales.count), husbandryName, moneyStr })
+                    emitMoneySummary(husbandry, husbandryName, "DAILY_SALES_SUMMARY", pending.sales)
                 end
 
                 if pending.overcrowding.count > 0 then
-                    local moneyStr = g_i18n:formatMoney(pending.overcrowding.totalValue, 2, true, true)
-                    husbandry:addRLMessageDirect("DAILY_OVERCROWDING_SUMMARY", nil,
-                        { tostring(pending.overcrowding.count), husbandryName, moneyStr })
+                    emitMoneySummary(husbandry, husbandryName, "DAILY_OVERCROWDING_SUMMARY", pending.overcrowding)
                 end
 
                 if pending.purchases.count > 0 then
-                    local moneyStr = g_i18n:formatMoney(pending.purchases.totalValue, 2, true, true)
-                    husbandry:addRLMessageDirect("DAILY_PURCHASES_SUMMARY", nil,
-                        { tostring(pending.purchases.count), husbandryName, moneyStr })
+                    emitMoneySummary(husbandry, husbandryName, "DAILY_PURCHASES_SUMMARY", pending.purchases)
                 end
 
                 -- Herdsman count-only summaries: one DAILY_*_SUMMARY per non-empty bucket, args

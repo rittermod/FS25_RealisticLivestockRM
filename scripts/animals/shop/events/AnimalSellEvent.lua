@@ -65,6 +65,7 @@ end
 
 --- Client: publish the reply code. Server: validate the whole batch, then remove and pay for it.
 ---@param connection table The sender's connection (a client when this runs on the server)
+---@return nil
 function AnimalSellEvent:run(connection)
 
 	if connection:getIsServer() then
@@ -143,15 +144,18 @@ function AnimalSellEvent:run(connection)
 		connection:sendEvent(AnimalSellEvent.newServerToClient(AnimalSellEvent.SELL_SUCCESS))
 
 		-- Object may be a trailer on trailer-based dealer sales; only husbandry
-		-- placeables carry addRLMessage.
-		if self.object.addRLMessage ~= nil then
+		-- placeables carry addRLMoneyMessage.
+		if self.object.addRLMoneyMessage ~= nil then
+			local amount = math.abs(self.price + self.transportPrice)
+			local money = g_i18n:formatMoney(amount, 2, true, true)
 			if #self.animals == 1 then
-				self.object:addRLMessage("SOLD_ANIMALS_SINGLE", nil, { g_i18n:formatMoney(math.abs(self.price + self.transportPrice), 2, true, true) })
+				self.object:addRLMoneyMessage("SOLD_ANIMALS_SINGLE", nil, { money }, amount)
 			elseif #self.animals > 0 then
-				self.object:addRLMessage("SOLD_ANIMALS_MULTIPLE", nil, { #self.animals, g_i18n:formatMoney(math.abs(self.price + self.transportPrice), 2, true, true) })
+				self.object:addRLMoneyMessage("SOLD_ANIMALS_MULTIPLE", nil, { #self.animals, money }, amount)
 			end
 		else
-			Log:trace("SellEvent:run: skipping addRLMessage (object has no husbandryAnimals spec, likely trailer sale) N=%d", #self.animals)
+			Log:trace("SellEvent:run: skipping addRLMoneyMessage"
+				.. " (object has no husbandryAnimals spec, likely trailer sale) N=%d", #self.animals)
 		end
 
 		Log:debug("SellEvent:run: sold %d animals farmId=%s total=%s",
