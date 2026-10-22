@@ -314,3 +314,71 @@ InGameMenuAnimalsFrame.updateMenuButtons = Utils.appendedFunction(
     InGameMenuAnimalsFrame.updateMenuButtons,
     RealisticLivestock_InGameMenuAnimalsFrame.onUpdateMenuButtons
 )
+
+
+--- Open the RL name dialog for the selected animal; the base rename dialog and event never run.
+--- @param superFunc function the base onButtonRename, never called
+--- @return nil
+function RealisticLivestock_InGameMenuAnimalsFrame:onButtonRename(superFunc)
+    if not Platform.gameplay.canRenameAnimals then
+        Log:trace("InGameMenuAnimalsFrame:onButtonRename: platform cannot rename animals, nothing opens")
+        return
+    end
+
+    -- A pen switch clears selectedCluster, and re-selecting the highlighted row fires no event.
+    local animal = self.selectedCluster
+    if animal == nil then
+        animal = getSelectedAnimal(self)
+        Log:trace("InGameMenuAnimalsFrame:onButtonRename: no selected cluster, highlighted row animal=%s",
+            tostring(animal ~= nil and animal.uniqueId or nil))
+    end
+
+    if animal == nil then
+        Log:trace("InGameMenuAnimalsFrame:onButtonRename: no animal selected, nothing opens")
+        return
+    end
+
+    local name = animal.name
+    if name == nil and g_currentMission ~= nil and g_currentMission.animalNameSystem ~= nil then
+        name = g_currentMission.animalNameSystem:getRandomName(animal.gender)
+        Log:trace("InGameMenuAnimalsFrame:onButtonRename: no existing name, generated random: %s", tostring(name))
+    end
+
+    Log:debug("InGameMenuAnimalsFrame:onButtonRename: farmId=%s uniqueId=%s opening dialog, prefill=%s",
+        tostring(animal.farmId), tostring(animal.uniqueId), tostring(name))
+    NameInputDialog.show(RealisticLivestock_InGameMenuAnimalsFrame.onRenameDone, self, name, nil, 30, animal,
+        animal.gender)
+end
+
+
+--- Name dialog callback: rename the animal the dialog opened for, then rebuild the list and, when a
+--- cluster is selected, the detail header.
+--- @param text string the entered name; empty clears it
+--- @param clickOk boolean true when the player confirmed
+--- @param animal table the animal the dialog opened for
+--- @return nil
+function RealisticLivestock_InGameMenuAnimalsFrame:onRenameDone(text, clickOk, animal)
+    if not clickOk then
+        Log:trace("InGameMenuAnimalsFrame:onRenameDone: dialog cancelled, name unchanged")
+        return
+    end
+
+    RmSafeUtils.safeCall("InGameMenuAnimalsFrame:onRenameDone", function()
+        Log:debug("InGameMenuAnimalsFrame:onRenameDone: farmId=%s uniqueId=%s newName=%s",
+            tostring(animal and animal.farmId), tostring(animal and animal.uniqueId), tostring(text))
+        RLAnimalInfoService.renameAnimal(animal, text)
+    end)
+
+    -- The list and header rebuild stay outside safeCall so a GUI error propagates.
+    self:reloadList()
+    if self.selectedCluster ~= nil and self.selectedHusbandry ~= nil then
+        self:displayCluster(self.selectedCluster, self.selectedHusbandry)
+    else
+        Log:trace("InGameMenuAnimalsFrame:onRenameDone: no selected cluster or husbandry, header not refreshed")
+    end
+end
+
+InGameMenuAnimalsFrame.onButtonRename = Utils.overwrittenFunction(
+    InGameMenuAnimalsFrame.onButtonRename,
+    RealisticLivestock_InGameMenuAnimalsFrame.onButtonRename
+)
