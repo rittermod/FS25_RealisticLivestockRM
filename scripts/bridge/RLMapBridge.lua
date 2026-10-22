@@ -260,9 +260,7 @@ end
 --- Tries current language first, falls back to English, then German.
 --- Uses the same XML format as modDesc l10n files: <l10n><texts><text name="..." text="..."/></texts></l10n>
 ---
---- Translations must be set in the GLOBAL I18N texts table (not the mod proxy)
---- because $l10n_ keys for animal visual data resolve using the map's mod name,
---- not RLRM's mod name, so the mod proxy table is never consulted.
+--- Translations go to RLRM's own text table, not the game's global one.
 ---@param bridge table Bridge entry from SUPPORTED_MAPS
 function RLMapBridge.loadBridgeTranslations(bridge)
     local translationsDir = modDirectory .. bridge.resolvedConfigPath .. "translations/translation"
@@ -284,10 +282,9 @@ function RLMapBridge.loadBridgeTranslations(bridge)
         return
     end
 
-    -- Write to the GLOBAL I18N instance (_G.g_i18n), not the mod proxy (g_i18n).
-    -- The mod proxy only stores texts under this mod's name, but $l10n_ keys
-    -- for animal visual data resolve under the map mod's name, so they only
-    -- find texts in the global table.
+    -- Write to RLRM's own text table (_G is this mod's environment), not the game's global one.
+    -- Bridge $l10n_ keys in <description> elements resolve because the bridge phase loads under
+    -- RLRM's environment.
     local count = 0
     for _, key in xmlFile:iterator("l10n.texts.text") do
         local name = xmlFile:getString(key .. "#name")
@@ -532,7 +529,7 @@ end
 
 --- Load translations for an animal pack.
 --- Uses the pack's translations prefix (e.g. "translations/translation") to find language files.
---- Translations are written to the GLOBAL I18N table (same as map bridge translations).
+--- Translations are written to RLRM's own text table (same as map bridge translations).
 ---@param bridge table Bridge entry with isPack=true
 function RLMapBridge.loadPackTranslations(bridge)
     local prefix = bridge.packModDir .. bridge.packTranslationsPrefix
@@ -807,8 +804,8 @@ function RLMapBridge.loadBreedMetadata(xmlFile, bridgeName)
 
             local displayName = xmlFile:getString(key .. "#displayName")
             if displayName ~= nil then
-                -- Resolve $l10n_ references from global I18N table (bridge/pack translations live there,
-                -- not in the mod proxy, so g_i18n:convertText won't find them)
+                -- Resolve $l10n_ references from RLRM's own text table, where bridge/pack translations live;
+                -- a g_i18n:convertText without this mod's environment won't find them.
                 if string.startsWith(displayName, "$l10n_") then
                     local l10nKey = string.sub(displayName, 7)
                     displayName = _G.g_i18n.texts[l10nKey] or displayName

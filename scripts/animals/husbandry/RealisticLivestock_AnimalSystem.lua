@@ -257,9 +257,7 @@ function RealisticLivestock_AnimalSystem:loadMapData(_, mapXml, mission, baseDir
     end
 
     -- Phase 3: Load bridge animal subtypes for detected maps
-    -- Reset customEnvironment to RLRM before bridge loading so the C++ engine's
-    -- $l10n_ resolution finds bridge translations in the global texts table
-    -- (with customEnv = MAP, the engine only checks the map's mod texts and misses them)
+    -- Back to RLRM's environment: while the map's environment is active, bridge $l10n_ keys do not resolve.
     self.customEnvironment = modName
 
     Log:info("AnimalSystem: === PHASE 3 START === bridge/pack loading (%d active bridges)", #RLMapBridge.activeBridges)
@@ -747,11 +745,27 @@ local function pathEquals(a, b)
 end
 
 
+--- Base visual load plus RLRM's node-path attributes, path defaults and texture indexes.
+---@param superFunc function Base AnimalSystem.loadVisualData
+---@param animalType table Animal type the visual belongs to
+---@param xmlFile table XMLFile handle
+---@param key string XML key of the visual
+---@param baseDirectory string Directory image paths resolve against
+---@return table|nil visualData nil when the base refuses the visual
 function RealisticLivestock_AnimalSystem:loadVisualData(superFunc, animalType, xmlFile, key, baseDirectory)
+
+    -- Descriptions resolve from the texts of the environment active in each load phase.
+    animalType.customEnvironment = self.customEnvironment
+    Log:trace("loadVisualData: type=%s customEnvironment=%s", tostring(animalType.name),
+        tostring(self.customEnvironment))
 
     local visualData = superFunc(self, animalType, xmlFile, key, baseDirectory)
 
-    if visualData == nil then return nil end
+    if visualData == nil then
+        Log:trace("loadVisualData: base returned no visual (type=%s key=%s)", tostring(animalType.name),
+            tostring(key))
+        return nil
+    end
 
     -- xmlFile:getString returns nil for both missing AND empty attributes, so an
     -- explicit `marker=""` map override is treated identically to a missing attribute
