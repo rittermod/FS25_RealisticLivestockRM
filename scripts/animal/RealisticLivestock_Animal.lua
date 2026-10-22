@@ -1607,6 +1607,24 @@ function Animal:getDirtFactor() return AnimalHorse.getDirtFactor(self) end
 
 function Animal:changeDirt(delta) AnimalHorse.changeDirt(self, delta) end
 
+--- @return boolean supported true when the animal worker's riding task can exercise this animal
+function Animal:getSupportsExercise() return AnimalHorse.getSupportsExercise(self) end
+
+--- @return boolean needed true when the riding task has work on this animal
+function Animal:getNeedsExercise() return AnimalHorse.getNeedsExercise(self) end
+
+--- @return boolean applied true when the riding task exercised this animal
+function Animal:applyExercise() return AnimalHorse.applyExercise(self) end
+
+--- @return boolean supported true when the animal worker's grooming task can groom this animal
+function Animal:getSupportsGrooming() return AnimalHorse.getSupportsGrooming(self) end
+
+--- @return boolean needed true when the grooming task has work on this animal
+function Animal:getNeedsGrooming() return AnimalHorse.getNeedsGrooming(self) end
+
+--- @return boolean applied true when the grooming task groomed this animal
+function Animal:applyGrooming() return AnimalHorse.applyGrooming(self) end
+
 function Animal:getSellPrice()
     local subType = self:getSubType()
     local sellPrice = subType.sellPrice:get(self.age < 0 and 0 or self.age)

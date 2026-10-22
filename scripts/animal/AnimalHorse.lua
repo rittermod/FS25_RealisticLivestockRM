@@ -98,6 +98,94 @@ function AnimalHorse.getDailyRidingTime(animal)
 end
 
 -- =============================================================================
+-- ANIMAL WORKER (the hired worker's riding and grooming tasks)
+-- =============================================================================
+
+--- Whether the riding task can exercise this animal: a horse whose subtype has a rideable.
+--- @param animal table Animal instance
+--- @return boolean supported
+function AnimalHorse.getSupportsExercise(animal)
+    local supported = animal:isHorse() and animal:getRidableFilename() ~= nil
+    Log:trace("AnimalHorse.getSupportsExercise: farmId=%s uniqueId=%s type=%s -> %s",
+        tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.animalTypeIndex), tostring(supported))
+    return supported
+end
+
+--- Whether the riding task has work on this animal: supported and riding below 100.
+--- @param animal table Animal instance
+--- @return boolean needed
+function AnimalHorse.getNeedsExercise(animal)
+    local needed = animal:getSupportsExercise() and animal.riding < 100
+    Log:trace("AnimalHorse.getNeedsExercise: farmId=%s uniqueId=%s type=%s riding=%s -> %s",
+        tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.animalTypeIndex),
+        tostring(animal.riding), tostring(needed))
+    return needed
+end
+
+--- Exercise the animal for the riding task: riding to 100 when needed.
+--- @param animal table Animal instance
+--- @return boolean applied true when the animal was exercised
+function AnimalHorse.applyExercise(animal)
+    if not animal:getNeedsExercise() then
+        Log:trace("AnimalHorse.applyExercise: farmId=%s uniqueId=%s type=%s not needed",
+            tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.animalTypeIndex))
+        return false
+    end
+    local before = animal.riding
+    -- The flag leads the write: a raise in the write still leaves the animal flagged for the pen flush.
+    -- Accepted trade: a raise in setDirty writes nothing and ends the worker's run before it bills, so the
+    -- horses that run already cared for go unbilled.
+    animal:setDirty()
+    animal:setRiding(100)
+    Log:debug("AnimalHorse.applyExercise: farmId=%s uniqueId=%s type=%s riding %s -> %s",
+        tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.animalTypeIndex),
+        tostring(before), tostring(animal.riding))
+    return true
+end
+
+--- Whether the grooming task can groom this animal: a horse, on a platform that needs horse cleaning.
+--- @param animal table Animal instance
+--- @return boolean supported
+function AnimalHorse.getSupportsGrooming(animal)
+    local supported = animal:isHorse() and Platform.gameplay.needHorseCleaning == true
+    Log:trace("AnimalHorse.getSupportsGrooming: farmId=%s uniqueId=%s type=%s -> %s",
+        tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.animalTypeIndex), tostring(supported))
+    return supported
+end
+
+--- Whether the grooming task has work on this animal: supported and dirt above 0.
+--- @param animal table Animal instance
+--- @return boolean needed
+function AnimalHorse.getNeedsGrooming(animal)
+    local needed = animal:getSupportsGrooming() and animal.dirt > 0
+    Log:trace("AnimalHorse.getNeedsGrooming: farmId=%s uniqueId=%s type=%s dirt=%s -> %s",
+        tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.animalTypeIndex),
+        tostring(animal.dirt), tostring(needed))
+    return needed
+end
+
+--- Groom the animal for the grooming task: dirt to 0 when needed.
+--- @param animal table Animal instance
+--- @return boolean applied true when the animal was groomed
+function AnimalHorse.applyGrooming(animal)
+    if not animal:getNeedsGrooming() then
+        Log:trace("AnimalHorse.applyGrooming: farmId=%s uniqueId=%s type=%s not needed",
+            tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.animalTypeIndex))
+        return false
+    end
+    local before = animal.dirt
+    -- The flag leads the write: a raise in the write still leaves the animal flagged for the pen flush.
+    -- Accepted trade: a raise in setDirty writes nothing and ends the worker's run before it bills, so the
+    -- horses that run already cared for go unbilled.
+    animal:setDirty()
+    animal:changeDirt(-100)
+    Log:debug("AnimalHorse.applyGrooming: farmId=%s uniqueId=%s type=%s dirt %s -> %s",
+        tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.animalTypeIndex),
+        tostring(before), tostring(animal.dirt))
+    return true
+end
+
+-- =============================================================================
 -- EXTRACTED CONDITIONAL BLOCKS
 -- =============================================================================
 
