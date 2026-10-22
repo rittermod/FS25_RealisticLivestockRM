@@ -78,6 +78,9 @@ end
 AnimalClusterHusbandry.deleteHusbandry = Utils.overwrittenFunction(AnimalClusterHusbandry.deleteHusbandry, RealisticLivestock_AnimalClusterHusbandry.deleteHusbandry)
 
 
+--- Rebuild the pen's visual animals; a horse back from riding is placed at the spot it was handed.
+--- @param superFunc function the overwritten base method, never called
+--- @param removeAll boolean|nil remove every visual before re-adding
 function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, removeAll)
 
     -- Phase timing: localise visual-update cost
@@ -85,6 +88,8 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
     -- (husbandryNotReady, cap reached) emit a one-line DEBUG with elapsed ms.
     local tStart = getTimeSec()
     local tPhase = tStart
+    Log:trace(">>> AnimalClusterHusbandry:updateVisuals(removeAll=%s) husbandryId=%s", tostring(removeAll),
+        tostring(self.husbandryId))
     local function phaseDoneMs()
         local now = getTimeSec()
         local ms = (now - tPhase) * 1000
@@ -96,6 +101,7 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
         self.visualUpdatePending = true
         Log:debug("AnimalClusterHusbandry:updateVisuals: deferred (husbandryNotReady) took %.2fms",
             (getTimeSec() - tStart) * 1000)
+        Log:trace("<<< AnimalClusterHusbandry:updateVisuals (deferred) husbandryId=%s", tostring(self.husbandryId))
         return
     end
 
@@ -117,6 +123,11 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
         for animalId, animal in pairs(animalIds) do
 
             if removeAll or animal == nil or animal.isSold or animal.isDead or animal.id == nil or animal.uniqueId == "1-1" or animal.uniqueId == "0-0" or animal.numAnimals <= 0 then
+
+                Log:trace("AnimalClusterHusbandry:updateVisuals: stale visual removed husbandry=%s animalId=%s "
+                    .. "farmId=%s uniqueId=%s removeAll=%s",
+                    tostring(husbandryId), tostring(animalId), tostring(animal and animal.farmId),
+                    tostring(animal and animal.uniqueId), tostring(removeAll))
 
                 local husbandryEngineId = self.husbandryIds[husbandryId]
                 local count = husbandryEngineId ~= nil and self.husbandryIdsToVisualAnimalCount[husbandryEngineId] or nil
@@ -151,6 +162,7 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
     if RealisticLivestock_AnimalClusterHusbandry.MAX_HUSBANDRIES <= 0 or self.visualAnimalCount == RealisticLivestock_AnimalClusterHusbandry.MAX_HUSBANDRIES then
         Log:debug("AnimalClusterHusbandry:updateVisuals: early-return (cap reached) staleRemove=%.2fms total=%.2fms",
             tStaleRemoveMs, (getTimeSec() - tStart) * 1000)
+        Log:trace("<<< AnimalClusterHusbandry:updateVisuals (cap reached) husbandryId=%s", tostring(self.husbandryId))
         return
     end
 
@@ -179,7 +191,17 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
 
     for _, animal in pairs(animals) do
 
-        if self.visualAnimalCount >= RealisticLivestock_AnimalClusterHusbandry.MAX_HUSBANDRIES or i > #self.husbandryIds or animal.isDead or animal.numAnimals <= 0 or animal.uniqueId == "1-1" or animal.uniqueId == "0-0" or (animal.id ~= nil and animal.idFull ~= nil and animal.id ~= "0-0" and animal.visualAnimalIndex == nil) then continue end
+        if self.visualAnimalCount >= RealisticLivestock_AnimalClusterHusbandry.MAX_HUSBANDRIES
+            or i > #self.husbandryIds or animal.isDead or animal.numAnimals <= 0
+            or animal.uniqueId == "1-1" or animal.uniqueId == "0-0"
+            or (animal.id ~= nil and animal.idFull ~= nil and animal.id ~= "0-0"
+                and animal.visualAnimalIndex == nil) then
+            Log:trace("AnimalClusterHusbandry:updateVisuals: skipped farmId=%s uniqueId=%s visualCount=%d i=%d "
+                .. "isDead=%s numAnimals=%s id=%s",
+                tostring(animal.farmId), tostring(animal.uniqueId), self.visualAnimalCount, i,
+                tostring(animal.isDead), tostring(animal.numAnimals), tostring(animal.id))
+            continue
+        end
 
         local husbandryAnimalCount = self.husbandryIdsToVisualAnimalCount[self.husbandryIds[i]] 
 
@@ -196,24 +218,37 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
                 tempHusbandryId = tonumber(string.sub(animal.id, 1, 1))
                 local tempAnimalId = tonumber(string.sub(animal.id, 3))
 
+                Log:trace("AnimalClusterHusbandry:updateVisuals: age-band re-add farmId=%s uniqueId=%s "
+                    .. "visual %s -> %s husbandry=%s",
+                    tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.visualAnimalIndex),
+                    tostring(newVisualAnimalIndex), tostring(tempHusbandryId))
+
                 removeHusbandryAnimal(self.husbandryIds[tempHusbandryId], tempAnimalId)
                 animal:deleteVisual()
                 animalId = addHusbandryAnimal(self.husbandryIds[tempHusbandryId], newVisualAnimalIndex - 1)
+                if animalId == 0 then
+                    Log:trace("AnimalClusterHusbandry:updateVisuals: add refused husbandry=%s farmId=%s uniqueId=%s",
+                        tostring(tempHusbandryId), tostring(animal.farmId), tostring(animal.uniqueId))
+                end
 
                 self.visualAnimalCount = math.max(self.visualAnimalCount - 1, 0)
                 husbandryAnimalCount = husbandryAnimalCount - 1
                 self.animalIdToCluster[tempHusbandryId][tempAnimalId] = nil
 
                 if animalId == nil then
-                    
+
                     self.husbandryIdsToVisualAnimalCount[self.husbandryIds[i]] = self.husbandryIdsToVisualAnimalCount[self.husbandryIds[i]] - 1
 
+                    Log:trace("AnimalClusterHusbandry:updateVisuals: age-band re-add returned nil, skipped "
+                        .. "farmId=%s uniqueId=%s", tostring(animal.farmId), tostring(animal.uniqueId))
                     continue
 
                 end
                 
                 useTempId = true
             else
+                Log:trace("AnimalClusterHusbandry:updateVisuals: visual up to date farmId=%s uniqueId=%s",
+                    tostring(animal.farmId), tostring(animal.uniqueId))
                 continue
             end
 
@@ -230,22 +265,70 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
 
         if animalId == 0 then
 
+            -- Decided before any add: an age-band re-add that fell through here never reads the position.
+            local isNewVisual = not useTempId
+
             while not useTempId and husbandryAnimalCount >= maxAnimalsPerHusbandry and i <= #self.husbandryIds and self.visualAnimalCount < RealisticLivestock_AnimalClusterHusbandry.MAX_HUSBANDRIES do
                 i = i + 1
                 if i > #self.husbandryIds then break end
                 husbandryAnimalCount = self.husbandryIdsToVisualAnimalCount[self.husbandryIds[i]]
             end
-        
-            if i > #self.husbandryIds or (husbandryAnimalCount >= maxAnimalsPerHusbandry and not useTempId) then break end
 
-            animalId = addHusbandryAnimal(self.husbandryIds[useTempId and tempHusbandryId or i], visualAnimalIndex - 1)
+            if i > #self.husbandryIds or (husbandryAnimalCount >= maxAnimalsPerHusbandry and not useTempId) then
+                Log:trace("AnimalClusterHusbandry:updateVisuals: husbandries full at i=%d count=%s max=%d, "
+                    .. "stopping before farmId=%s uniqueId=%s",
+                    i, tostring(husbandryAnimalCount), maxAnimalsPerHusbandry, tostring(animal.farmId),
+                    tostring(animal.uniqueId))
+                break
+            end
+
+            local spawnPos, spawnRot
+            if isNewVisual then
+                local px, py, pz, prx, pry, prz = animal:getPendingSpawnWorldPosition()
+                if px ~= nil then
+                    -- The engine add takes its optional placement as vectors.
+                    spawnPos = vector.create(px, py, pz)
+                    spawnRot = vector.create(prx, pry, prz)
+                    animal:clearPendingSpawnWorldPosition()
+                    Log:debug("AnimalClusterHusbandry:updateVisuals: placing returned animal farmId=%s uniqueId=%s "
+                        .. "at x=%s y=%s z=%s yaw=%s",
+                        tostring(animal.farmId), tostring(animal.uniqueId), tostring(px), tostring(py),
+                        tostring(pz), tostring(pry))
+                end
+            end
+
+            if spawnPos ~= nil then
+                animalId = addHusbandryAnimal(self.husbandryIds[useTempId and tempHusbandryId or i],
+                    visualAnimalIndex - 1, spawnPos, spawnRot)
+            else
+                animalId = addHusbandryAnimal(self.husbandryIds[useTempId and tempHusbandryId or i],
+                    visualAnimalIndex - 1)
+            end
+            if animalId == 0 then
+                Log:trace("AnimalClusterHusbandry:updateVisuals: add refused husbandry=%s farmId=%s uniqueId=%s",
+                    tostring(useTempId and tempHusbandryId or i), tostring(animal.farmId), tostring(animal.uniqueId))
+            end
 
 
             while animalId == 0 and i <= #self.husbandryIds do
                 i = useTempId and i or (i + 1)
                 useTempId = false
                 if i > #self.husbandryIds or self.husbandryIdsToVisualAnimalCount[self.husbandryIds[i]] >= maxAnimalsPerHusbandry then break end
-                animalId = addHusbandryAnimal(self.husbandryIds[i], visualAnimalIndex - 1)
+                if spawnPos ~= nil then
+                    animalId = addHusbandryAnimal(self.husbandryIds[i], visualAnimalIndex - 1, spawnPos, spawnRot)
+                else
+                    animalId = addHusbandryAnimal(self.husbandryIds[i], visualAnimalIndex - 1)
+                end
+                if animalId == 0 then
+                    Log:trace("AnimalClusterHusbandry:updateVisuals: add refused husbandry=%s farmId=%s uniqueId=%s",
+                        tostring(i), tostring(animal.farmId), tostring(animal.uniqueId))
+                end
+            end
+
+            if spawnPos ~= nil and animalId == 0 then
+                Log:debug("AnimalClusterHusbandry:updateVisuals: spawn position lost, no husbandry took the add "
+                    .. "farmId=%s uniqueId=%s",
+                    tostring(animal.farmId), tostring(animal.uniqueId))
             end
 
         end
@@ -284,6 +367,8 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
             animal:setVisualEarTagColours(colours.earTagLeft, colours.earTagLeft_text, colours.earTagRight, colours.earTagRight_text)
 
         else
+            Log:trace("AnimalClusterHusbandry:updateVisuals: no visual this pass farmId=%s uniqueId=%s",
+                tostring(animal.farmId), tostring(animal.uniqueId))
             animal.id = nil
             animal.idFull = nil
             animal.visualAnimalIndex = nil
@@ -291,8 +376,16 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
 
         self.husbandryIdsToVisualAnimalCount[self.husbandryIds[i]] = husbandryAnimalCount
 
-        if self.visualAnimalCount > RealisticLivestock_AnimalClusterHusbandry.MAX_HUSBANDRIES then break end
-        if animalId == 0 then break end
+        if self.visualAnimalCount > RealisticLivestock_AnimalClusterHusbandry.MAX_HUSBANDRIES then
+            Log:trace("AnimalClusterHusbandry:updateVisuals: visual cap passed, stopping (visualCount=%s)",
+                tostring(self.visualAnimalCount))
+            break
+        end
+        if animalId == 0 then
+            Log:trace("AnimalClusterHusbandry:updateVisuals: last add refused, stopping after farmId=%s uniqueId=%s",
+                tostring(animal.farmId), tostring(animal.uniqueId))
+            break
+        end
 
     end
 
@@ -336,6 +429,7 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
         nextCount,
         self.visualAnimalCount,
         tStaleRemoveMs, tSetupMs, tMainLoopMs, tShaderPassMs, tTotalMs)
+    Log:trace("<<< AnimalClusterHusbandry:updateVisuals (done) husbandryId=%s", tostring(self.husbandryId))
 
 end
 
