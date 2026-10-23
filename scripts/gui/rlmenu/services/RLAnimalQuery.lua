@@ -393,6 +393,11 @@ function RLAnimalQuery.formatAnimalRow(item)
                 row.productionIcon = "egg"
             elseif cluster.animalTypeIndex == AnimalType.COW then
                 row.productionIcon = "milk"
+            else
+                -- A type RLRM ships no data for (a DLC or mod type) still shows that it produces.
+                row.productionIcon = "scissors"
+                Log:trace("RLAnimalQuery.formatAnimalRow: subtype %s pallets output -> fallback icon",
+                    tostring(cluster.subType))
             end
         end
     end

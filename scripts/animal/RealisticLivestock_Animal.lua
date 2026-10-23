@@ -1138,6 +1138,8 @@ function Animal:addGeneticsInfo()
     return texts
 end
 
+--- Add the monitor HUD lines (fee, health, weights, value, inputs, outputs) for a monitored animal.
+---@param box table The HUD key/value box being filled.
 function Animal:showMonitorInfo(box)
     if not self.monitor.active and not self.monitor.removed then return end
 
@@ -1163,19 +1165,23 @@ function Animal:showMonitorInfo(box)
     end
 
     for fillType, amount in pairs(self.output) do
-        local outputText = fillType
+        local title
 
         if fillType == "pallets" then
-            if self.animalTypeIndex == AnimalType.COW then outputText = "pallets_milk" end
-
-            if self.animalTypeIndex == AnimalType.SHEEP then outputText = self.subType == "GOAT" and "pallets_goatMilk" or
-                "pallets_wool" end
-
-            if self.animalTypeIndex == AnimalType.CHICKEN then outputText = "pallets_eggs" end
+            local subType = self:getSubType()
+            local pallets = subType ~= nil and subType.output ~= nil and subType.output.pallets or nil
+            local fillTypeTitle = nil
+            if pallets ~= nil and pallets.fillType ~= nil then
+                fillTypeTitle = g_fillTypeManager:getFillTypeTitleByIndex(pallets.fillType)
+            end
+            local typeName = g_currentMission.animalSystem.typeIndexToName[self.animalTypeIndex]
+            local text, isKey = RLAnimalTypeSupport.palletsOutputLabel(typeName, self.subType, fillTypeTitle)
+            title = isKey and g_i18n:getText(text) or text
+        else
+            title = g_i18n:getText("rl_ui_output_" .. fillType)
         end
 
-        box:addLine(g_i18n:getText("rl_ui_output_" .. outputText),
-            RLAnimalDisplayHelper.formatAmountPerDay((amount * 24) / daysPerMonth))
+        box:addLine(title, RLAnimalDisplayHelper.formatAmountPerDay((amount * 24) / daysPerMonth))
     end
 end
 

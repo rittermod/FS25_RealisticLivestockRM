@@ -32,6 +32,9 @@ local SALE_LISTING_MAX_AGE_DAYS = 2
 -- offset, and so raising it does not turn every age fixture into a silent lie.
 AnimalSystem.SALE_LISTING_MAX_AGE_DAYS = SALE_LISTING_MAX_AGE_DAYS
 
+--- Lowest source-farm quality an AI stud may come from; seeding a type with a male aims for it too.
+AnimalSystem.AI_STUD_MIN_FARM_QUALITY = 1.35
+
 -- One-shot warning latches for the hourly sale-pool rotation. ONE flag PER
 -- DETECTION SITE, never one shared flag: these causes are independent, and a
 -- fired warning must not silence a different diagnostic. The sites sit inside
@@ -283,6 +286,10 @@ end
 AnimalSystem.loadMapData = Utils.overwrittenFunction(AnimalSystem.loadMapData, RealisticLivestock_AnimalSystem.loadMapData)
 
 
+--- Register the types and subtypes of one animals XML; a new type records isRLBundled.
+---@param _ function Overwritten-function predecessor (unused; replaced wholesale)
+---@param xmlFile table The animals XML file being read.
+---@param directory string The directory the XML's relative paths resolve against.
 function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
 
 	for _, key in xmlFile:iterator("animals.animal") do
@@ -411,6 +418,7 @@ function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
 
             if fertility == nil then
 
+                Log:trace("loadAnimals: type '%s' declares no fertility curve, using the default", name)
                 fertility = AnimCurve.new(linearInterpolator1)
 
                 for i = 0, 120, 6 do
@@ -458,10 +466,12 @@ function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
                     ["average"] = averageChildren
                 },
                 ["fertility"] = fertility,
-                ["breeds"] = {}
+                ["breeds"] = {},
+                ["isRLBundled"] = self.isLoadingRLBundle == true
 		    }
 
-            Log:debug("loadAnimals: new type '%s' (typeIndex=%d, config='%s')", name, animalType.typeIndex, configFilename)
+            Log:debug("loadAnimals: new type '%s' (typeIndex=%d, config='%s', isRLBundled=%s)", name,
+                animalType.typeIndex, configFilename, tostring(animalType.isRLBundled))
 
 		end
 
@@ -508,11 +518,15 @@ function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
 			        self.nameToType[name] = animalType
 			        self.nameToTypeIndex[name] = animalType.typeIndex
 			        self.typeIndexToName[animalType.typeIndex] = name
+                    Log:trace("loadAnimals: registered type '%s' at index %d", name, animalType.typeIndex)
 
                 end
 
 		    end
 
+        else
+            Log:warning("loadAnimals: animal config '%s' for type '%s' (%s) did not load; a new type is skipped",
+                tostring(configFilename), tostring(name), tostring(key))
         end
 
 	end
@@ -899,6 +913,7 @@ function AnimalSystem:rlrmFillVisualDefaults(typeName, idx, visualData, animalTy
 end
 
 
+--- Build the empty country and dealer pools, subscribe the ticks, report unbundled types.
 function AnimalSystem:initialiseCountries()
 
     self.maxDealerAnimals = self.maxDealerAnimals or 40
@@ -928,9 +943,24 @@ function AnimalSystem:initialiseCountries()
     g_messageCenter:subscribe(MessageType.DAY_CHANGED, self.onDayChanged, self)
     g_messageCenter:subscribe(MessageType.PERIOD_CHANGED, self.onPeriodChanged, self)
 
+    -- Runs after every type is registered, a mod's appended loadMapData included.
+    local reported = 0
+    local function getSubType(subTypeIndex) return self:getSubTypeByIndex(subTypeIndex) end
+
+    for _, animalType in ipairs(self.types) do
+        for _, line in ipairs(RLAnimalTypeSupport.describeUnbundledType(animalType, getSubType)) do
+            if line.level == "warning" then Log:warning(line.text) else Log:info(line.text) end
+            reported = reported + 1
+        end
+    end
+
+    Log:debug("initialiseCountries: %d types, %d unbundled-type report line(s)", #self.types, reported)
+
 end
 
 
+--- Ensure 20 source farms per country, a map-country farm for every type, and first dealer stock.
+---@param hasData boolean true when the savegame held dealer data
 function AnimalSystem:validateFarms(hasData)
 
     if self.countries == nil then self.countries = {} end
@@ -947,6 +977,7 @@ function AnimalSystem:validateFarms(hasData)
 
         if self.countries[countryIndex] == nil then
 
+            Log:trace("validateFarms: country %d missing, created empty", countryIndex)
             self.countries[countryIndex] = {
                 ["index"] = countryIndex,
                 ["farms"] = {}
@@ -983,6 +1014,9 @@ function AnimalSystem:validateFarms(hasData)
 
         if #country.farms < 20 then
 
+            Log:trace("validateFarms: country %d has %d farms, filling to 20 (firstCreation=%s)", country.index,
+                #country.farms, tostring(isFirstCreation))
+
             for i = #country.farms + 1, 20 do
 
                 local farm = { ["quality"] = math.random(250, 1750) / 1000, ["ids"] = {} }
@@ -1014,6 +1048,9 @@ function AnimalSystem:validateFarms(hasData)
             if isFirstCreation and country.index == mapCountryIndex then
                 
                 -- validate there is at least 1 farm that produces each animal type
+
+                Log:trace("validateFarms: first creation of map country %d, a random farm per type for %d types",
+                    country.index, #animalTypeIndexes)
 
                 for i = 1, #animalTypeIndexes do
 
@@ -1050,11 +1087,45 @@ function AnimalSystem:validateFarms(hasData)
     end
 
 
+    -- validate the map country carries every registered type (first creation covers a new save;
+    -- this covers a type added to an existing one)
+
+    local seedTypes = {}
+
+    for _, animalType in ipairs(self.types) do
+        local hasMale = false
+        for _, subTypeIndex in ipairs(animalType.subTypes) do
+            local subType = self:getSubTypeByIndex(subTypeIndex)
+            if subType ~= nil and subType.gender == "male" then
+                hasMale = true
+                break
+            end
+        end
+        table.insert(seedTypes, { typeIndex = animalType.typeIndex, hasMale = hasMale, name = animalType.name })
+    end
+
+    local mapCountry = self.countries[mapCountryIndex]
+    local seeded = RLAnimalTypeSupport.seedMissingTypeFarms(mapCountry, seedTypes, math.random,
+        AnimalSystem.AI_STUD_MIN_FARM_QUALITY)
+
+    for _, entry in ipairs(seeded) do
+        Log:debug("validateFarms: seeded type %s (index %d) on farm %s (quality=%.3f, studFarm=%s) in country %d",
+            tostring(self.typeIndexToName[entry.typeIndex]), entry.typeIndex, tostring(entry.farmId),
+            entry.quality or 0, tostring(entry.studFarm), mapCountryIndex)
+    end
+
+    if #seeded == 0 then
+        Log:trace("validateFarms: map country %d already carries all %d types, nothing missing",
+            mapCountryIndex, #seedTypes)
+    end
+
 
     -- validate there are at least 25 animals of each type for sale
 
     if not hasData then
-    
+
+        Log:trace("validateFarms: no saved dealer data, filling the dealer and AI stock")
+
         for animalTypeIndex, animals in pairs(self.animals) do
 
             if #animals < self.maxDealerAnimals then
@@ -1816,42 +1887,21 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
         
         if genetics.productivity ~= nil then minProductivity, maxProductivity = genetics.productivity * 0.9, genetics.productivity * 1.1 end
 
+        local function getSubType(stIndex) return self:getSubTypeByIndex(stIndex) end
+
         for i = 1, childNum do
 
-            local gender = math.random() >= 0.5 and "male" or "female"
-            local childSubTypeIndex = subTypeIndex + (gender == "male" and 1 or 0)
+            local rolledGender = math.random() >= 0.5 and "male" or "female"
+            local candidateIndex = subTypeIndex + (rolledGender == "male" and 1 or 0)
 
-            -- Validate subtype index - the +1 arithmetic assumes adjacent
-            -- male/female subtypes, which fails for bridge-added exotic types.
-            local candidateSubType = self:getSubTypeByIndex(childSubTypeIndex)
+            -- The child's subtype always comes from the mother's type, and its gender from that subtype.
+            local childSubTypeIndex, gender, reason = RLAnimalTypeSupport.resolveOffspringSubType(
+                animalType.typeIndex, animalType.subTypes, getSubType, candidateIndex, subTypeIndex,
+                subType.breed, rolledGender, math.random)
 
-            if candidateSubType == nil or candidateSubType.gender ~= gender or candidateSubType.typeIndex ~= animalType.typeIndex then
-                local breedFallback = nil
-                local genderFallback = nil
-
-                for _, stIndex in pairs(animalType.subTypes) do
-                    local st = self:getSubTypeByIndex(stIndex)
-                    if st ~= nil and st.gender == gender then
-                        if genderFallback == nil then
-                            genderFallback = stIndex
-                        end
-                        if st.breed == subType.breed then
-                            breedFallback = stIndex
-                            break
-                        end
-                    end
-                end
-
-                local fallbackIndex = breedFallback or genderFallback
-
-                if fallbackIndex ~= nil then
-                    Log:debug("createNewSaleAnimal: child[%d] subtype fallback for gender '%s' breed '%s': index %d -> %d (breedMatch=%s)",
-                        i, gender, subType.breed or "?", childSubTypeIndex, fallbackIndex, tostring(breedFallback ~= nil))
-                    childSubTypeIndex = fallbackIndex
-                else
-                    Log:debug("createNewSaleAnimal: child[%d] no fallback found for gender '%s' in type %d, keeping index %d",
-                        i, gender, animalType.typeIndex, childSubTypeIndex)
-                end
+            if reason ~= "candidate" then
+                Log:debug("createNewSaleAnimal: child[%d] subtype %s: index %d -> %d, gender %s -> %s (type %s)",
+                    i, reason, candidateIndex, childSubTypeIndex, rolledGender, gender, tostring(animalType.name))
             end
 
             local resolvedSubType = self:getSubTypeByIndex(childSubTypeIndex)
@@ -2945,15 +2995,17 @@ end
 
 
 --- Build a new AI-stock sire of the given animal type.
---- Male subtypes only; the source farm must carry the animal type and a farm
---- quality of at least 1.35, so AI sires skew toward high-genetics origins.
+--- Male subtypes only, from a farm carrying the type at AI_STUD_MIN_FARM_QUALITY or above.
 --- @param animalTypeIndex number Index into the animal-type registry
 --- @return table|nil animal Newly built AI animal, or nil if no male subtype or source farm resolves
 function AnimalSystem:createNewAIAnimal(animalTypeIndex)
 
      local animalType = self:getTypeByIndex(animalTypeIndex)
 
-    if animalType == nil then return nil end
+    if animalType == nil then
+        Log:trace("createNewAIAnimal: no type at index %s", tostring(animalTypeIndex))
+        return nil
+    end
 
     local validSubTypes = {}
 
@@ -2965,20 +3017,33 @@ function AnimalSystem:createNewAIAnimal(animalTypeIndex)
 
     end
 
-    if #validSubTypes == 0 then return nil end
+    if #validSubTypes == 0 then
+        noteSaleGenerationBail("noMaleSubTypes", animalTypeIndex, "debug", string.format(
+            "createNewAIAnimal: type %s (index %d) has no male subtype, so no AI stud can be generated for it. "
+            .. "Further attempts this map load are silent.",
+            tostring(animalType.name), animalTypeIndex))
+        return nil
+    end
 
     local subType = validSubTypes[math.random(1, #validSubTypes)]
 
-    if subType == nil then return end
+    if subType == nil then
+        Log:trace("createNewAIAnimal: no male subtype drawn for type %s", tostring(animalType.name))
+        return
+    end
 
     local subTypeIndex = subType.subTypeIndex
-    
+
     local farmId, farmQuality, farmCountryIndex, lastAnimalId
     local attemptedCountryIndexes = {}
-    
+
     while farmId == nil do
 
-        if #attemptedCountryIndexes == #self.countries then return nil end
+        if #attemptedCountryIndexes == #self.countries then
+            Log:trace("createNewAIAnimal: no country has a farm keeping type %s at quality >= %s",
+                tostring(animalType.name), tostring(AnimalSystem.AI_STUD_MIN_FARM_QUALITY))
+            return nil
+        end
 
         local countryIndex
         local wasMapPick = false
@@ -3002,13 +3067,19 @@ function AnimalSystem:createNewAIAnimal(animalTypeIndex)
         
             local farm = country.farms[i]
 
-            if farm.ids[animalTypeIndex] ~= nil and farm.quality >= 1.35 then table.insert(validFarms, i) end
+            if farm.ids[animalTypeIndex] ~= nil and farm.quality >= AnimalSystem.AI_STUD_MIN_FARM_QUALITY then
+                table.insert(validFarms, i)
+            end
 
         end
 
         if #validFarms == 0 then
             if wasMapPick then
-                Log:debug("createNewAIAnimal: map/override country %d has no valid farms for animalTypeIndex=%d; cycling random countries", countryIndex, animalTypeIndex)
+                Log:debug("createNewAIAnimal: map/override country %d has no valid farms for type %s (index %d); "
+                    .. "cycling random countries", countryIndex, tostring(animalType.name), animalTypeIndex)
+            else
+                Log:trace("createNewAIAnimal: country %d has no stud farm for type %s",
+                    countryIndex, tostring(animalType.name))
             end
             continue
         end

@@ -468,66 +468,36 @@ function AnimalReproduction.createPregnancy(animal, childNum, month, year, fathe
     local children = {}
     local hasMale, hasFemale = false, false
 
+    local animalSystem = g_currentMission.animalSystem
+    local animalTypeObj = animalSystem:getTypeByIndex(animal.animalTypeIndex)
+    local typeSubTypes = animalTypeObj ~= nil and animalTypeObj.subTypes or nil
+    local function getSubType(stIndex) return animalSystem:getSubTypeByIndex(stIndex) end
+
 
     for i = 1, childNum do
 
 
-        local gender = math.random() >= 0.5 and "male" or "female"
-        local subTypeIndex
+        local rolledGender = math.random() >= 0.5 and "male" or "female"
+        local candidateIndex
 
         if fatherSubTypeIndex ~= nil and math.random() >= 0.5 then
 
-            subTypeIndex = fatherSubTypeIndex + (gender == "male" and 0 or -1)
+            candidateIndex = fatherSubTypeIndex + (rolledGender == "male" and 0 or -1)
 
         else
 
-            subTypeIndex = animal.subTypeIndex + (gender == "male" and 1 or 0)
+            candidateIndex = animal.subTypeIndex + (rolledGender == "male" and 1 or 0)
 
         end
 
-        -- Validate subtype index: must be correct gender and same animal type.
-        -- If index arithmetic produced a wrong result (e.g. bridge subtypes with non-adjacent indices),
-        -- fall back to breed-aware search: prefer same breed + gender, then any gender match in type.
-        local animalSystem = g_currentMission.animalSystem
-        local candidateSubType = animalSystem:getSubTypeByIndex(subTypeIndex)
+        -- The child's subtype always comes from the mother's type, and its gender from that subtype.
+        local subTypeIndex, gender, reason = RLAnimalTypeSupport.resolveOffspringSubType(
+            animal.animalTypeIndex, typeSubTypes, getSubType, candidateIndex, animal.subTypeIndex,
+            animal.breed, rolledGender, math.random)
 
-        if candidateSubType == nil or candidateSubType.gender ~= gender or candidateSubType.typeIndex ~= animal.animalTypeIndex then
-            local animalTypeObj = animalSystem:getTypeByIndex(animal.animalTypeIndex)
-            local breedFallback = nil
-            local genderFallback = nil
-
-            if animalTypeObj ~= nil then
-                -- First pass: find matching breed + gender (preferred)
-                -- Second pass: any matching gender (fallback)
-                for _, stIndex in pairs(animalTypeObj.subTypes) do
-                    local st = animalSystem:getSubTypeByIndex(stIndex)
-                    if st ~= nil and st.gender == gender then
-                        if genderFallback == nil then
-                            genderFallback = stIndex
-                        end
-                        if st.breed == animal.breed then
-                            breedFallback = stIndex
-                            break
-                        end
-                    end
-                end
-            end
-
-            local fallbackIndex = breedFallback or genderFallback
-
-            if fallbackIndex ~= nil then
-                Log:debug("createPregnancy: Offspring subtype fallback for gender '%s' breed '%s': index %d -> %d (type=%s, breedMatch=%s)",
-                    gender, animal.breed or "?", subTypeIndex, fallbackIndex, animalTypeObj and animalTypeObj.name or "?",
-                    tostring(breedFallback ~= nil))
-                subTypeIndex = fallbackIndex
-            else
-                Log:debug("createPregnancy: No fallback subtype found for gender '%s' in type %d, keeping index %d",
-                    gender, animal.animalTypeIndex, subTypeIndex)
-            end
-        else
-            Log:debug("createPregnancy: Offspring subtype index %d valid (gender=%s, type=%s)",
-                subTypeIndex, gender, candidateSubType.name or "?")
-        end
+        Log:debug("createPregnancy: offspring subtype %s: index %d -> %d, gender %s -> %s (type=%s)",
+            reason, candidateIndex, subTypeIndex, rolledGender, gender,
+            animalTypeObj ~= nil and tostring(animalTypeObj.name) or "?")
 
         local resolvedSubType = animalSystem:getSubTypeByIndex(subTypeIndex)
         local childBreed = resolvedSubType and resolvedSubType.breed or "?"

@@ -122,8 +122,25 @@ local function buildInputRows(animal)
     return rows
 end
 
---- Build output rows for monitored animals. Maps "pallets" fillType to
---- species-specific l10n key (pallets_milk, pallets_wool, etc.).
+--- The label of an animal's pallets output row: a shipped key (by type, GOAT by subtype), else its fill type's title.
+--- @param animal table
+--- @return string title
+local function getPalletsTitle(animal)
+    local animalSystem = getAnimalSystem()
+    local typeName = animalSystem ~= nil and animalSystem.typeIndexToName[animal.animalTypeIndex] or nil
+    local subType = animal.getSubType ~= nil and animal:getSubType() or nil
+    local pallets = subType ~= nil and subType.output ~= nil and subType.output.pallets or nil
+    local fillTypeTitle = nil
+    if pallets ~= nil and pallets.fillType ~= nil then
+        fillTypeTitle = g_fillTypeManager:getFillTypeTitleByIndex(pallets.fillType)
+    end
+    local text, isKey = RLAnimalTypeSupport.palletsOutputLabel(typeName, animal.subType, fillTypeTitle)
+    Log:trace("RLAnimalInfoService.getPalletsTitle: type=%s subType=%s -> %s (isKey=%s)",
+        tostring(typeName), tostring(animal.subType), tostring(text), tostring(isKey))
+    return isKey and g_i18n:getText(text) or text
+end
+
+--- Build output rows for monitored animals; a pallets output takes getPalletsTitle's label.
 --- @param animal table
 --- @return table rows
 local function buildOutputRows(animal)
@@ -131,15 +148,12 @@ local function buildOutputRows(animal)
     if animal == nil or type(animal.output) ~= "table" then return rows end
     local daysPerMonth = g_currentMission.environment.daysPerPeriod
     for fillType, amount in pairs(animal.output) do
-        local outputText = fillType
+        local title
         if fillType == "pallets" then
-            if animal.animalTypeIndex == AnimalType.COW then outputText = "pallets_milk" end
-            if animal.animalTypeIndex == AnimalType.SHEEP then
-                outputText = (animal.subType == "GOAT") and "pallets_goatMilk" or "pallets_wool"
-            end
-            if animal.animalTypeIndex == AnimalType.CHICKEN then outputText = "pallets_eggs" end
+            title = getPalletsTitle(animal)
+        else
+            title = g_i18n:getText("rl_ui_output_" .. fillType)
         end
-        local title = g_i18n:getText("rl_ui_output_" .. outputText)
         local valueText = RLAnimalDisplayHelper.formatAmountPerDay((amount * 24) / daysPerMonth)
         table.insert(rows, { title = title, valueText = valueText })
     end
