@@ -1250,12 +1250,13 @@ function AnimalSystem:loadFromXMLFile()
 
 
     local hasData = false
+    local droppedFarmIds = {}
 
 
     xmlFile:iterate(rootKey .. ".countries.country", function(_, key)
 
         local countryIndex = xmlFile:getInt(key .. "#index")
-        
+
         local farms = self.countries[countryIndex].farms
 
         xmlFile:iterate(key .. ".farm", function(_, farmKey)
@@ -1263,33 +1264,11 @@ function AnimalSystem:loadFromXMLFile()
             hasData = true
 
             local farmId = xmlFile:getInt(farmKey .. "#id")
-            local cowId = xmlFile:getInt(farmKey .. "#cowId", nil)
-            local pigId = xmlFile:getInt(farmKey .. "#pigId", nil)
-            local sheepId = xmlFile:getInt(farmKey .. "#sheepId", nil)
-            local horseId = xmlFile:getInt(farmKey .. "#horseId", nil)
-            local chickenId = xmlFile:getInt(farmKey .. "#chickenId", nil)
             local quality = xmlFile:getFloat(farmKey .. "#quality", math.random(250, 1750) / 1000)
             local semenPrice = xmlFile:getFloat(farmKey .. "#semenPrice", (math.random(75, 125) / 100) * quality)
-            
-            local ids = {}
 
-            -- compatibility with previous builds
+            local ids = RLDealerFarmIdCodec.read(xmlFile, farmKey, self, droppedFarmIds)
 
-            if cowId ~= nil then ids[1] = cowId end
-            if pigId ~= nil then ids[2] = pigId end
-            if sheepId ~= nil then ids[3] = sheepId end
-            if horseId ~= nil then ids[4] = horseId end
-            if chickenId ~= nil then ids[5] = chickenId end
-
-            xmlFile:iterate(farmKey .. ".id", function(_, idKey)
-            
-                local animalTypeIndex = xmlFile:getInt(idKey .. "#type", 1)
-                local lastId = xmlFile:getInt(idKey .. "#id", 0)
-
-                ids[animalTypeIndex] = lastId
-            
-            end)
-            
             table.insert(farms, { ["id"] = farmId, ["quality"] = quality, ["ids"] = ids, ["semenPrice"] = semenPrice })
 
         end)
@@ -1297,6 +1276,12 @@ function AnimalSystem:loadFromXMLFile()
         self.countries[countryIndex].farms = farms
 
     end)
+
+    -- One line per missing type, never per entry: a removed type can hit dozens of farms.
+    for droppedKey, count in pairs(droppedFarmIds) do
+        Log:warning("AnimalSystem:loadFromXMLFile: dropped %s dealer farm id(s) for animal type '%s', "
+            .. "which is not registered", tostring(count), tostring(droppedKey))
+    end
 
 
     xmlFile:iterate(rootKey .. ".animals.animal", function(_, key)
@@ -1349,15 +1334,23 @@ function AnimalSystem:loadFromXMLFile()
 end
 
 
+--- Save the dealer farms, sale animals and AI studs to rm_RlAnimalSystem.xml in the savegame directory.
+---@param _ string|nil path the engine passes; ignored, the file name is fixed
 function AnimalSystem:saveToXMLFile(_)
 
     -- Always save to new filename with versioning (ignore path parameter)
     local savegameDir = g_currentMission.missionInfo.savegameDirectory
-    if savegameDir == nil then return end
+    if savegameDir == nil then
+        Log:trace("AnimalSystem:saveToXMLFile: no savegame directory; nothing saved")
+        return
+    end
 
     local newPath = savegameDir .. "/rm_RlAnimalSystem.xml"
     local xmlFile = XMLFile.create("rm_RlAnimalSystem", newPath, "rm_RlAnimalSystem")
-    if xmlFile == nil then return end
+    if xmlFile == nil then
+        Log:warning("AnimalSystem:saveToXMLFile: could not create %s", tostring(newPath))
+        return
+    end
 
     -- Add version attribute for future migrations
     xmlFile:setInt("rm_RlAnimalSystem#version", 1)
@@ -1387,18 +1380,7 @@ function AnimalSystem:saveToXMLFile(_)
             xmlFile:setFloat(farmKey .. "#quality", farm.quality)
             xmlFile:setFloat(farmKey .. "#semenPrice", farm.semenPrice)
 
-            local j = 0
-
-            for animalTypeIndex, id in pairs(farm.ids) do
-
-                local idKey = farmKey .. ".id( " .. j .. ")"
-
-                xmlFile:setInt(idKey .. "#type", animalTypeIndex)
-                xmlFile:setInt(idKey .. "#id", id)
-
-                j = j + 1
-
-            end
+            RLDealerFarmIdCodec.write(xmlFile, farmKey, farm.ids, self)
 
         end
 
@@ -1457,6 +1439,9 @@ function AnimalSystem:saveToXMLFile(_)
 
     xmlFile:save(false, true)
     xmlFile:delete()
+
+    Log:debug("AnimalSystem:saveToXMLFile: wrote %s (%d countries, %d sale, %d AI animals)",
+        newPath, #self.countries, #allAnimals, #allAIAnimals)
 
 end
 

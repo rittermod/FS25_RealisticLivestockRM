@@ -32,6 +32,8 @@ source(modDirectory .. "scripts/utils/RLMoveDestinationHelper.lua")
 source(modDirectory .. "scripts/utils/RLTimeFormat.lua")
 source(modDirectory .. "scripts/utils/RLCalendar.lua")
 source(modDirectory .. "scripts/utils/RLAnimalTypeSupport.lua")
+source(modDirectory .. "scripts/utils/RLSavedTypeRef.lua")
+source(modDirectory .. "scripts/utils/RLDealerFarmIdCodec.lua")
 
 -- SECTION 2c: Constants
 source(modDirectory .. "scripts/core/RLConstants.lua")
@@ -268,6 +270,7 @@ source(modDirectory .. "scripts/handTools/RLHandTools.lua")
 
 -- SECTION 16: Insemination - Dewar (DewarData specialization and rlDewar vehicle type registered in Lua)
 source(modDirectory .. "scripts/insemination/DewarMigration.lua")
+source(modDirectory .. "scripts/insemination/RLSemenRecordCodec.lua")
 source(modDirectory .. "scripts/insemination/DewarTypeRegistration.lua")
 source(modDirectory .. "scripts/insemination/DewarObjectStorageHook.lua")
 

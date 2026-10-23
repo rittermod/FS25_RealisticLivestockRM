@@ -363,15 +363,49 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
 
 
     local insemination
+    local inseminationKey = key .. ".insemination"
+    local inseminationSubType
 
-    if xmlFile:hasProperty(key .. ".insemination") then
+    if xmlFile:hasProperty(inseminationKey) then
+
+        local savedSubTypeIndex = xmlFile:getInt(inseminationKey .. "#subTypeIndex")
+        inseminationSubType = savedSubTypeIndex
+
+        -- The legacy importer path reads the index only.
+        if not isLegacy then
+            local savedSubTypeName = nil
+            if xmlFile:hasProperty(inseminationKey .. "#subTypeName") then
+                savedSubTypeName = xmlFile:getString(inseminationKey .. "#subTypeName", "")
+            end
+
+            -- The mother's own type, from the no-default resolution above; nil skips the type check.
+            local motherTypeIndex = animalSubType ~= nil and animalSubType.typeIndex or nil
+            local source
+            inseminationSubType, source = RLSavedTypeRef.resolveSubType(g_currentMission.animalSystem,
+                savedSubTypeName, savedSubTypeIndex, motherTypeIndex)
+
+            if inseminationSubType == nil then
+                local savedRef = savedSubTypeName ~= nil and tostring(savedSubTypeName)
+                    or ("#subTypeIndex=" .. tostring(savedSubTypeIndex))
+                Log:warning("loadAnimal: dropped a pending insemination, its sire subtype %s does not resolve (%s) "
+                    .. "for the mother's type %s (farmId=%s uniqueId=%s)", savedRef, tostring(source),
+                    tostring(animalTypeName), tostring(farmId), tostring(id))
+            else
+                Log:debug("loadAnimal: pending insemination sire subtype %s (source=%s) (farmId=%s uniqueId=%s)",
+                    tostring(inseminationSubType), tostring(source), tostring(farmId), tostring(id))
+            end
+        end
+
+    end
+
+    if inseminationSubType ~= nil or (isLegacy and xmlFile:hasProperty(inseminationKey)) then
 
         insemination = {
             ["country"] = xmlFile:getInt(key .. ".insemination#country"),
             ["farmId"] = xmlFile:getString(key .. ".insemination#farmId"),
             ["uniqueId"] = xmlFile:getString(key .. ".insemination#uniqueId"),
             ["name"] = xmlFile:getString(key .. ".insemination#name"),
-            ["subTypeIndex"] = xmlFile:getInt(key .. ".insemination#subTypeIndex"),
+            ["subTypeIndex"] = inseminationSubType,
             ["genetics"] = {},
             ["success"] = xmlFile:getFloat(key .. ".insemination#success")
         }
@@ -567,6 +601,14 @@ function AnimalPersistence.saveToXMLFile(animal, xmlFile, key)
         xmlFile:setString(key .. ".insemination#uniqueId", insemination.uniqueId)
         xmlFile:setString(key .. ".insemination#name", insemination.name)
         xmlFile:setInt(key .. ".insemination#subTypeIndex", insemination.subTypeIndex)
+        local inseminationSubTypeName = RLSavedTypeRef.subTypeNameOf(g_currentMission.animalSystem,
+            insemination.subTypeIndex)
+        if inseminationSubTypeName ~= nil then
+            xmlFile:setString(key .. ".insemination#subTypeName", inseminationSubTypeName)
+        else
+            Log:trace("saveAnimal: insemination subtype %s has no registered name; index only (uniqueId=%s)",
+                tostring(insemination.subTypeIndex), tostring(animal.uniqueId))
+        end
         xmlFile:setFloat(key .. ".insemination#success", insemination.success)
         xmlFile:setFloat(key .. ".insemination.genetics#metabolism", insemination.genetics.metabolism)
         xmlFile:setFloat(key .. ".insemination.genetics#quality", insemination.genetics.quality)

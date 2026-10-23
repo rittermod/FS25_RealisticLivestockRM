@@ -121,6 +121,9 @@ end
 -- Savegame persistence
 -- ---------------------------------------------------------------------------
 
+--- Restore straws and semen record; an unresolved record zeroes the straws so the empty-dewar delete runs.
+---@param xmlFile table XMLFile object
+---@param key string path of the dewarData element
 function DewarData:loadDewarFromSavegame(xmlFile, key)
     local spec = self[DewarData.SPEC_TABLE_NAME]
 
@@ -130,43 +133,24 @@ function DewarData:loadDewarFromSavegame(xmlFile, key)
     end
     spec.straws = xmlFile:getInt(key .. "#straws") or 0
 
-    local animalKey = key .. ".animal"
-    if xmlFile:hasProperty(animalKey) then
-        local animal = {}
-
-        animal.country = xmlFile:getInt(animalKey .. "#country")
-        animal.farmId = xmlFile:getString(animalKey .. "#farmId")
-        animal.uniqueId = xmlFile:getString(animalKey .. "#uniqueId")
-        animal.name = xmlFile:getString(animalKey .. "#name")
-        animal.typeIndex = xmlFile:getInt(animalKey .. "#typeIndex")
-        animal.subTypeIndex = xmlFile:getInt(animalKey .. "#subTypeIndex")
-        animal.success = xmlFile:getFloat(animalKey .. "#success")
-
-        animal.genetics = {
-            ["metabolism"] = xmlFile:getFloat(animalKey .. ".genetics#metabolism"),
-            ["fertility"] = xmlFile:getFloat(animalKey .. ".genetics#fertility"),
-            ["health"] = xmlFile:getFloat(animalKey .. ".genetics#health"),
-            ["quality"] = xmlFile:getFloat(animalKey .. ".genetics#quality"),
-            ["productivity"] = xmlFile:getFloat(animalKey .. ".genetics#productivity")
-        }
-
-        -- Validate subtype consistency
-        local animalSystem = g_currentMission.animalSystem
-        local st = animalSystem:getSubTypeByIndex(animal.subTypeIndex)
-        local resolvedTypeName = st and animalSystem.typeIndexToName[st.typeIndex] or "nil"
-        local savedTypeName = animalSystem.typeIndexToName[animal.typeIndex] or "nil"
-        Log:debug("DewarData load: saved typeIndex=%d subTypeIndex=%d -> resolved name=%s (type=%s)",
-            animal.typeIndex, animal.subTypeIndex, st and st.name or "nil", resolvedTypeName)
-        if st == nil then
-            Log:warning("DewarData load: subTypeIndex=%d has no matching subtype - semen data may be from removed pack", animal.subTypeIndex)
-        elseif st.typeIndex ~= animal.typeIndex then
-            Log:warning("DewarData load: type mismatch! saved typeIndex=%d(%s) but subTypeIndex=%d resolves to typeIndex=%d(%s) - index may be stale",
-                animal.typeIndex, savedTypeName, animal.subTypeIndex, st.typeIndex, resolvedTypeName)
-        end
-
+    local animal, reason, ref = RLSemenRecordCodec.read(xmlFile, key, g_currentMission.animalSystem)
+    if animal ~= nil then
         spec.animal = animal
         DewarData.syncCompatProperties(self)
         DewarData.registerWithManager(self)
+    elseif reason ~= nil then
+        local animalKey = key .. ".animal"
+        Log:warning("DewarData:loadDewarFromSavegame: removing dewar uniqueId=%s, its semen record's %s does not "
+            .. "resolve (%s) (typeName=%s subTypeName=%s typeIndex=%s subTypeIndex=%s)",
+            tostring(self:getUniqueId()), tostring(ref), tostring(reason),
+            tostring(xmlFile:getString(animalKey .. "#typeName")),
+            tostring(xmlFile:getString(animalKey .. "#subTypeName")),
+            tostring(xmlFile:getInt(animalKey .. "#typeIndex")),
+            tostring(xmlFile:getInt(animalKey .. "#subTypeIndex")))
+        spec.straws = 0
+    else
+        Log:trace("DewarData:loadDewarFromSavegame: uniqueId=%s carries no semen record",
+            tostring(self:getUniqueId()))
     end
 
     -- Mirror straws even if no animal
@@ -200,6 +184,10 @@ function DewarData:loadDewarFromSavegame(xmlFile, key)
 end
 
 
+--- Write the dewar's straw count and semen record into its vehicle savegame block.
+---@param xmlFile table XMLFile object
+---@param key string path of the dewarData element
+---@param usedModNames table|nil unused
 function DewarData:saveToXMLFile(xmlFile, key, usedModNames)
     local spec = self[DewarData.SPEC_TABLE_NAME]
 
@@ -210,20 +198,9 @@ function DewarData:saveToXMLFile(xmlFile, key, usedModNames)
     xmlFile:setInt(key .. "#straws", spec.straws)
 
     if spec.animal ~= nil then
-        local animalKey = key .. ".animal"
-        local animal = spec.animal
-
-        xmlFile:setInt(animalKey .. "#country", animal.country)
-        xmlFile:setString(animalKey .. "#farmId", animal.farmId)
-        xmlFile:setString(animalKey .. "#uniqueId", animal.uniqueId)
-        xmlFile:setString(animalKey .. "#name", animal.name or "")
-        xmlFile:setInt(animalKey .. "#typeIndex", animal.typeIndex)
-        xmlFile:setInt(animalKey .. "#subTypeIndex", animal.subTypeIndex)
-        xmlFile:setFloat(animalKey .. "#success", animal.success)
-
-        for type, value in pairs(animal.genetics) do
-            xmlFile:setFloat(animalKey .. ".genetics#" .. type, value)
-        end
+        RLSemenRecordCodec.write(xmlFile, key, spec.animal, g_currentMission.animalSystem)
+    else
+        Log:trace("DewarData:saveToXMLFile: uniqueId=%s has no semen record", tostring(dewarUniqueId))
     end
 end
 

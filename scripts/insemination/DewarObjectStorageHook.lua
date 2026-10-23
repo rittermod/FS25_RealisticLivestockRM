@@ -106,7 +106,8 @@ end
 ---@param state table|nil Snapshot to write
 ---@param xmlFile table XMLFile handle (must support setValue)
 ---@param baseKey string Path prefix (e.g. "placeables.placeable(1).objectStorage.object(0)")
-function DewarObjectStorageHook.writeStateToXML(state, xmlFile, baseKey)
+---@param registry table animal system the type and subtype indices are named from
+function DewarObjectStorageHook.writeStateToXML(state, xmlFile, baseKey, registry)
     if state == nil then return end
     local base = baseKey .. "." .. DewarObjectStorageHook.SAVEGAME_KEY
 
@@ -118,13 +119,19 @@ function DewarObjectStorageHook.writeStateToXML(state, xmlFile, baseKey)
     if state.animal ~= nil then
         local a = state.animal
         local animalBase = base .. ".animal"
+        local typeName = RLSavedTypeRef.typeNameOf(registry, a.typeIndex)
+        local subTypeName = RLSavedTypeRef.subTypeNameOf(registry, a.subTypeIndex)
         if a.country      ~= nil then xmlFile:setValue(animalBase .. "#country",      a.country)      end
         if a.farmId       ~= nil then xmlFile:setValue(animalBase .. "#farmId",       a.farmId)       end
         if a.uniqueId     ~= nil then xmlFile:setValue(animalBase .. "#uniqueId",     a.uniqueId)     end
         if a.name         ~= nil then xmlFile:setValue(animalBase .. "#name",         a.name)         end
         if a.typeIndex    ~= nil then xmlFile:setValue(animalBase .. "#typeIndex",    a.typeIndex)    end
+        if typeName       ~= nil then xmlFile:setValue(animalBase .. "#typeName",     typeName)       end
         if a.subTypeIndex ~= nil then xmlFile:setValue(animalBase .. "#subTypeIndex", a.subTypeIndex) end
+        if subTypeName    ~= nil then xmlFile:setValue(animalBase .. "#subTypeName",  subTypeName)    end
         if a.success      ~= nil then xmlFile:setValue(animalBase .. "#success",      a.success)      end
+        Log:trace("DewarStorage WRITE: uniqueId=%s typeName=%s subTypeName=%s",
+            tostring(state.uniqueId), tostring(typeName), tostring(subTypeName))
         if a.genetics ~= nil then
             for _, gene in ipairs(DewarObjectStorageHook.GENETICS_FIELDS) do
                 if a.genetics[gene] ~= nil then
@@ -135,11 +142,22 @@ function DewarObjectStorageHook.writeStateToXML(state, xmlFile, baseKey)
     end
 end
 
---- Read the nested dewar state XML block under `baseKey`, or nil when there is none.
+--- A name attribute's value when present (the empty string included), nil when absent.
+---@param xmlFile table XMLFile handle (getValue + hasProperty)
+---@param path string attribute path
+---@return string|nil
+local function readPresentName(xmlFile, path)
+    if not xmlFile:hasProperty(path) then return nil end
+    return xmlFile:getValue(path) or ""
+end
+
+
+--- Read the nested dewar state under `baseKey`, or nil; an unresolved semen record drops and zeroes straws.
 ---@param xmlFile table XMLFile handle (must support getValue + hasProperty)
 ---@param baseKey string Path prefix
+---@param registry table animal system the type and subtype references resolve against
 ---@return table|nil state
-function DewarObjectStorageHook.readStateFromXML(xmlFile, baseKey)
+function DewarObjectStorageHook.readStateFromXML(xmlFile, baseKey, registry)
     local base = baseKey .. "." .. DewarObjectStorageHook.SAVEGAME_KEY
     if not xmlFile:hasProperty(base) then return nil end
 
@@ -149,23 +167,52 @@ function DewarObjectStorageHook.readStateFromXML(xmlFile, baseKey)
     }
 
     local animalBase = base .. ".animal"
-    if xmlFile:hasProperty(animalBase) then
-        local animal = {
-            country      = xmlFile:getValue(animalBase .. "#country"),
-            farmId       = xmlFile:getValue(animalBase .. "#farmId"),
-            uniqueId     = xmlFile:getValue(animalBase .. "#uniqueId"),
-            name         = xmlFile:getValue(animalBase .. "#name"),
-            typeIndex    = xmlFile:getValue(animalBase .. "#typeIndex"),
-            subTypeIndex = xmlFile:getValue(animalBase .. "#subTypeIndex"),
-            success      = xmlFile:getValue(animalBase .. "#success"),
-            genetics = {},
-        }
-        for _, gene in ipairs(DewarObjectStorageHook.GENETICS_FIELDS) do
-            animal.genetics[gene] = xmlFile:getValue(animalBase .. ".genetics#" .. gene)
-        end
-        state.animal = animal
+    if not xmlFile:hasProperty(animalBase) then
+        Log:trace("DewarStorage READ: uniqueId=%s carries no semen record", tostring(state.uniqueId))
+        return state
     end
 
+    local typeName = readPresentName(xmlFile, animalBase .. "#typeName")
+    local savedTypeIndex = xmlFile:getValue(animalBase .. "#typeIndex")
+    local typeIndex, typeSource = RLSavedTypeRef.resolveType(registry, typeName, savedTypeIndex)
+
+    -- Read before the type check so a drop WARNING names the saved subtype either way.
+    local subTypeName = readPresentName(xmlFile, animalBase .. "#subTypeName")
+    local savedSubTypeIndex = xmlFile:getValue(animalBase .. "#subTypeIndex")
+    local subTypeIndex, subTypeSource
+    if typeIndex ~= nil then
+        subTypeIndex, subTypeSource = RLSavedTypeRef.resolveSubType(registry, subTypeName, savedSubTypeIndex,
+            typeIndex)
+    end
+
+    if subTypeIndex == nil then
+        local ref, reason = "subType", subTypeSource
+        if typeIndex == nil then ref, reason = "type", typeSource end
+        Log:warning("DewarStorage READ: removing stored dewar uniqueId=%s, its semen record's %s does not resolve "
+            .. "(%s) (typeName=%s typeIndex=%s subTypeName=%s subTypeIndex=%s)",
+            tostring(state.uniqueId), ref, tostring(reason),
+            tostring(typeName), tostring(savedTypeIndex), tostring(subTypeName), tostring(savedSubTypeIndex))
+        state.straws = 0
+        return state
+    end
+
+    local animal = {
+        country      = xmlFile:getValue(animalBase .. "#country"),
+        farmId       = xmlFile:getValue(animalBase .. "#farmId"),
+        uniqueId     = xmlFile:getValue(animalBase .. "#uniqueId"),
+        name         = xmlFile:getValue(animalBase .. "#name"),
+        typeIndex    = typeIndex,
+        subTypeIndex = subTypeIndex,
+        success      = xmlFile:getValue(animalBase .. "#success"),
+        genetics = {},
+    }
+    for _, gene in ipairs(DewarObjectStorageHook.GENETICS_FIELDS) do
+        animal.genetics[gene] = xmlFile:getValue(animalBase .. ".genetics#" .. gene)
+    end
+    state.animal = animal
+
+    Log:debug("DewarStorage READ: uniqueId=%s type %s (source=%s) subtype %s (source=%s)",
+        tostring(state.uniqueId), tostring(typeIndex), typeSource, tostring(subTypeIndex), subTypeSource)
     return state
 end
 
@@ -213,7 +260,9 @@ local function installHooks()
         schema:register(XMLValueType.STRING, animalBase .. "#uniqueId",     "Stored animal uniqueId")
         schema:register(XMLValueType.STRING, animalBase .. "#name",         "Stored animal name")
         schema:register(XMLValueType.INT,    animalBase .. "#typeIndex",    "Stored animal type index")
+        schema:register(XMLValueType.STRING, animalBase .. "#typeName",     "Stored animal type name")
         schema:register(XMLValueType.INT,    animalBase .. "#subTypeIndex", "Stored animal subtype index")
+        schema:register(XMLValueType.STRING, animalBase .. "#subTypeName",  "Stored animal subtype name")
         schema:register(XMLValueType.FLOAT,  animalBase .. "#success",      "Stored animal breeding success")
         for _, gene in ipairs(DewarObjectStorageHook.GENETICS_FIELDS) do
             schema:register(XMLValueType.FLOAT, animalBase .. ".genetics#" .. gene, "Stored animal genetics " .. gene)
@@ -266,7 +315,7 @@ local function installHooks()
         AbstractPalletObject.saveToXMLFile,
         function(self, storage, xmlFile, key)
             if self.rlDewarData == nil then return end
-            DewarObjectStorageHook.writeStateToXML(self.rlDewarData, xmlFile, key)
+            DewarObjectStorageHook.writeStateToXML(self.rlDewarData, xmlFile, key, g_currentMission.animalSystem)
             Log:debug("DewarStorage SAVE: wrote uniqueId=%s straws=%d hasAnimal=%s",
                 tostring(self.rlDewarData.uniqueId), self.rlDewarData.straws or 0,
                 tostring(self.rlDewarData.animal ~= nil))
@@ -287,7 +336,7 @@ local function installHooks()
 
         origLoadFromXMLFile(storage, xmlFile, key)
 
-        local state = DewarObjectStorageHook.readStateFromXML(xmlFile, key)
+        local state = DewarObjectStorageHook.readStateFromXML(xmlFile, key, g_currentMission.animalSystem)
         if state == nil then return end
         if specOS == nil or specOS.storedObjects == nil then return end
         if #specOS.storedObjects <= priorCount then return end

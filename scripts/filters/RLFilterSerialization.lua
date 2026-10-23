@@ -21,7 +21,7 @@
 -- animalType is stored as the STABLE STRING NAME, not the runtime int index, so it survives
 -- AnimalType reordering across game versions or mod sets. The MP wire still carries the index.
 --
--- FAIL-CLOSED both directions: a failed animalType resolution warns, a missing `.group` on
+-- FAIL-CLOSED both directions: a failed animalType resolution skips the filter, a missing `.group` on
 -- read skips the filter rather than fabricating an empty AND that matches every animal, a
 -- scalar with a nil `value` is rejected at write time before it reaches the XML bindings, and
 -- `cmp` is validated against the catalog whitelist on read and write alike.
@@ -90,10 +90,7 @@ local function animalTypeIndexToName(idx)
     return nil
 end
 
---- Resolve a stable AnimalType name back to its runtime int index, or nil.
----
---- A failed resolution warns once per name: without it a scoped filter would
---- silently become global on reload.
+--- Resolve a stable AnimalType name back to its runtime int index, or nil; the caller warns on a miss.
 ---@param name string|nil
 ---@return integer|nil index
 local function animalTypeNameToIndex(name)
@@ -107,11 +104,7 @@ local function animalTypeNameToIndex(name)
     end
     local idx = _G.AnimalType[name]
     if type(idx) == "number" then return idx end
-    if not _warnedTypeName[name] then
-        Log:warning("RLFilterSerialization.animalTypeNameToIndex: name='%s' not registered in AnimalType (mod uninstalled?); filter will load as global scope",
-            tostring(name))
-        _warnedTypeName[name] = true
-    end
+    Log:trace("RLFilterSerialization.animalTypeNameToIndex: name='%s' not registered in AnimalType", tostring(name))
     return nil
 end
 
@@ -388,10 +381,7 @@ function RLFilterSerialization.writeFilter(xmlFile, filterKey, filter)
         tostring(typeName), tostring(filter.farmId), tostring(filter.usage), tostring(filter.version))
 end
 
---- Read one filter record from `filterKey`, or nil when `id` or the mandatory
---- `.group` subtree is absent: an empty-AND fabricated from a truncated save
---- matches every animal and would be written back on the next save. The caller
---- stores the returned record.
+--- Read one filter record, or nil when `id` or `.group` is absent or a present `animalType` does not resolve.
 ---@param xmlFile table
 ---@param filterKey string
 ---@return table|nil filter
@@ -404,8 +394,21 @@ function RLFilterSerialization.readFilter(xmlFile, filterKey)
     end
 
     local name = xmlFile:getString(filterKey .. "#name", "")
-    local typeName = xmlFile:getString(filterKey .. "#animalType")
-    local animalType = animalTypeNameToIndex(typeName)
+    local typeName = nil
+    local animalType = nil
+    if xmlFile:hasProperty(filterKey .. "#animalType") then
+        typeName = xmlFile:getString(filterKey .. "#animalType", "")
+        animalType = animalTypeNameToIndex(typeName)
+        if animalType == nil then
+            Log:warning("RLFilterSerialization.readFilter: filter id=%s names animal type '%s', "
+                .. "which is not registered; skipping filter", tostring(id), tostring(typeName))
+            return nil
+        end
+        Log:debug("RLFilterSerialization.readFilter: filter id=%s animal type %s -> %s",
+            tostring(id), tostring(typeName), tostring(animalType))
+    else
+        Log:trace("RLFilterSerialization.readFilter: filter id=%s has no animalType; any type", tostring(id))
+    end
     local farmId = xmlFile:getInt(filterKey .. "#farmId")
     local version = xmlFile:getInt(filterKey .. "#version", 1)
 

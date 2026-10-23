@@ -40,6 +40,8 @@ function HandToolAIStraw.prerequisitesPresent()
 end
 
 
+--- Initialise the straw and restore its saved semen record; an unresolved record removes the straw.
+---@param savegame table|nil { xmlFile, key } when loaded from a savegame
 function HandToolAIStraw:onPostLoad(savegame)
 
 	HandToolAIStraw.numHeldStraws = HandToolAIStraw.numHeldStraws + 1
@@ -64,50 +66,37 @@ function HandToolAIStraw:onPostLoad(savegame)
 		namespace = ".FS25_RealisticLivestock.aiStraw"  -- Legacy fallback
 	end
 
-	if not xmlFile:hasProperty(key .. namespace) then return end
+	if not xmlFile:hasProperty(key .. namespace) then
+		Log:trace("AIStraw load: no saved straw state")
+		return
+	end
 
 	local baseKey = key .. namespace
-	local animalKey = baseKey .. ".animal"
 
 	spec.isEmpty = xmlFile:getBool(baseKey .. "#isEmpty", false)
 	spec.dewarUniqueId = xmlFile:getString(baseKey .. "#dewarUniqueId")
 
-	if xmlFile:hasProperty(animalKey) then
+	local animal, reason, ref = RLSemenRecordCodec.read(xmlFile, baseKey, g_currentMission.animalSystem)
 
-		local animal = {}
-
-		animal.country = xmlFile:getInt(animalKey .. "#country")
-		animal.farmId = xmlFile:getString(animalKey .. "#farmId")
-		animal.uniqueId = xmlFile:getString(animalKey .. "#uniqueId")
-		animal.name = xmlFile:getString(animalKey .. "#name")
-		animal.typeIndex = xmlFile:getInt(animalKey .. "#typeIndex")
-		animal.subTypeIndex = xmlFile:getInt(animalKey .. "#subTypeIndex")
-		animal.success = xmlFile:getFloat(animalKey .. "#success")
-
-		animal.genetics = {
-			["metabolism"] = xmlFile:getFloat(animalKey .. ".genetics#metabolism"),
-			["fertility"] = xmlFile:getFloat(animalKey .. ".genetics#fertility"),
-			["health"] = xmlFile:getFloat(animalKey .. ".genetics#health"),
-			["quality"] = xmlFile:getFloat(animalKey .. ".genetics#quality"),
-			["productivity"] = xmlFile:getFloat(animalKey .. ".genetics#productivity")
-		}
-
-		self.animal = animal
-
-		local animalSystem = g_currentMission.animalSystem
-		local st = animalSystem:getSubTypeByIndex(animal.subTypeIndex)
-		Log:debug("AIStraw load: subTypeIndex=%d -> resolved name=%s (type=%s)",
-			animal.subTypeIndex, st and st.name or "nil",
-			st and (animalSystem.typeIndexToName[st.typeIndex] or "?") or "nil")
-		if st == nil then
-			Log:warning("AIStraw load: subTypeIndex=%d has no matching subtype - straw data may be from removed pack", animal.subTypeIndex)
-		elseif st.typeIndex ~= animal.typeIndex then
-			local savedTypeName = animalSystem.typeIndexToName[animal.typeIndex] or "nil"
-			local resolvedTypeName = animalSystem.typeIndexToName[st.typeIndex] or "nil"
-			Log:warning("AIStraw load: type mismatch! saved typeIndex=%d(%s) but subTypeIndex=%d resolves to typeIndex=%d(%s) - index may be stale",
-				animal.typeIndex, savedTypeName, animal.subTypeIndex, st.typeIndex, resolvedTypeName)
-		end
-
+	if animal ~= nil then
+		spec.animal = animal
+		Log:debug("AIStraw load: semen record uniqueId=%s type=%s subtype=%s dewar=%s",
+			tostring(animal.uniqueId), tostring(animal.typeIndex), tostring(animal.subTypeIndex),
+			tostring(spec.dewarUniqueId))
+	elseif reason ~= nil then
+		local animalKey = baseKey .. ".animal"
+		Log:warning("AIStraw load: removing straw of dewar %s, its semen record's %s does not resolve (%s) "
+			.. "(typeName=%s subTypeName=%s typeIndex=%s subTypeIndex=%s)",
+			tostring(spec.dewarUniqueId), tostring(ref), tostring(reason),
+			tostring(xmlFile:getString(animalKey .. "#typeName")),
+			tostring(xmlFile:getString(animalKey .. "#subTypeName")),
+			tostring(xmlFile:getInt(animalKey .. "#typeIndex")),
+			tostring(xmlFile:getInt(animalKey .. "#subTypeIndex")))
+		spec.animal = nil
+		spec.isEmpty = true
+		g_currentMission.handToolSystem:markHandToolForDeletion(self)
+	else
+		Log:trace("AIStraw load: saved straw carries no semen record (dewar=%s)", tostring(spec.dewarUniqueId))
 	end
 
 end
@@ -127,6 +116,9 @@ function HandToolAIStraw:onDelete()
 end
 
 
+--- Write the straw's state and semen record into its savegame block.
+---@param xmlFile table XMLFile object
+---@param key string path of the aiStraw element
 function HandToolAIStraw:saveToXMLFile(xmlFile, key)
 
 	local animal = self[specName].animal
@@ -135,19 +127,9 @@ function HandToolAIStraw:saveToXMLFile(xmlFile, key)
 	xmlFile:setString(key .. "#dewarUniqueId", self[specName].dewarUniqueId or "")
 
 	if animal ~= nil then
-
-		xmlFile:setInt(key .. ".animal#country", animal.country)
-		xmlFile:setString(key .. ".animal#farmId", animal.farmId)
-		xmlFile:setString(key .. ".animal#uniqueId", animal.uniqueId)
-		xmlFile:setString(key .. ".animal#name", animal.name)
-		xmlFile:setInt(key .. ".animal#typeIndex", animal.typeIndex)
-		xmlFile:setInt(key .. ".animal#subTypeIndex", animal.subTypeIndex)
-		xmlFile:setFloat(key .. ".animal#success", animal.success)
-		
-		for type, value in pairs(animal.genetics) do
-			xmlFile:setFloat(key .. ".animal.genetics#" .. type, value)
-		end
-
+		RLSemenRecordCodec.write(xmlFile, key, animal, g_currentMission.animalSystem)
+	else
+		Log:trace("AIStraw save: no semen record (dewar=%s)", tostring(self[specName].dewarUniqueId))
 	end
 
 end
@@ -301,11 +283,17 @@ function HandToolAIStraw:updateStraw(dT)
 
 	end
 
-	local canBeInseminated, error = animal:getCanBeInseminatedByAnimal(spec.animal)
+	-- A straw removed on load keeps running until its deferred delete lands, with no record.
+	local canBeInseminated, error = false, nil
+	if spec.animal ~= nil then
+		canBeInseminated, error = animal:getCanBeInseminatedByAnimal(spec.animal)
+	else
+		Log:trace("AIStraw updateStraw: no semen record, treated as empty")
+	end
 
-	if spec.isEmpty or not canBeInseminated then
+	if spec.isEmpty or spec.animal == nil or not canBeInseminated then
 
-		if spec.isEmpty then error = g_i18n:getText("rl_ui_strawEmpty") end
+		if spec.isEmpty or spec.animal == nil then error = g_i18n:getText("rl_ui_strawEmpty") end
 
 		g_inputBinding:setActionEventActive(spec.activateActionEventId, false)
 
