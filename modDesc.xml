@@ -1,6 +1,6 @@
 <modDesc descVersion="114">
     <author>Ritter</author>
-    <version>1.4.2.0-dev.2</version>
+    <version>1.4.2.0-dev.3</version>
     <title>
         <en>Realistic Livestock - Ritter version</en>
         <it>Allevamento Realistico - Versione Ritter</it>
@@ -25,6 +25,18 @@ Documentation: https://rittermod.github.io/FS25_RealisticLivestockRM
 Source code and issue tracker: https://github.com/rittermod/FS25_RealisticLivestockRM
 
 Changelog:
+1.4.2.0-dev.3:
+- Fixed animal descriptions showing a "Missing" message on the Animals page and in the RL menu on game version 1.25.
+- Fixed the daily summary messages for sold, bought and overcrowding newborns showing wrong money totals in many languages.
+- Fixed hired animal workers doing no riding or grooming of horses on game version 1.25.
+- Fixed renaming an animal from the Animals page on game version 1.25, which now uses the RL menu's name dialog.
+- Fixed a horse ridden back into its stable reappearing at a random spot instead of where it entered, in singleplayer and for the host on game version 1.25.
+- Fixed the animal dealer never stocking an animal type that a DLC or mod adds to an existing save.
+- Fixed offspring of map and bridge animals whose breed has several colours always taking the first colour.
+- Fixed newborns of an animal type added by a DLC or mod sometimes becoming a different breed or animal type.
+- Fixed saved semen straws, dewars, inseminations and dealer farms changing animal type when animal types from a DLC or mod are added or removed later.
+- Fixed a straw held in hand becoming unusable after loading a save.
+
 1.4.2.0-dev.2:
 - Fixed the Animals page of the in-game menu showing no animals on game version 1.25.
 - Fixed a horse ridden back into its stable on game version 1.25 staying frozen outside instead of rejoining the herd.
