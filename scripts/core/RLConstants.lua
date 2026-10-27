@@ -237,7 +237,8 @@ RLConstants.MAX_LIFESPAN_MONTHS_BY_TYPE = {
     PIG = 240,
     SHEEP = 144,
     HORSE = 360,
-    CHICKEN = 96
+    CHICKEN = 96,
+    ALPACA = 240
 }
 
 

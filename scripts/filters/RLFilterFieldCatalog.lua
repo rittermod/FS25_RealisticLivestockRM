@@ -292,7 +292,7 @@ RLFilterFieldCatalog.FIELDS = {
         key         = "genetics.productivity",
         type        = "number",
         cmps        = NUMBER_CMPS,
-        animalTypes = { "COW", "SHEEP", "CHICKEN" },
+        animalTypes = { "COW", "SHEEP", "CHICKEN", "ALPACA" },
         scale       = "0-99",
         getter      = function(animal)
             return animal.genetics and scaled(animal.genetics.productivity) or nil

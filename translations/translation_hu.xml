@@ -44,6 +44,11 @@
         <text name="animal_descriptionRamFeed" text="A kosok füvet és szénát esznek."/>
         <text name="animal_descriptionRamYoung" text="Ez egy kosbárány."/>
         <text name="animal_descriptionRamReproduction" text="Az egészséges és 5 hónapnál idősebb kosok képesek szaporodni."/>
+        <text name="animal_group_alpacas" text="Alpacas"/>
+        <text name="animal_descriptionAlpacaYoung" text="Young alpacas need hay or grass as well as water but do not produce fleece yet."/>
+        <text name="animal_descriptionAlpacaAdult" text="Adult alpacas need hay or grass as well as water and produce valuable fleece."/>
+        <text name="animal_descriptionAlpacaReproduction" text="Alpacas that are healthy and older than 14 months can reproduce."/>
+        <text name="animal_descriptionAlpacaMaleReproduction" text="Male alpacas that are healthy and older than 24 months can reproduce."/>
         <text name="rl_descriptionSheepReproduction" text="Az egészséges és 8 hónapnál idősebb anyajuhok képesek szaporodni."/>
 
         <!-- GOATS -->
@@ -62,6 +67,14 @@
         <text name="fillType_stallion_black" text="Fekete csődör"/>
         <text name="fillType_stallion_seal_brown" text="Sötétpej csődör"/>
         <text name="fillType_stallion_dun" text="Fakó csődör"/>
+        <text name="fillType_alpaca_white" text="White Alpaca"/>
+        <text name="fillType_alpaca_white_male" text="White Alpaca Male"/>
+        <text name="fillType_alpaca_brown" text="Brown Alpaca"/>
+        <text name="fillType_alpaca_brown_male" text="Brown Alpaca Male"/>
+        <text name="fillType_alpaca_grey" text="Grey Alpaca"/>
+        <text name="fillType_alpaca_grey_male" text="Grey Alpaca Male"/>
+        <text name="fillType_alpaca_fawn" text="Fawn Alpaca"/>
+        <text name="fillType_alpaca_fawn_male" text="Fawn Alpaca Male"/>
         <text name="animal_descriptionStallionFeed" text="A csődörök szeretik a szénát, a zabot és a cirkot."/>
         <text name="animal_descriptionStallionProfit" text="A csődörök haszonnal eladhatók."/>
         <text name="animal_descriptionStallionReproduction" text="Az egészséges és 36 hónapnál idősebb csődörök képesek szaporodni."/>
@@ -134,6 +147,7 @@
 
         <text name="rl_ui_milk" text="Tejtermelés"/>
         <text name="rl_ui_wool" text="Gyapjútermelés"/>
+        <text name="rl_ui_fleece" text="Fleece production"/>
         <text name="rl_ui_eggs" text="Tojástermelés"/>
         <text name="rl_ui_metabolism" text="Anyagcsere"/>
         <text name="rl_ui_meat" text="Minőség"/>

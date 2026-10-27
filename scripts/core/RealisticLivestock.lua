@@ -639,8 +639,13 @@ end
 
 -- Animals can die from old age
 
+--- Pen-level monthly old-age roll over one cluster; kills part of the cluster past the type's minimum age.
+--- @param spec table Husbandry animal spec (provides animalTypeIndex)
+--- @param cluster table Cluster with numAnimals and age
+--- @return nil
 function RealisticLivestock.calculateOldAgeMonthlyAnimalDeaths(spec, cluster)
     if cluster.numAnimals <= 0 then
+        Log:trace("calculateOldAgeMonthlyAnimalDeaths: skipped, numAnimals=%s", tostring(cluster.numAnimals))
         return
     end
 
@@ -678,13 +683,22 @@ function RealisticLivestock.calculateOldAgeMonthlyAnimalDeaths(spec, cluster)
         -- chicken old age max: 8y (96m)
         minAge = 60
         maxAge = 96
+    elseif animalType == AnimalType.ALPACA then
+        -- alpaca old age min: 15y (180m)
+        -- alpaca old age max: 20y (240m)
+        minAge = 180
+        maxAge = 240
     end
 
     if age < minAge then
+        Log:trace("calculateOldAgeMonthlyAnimalDeaths: type=%s age=%s < minAge=%s, no roll", tostring(animalType),
+            tostring(age), tostring(minAge))
         return
     end
 
     deathChance = 0.7 - ((maxAge - age) / 100)
+    Log:trace("calculateOldAgeMonthlyAnimalDeaths: type=%s age=%s minAge=%s maxAge=%s deathChance=%s",
+        tostring(animalType), tostring(age), tostring(minAge), tostring(maxAge), tostring(deathChance))
     if math.random() <= deathChance then
         numAnimalsToDispose = math.random((0.61 - ((maxAge - age) / 100)) * numAnimals)
         if numAnimalsToDispose < 1 then
@@ -695,6 +709,8 @@ function RealisticLivestock.calculateOldAgeMonthlyAnimalDeaths(spec, cluster)
             numAnimalsToDispose = numAnimals
         end
 
+        Log:trace("calculateOldAgeMonthlyAnimalDeaths: type=%s killing %s of %s", tostring(animalType),
+            tostring(numAnimalsToDispose), tostring(numAnimals))
         RealisticLivestock.KillAnimals(spec, cluster, numAnimalsToDispose)
 
         local animalTypeText = ""

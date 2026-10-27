@@ -29,10 +29,7 @@ function AnimalHealth.getHealthFactor(animal)
 end
 
 
---- Update animal health based on food factor relative to subType threshold.
---- Food above threshold increases health; below threshold decreases it.
---- Better health genetics slow the loss, matching the (2 - genetics) term of the old-age death roll.
---- Also triggers weight update via animal:updateWeight().
+--- Hourly health: food (or the type's health hook) vs the threshold, loss slowed by 2 - genetics; weight: raw food.
 --- @param animal table Animal instance
 --- @param foodFactor number Food factor (0.0-1.0)
 function AnimalHealth.updateHealth(animal, foodFactor)
@@ -41,15 +38,24 @@ function AnimalHealth.updateHealth(animal, foodFactor)
     local healthThresholdFactor = subType.healthThresholdFactor
     local healthGenetics = animal.genetics.health
 
+    local healthFactor = foodFactor
+    local typeModule = animal:getTypeModule()
+    if typeModule ~= nil and typeModule.getHealthFoodFactor ~= nil then
+        local hooked = typeModule.getHealthFoodFactor(animal, foodFactor)
+        if type(hooked) == "number" then healthFactor = hooked end
+    end
+    Log:trace("updateHealth: farmId=%s uniqueId=%s food=%s healthFactor=%s", tostring(animal.farmId),
+        tostring(animal.uniqueId), tostring(foodFactor), tostring(healthFactor))
+
     local factor, delta, geneticsTerm, branch
 
-    if healthThresholdFactor < foodFactor then
-        factor = (foodFactor - healthThresholdFactor) / (1 - healthThresholdFactor)
+    if healthThresholdFactor < healthFactor then
+        factor = (healthFactor - healthThresholdFactor) / (1 - healthThresholdFactor)
         delta = subType.healthIncreaseHour
         geneticsTerm = healthGenetics
         branch = "gain"
     else
-        factor = foodFactor / healthThresholdFactor - 1
+        factor = healthFactor / healthThresholdFactor - 1
         delta = subType.healthDecreaseHour
         geneticsTerm = 2 - healthGenetics
         branch = "loss"
@@ -170,6 +176,11 @@ function AnimalHealth.getOldAgeMonthlyDeathChance(animal)
         -- chicken old age max: 8y (96m)
         minAge = 60
         maxAge = 96
+    elseif animalType == AnimalType.ALPACA then
+        -- alpaca old age min: 15y (180m)
+        -- alpaca old age max: 20y (240m)
+        minAge = 180
+        maxAge = 240
     end
 
     if age < minAge then
@@ -232,6 +243,8 @@ function AnimalHealth.getAccidentMonthlyDeathChance(animal, spec)
             deathChance = 0.0016
         end
         animalsCanBeSold = false
+    elseif animalType == AnimalType.ALPACA then
+        deathChance = 0.003
     end
 
     -- animals are more likely to die in cold weather, especially young animals due to ice, pneumonia etc

@@ -377,7 +377,8 @@ function AnimalFilterDialog:onOpen()
 
     }
 
-    if self.animalTypeIndex == AnimalType.COW or self.animalTypeIndex == AnimalType.SHEEP or self.animalTypeIndex == AnimalType.CHICKEN then
+    if self.animalTypeIndex == AnimalType.COW or self.animalTypeIndex == AnimalType.SHEEP or self.animalTypeIndex == AnimalType.CHICKEN
+        or self.animalTypeIndex == AnimalType.ALPACA then
         
         table.insert(filters, {
             ["isLayered"] = true,

@@ -115,6 +115,8 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
     local dirt = xmlFile:getFloat(key .. "#dirt", nil)
     local fitness = xmlFile:getFloat(key .. "#fitness", nil)
     local riding = xmlFile:getFloat(key .. "#riding", nil)
+    local happiness = xmlFile:getFloat(key .. "#happiness", nil)
+    local fleeceState = xmlFile:getFloat(key .. "#fleeceState", nil)
 
     local pos = nil
 
@@ -426,7 +428,8 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
         isParent = isParent, isPregnant = isPregnant, isLactating = isLactating,
         clusterSystem = clusterSystem, uniqueId = id, motherId = motherId,
         fatherId = fatherId, pos = pos, name = name, dirt = dirt,
-        fitness = fitness, riding = riding, farmId = farmId, weight = weight,
+        fitness = fitness, riding = riding, happiness = happiness, fleeceState = fleeceState,
+        farmId = farmId, weight = weight,
         genetics = genetics, impregnatedBy = impregnatedBy, variation = variation,
         children = children, monitor = monitor, isCastrated = isCastrated,
         diseases = diseases, recentlyBoughtByAI = recentlyBoughtByAI,

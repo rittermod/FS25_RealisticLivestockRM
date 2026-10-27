@@ -44,6 +44,11 @@
         <text name="animal_descriptionRamFeed" text="公羊喜食牧草和干草。"/>
         <text name="animal_descriptionRamYoung" text="这是雄性羔羊。"/>
         <text name="animal_descriptionRamReproduction" text="健康且月龄超过5个月的公羊可以繁殖。"/>
+        <text name="animal_group_alpacas" text="Alpacas"/>
+        <text name="animal_descriptionAlpacaYoung" text="Young alpacas need hay or grass as well as water but do not produce fleece yet."/>
+        <text name="animal_descriptionAlpacaAdult" text="Adult alpacas need hay or grass as well as water and produce valuable fleece."/>
+        <text name="animal_descriptionAlpacaReproduction" text="Alpacas that are healthy and older than 14 months can reproduce."/>
+        <text name="animal_descriptionAlpacaMaleReproduction" text="Male alpacas that are healthy and older than 24 months can reproduce."/>
         <text name="rl_descriptionSheepReproduction" text="Ewes that are healthy and older than 8 months can reproduce."/>
 
         <!-- GOATS -->
@@ -62,6 +67,14 @@
         <text name="fillType_stallion_black" text="黑色种马"/>
         <text name="fillType_stallion_seal_brown" text="海豹褐色种马"/>
         <text name="fillType_stallion_dun" text="沙毛种马"/>
+        <text name="fillType_alpaca_white" text="White Alpaca"/>
+        <text name="fillType_alpaca_white_male" text="White Alpaca Male"/>
+        <text name="fillType_alpaca_brown" text="Brown Alpaca"/>
+        <text name="fillType_alpaca_brown_male" text="Brown Alpaca Male"/>
+        <text name="fillType_alpaca_grey" text="Grey Alpaca"/>
+        <text name="fillType_alpaca_grey_male" text="Grey Alpaca Male"/>
+        <text name="fillType_alpaca_fawn" text="Fawn Alpaca"/>
+        <text name="fillType_alpaca_fawn_male" text="Fawn Alpaca Male"/>
         <text name="animal_descriptionStallionFeed" text="种马喜食干草、燕麦和高粱。"/>
         <text name="animal_descriptionStallionProfit" text="种马可以出售获利。"/>
         <text name="animal_descriptionStallionReproduction" text="健康且月龄超过36个月的种马可以繁殖。"/>
@@ -127,6 +140,7 @@
 
         <text name="rl_ui_milk" text="产奶量"/>
         <text name="rl_ui_wool" text="产毛量"/>
+        <text name="rl_ui_fleece" text="Fleece production"/>
         <text name="rl_ui_eggs" text="产蛋量"/>
         <text name="rl_ui_metabolism" text="新陈代谢"/>
         <text name="rl_ui_meat" text="品质"/>

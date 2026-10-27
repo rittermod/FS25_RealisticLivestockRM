@@ -199,7 +199,7 @@ function RealisticLivestock_InGameMenuAnimalsFrame:displayCluster(superFunc, ani
         local animalSystem = g_currentMission.animalSystem
         local subTypeIndex = animal:getSubTypeIndex()
         local age = animal:getAge()
-        local visual = animalSystem:getVisualByAge(subTypeIndex, age)
+        local visual = animalSystem:getVisualByAge(subTypeIndex, age, animal)
 
         if visual ~= nil then
             local subType = animal:getSubType()
@@ -243,7 +243,7 @@ function RealisticLivestock_InGameMenuAnimalsFrame:populateCellForItemInSection(
     local subType = self.husbandrySubTypes[subTypeIndex]
     local animal = self.subTypeIndexToClusters[subType][animalIndex]
 
-    if g_currentMission.animalSystem:getVisualByAge(subType, animal:getAge()) ~= nil then
+    if g_currentMission.animalSystem:getVisualByAge(subType, animal:getAge(), animal) ~= nil then
         local baseName = animal.uniqueId .. (animal:getName() == "" and "" or (" (" .. animal:getName() .. ")"))
         cell:getAttribute("name"):setText(RLAnimalDisplayHelper.formatDisplayName(baseName, animal))
         cell:getAttribute("count"):setVisible(false)

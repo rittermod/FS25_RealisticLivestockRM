@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!-- Loaded only while the Beans and Alpacas DLC is active, with the DLC directory as base path. -->
+<animals>
+	<animal type="ALPACA" groupTitle="$l10n_animal_group_alpacas" statsBreeding="breedAlpacasCount" clusterClass="pdlc_beansAndAlpacasPack.AnimalClusterAlpaca" averageBuyAge="18" maxBuyAge="96">
+		<configFilename>$dataS/character/animals/domesticated/alpaca/animals.xml</configFilename>
+		<navMeshAgent height="1.7" radius="0.6" maxClimbMeters="1" maxSlope="50"/>
+		<pasture sqmPerAnimal="40"/>
+		<pregnancy average="1" max="1"/>
+		<fertility>
+			<key ageMonth="0" value="0"/>
+			<key ageMonth="14" value="0"/>
+			<key ageMonth="14" value="700"/>
+			<key ageMonth="27" value="750"/>
+			<key ageMonth="54" value="800"/>
+			<key ageMonth="108" value="920"/>
+			<key ageMonth="126" value="660"/>
+			<key ageMonth="180" value="130"/>
+			<key ageMonth="180" value="0"/>
+		</fertility>
+		<subType subType="ALPACA_WHITE" fillTypeName="ALPACA_WHITE" gender="female" minWeight="7.0" targetWeight="60.0" maxWeight="100.0" breed="WHITE">
+			<visuals>
+				<visual minAge="0" visualAnimalIndex="1" image="$dataS/character/animals/domesticated/alpaca/store_alpacaWhiteBaby.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="6" visualAnimalIndex="2" image="$dataS/character/animals/domesticated/alpaca/store_alpacaWhiteKid.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="3" minFleeceState="0" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaWhiteAdultSheared.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaReproduction</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="4" minFleeceState="40" canBeSheared="true" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaWhiteAdult.png" canBeBought="false">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaReproduction</description>
+				</visual>
+			</visuals>
+			<reproduction minAgeMonth="14" durationMonth="11" minHealthFactor="0.75"/>
+			<health increasePerHour="10" decreasePerHour="8" thresholdFactor="0.45"/>
+			<leading filename="animals/alpaca/alpaca.xml" dailyHikingTimeMinutes="5"/>
+			<fleeceParticle diffuse="effects/fleece/particle/fleeceWhite_diffuse.png"/>
+			<fleece regrowthPerDay="10" maxFleece="500">
+				<fleeceAmount>
+					<key ageMonth="0" value="0"/>
+					<key ageMonth="10" value="0"/>
+					<key ageMonth="14" value="500"/>
+					<key ageMonth="24" value="500"/>
+				</fleeceAmount>
+			</fleece>
+			<buyPrice>
+				<key ageMonth="0" value="500"/>
+				<key ageMonth="36" value="6000"/>
+			</buyPrice>
+			<sellPrice>
+				<key ageMonth="0" value="150"/>
+				<key ageMonth="36" value="5000"/>
+			</sellPrice>
+			<transportPrice>
+				<key ageMonth="0" value="40"/>
+				<key ageMonth="8" value="60"/>
+			</transportPrice>
+			<input>
+				<water>
+					<key ageMonth="0" value="2"/>
+					<key ageMonth="5" value="20"/>
+				</water>
+				<food>
+					<key ageMonth="0" value="10"/>
+					<key ageMonth="5" value="100"/>
+				</food>
+			</input>
+		</subType>
+		<subType subType="ALPACA_WHITE_MALE" fillTypeName="ALPACA_WHITE_MALE" gender="male" minWeight="7.5" targetWeight="65.0" maxWeight="110.0" breed="WHITE">
+			<visuals>
+				<visual minAge="0" visualAnimalIndex="1" image="$dataS/character/animals/domesticated/alpaca/store_alpacaWhiteBaby.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="6" visualAnimalIndex="2" image="$dataS/character/animals/domesticated/alpaca/store_alpacaWhiteKid.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="3" minFleeceState="0" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaWhiteAdultSheared.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaMaleReproduction</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="4" minFleeceState="40" canBeSheared="true" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaWhiteAdult.png" canBeBought="false">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaMaleReproduction</description>
+				</visual>
+			</visuals>
+			<reproduction minAgeMonth="24" supported="false"/>
+			<health increasePerHour="10" decreasePerHour="8" thresholdFactor="0.45"/>
+			<leading filename="animals/alpaca/alpaca.xml" dailyHikingTimeMinutes="5"/>
+			<fleeceParticle diffuse="effects/fleece/particle/fleeceWhite_diffuse.png"/>
+			<fleece regrowthPerDay="10" maxFleece="500">
+				<fleeceAmount>
+					<key ageMonth="0" value="0"/>
+					<key ageMonth="10" value="0"/>
+					<key ageMonth="14" value="500"/>
+					<key ageMonth="24" value="500"/>
+				</fleeceAmount>
+			</fleece>
+			<buyPrice>
+				<key ageMonth="0" value="500"/>
+				<key ageMonth="36" value="6000"/>
+			</buyPrice>
+			<sellPrice>
+				<key ageMonth="0" value="150"/>
+				<key ageMonth="36" value="5000"/>
+			</sellPrice>
+			<transportPrice>
+				<key ageMonth="0" value="40"/>
+				<key ageMonth="8" value="60"/>
+			</transportPrice>
+			<input>
+				<water>
+					<key ageMonth="0" value="2"/>
+					<key ageMonth="5" value="20"/>
+				</water>
+				<food>
+					<key ageMonth="0" value="10"/>
+					<key ageMonth="5" value="100"/>
+				</food>
+			</input>
+		</subType>
+		<subType subType="ALPACA_BROWN" fillTypeName="ALPACA_BROWN" gender="female" minWeight="7.0" targetWeight="60.0" maxWeight="100.0" breed="BROWN">
+			<visuals>
+				<visual minAge="0" visualAnimalIndex="5" image="$dataS/character/animals/domesticated/alpaca/store_alpacaBrownBaby.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="6" visualAnimalIndex="6" image="$dataS/character/animals/domesticated/alpaca/store_alpacaBrownKid.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="7" minFleeceState="0" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaBrownAdultSheared.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaReproduction</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="8" minFleeceState="40" canBeSheared="true" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaBrownAdult.png" canBeBought="false">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaReproduction</description>
+				</visual>
+			</visuals>
+			<reproduction minAgeMonth="14" durationMonth="11" minHealthFactor="0.75"/>
+			<health increasePerHour="10" decreasePerHour="8" thresholdFactor="0.45"/>
+			<leading filename="animals/alpaca/alpaca.xml" dailyHikingTimeMinutes="5"/>
+			<fleeceParticle diffuse="effects/fleece/particle/fleeceBrown_diffuse.png"/>
+			<fleece regrowthPerDay="10" maxFleece="500">
+				<fleeceAmount>
+					<key ageMonth="0" value="0"/>
+					<key ageMonth="10" value="0"/>
+					<key ageMonth="14" value="500"/>
+					<key ageMonth="24" value="500"/>
+				</fleeceAmount>
+			</fleece>
+			<buyPrice>
+				<key ageMonth="0" value="500"/>
+				<key ageMonth="36" value="6000"/>
+			</buyPrice>
+			<sellPrice>
+				<key ageMonth="0" value="150"/>
+				<key ageMonth="36" value="5000"/>
+			</sellPrice>
+			<transportPrice>
+				<key ageMonth="0" value="40"/>
+				<key ageMonth="8" value="60"/>
+			</transportPrice>
+			<input>
+				<water>
+					<key ageMonth="0" value="2"/>
+					<key ageMonth="5" value="20"/>
+				</water>
+				<food>
+					<key ageMonth="0" value="10"/>
+					<key ageMonth="5" value="100"/>
+				</food>
+			</input>
+		</subType>
+		<subType subType="ALPACA_BROWN_MALE" fillTypeName="ALPACA_BROWN_MALE" gender="male" minWeight="7.5" targetWeight="65.0" maxWeight="110.0" breed="BROWN">
+			<visuals>
+				<visual minAge="0" visualAnimalIndex="5" image="$dataS/character/animals/domesticated/alpaca/store_alpacaBrownBaby.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="6" visualAnimalIndex="6" image="$dataS/character/animals/domesticated/alpaca/store_alpacaBrownKid.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="7" minFleeceState="0" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaBrownAdultSheared.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaMaleReproduction</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="8" minFleeceState="40" canBeSheared="true" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaBrownAdult.png" canBeBought="false">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaMaleReproduction</description>
+				</visual>
+			</visuals>
+			<reproduction minAgeMonth="24" supported="false"/>
+			<health increasePerHour="10" decreasePerHour="8" thresholdFactor="0.45"/>
+			<leading filename="animals/alpaca/alpaca.xml" dailyHikingTimeMinutes="5"/>
+			<fleeceParticle diffuse="effects/fleece/particle/fleeceBrown_diffuse.png"/>
+			<fleece regrowthPerDay="10" maxFleece="500">
+				<fleeceAmount>
+					<key ageMonth="0" value="0"/>
+					<key ageMonth="10" value="0"/>
+					<key ageMonth="14" value="500"/>
+					<key ageMonth="24" value="500"/>
+				</fleeceAmount>
+			</fleece>
+			<buyPrice>
+				<key ageMonth="0" value="500"/>
+				<key ageMonth="36" value="6000"/>
+			</buyPrice>
+			<sellPrice>
+				<key ageMonth="0" value="150"/>
+				<key ageMonth="36" value="5000"/>
+			</sellPrice>
+			<transportPrice>
+				<key ageMonth="0" value="40"/>
+				<key ageMonth="8" value="60"/>
+			</transportPrice>
+			<input>
+				<water>
+					<key ageMonth="0" value="2"/>
+					<key ageMonth="5" value="20"/>
+				</water>
+				<food>
+					<key ageMonth="0" value="10"/>
+					<key ageMonth="5" value="100"/>
+				</food>
+			</input>
+		</subType>
+		<subType subType="ALPACA_GREY" fillTypeName="ALPACA_GREY" gender="female" minWeight="7.0" targetWeight="60.0" maxWeight="100.0" breed="GREY">
+			<visuals>
+				<visual minAge="0" visualAnimalIndex="9" image="$dataS/character/animals/domesticated/alpaca/store_alpacaGreyBaby.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="6" visualAnimalIndex="10" image="$dataS/character/animals/domesticated/alpaca/store_alpacaGreyKid.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="11" minFleeceState="0" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaGreyAdultSheared.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaReproduction</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="12" minFleeceState="40" canBeSheared="true" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaGreyAdult.png" canBeBought="false">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaReproduction</description>
+				</visual>
+			</visuals>
+			<reproduction minAgeMonth="14" durationMonth="11" minHealthFactor="0.75"/>
+			<health increasePerHour="10" decreasePerHour="8" thresholdFactor="0.45"/>
+			<leading filename="animals/alpaca/alpaca.xml" dailyHikingTimeMinutes="5"/>
+			<fleeceParticle diffuse="effects/fleece/particle/fleeceGray_diffuse.png"/>
+			<fleece regrowthPerDay="10" maxFleece="500">
+				<fleeceAmount>
+					<key ageMonth="0" value="0"/>
+					<key ageMonth="10" value="0"/>
+					<key ageMonth="14" value="500"/>
+					<key ageMonth="24" value="500"/>
+				</fleeceAmount>
+			</fleece>
+			<buyPrice>
+				<key ageMonth="0" value="500"/>
+				<key ageMonth="36" value="6000"/>
+			</buyPrice>
+			<sellPrice>
+				<key ageMonth="0" value="150"/>
+				<key ageMonth="36" value="5000"/>
+			</sellPrice>
+			<transportPrice>
+				<key ageMonth="0" value="40"/>
+				<key ageMonth="8" value="60"/>
+			</transportPrice>
+			<input>
+				<water>
+					<key ageMonth="0" value="2"/>
+					<key ageMonth="5" value="20"/>
+				</water>
+				<food>
+					<key ageMonth="0" value="10"/>
+					<key ageMonth="5" value="100"/>
+				</food>
+			</input>
+		</subType>
+		<subType subType="ALPACA_GREY_MALE" fillTypeName="ALPACA_GREY_MALE" gender="male" minWeight="7.5" targetWeight="65.0" maxWeight="110.0" breed="GREY">
+			<visuals>
+				<visual minAge="0" visualAnimalIndex="9" image="$dataS/character/animals/domesticated/alpaca/store_alpacaGreyBaby.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="6" visualAnimalIndex="10" image="$dataS/character/animals/domesticated/alpaca/store_alpacaGreyKid.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="11" minFleeceState="0" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaGreyAdultSheared.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaMaleReproduction</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="12" minFleeceState="40" canBeSheared="true" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaGreyAdult.png" canBeBought="false">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaMaleReproduction</description>
+				</visual>
+			</visuals>
+			<reproduction minAgeMonth="24" supported="false"/>
+			<health increasePerHour="10" decreasePerHour="8" thresholdFactor="0.45"/>
+			<leading filename="animals/alpaca/alpaca.xml" dailyHikingTimeMinutes="5"/>
+			<fleeceParticle diffuse="effects/fleece/particle/fleeceGray_diffuse.png"/>
+			<fleece regrowthPerDay="10" maxFleece="500">
+				<fleeceAmount>
+					<key ageMonth="0" value="0"/>
+					<key ageMonth="10" value="0"/>
+					<key ageMonth="14" value="500"/>
+					<key ageMonth="24" value="500"/>
+				</fleeceAmount>
+			</fleece>
+			<buyPrice>
+				<key ageMonth="0" value="500"/>
+				<key ageMonth="36" value="6000"/>
+			</buyPrice>
+			<sellPrice>
+				<key ageMonth="0" value="150"/>
+				<key ageMonth="36" value="5000"/>
+			</sellPrice>
+			<transportPrice>
+				<key ageMonth="0" value="40"/>
+				<key ageMonth="8" value="60"/>
+			</transportPrice>
+			<input>
+				<water>
+					<key ageMonth="0" value="2"/>
+					<key ageMonth="5" value="20"/>
+				</water>
+				<food>
+					<key ageMonth="0" value="10"/>
+					<key ageMonth="5" value="100"/>
+				</food>
+			</input>
+		</subType>
+		<subType subType="ALPACA_FAWN" fillTypeName="ALPACA_FAWN" gender="female" minWeight="7.0" targetWeight="60.0" maxWeight="100.0" breed="FAWN">
+			<visuals>
+				<visual minAge="0" visualAnimalIndex="13" image="$dataS/character/animals/domesticated/alpaca/store_alpacaFawnBaby.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="6" visualAnimalIndex="14" image="$dataS/character/animals/domesticated/alpaca/store_alpacaFawnKid.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="15" minFleeceState="0" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaFawnAdultSheared.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaReproduction</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="16" minFleeceState="40" canBeSheared="true" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaFawnAdult.png" canBeBought="false">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaReproduction</description>
+				</visual>
+			</visuals>
+			<reproduction minAgeMonth="14" durationMonth="11" minHealthFactor="0.75"/>
+			<health increasePerHour="10" decreasePerHour="8" thresholdFactor="0.45"/>
+			<leading filename="animals/alpaca/alpaca.xml" dailyHikingTimeMinutes="5"/>
+			<fleeceParticle diffuse="effects/fleece/particle/fleeceBeige_diffuse.png"/>
+			<fleece regrowthPerDay="10" maxFleece="500">
+				<fleeceAmount>
+					<key ageMonth="0" value="0"/>
+					<key ageMonth="10" value="0"/>
+					<key ageMonth="14" value="500"/>
+					<key ageMonth="24" value="500"/>
+				</fleeceAmount>
+			</fleece>
+			<buyPrice>
+				<key ageMonth="0" value="500"/>
+				<key ageMonth="36" value="6000"/>
+			</buyPrice>
+			<sellPrice>
+				<key ageMonth="0" value="150"/>
+				<key ageMonth="36" value="5000"/>
+			</sellPrice>
+			<transportPrice>
+				<key ageMonth="0" value="40"/>
+				<key ageMonth="8" value="60"/>
+			</transportPrice>
+			<input>
+				<water>
+					<key ageMonth="0" value="2"/>
+					<key ageMonth="5" value="20"/>
+				</water>
+				<food>
+					<key ageMonth="0" value="10"/>
+					<key ageMonth="5" value="100"/>
+				</food>
+			</input>
+		</subType>
+		<subType subType="ALPACA_FAWN_MALE" fillTypeName="ALPACA_FAWN_MALE" gender="male" minWeight="7.5" targetWeight="65.0" maxWeight="110.0" breed="FAWN">
+			<visuals>
+				<visual minAge="0" visualAnimalIndex="13" image="$dataS/character/animals/domesticated/alpaca/store_alpacaFawnBaby.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="6" visualAnimalIndex="14" image="$dataS/character/animals/domesticated/alpaca/store_alpacaFawnKid.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaYoung</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="15" minFleeceState="0" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaFawnAdultSheared.png" canBeBought="true">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaMaleReproduction</description>
+				</visual>
+				<visual minAge="14" visualAnimalIndex="16" minFleeceState="40" canBeSheared="true" supportsShearing="true" canBeLed="true" image="$dataS/character/animals/domesticated/alpaca/store_alpacaFawnAdult.png" canBeBought="false">
+					<description>$l10n_animal_descriptionAlpacaAdult</description>
+					<description>$l10n_animal_descriptionAlpacaMaleReproduction</description>
+				</visual>
+			</visuals>
+			<reproduction minAgeMonth="24" supported="false"/>
+			<health increasePerHour="10" decreasePerHour="8" thresholdFactor="0.45"/>
+			<leading filename="animals/alpaca/alpaca.xml" dailyHikingTimeMinutes="5"/>
+			<fleeceParticle diffuse="effects/fleece/particle/fleeceBeige_diffuse.png"/>
+			<fleece regrowthPerDay="10" maxFleece="500">
+				<fleeceAmount>
+					<key ageMonth="0" value="0"/>
+					<key ageMonth="10" value="0"/>
+					<key ageMonth="14" value="500"/>
+					<key ageMonth="24" value="500"/>
+				</fleeceAmount>
+			</fleece>
+			<buyPrice>
+				<key ageMonth="0" value="500"/>
+				<key ageMonth="36" value="6000"/>
+			</buyPrice>
+			<sellPrice>
+				<key ageMonth="0" value="150"/>
+				<key ageMonth="36" value="5000"/>
+			</sellPrice>
+			<transportPrice>
+				<key ageMonth="0" value="40"/>
+				<key ageMonth="8" value="60"/>
+			</transportPrice>
+			<input>
+				<water>
+					<key ageMonth="0" value="2"/>
+					<key ageMonth="5" value="20"/>
+				</water>
+				<food>
+					<key ageMonth="0" value="10"/>
+					<key ageMonth="5" value="100"/>
+				</food>
+			</input>
+		</subType>
+	</animal>
+</animals>

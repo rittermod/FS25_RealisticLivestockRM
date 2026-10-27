@@ -135,7 +135,7 @@ end
 --- The label names a SPECIES-level breeding trait, not the individual's current output: a
 --- COW returns rl_ui_milk for every subtype and gender, and a goat (SHEEP subtype GOAT or
 --- RAM_GOAT) likewise returns rl_ui_milk. Every other SHEEP subtype, nil and "" included,
---- returns rl_ui_wool.
+--- returns rl_ui_wool. An ALPACA returns rl_ui_fleece.
 --- @param animalTypeIndex number|nil
 --- @param subTypeName string|nil optional; distinguishes goats within SHEEP. A nil/absent value keeps the SHEEP -> wool default.
 --- @return string|nil labelKey
@@ -147,6 +147,10 @@ function RLGeneticsFormatter.getProductivityLabelKey(animalTypeIndex, subTypeNam
         return "rl_ui_wool"
     end
     if animalTypeIndex == AnimalType.CHICKEN then return "rl_ui_eggs" end
+    if animalTypeIndex == AnimalType.ALPACA then
+        if Log ~= nil then Log:trace("RLGeneticsFormatter.getProductivityLabelKey: ALPACA -> rl_ui_fleece") end
+        return "rl_ui_fleece"
+    end
     return nil
 end
 

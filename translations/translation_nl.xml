@@ -44,6 +44,11 @@
         <text name="animal_descriptionRamFeed" text="Rammen eten gras en hooi."/>
         <text name="animal_descriptionRamYoung" text="Dit is een mannelijk lammetje."/>
         <text name="animal_descriptionRamReproduction" text="Rammen die gezond zijn en ouder dan 5 maanden kunnen zich voortplanten."/>
+        <text name="animal_group_alpacas" text="Alpacas"/>
+        <text name="animal_descriptionAlpacaYoung" text="Young alpacas need hay or grass as well as water but do not produce fleece yet."/>
+        <text name="animal_descriptionAlpacaAdult" text="Adult alpacas need hay or grass as well as water and produce valuable fleece."/>
+        <text name="animal_descriptionAlpacaReproduction" text="Alpacas that are healthy and older than 14 months can reproduce."/>
+        <text name="animal_descriptionAlpacaMaleReproduction" text="Male alpacas that are healthy and older than 24 months can reproduce."/>
         <text name="rl_descriptionSheepReproduction" text="Ooien die gezond zijn en ouder dan 8 maanden kunnen zich voortplanten."/>
 
         <!-- GOATS -->
@@ -62,6 +67,14 @@
         <text name="fillType_stallion_black" text="Hengst (zwart)"/>
         <text name="fillType_stallion_seal_brown" text="Hengst (donkerbruin)"/>
         <text name="fillType_stallion_dun" text="Hengst (lichtbruin)"/>
+        <text name="fillType_alpaca_white" text="White Alpaca"/>
+        <text name="fillType_alpaca_white_male" text="White Alpaca Male"/>
+        <text name="fillType_alpaca_brown" text="Brown Alpaca"/>
+        <text name="fillType_alpaca_brown_male" text="Brown Alpaca Male"/>
+        <text name="fillType_alpaca_grey" text="Grey Alpaca"/>
+        <text name="fillType_alpaca_grey_male" text="Grey Alpaca Male"/>
+        <text name="fillType_alpaca_fawn" text="Fawn Alpaca"/>
+        <text name="fillType_alpaca_fawn_male" text="Fawn Alpaca Male"/>
         <text name="animal_descriptionStallionFeed" text="Hengsten houden van hooi, haver en sorghum."/>
         <text name="animal_descriptionStallionProfit" text="Je kunt hengsten verkopen voor winst."/>
         <text name="animal_descriptionStallionReproduction" text="Hengsten die gezond zijn en ouder dan 36 maanden kunnen zich voortplanten."/>
@@ -127,6 +140,7 @@
 
         <text name="rl_ui_milk" text="Melk productie"/>
         <text name="rl_ui_wool" text="Wol productie"/>
+        <text name="rl_ui_fleece" text="Fleece production"/>
         <text name="rl_ui_eggs" text="Eieren productie"/>
         <text name="rl_ui_metabolism" text="Metabolisme"/>
         <text name="rl_ui_meat" text="Kwaliteit"/>

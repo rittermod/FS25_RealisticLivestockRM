@@ -263,6 +263,22 @@ The **Diseases** setting decides how often animals fall ill in the first place. 
 
 ---
 
+## Where are the alpacas?
+
+Alpacas come with the **Beans and Alpacas** DLC. Without the DLC active, Realistic Livestock adds no alpacas on any map.
+
+With the DLC, Realistic Livestock adds a male for each of the four coat colours, because a female needs a male in the pen to get pregnant (an AI straw works too). Males count toward the alpaca shed's limit of 16 animals, so leave room for one. Alpacas can be led and sheared from 14 months.
+
+Every alpaca, male or female, carries **happiness** and **fleece**, shown on the animal's info page, its HUD box and the dealer card:
+
+- **Fleece** grows every day. A content alpaca grows a full coat's worth faster than an unhappy one, and the growth per month is about the same whatever your month length. From 40% fleece an adult alpaca (14 months and older) shows its woolly coat; below that it looks sheared.
+- **Happiness** drops a little every day. A happier alpaca sells for more, keeps its health up better and grows its fleece faster.
+- Alpacas from the dealer arrive sheared, at no happiness and no fleece.
+
+Leading an alpaca (which raises its happiness) and shearing it (which harvests its fleece) are not handled by Realistic Livestock yet.
+
+---
+
 ## Why don't Hof Bergmann pasture bulls breed like cattle?
 
 **Short answer:** Hof Bergmann's pasture bulls are a completely different animal type from cattle. The game engine doesn't allow animals of different types to breed with each other, and this isn't something the mod can work around.

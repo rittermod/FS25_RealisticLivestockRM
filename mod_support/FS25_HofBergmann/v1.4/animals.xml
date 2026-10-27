@@ -197,11 +197,11 @@
     <!-- Real alpacas: 60-90 kg male, 55-65 kg female -->
     <!-- Cross-color breeding: all ALPACA subtypes share breed="ALPACA" -->
     <animal type="ALPACA">
-        <!-- Override: set breed on existing females for breeding group compatibility -->
-        <subType subType="ALPACA_WHITE" breed="ALPACA"/>
-        <subType subType="ALPACA_BROWN" breed="ALPACA"/>
-        <subType subType="ALPACA_BLACK" breed="ALPACA"/>
-        <subType subType="ALPACA_GREY" breed="ALPACA"/>
+        <!-- Override: breed for breeding group compatibility, and adult female weights HB does not declare -->
+        <subType subType="ALPACA_WHITE" breed="ALPACA" minWeight="7.0" targetWeight="60.0" maxWeight="100.0"/>
+        <subType subType="ALPACA_BROWN" breed="ALPACA" minWeight="7.0" targetWeight="60.0" maxWeight="100.0"/>
+        <subType subType="ALPACA_BLACK" breed="ALPACA" minWeight="7.0" targetWeight="60.0" maxWeight="100.0"/>
+        <subType subType="ALPACA_GREY" breed="ALPACA" minWeight="7.0" targetWeight="60.0" maxWeight="100.0"/>
 
         <!-- New: ALPACA_WHITE_MALE -->
         <subType subType="ALPACA_WHITE_MALE" fillTypeName="ALPACA_WHITE_MALE" gender="male" breed="ALPACA"

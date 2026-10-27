@@ -66,7 +66,7 @@ function VisualAnimal:load()
 	local nodes = self.nodes
 	if nodes.root == nil or nodes.root == 0 then return end
 
-	local visualData = g_currentMission.animalSystem:getVisualByAge(self.animal.subTypeIndex, self.animal.age)
+	local visualData = g_currentMission.animalSystem:getVisualByAge(self.animal.subTypeIndex, self.animal.age, self.animal)
 
 	if visualData.monitor ~= nil then nodes.monitor = safeIndexToObject(nodes.root, visualData.monitor) end
 	if visualData.noseRing ~= nil then nodes.noseRing = safeIndexToObject(nodes.root, visualData.noseRing) end

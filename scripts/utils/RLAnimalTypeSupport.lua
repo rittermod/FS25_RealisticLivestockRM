@@ -1,14 +1,24 @@
 --[[
     RLAnimalTypeSupport.lua
-    Pure helpers that keep an animal type RLRM ships no data for working: the cluster class,
-    dealer-farm seeding, offspring subtype resolution inside the parent's type, the pallets output
-    label and the load-time report lines. Data in, data out: no g_* reads, no XML, lookups and rng
-    injected.
+    Pure helpers for animal types beyond RLRM's five core types: the cluster class, dealer-farm
+    seeding, offspring subtype resolution inside the parent's type, the pallets output label, the
+    load-time report lines, and the DLC-gated bundle files (a type RLRM ships only while its DLC is
+    active). Data in, data out: no g_* reads, no XML, lookups, rng and the active-mod set injected.
 ]]
 
 RLAnimalTypeSupport = {}
 
 local Log = RmLogging.getLogger("RLRM")
+
+--- Bundle files RLRM loads only while their DLC is active. Paths are relative to RLRM's mod directory.
+RLAnimalTypeSupport.DLC_BUNDLES = {
+    {
+        dlc = "beansAndAlpacasPack",
+        types = { "ALPACA" },
+        animalsFile = "xml/animals_alpaca.xml",
+        fillTypesFile = "xml/fillTypes_alpaca.xml"
+    }
+}
 
 
 --- Pick one entry of a list, drawing the rng only when there is a choice to make.
@@ -251,6 +261,62 @@ function RLAnimalTypeSupport.describeUnbundledType(animalType, getSubType)
 
     Log:trace("RLAnimalTypeSupport.describeUnbundledType: %s -> %d line(s)", tostring(animalType.name), #lines)
     return lines
+end
+
+
+--- Whether a DLC is active in this session: its prefixed mod name is in the active-mod set.
+---@param modIsLoaded table|nil the session's active-mod set (g_modIsLoaded)
+---@param prefix string|nil the DLC mod-name prefix (g_uniqueDlcNamePrefix)
+---@param dlcName string the DLC's name without the prefix, such as "beansAndAlpacasPack"
+---@return boolean active
+function RLAnimalTypeSupport.isDlcActive(modIsLoaded, prefix, dlcName)
+    if type(modIsLoaded) ~= "table" or prefix == nil or dlcName == nil then
+        Log:trace("RLAnimalTypeSupport.isDlcActive: %s inactive (no active-mod set or prefix)", tostring(dlcName))
+        return false
+    end
+
+    local active = modIsLoaded[prefix .. dlcName] ~= nil
+    Log:trace("RLAnimalTypeSupport.isDlcActive: %s%s -> %s", tostring(prefix), tostring(dlcName), tostring(active))
+    return active
+end
+
+
+--- The DLC bundles whose DLC is active, in DLC_BUNDLES order.
+---@param modIsLoaded table|nil the session's active-mod set (g_modIsLoaded)
+---@param prefix string|nil the DLC mod-name prefix (g_uniqueDlcNamePrefix)
+---@return table bundles array of DLC_BUNDLES entries
+function RLAnimalTypeSupport.getActiveDlcBundles(modIsLoaded, prefix)
+    local bundles = {}
+
+    for _, bundle in ipairs(RLAnimalTypeSupport.DLC_BUNDLES) do
+        if RLAnimalTypeSupport.isDlcActive(modIsLoaded, prefix, bundle.dlc) then
+            table.insert(bundles, bundle)
+        end
+    end
+
+    Log:trace("RLAnimalTypeSupport.getActiveDlcBundles: %d of %d active", #bundles, #RLAnimalTypeSupport.DLC_BUNDLES)
+    return bundles
+end
+
+
+--- The type names of every DLC bundle whose DLC is inactive, as a name set.
+---@param modIsLoaded table|nil the session's active-mod set (g_modIsLoaded)
+---@param prefix string|nil the DLC mod-name prefix (g_uniqueDlcNamePrefix)
+---@return table names { [typeName] = true }
+function RLAnimalTypeSupport.getInactiveGatedTypes(modIsLoaded, prefix)
+    local names, count = {}, 0
+
+    for _, bundle in ipairs(RLAnimalTypeSupport.DLC_BUNDLES) do
+        if not RLAnimalTypeSupport.isDlcActive(modIsLoaded, prefix, bundle.dlc) then
+            for _, typeName in ipairs(bundle.types) do
+                names[typeName] = true
+                count = count + 1
+            end
+        end
+    end
+
+    Log:trace("RLAnimalTypeSupport.getInactiveGatedTypes: %d type name(s) gated off", count)
+    return names
 end
 
 

@@ -59,9 +59,13 @@ function DiseaseManager:loadDiseases()
     -- because the absent-file case is one of parse's own warning rules.
     local xmlFile = XMLFile.loadIfExists("diseases", modDirectory .. "xml/diseases.xml")
 
+    -- A type RLRM ships only with its DLC is absent while the DLC is off; naming it is not an authoring defect.
+    local optionalAnimalTypes = RLAnimalTypeSupport.getInactiveGatedTypes(g_modIsLoaded, g_uniqueDlcNamePrefix)
+
     local registry, warnings = RLDiseaseDefinition.parse(xmlFile, {
         ["animalTypes"] = AnimalType,
-        ["i18n"] = g_i18n
+        ["i18n"] = g_i18n,
+        ["optionalAnimalTypes"] = optionalAnimalTypes
     })
 
     self.diseases = registry

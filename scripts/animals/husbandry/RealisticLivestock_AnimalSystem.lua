@@ -173,6 +173,39 @@ AnimalSystem.BREED_TO_MARKER_COLOUR = {
 }
 
 
+--- Load the animal file of every DLC bundle whose DLC is active, with the DLC's directory as base path.
+---@param animalSystem table the animal system loading its Phase 1 bundle
+---@return nil
+function RealisticLivestock_AnimalSystem.loadDlcBundleAnimals(animalSystem)
+
+    for _, bundle in ipairs(RLAnimalTypeSupport.DLC_BUNDLES) do
+
+        if not RLAnimalTypeSupport.isDlcActive(g_modIsLoaded, g_uniqueDlcNamePrefix, bundle.dlc) then
+            Log:debug("AnimalSystem: DLC '%s' not active, skipping '%s'", tostring(bundle.dlc),
+                tostring(bundle.animalsFile))
+        else
+            local path = modDirectory .. bundle.animalsFile
+            local dlcDirectory = g_modNameToDirectory[g_uniqueDlcNamePrefix .. bundle.dlc]
+            local dlcXml = XMLFile.load("animals", path)
+
+            if dlcXml == nil then
+                Log:warning("AnimalSystem: DLC '%s' is active but '%s' did not load; its animal types are missing",
+                    tostring(bundle.dlc), tostring(path))
+            else
+                local typesBefore, subTypesBefore = #animalSystem.types, #animalSystem.subTypes
+                animalSystem:loadAnimals(dlcXml, dlcDirectory, modName)
+                dlcXml:delete()
+                Log:info("AnimalSystem: loaded '%s' for DLC '%s' (base '%s'): +%d types, +%d subtypes",
+                    tostring(bundle.animalsFile), tostring(bundle.dlc), tostring(dlcDirectory),
+                    #animalSystem.types - typesBefore, #animalSystem.subTypes - subTypesBefore)
+            end
+        end
+
+    end
+
+end
+
+
 --- Load RLRM's bundle, the map's animals and the bridge animals, then apply the saved ear-tag colours.
 ---@param _ function Overwritten-function predecessor (unused; replaced wholesale)
 ---@param mapXml number The map XML handle.
@@ -224,6 +257,7 @@ function RealisticLivestock_AnimalSystem:loadMapData(_, mapXml, mission, baseDir
         -- (default modDirectory or RLSettings.customAnimals override).
         self.isLoadingRLBundle = true
         self:loadAnimals(xmlFile, basePath)
+        RealisticLivestock_AnimalSystem.loadDlcBundleAnimals(self)
         self.isLoadingRLBundle = false
         xmlFile:delete()
 
@@ -1526,8 +1560,9 @@ end
 --- Pick a sale-animal age that honours per-visual `canBeBought`.
 ---
 --- Builds the buyable-age union from `subType.visuals` (each buyable visual
---- contributes `[v.minAge, nextMinAge-1]`; the last buyable visual extends to
---- `maxBuyAge`). Intersects today's three skew buckets with that union, drops
+--- contributes `[v.minAge, nextGreaterMinAge-1]`, or up to `maxBuyAge` when no
+--- later visual is older; only the first store-bearing visual at a shared `minAge` counts).
+--- Intersects today's three skew buckets with that union, drops
 --- empty buckets and renormalises remaining weights, then uniformly draws an
 --- integer age across the chosen bucket's intersected integer ages. When a
 --- bucket's intersection splits into multiple disjoint segments, the segment
@@ -1549,15 +1584,20 @@ function AnimalSystem:_pickSaleAnimalAge(subType, averageBuyAge, maxBuyAge, rand
     local union = {}
     if subType ~= nil and subType.visuals ~= nil then
         local n = #subType.visuals
+        local storeAtMinAge = {}
         for i = 1, n do
             local visual = subType.visuals[i]
-            if visual.store ~= nil and visual.store.canBeBought then
+            if visual.store ~= nil and storeAtMinAge[visual.minAge] then
+                Log:trace("_pickSaleAnimalAge: subType=%s visual %d shares minAge %s with an earlier one; skipped",
+                    tostring(subType.name), i, tostring(visual.minAge))
+            elseif visual.store ~= nil and visual.store.canBeBought then
                 local lo = visual.minAge
-                local hi
-                if i < n then
-                    hi = subType.visuals[i + 1].minAge - 1
-                else
-                    hi = maxBuyAge
+                local hi = maxBuyAge
+                for j = i + 1, n do
+                    if subType.visuals[j].minAge > lo then
+                        hi = subType.visuals[j].minAge - 1
+                        break
+                    end
                 end
                 if hi >= lo then
                     -- Merge with previous if adjacent / overlapping.
@@ -1569,6 +1609,7 @@ function AnimalSystem:_pickSaleAnimalAge(subType, averageBuyAge, maxBuyAge, rand
                     end
                 end
             end
+            if visual.store ~= nil then storeAtMinAge[visual.minAge] = true end
         end
     end
 
@@ -1834,7 +1875,7 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
     -- on its own base quality rather than on the source farm's. Productivity is
     -- drawn only for the types that carry it.
     local traitKeys = (animalTypeIndex == AnimalType.COW or animalTypeIndex == AnimalType.SHEEP
-        or animalTypeIndex == AnimalType.CHICKEN)
+        or animalTypeIndex == AnimalType.CHICKEN or animalTypeIndex == AnimalType.ALPACA)
         and RLGeneticsDraw.TRAITS_WITH_PRODUCTIVITY or RLGeneticsDraw.TRAITS_BASE
 
     local genetics = RLGeneticsDraw.draw(traitKeys)
@@ -1911,7 +1952,7 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
     animal.uniqueId = uniqueId
     animal.birthday.country = farmCountryIndex
 
-    local variations = self:getVisualByAge(subTypeIndex, age).visualAnimal.variations
+    local variations = self:getVisualByAge(subTypeIndex, age, animal).visualAnimal.variations
     local variationIndex = 1
 
     if #variations > 1 then variationIndex = math.random(1, #variations) end
@@ -2784,7 +2825,7 @@ function AnimalSystem:onPeriodChanged()
 
                     if animal.monitor.removed and not animal.monitor.active then
 
-                        local visualData = self:getVisualByAge(animal.subTypeIndex, animal.age)
+                        local visualData = self:getVisualByAge(animal.subTypeIndex, animal.age, animal)
 
                         if visualData.monitor ~= nil and animal.idFull ~= nil and animal.idFull ~= "1-1" then
 
@@ -3171,7 +3212,11 @@ function AnimalSystem:createNewAIAnimal(animalTypeIndex)
         ["health"] = math.clamp(math.random(geneticsModifier - 300, geneticsModifier + 300) / 1000, 1.15, 1.75)
     }
 
-    if animalTypeIndex == AnimalType.COW or animalTypeIndex == AnimalType.SHEEP or animalTypeIndex == AnimalType.CHICKEN then genetics.productivity = math.clamp(math.random(geneticsModifier - 300, geneticsModifier + 300) / 1000, 1.15, 1.75) end
+    if animalTypeIndex == AnimalType.COW or animalTypeIndex == AnimalType.SHEEP or animalTypeIndex == AnimalType.CHICKEN
+        or animalTypeIndex == AnimalType.ALPACA then
+        genetics.productivity = math.clamp(math.random(geneticsModifier - 300, geneticsModifier + 300) / 1000, 1.15, 1.75)
+        Log:trace("createNewAIAnimal: type=%s productivity=%s", tostring(animalTypeIndex), tostring(genetics.productivity))
+    end
 
   
     local name = g_currentMission.animalNameSystem:getRandomName("male")
@@ -3190,7 +3235,7 @@ function AnimalSystem:createNewAIAnimal(animalTypeIndex)
     animal.uniqueId = uniqueId
     animal.birthday.country = farmCountryIndex
 
-    local variations = self:getVisualByAge(subTypeIndex, age).visualAnimal.variations
+    local variations = self:getVisualByAge(subTypeIndex, age, animal).visualAnimal.variations
     local variationIndex = 1
 
     if #variations > 1 then variationIndex = math.random(1, #variations) end

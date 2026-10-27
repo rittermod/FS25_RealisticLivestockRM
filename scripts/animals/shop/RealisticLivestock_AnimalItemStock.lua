@@ -18,7 +18,7 @@ function RealisticLivestock_AnimalItemStock.new(animal)
     local self = setmetatable({}, mt)
 
     self.cluster = animal
-	self.visual = g_currentMission.animalSystem:getVisualByAge(animal.subTypeIndex, animal:getAge())
+	self.visual = g_currentMission.animalSystem:getVisualByAge(animal.subTypeIndex, animal:getAge(), animal)
 	local subType = g_currentMission.animalSystem:getSubTypeByIndex(animal.subTypeIndex)
 	self.title = g_fillTypeManager:getFillTypeTitleByIndex(subType.fillTypeIndex)
 

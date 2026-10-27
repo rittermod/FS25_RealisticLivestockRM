@@ -44,6 +44,11 @@
         <text name="animal_descriptionRamFeed" text="Koçlar çim ve kuru ot yerler."/>
         <text name="animal_descriptionRamYoung" text="Bu erkek bir kuzudur."/>
         <text name="animal_descriptionRamReproduction" text="5 aylıktan büyük ve sağlıklı koçlar üreyebilir."/>
+        <text name="animal_group_alpacas" text="Alpacas"/>
+        <text name="animal_descriptionAlpacaYoung" text="Young alpacas need hay or grass as well as water but do not produce fleece yet."/>
+        <text name="animal_descriptionAlpacaAdult" text="Adult alpacas need hay or grass as well as water and produce valuable fleece."/>
+        <text name="animal_descriptionAlpacaReproduction" text="Alpacas that are healthy and older than 14 months can reproduce."/>
+        <text name="animal_descriptionAlpacaMaleReproduction" text="Male alpacas that are healthy and older than 24 months can reproduce."/>
         <text name="rl_descriptionSheepReproduction" text="8 aylıktan büyük ve sağlıklı koyunlar üreyebilir."/>
 
         <!-- GOATS -->
@@ -62,6 +67,14 @@
         <text name="fillType_stallion_black" text="Siyah Aygır"/>
         <text name="fillType_stallion_seal_brown" text="Seal Brown Aygır"/>
         <text name="fillType_stallion_dun" text="Dun Aygır"/>
+        <text name="fillType_alpaca_white" text="White Alpaca"/>
+        <text name="fillType_alpaca_white_male" text="White Alpaca Male"/>
+        <text name="fillType_alpaca_brown" text="Brown Alpaca"/>
+        <text name="fillType_alpaca_brown_male" text="Brown Alpaca Male"/>
+        <text name="fillType_alpaca_grey" text="Grey Alpaca"/>
+        <text name="fillType_alpaca_grey_male" text="Grey Alpaca Male"/>
+        <text name="fillType_alpaca_fawn" text="Fawn Alpaca"/>
+        <text name="fillType_alpaca_fawn_male" text="Fawn Alpaca Male"/>
         <text name="animal_descriptionStallionFeed" text="Aygırlar kuru ot, yulaf ve sorgum severler."/>
         <text name="animal_descriptionStallionProfit" text="Aygırlar kar amacıyla satılabilir."/>
         <text name="animal_descriptionStallionReproduction" text="36 aylıktan büyük ve sağlıklı aygırlar üreyebilir."/>
@@ -134,6 +147,7 @@
 
         <text name="rl_ui_milk" text="Süt üretimi"/>
         <text name="rl_ui_wool" text="Yün üretimi"/>
+        <text name="rl_ui_fleece" text="Fleece production"/>
         <text name="rl_ui_eggs" text="Yumurta üretimi"/>
         <text name="rl_ui_metabolism" text="Metabolizma"/>
         <text name="rl_ui_meat" text="Kalite"/>

@@ -611,7 +611,7 @@ end
 ---@param xmlFile table open XMLFile document
 ---@param key string this disease's element key
 ---@param title string resolved, non-empty title
----@param deps table `{ animalTypes = <name-to-index map>, i18n = <text resolver> }`
+---@param deps table `{ animalTypes = <name-to-index map>, i18n = <text resolver>, optionalAnimalTypes = <set>|nil }`
 ---@param warnings table the accumulator
 ---@return table|nil the registry entry, or nil when the disease must be dropped
 local function buildModelEntry(xmlFile, key, title, deps, warnings)
@@ -631,6 +631,8 @@ local function buildModelEntry(xmlFile, key, title, deps, warnings)
     -- while `pairs` traversal order is undefined. Both runners' splits return a
     -- contiguous sequence, so the two walk the same tokens.
     local animals = {}
+    local optionalTypes = deps.optionalAnimalTypes or {}
+    local tokenCount, optionalSkipped = 0, 0
 
     for _, animalName in ipairs(string.split(animalNames, " ")) do
 
@@ -640,20 +642,34 @@ local function buildModelEntry(xmlFile, key, title, deps, warnings)
         -- sets for the same file.
         if animalName ~= "" then
 
+            tokenCount = tokenCount + 1
+
             -- Resolved for its SIDE EFFECT of validating the name: the entry
             -- stores NAMES, because its consumers are pure modules that may not
             -- reach the animal-type registry. Warns once per unresolvable
             -- OCCURRENCE, so `animals="FOO FOO"` warns twice.
-            if deps.animalTypes[animalName] == nil then
+            if deps.animalTypes[animalName] ~= nil then
+                table.insert(animals, animalName)
+            elseif optionalTypes[animalName] == true then
+                optionalSkipped = optionalSkipped + 1
+                Log:trace("RLDiseaseDefinition.buildModelEntry: title=%s optional type %s absent; name skipped",
+                    tostring(title), tostring(animalName))
+            else
                 warn(warnings, title, "unknown-animal-type",
                     string.format("animal type %s does not resolve; name skipped",
                         tostring(animalName)))
-            else
-                table.insert(animals, animalName)
             end
 
         end
 
+    end
+
+    -- Every name belongs to a type whose DLC is off: the disease is inert this
+    -- session, which is expected, so it is dropped without an authoring warning.
+    if #animals == 0 and tokenCount > 0 and optionalSkipped == tokenCount then
+        Log:trace("RLDiseaseDefinition.buildModelEntry: title=%s lists only absent optional types (%s); dropped",
+            tostring(title), tostring(animalNames))
+        return nil
     end
 
     -- Row-fatal: a disease bound to no animal type is unreachable, so keeping it
@@ -876,7 +892,7 @@ end
 --- `g_diseaseManager` nil. A nil `xmlFile` is a legitimate input, not a caller error:
 --- routing it through here keeps ONE emission point for the whole rule vocabulary.
 ---@param xmlFile table|nil open XMLFile document, or nil where the file is absent
----@param deps table `{ animalTypes = <name-to-index map>, i18n = <text resolver> }`.
+---@param deps table `{ animalTypes, i18n, optionalAnimalTypes }`; an absent optional type is skipped silently.
 --- Injected, never read from the environment - a module-load read of either is the
 --- load-order trap that reads populated headless and empty in-game.
 ---@return table registry map of title to disease entry. A MAP, not an array: use

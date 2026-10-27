@@ -44,6 +44,11 @@
         <text name="animal_descriptionRamFeed" text="Los carneros comen hierba y heno."/>
         <text name="animal_descriptionRamYoung" text="Este es un cordero macho."/>
         <text name="animal_descriptionRamReproduction" text="Los carneros sanos y mayores de 5 meses pueden reproducirse."/>
+        <text name="animal_group_alpacas" text="Alpacas"/>
+        <text name="animal_descriptionAlpacaYoung" text="Young alpacas need hay or grass as well as water but do not produce fleece yet."/>
+        <text name="animal_descriptionAlpacaAdult" text="Adult alpacas need hay or grass as well as water and produce valuable fleece."/>
+        <text name="animal_descriptionAlpacaReproduction" text="Alpacas that are healthy and older than 14 months can reproduce."/>
+        <text name="animal_descriptionAlpacaMaleReproduction" text="Male alpacas that are healthy and older than 24 months can reproduce."/>
         <text name="rl_descriptionSheepReproduction" text="Las ovejas sanas y mayores de 8 meses pueden reproducirse."/>
 
         <!-- GOATS -->
@@ -62,6 +67,14 @@
         <text name="fillType_stallion_black" text="Semental Negro"/>
         <text name="fillType_stallion_seal_brown" text="Semental Marrón Foca"/>
         <text name="fillType_stallion_dun" text="Semental Bayo"/>
+        <text name="fillType_alpaca_white" text="White Alpaca"/>
+        <text name="fillType_alpaca_white_male" text="White Alpaca Male"/>
+        <text name="fillType_alpaca_brown" text="Brown Alpaca"/>
+        <text name="fillType_alpaca_brown_male" text="Brown Alpaca Male"/>
+        <text name="fillType_alpaca_grey" text="Grey Alpaca"/>
+        <text name="fillType_alpaca_grey_male" text="Grey Alpaca Male"/>
+        <text name="fillType_alpaca_fawn" text="Fawn Alpaca"/>
+        <text name="fillType_alpaca_fawn_male" text="Fawn Alpaca Male"/>
         <text name="animal_descriptionStallionFeed" text="A los sementales les gusta el heno, la avena y el sorgo."/>
         <text name="animal_descriptionStallionProfit" text="Los sementales se pueden vender con beneficio."/>
         <text name="animal_descriptionStallionReproduction" text="Los sementales sanos y mayores de 36 meses pueden reproducirse."/>
@@ -133,6 +146,7 @@
 
         <text name="rl_ui_milk" text="Producción de leche"/>
         <text name="rl_ui_wool" text="Producción de lana"/>
+        <text name="rl_ui_fleece" text="Fleece production"/>
         <text name="rl_ui_eggs" text="Producción de huevos"/>
         <text name="rl_ui_metabolism" text="Metabolismo"/>
         <text name="rl_ui_meat" text="Calidad"/>

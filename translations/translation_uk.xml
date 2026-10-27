@@ -41,6 +41,11 @@
         <text name="animal_descriptionRamFeed" text="Барани їдять траву та сіно."/>
         <text name="animal_descriptionRamYoung" text="Це ягня-самець."/>
         <text name="animal_descriptionRamReproduction" text="Барани, які здорові та старші за 5 місяців, можуть розмножуватись."/>
+        <text name="animal_group_alpacas" text="Alpacas"/>
+        <text name="animal_descriptionAlpacaYoung" text="Young alpacas need hay or grass as well as water but do not produce fleece yet."/>
+        <text name="animal_descriptionAlpacaAdult" text="Adult alpacas need hay or grass as well as water and produce valuable fleece."/>
+        <text name="animal_descriptionAlpacaReproduction" text="Alpacas that are healthy and older than 14 months can reproduce."/>
+        <text name="animal_descriptionAlpacaMaleReproduction" text="Male alpacas that are healthy and older than 24 months can reproduce."/>
         <text name="rl_descriptionSheepReproduction" text="Вівці, які здорові та старші за 8 місяців, можуть розмножуватись."/>
 
         <!-- КОЗИ -->
@@ -57,6 +62,14 @@
         <text name="fillType_stallion_black" text="Чорний жеребець"/>
         <text name="fillType_stallion_seal_brown" text="Темно-коричневий жеребець"/>
         <text name="fillType_stallion_dun" text="Мишастий жеребець"/>
+        <text name="fillType_alpaca_white" text="White Alpaca"/>
+        <text name="fillType_alpaca_white_male" text="White Alpaca Male"/>
+        <text name="fillType_alpaca_brown" text="Brown Alpaca"/>
+        <text name="fillType_alpaca_brown_male" text="Brown Alpaca Male"/>
+        <text name="fillType_alpaca_grey" text="Grey Alpaca"/>
+        <text name="fillType_alpaca_grey_male" text="Grey Alpaca Male"/>
+        <text name="fillType_alpaca_fawn" text="Fawn Alpaca"/>
+        <text name="fillType_alpaca_fawn_male" text="Fawn Alpaca Male"/>
         <text name="animal_descriptionStallionFeed" text="Жеребці їдять сіно, овес і сорго."/>
         <text name="animal_descriptionStallionProfit" text="Жеребців можна продавати з прибутком."/>
         <text name="animal_descriptionStallionReproduction" text="Жеребці, які здорові та старші за 36 місяців, можуть розмножуватись."/>
@@ -115,6 +128,7 @@
         <text name="rl_ui_year" text="рік"/>
         <text name="rl_ui_milk" text="Виробництво молока"/>
         <text name="rl_ui_wool" text="Виробництво вовни"/>
+        <text name="rl_ui_fleece" text="Fleece production"/>
         <text name="rl_ui_eggs" text="Виробництво яєць"/>
         <text name="rl_ui_metabolism" text="Метаболізм"/>
         <text name="rl_ui_meat" text="Якість м’яса"/>

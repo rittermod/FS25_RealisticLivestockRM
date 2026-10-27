@@ -11,10 +11,10 @@
 -- consumer toggles the registry off an entry with no decoding.
 --
 -- Age ranges MIRROR the sale generator so the displayed band equals what the dealer sells: a
--- store-bearing stage spans `[minAge, nextRawVisual.minAge - 1]`, the LAST raw visual extends
--- to `animalType.maxBuyAge` (60 when a bridge type ships none), a store-less visual is a
--- BOUNDARY that emits nothing, and a stage whose upper bound falls below its `minAge` is
--- DROPPED rather than clamped - which also collapses a duplicate `minAge`.
+-- store-bearing stage spans `[minAge, nextGreaterMinAge - 1]`, or up to `animalType.maxBuyAge`
+-- (60 when a bridge type ships none) when no later visual is older; a store-less visual is a
+-- BOUNDARY that emits nothing, and at a shared `minAge` only the first store-bearing visual in
+-- the `visuals` order is a stage.
 
 local Log = RmLogging.getLogger("RLRM")
 
@@ -84,30 +84,41 @@ end
 ---@return table[] stage view-models (possibly empty)
 local function buildStages(subType, maxBuyAge, counters)
     -- The boundary array is every numeric-minAge visual, store-bearing or not, ascending - the
-    -- same raw array the generator walks.
+    -- same raw array the generator walks. Equal minAge keeps the visuals array order.
     local ordered = {}
-    for _, visual in ipairs(subType.visuals) do
+    local position = {}
+    for index, visual in ipairs(subType.visuals) do
         if type(visual.minAge) == "number" then
             ordered[#ordered + 1] = visual
+            position[visual] = index
         else
             counters.visualsSkipped = counters.visualsSkipped + 1
             Log:trace("RLDealerSaleCatalog.build: %s dropped a visual with non-numeric minAge (%s)",
                 tostring(subType.name), tostring(visual.minAge))
         end
     end
-    table.sort(ordered, function(a, b) return a.minAge < b.minAge end)
+    table.sort(ordered, function(a, b)
+        if a.minAge ~= b.minAge then return a.minAge < b.minAge end
+        return position[a] < position[b]
+    end)
 
     local stages = {}
+    local stageAtMinAge = {}
     local n = #ordered
     for i = 1, n do
         local visual = ordered[i]
-        if visual.store ~= nil then
+        if visual.store ~= nil and stageAtMinAge[visual.minAge] then
+            Log:trace("RLDealerSaleCatalog.build: %s skipped a later visual at shared minAge %d",
+                tostring(subType.name), visual.minAge)
+        elseif visual.store ~= nil then
+            stageAtMinAge[visual.minAge] = true
             local lo = visual.minAge
-            local hi
-            if i < n then
-                hi = ordered[i + 1].minAge - 1
-            else
-                hi = maxBuyAge
+            local hi = maxBuyAge
+            for j = i + 1, n do
+                if ordered[j].minAge > lo then
+                    hi = ordered[j].minAge - 1
+                    break
+                end
             end
             if hi >= lo then
                 stages[#stages + 1] = {

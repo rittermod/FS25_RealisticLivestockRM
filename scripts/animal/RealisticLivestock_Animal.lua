@@ -134,7 +134,8 @@ function Animal.new(config)
         end
 
 
-        if self.animalTypeIndex == AnimalType.COW or self.animalTypeIndex == AnimalType.SHEEP or self.animalTypeIndex == AnimalType.CHICKEN then
+        if self.animalTypeIndex == AnimalType.COW or self.animalTypeIndex == AnimalType.SHEEP or self.animalTypeIndex == AnimalType.CHICKEN
+            or self.animalTypeIndex == AnimalType.ALPACA then
             local productivityChance = math.random()
 
             if productivityChance < 0.05 then
@@ -148,6 +149,8 @@ function Animal.new(config)
             else
                 self.genetics.productivity = math.random(90, 110) / 100
             end
+            Log:trace("Animal.new: type=%s productivity drawn=%s", tostring(self.animalTypeIndex),
+                tostring(self.genetics.productivity))
         end
 
 
@@ -271,6 +274,8 @@ function Animal.new(config)
     self.dirt = cfg.dirt or 0
     self.fitness = cfg.fitness or 0
     self.riding = cfg.riding or 0
+    self.happiness = cfg.happiness or 0
+    self.fleeceState = cfg.fleeceState or 0
     if name == "" then name = nil end
     local typeModule = self:getTypeModule()
     if name == nil and typeModule ~= nil and typeModule.getDefaultName ~= nil then
@@ -400,6 +405,8 @@ function Animal:clone()
         dirt = self.dirt,
         fitness = self.fitness,
         riding = self.riding,
+        happiness = self.happiness,
+        fleeceState = self.fleeceState,
         farmId = self.farmId,
         weight = self.weight,
         genetics = self.genetics,
@@ -527,12 +534,12 @@ function Animal:getAge()
     return self.age
 end
 
---- The age visual for this animal's own subtype and age, or the type's getVisual hook's choice; nil when none.
+--- The visual for this animal's own subtype, age and fleece, or the type's getVisual hook's choice; nil when none.
 --- @return table|nil visual
 function Animal:getVisual()
     local subTypeIndex = self:getSubTypeIndex()
     local age = self:getAge()
-    local visual = g_currentMission.animalSystem:getVisualByAge(subTypeIndex, age)
+    local visual = g_currentMission.animalSystem:getVisualByAge(subTypeIndex, age, self)
 
     local typeModule = self:getTypeModule()
     if typeModule ~= nil and typeModule.getVisual ~= nil then
@@ -984,9 +991,15 @@ function Animal:showGeneticsInfo(box)
         if typeIndex == AnimalType.SHEEP then box:addLine(g_i18n:getText((self.subType == "GOAT" or self.subType == "RAM_GOAT") and "rl_ui_milk" or "rl_ui_wool"), "rl_ui_genetics_" .. qualityText) end
         if typeIndex == AnimalType.CHICKEN then box:addLine(g_i18n:getText("rl_ui_eggs"),
                 "rl_ui_genetics_" .. qualityText) end
+        if typeIndex == AnimalType.ALPACA then box:addLine(g_i18n:getText("rl_ui_fleece"),
+                "rl_ui_genetics_" .. qualityText) end
+        Log:trace("showGeneticsInfo: uniqueId=%s type=%s productivity row quality=%s", tostring(self.uniqueId),
+            tostring(typeIndex), tostring(qualityText))
     end
 end
 
+--- Genetics rows for the animal info pane; the productivity row is titled by type (milk, wool, fleece or eggs).
+--- @return table texts list of { title, text } rows, empty when the animal has no genetics
 function Animal:addGeneticsInfo()
     local texts = {}
 
@@ -1146,6 +1159,9 @@ function Animal:addGeneticsInfo()
         if self.animalTypeIndex == AnimalType.COW then productivityTitle = g_i18n:getText("rl_ui_milk") end
         if self.animalTypeIndex == AnimalType.SHEEP then productivityTitle = g_i18n:getText((self.subType == "GOAT" or self.subType == "RAM_GOAT") and "rl_ui_milk" or "rl_ui_wool") end
         if self.animalTypeIndex == AnimalType.CHICKEN then productivityTitle = g_i18n:getText("rl_ui_eggs") end
+        if self.animalTypeIndex == AnimalType.ALPACA then productivityTitle = g_i18n:getText("rl_ui_fleece") end
+        Log:trace("addGeneticsInfo: uniqueId=%s type=%s productivity row title=%s", tostring(self.uniqueId),
+            tostring(self.animalTypeIndex), tostring(productivityTitle))
 
         text = {
             title = productivityTitle,
@@ -1636,7 +1652,21 @@ function Animal:calculateRandomMonthlyAnimalDeaths(spec, daysPerPeriod) return A
 --- @return boolean true if this animal is a horse (any subtype: HORSE, STALLION, etc.)
 function Animal:isHorse() return self.animalTypeIndex == AnimalType.HORSE end
 
-function Animal:getHealthChangeFactor(foodFactor) return AnimalHorse.getHealthChangeFactor(self, foodFactor) end
+--- The health change factor: the type's health hook when it answers (an alpaca with fleece data), else the horse's.
+--- @param foodFactor number food factor, 0-1
+--- @return number factor
+function Animal:getHealthChangeFactor(foodFactor)
+    local typeModule = self:getTypeModule()
+    if typeModule ~= nil and typeModule.getHealthFoodFactor ~= nil then
+        local factor = typeModule.getHealthFoodFactor(self, foodFactor)
+        if factor ~= nil then
+            Log:trace("Animal:getHealthChangeFactor: the type's health hook (farmId=%s uniqueId=%s) -> %s",
+                tostring(self.farmId), tostring(self.uniqueId), tostring(factor))
+            return factor
+        end
+    end
+    return AnimalHorse.getHealthChangeFactor(self, foodFactor)
+end
 
 function Animal:getFitnessFactor() return AnimalHorse.getFitnessFactor(self) end
 
@@ -1653,6 +1683,26 @@ function Animal:changeRiding(delta) AnimalHorse.changeRiding(self, delta) end
 function Animal:getDirtFactor() return AnimalHorse.getDirtFactor(self) end
 
 function Animal:changeDirt(delta) AnimalHorse.changeDirt(self, delta) end
+
+-- ##################################
+--             ALPACAS
+-- (implementations in AnimalAlpaca.lua)
+-- ##################################
+
+--- @return number factor happiness as 0-1
+function Animal:getHappinessFactor() return AnimalAlpaca.getHappinessFactor(self) end
+
+--- @param delta number happiness points to add, clamped to 0-100
+function Animal:changeHappiness(delta) AnimalAlpaca.changeHappiness(self, delta) end
+
+--- @return number fleeceState the stored fleece state, 0-100
+function Animal:getFleeceState() return AnimalAlpaca.getFleeceState(self) end
+
+--- @param delta number fleece points to add, clamped to 0-100
+function Animal:changeFleeceState(delta) AnimalAlpaca.changeFleeceState(self, delta) end
+
+--- @return number|nil dailyHikingTime the subtype's daily hiking time in milliseconds
+function Animal:getDailyHikingTime() return AnimalAlpaca.getDailyHikingTime(self) end
 
 --- A worker method's answer through the type's hook of that name: true only when the hook answers true.
 --- @param animal table Animal instance
@@ -1687,7 +1737,7 @@ function Animal:getNeedsGrooming() return workerAnswer(self, "getNeedsGrooming")
 --- @return boolean applied true when the grooming task groomed this animal
 function Animal:applyGrooming() return workerAnswer(self, "applyGrooming") end
 
---- The sale price: the standard livestock formula, or the type's getSellPrice hook after the disease fold.
+--- The sale price: the type's getSellPrice hook after the disease fold, or the standard formula when it answers nil.
 --- @return number price
 function Animal:getSellPrice()
     local subType = self:getSubType()
@@ -1711,9 +1761,14 @@ function Animal:getSellPrice()
 
     local typeModule = self:getTypeModule()
     if typeModule ~= nil and typeModule.getSellPrice ~= nil then
-        Log:trace("Animal:getSellPrice: the type's price hook (farmId=%s uniqueId=%s)", tostring(self.farmId),
-            tostring(self.uniqueId))
-        return typeModule.getSellPrice(self, sellPrice, meatFactor, weightFactor)
+        local hooked = typeModule.getSellPrice(self, sellPrice, meatFactor, weightFactor)
+        if hooked ~= nil then
+            Log:trace("Animal:getSellPrice: the type's price hook (farmId=%s uniqueId=%s)", tostring(self.farmId),
+                tostring(self.uniqueId))
+            return hooked
+        end
+        Log:trace("Animal:getSellPrice: the type's price hook kept the base formula (farmId=%s uniqueId=%s)",
+            tostring(self.farmId), tostring(self.uniqueId))
     end
 
     return math.max(

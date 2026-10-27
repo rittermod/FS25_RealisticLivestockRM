@@ -102,7 +102,7 @@ RLHerdsmanPlanner.OPERATION_TRAITS = {
 --- Herdsman daily wage per animal, keyed by the runtime AnimalType.* index so it matches
 --- `husbandry.animalTypeIndex`. A type absent from the table falls back to DEFAULT_WAGE.
 local DEFAULT_WAGE = 5
-local WAGE_BY_NAME = { COW = 20, SHEEP = 12.5, PIG = 10, HORSE = 25, CHICKEN = 2 }
+local WAGE_BY_NAME = { COW = 20, SHEEP = 12.5, PIG = 10, HORSE = 25, CHICKEN = 2, ALPACA = 12.5 }
 
 --- The daily wage rate for an animalType. The index->wage table is built at RUNTIME, not at module
 --- load: in-game `AnimalType` is not yet populated when this module is sourced, so a load-time build

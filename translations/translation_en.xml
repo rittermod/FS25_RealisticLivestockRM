@@ -44,6 +44,11 @@
         <text name="animal_descriptionRamFeed" text="Rams eat grass and hay."/>
         <text name="animal_descriptionRamYoung" text="This is a male lamb."/>
         <text name="animal_descriptionRamReproduction" text="Rams that are healthy and older than 5 months can reproduce."/>
+        <text name="animal_group_alpacas" text="Alpacas"/>
+        <text name="animal_descriptionAlpacaYoung" text="Young alpacas need hay or grass as well as water but do not produce fleece yet."/>
+        <text name="animal_descriptionAlpacaAdult" text="Adult alpacas need hay or grass as well as water and produce valuable fleece."/>
+        <text name="animal_descriptionAlpacaReproduction" text="Alpacas that are healthy and older than 14 months can reproduce."/>
+        <text name="animal_descriptionAlpacaMaleReproduction" text="Male alpacas that are healthy and older than 24 months can reproduce."/>
         <text name="rl_descriptionSheepReproduction" text="Ewes that are healthy and older than 8 months can reproduce."/>
 
         <!-- GOATS -->
@@ -62,6 +67,14 @@
         <text name="fillType_stallion_black" text="Black Stallion"/>
         <text name="fillType_stallion_seal_brown" text="Seal Brown Stallion"/>
         <text name="fillType_stallion_dun" text="Dun Stallion"/>
+        <text name="fillType_alpaca_white" text="White Alpaca"/>
+        <text name="fillType_alpaca_white_male" text="White Alpaca Male"/>
+        <text name="fillType_alpaca_brown" text="Brown Alpaca"/>
+        <text name="fillType_alpaca_brown_male" text="Brown Alpaca Male"/>
+        <text name="fillType_alpaca_grey" text="Grey Alpaca"/>
+        <text name="fillType_alpaca_grey_male" text="Grey Alpaca Male"/>
+        <text name="fillType_alpaca_fawn" text="Fawn Alpaca"/>
+        <text name="fillType_alpaca_fawn_male" text="Fawn Alpaca Male"/>
         <text name="animal_descriptionStallionFeed" text="Stallions like hay, oat and sorghum."/>
         <text name="animal_descriptionStallionProfit" text="Stallions can be sold for a profit."/>
         <text name="animal_descriptionStallionReproduction" text="Stallions that are healthy and older than 36 months can reproduce."/>
@@ -134,6 +147,7 @@
 
         <text name="rl_ui_milk" text="Milk production"/>
         <text name="rl_ui_wool" text="Wool production"/>
+        <text name="rl_ui_fleece" text="Fleece production"/>
         <text name="rl_ui_eggs" text="Egg production"/>
         <text name="rl_ui_metabolism" text="Metabolism"/>
         <text name="rl_ui_meat" text="Quality"/>

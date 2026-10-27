@@ -25,8 +25,7 @@ RLDealerSaleApply.sessionBaseline = {}
 -- Pure core (data in / data out) - the dual-run unit
 -- =============================================================================
 
---- Fold `registry` over `subTypes`, writing the effective sale-availability onto each
---- overridden visual's `store.canBeBought` and lazily capturing its default into `baseline`.
+--- Fold `registry` onto the first store-bearing visual per overridden `minAge`; capture defaults in `baseline`.
 --- Both are mutated in place; no engine access.
 ---
 --- Phase 1 captures a default only the FIRST time a key is seen, so the snapshot survives
@@ -60,7 +59,7 @@ function RLDealerSaleApply.apply(subTypes, registry, baseline)
                                 rec.subTypeName, rec.minAge, tostring(baseline[rec.subTypeName][rec.minAge]))
                         end
                         matched = true
-                        break  -- minAge is unique per subtype (loader-enforced); first match is the only match
+                        break  -- the first store-bearing visual at a minAge is the stage an override acts on
                     else
                         minAgeSeenButNoStore = true  -- keep scanning; a store-bearing match still wins
                     end
@@ -86,8 +85,13 @@ function RLDealerSaleApply.apply(subTypes, registry, baseline)
     for subTypeName, ages in pairs(baseline) do
         local st = byName[subTypeName]
         if st ~= nil and st.visuals ~= nil then
+            local writtenAtMinAge = {}
             for _, visual in ipairs(st.visuals) do
-                if visual.store ~= nil and ages[visual.minAge] ~= nil then
+                if visual.store ~= nil and ages[visual.minAge] ~= nil and writtenAtMinAge[visual.minAge] then
+                    Log:trace("RLDealerSaleApply.apply: %s@%d skipped a later visual at the shared minAge",
+                        subTypeName, visual.minAge)
+                elseif visual.store ~= nil and ages[visual.minAge] ~= nil then
+                    writtenAtMinAge[visual.minAge] = true
                     local override = registry:get(subTypeName, visual.minAge)
                     visual.store.canBeBought = RLDealerSaleRegistry.effective(override, ages[visual.minAge])
                     written = written + 1

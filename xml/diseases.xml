@@ -115,7 +115,7 @@
 		</model>
 	</disease>
 
-	<disease title="clostridial" animals="SHEEP">
+	<disease title="clostridial" animals="SHEEP ALPACA">
 		<model archetype="infectious" endpoint="recovers" cullRequired="false"
 			incubationTicks="1" r0="0" durationMonths="2" recoveryChancePerMonth="0.75"
 			caseFatality="0.367544" immunityMonths="12" salePrice="0.6">

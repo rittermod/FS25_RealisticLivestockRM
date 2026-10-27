@@ -3,7 +3,8 @@
     The per-type behaviour table: an animal type NAME maps to a hook table that the Animal routing points ask.
     A type with no entry, or an entry without a hook, keeps base behaviour, and a worker method answers false.
     Entries are built on the first lookup, never at file scope, and capture the module functions they name.
-    Load, stream and clone are not hooks: the horse fields load and stream for every type.
+    Load, stream and clone are not hooks: the horse and alpaca fields load, stream and clone for every type.
+    A getSellPrice or getHealthFoodFactor hook returning nil keeps the base value, as getVisual does.
 ]]
 
 RLAnimalTypeModules = {}
@@ -16,7 +17,8 @@ RLAnimalTypeModules.HOOKS = {
     "addInfos",            -- (infos)
     "showHudInfo",         -- (box)
     "onDayChanged",        -- ()
-    "getSellPrice",        -- (sellPrice, meatFactor, weightFactor) -> number
+    "getSellPrice",        -- (sellPrice, meatFactor, weightFactor) -> number|nil, nil keeps the base formula
+    "getHealthFoodFactor", -- (foodFactor) -> number|nil, nil keeps the raw food factor
     "saveFields",          -- (xmlFile, key)
     "addDealerInfos",      -- (infos)
     "getVisual",           -- (visual|nil) -> table|nil, nil keeps the base visual
@@ -50,6 +52,16 @@ local function buildEntries()
             getSupportsGrooming = AnimalHorse.getSupportsGrooming,
             getNeedsGrooming = AnimalHorse.getNeedsGrooming,
             applyGrooming = AnimalHorse.applyGrooming,
+        },
+        ALPACA = {
+            getDefaultName = AnimalAlpaca.getDefaultName,
+            addInfos = AnimalAlpaca.addInfos,
+            showHudInfo = AnimalAlpaca.showHudInfo,
+            onDayChanged = AnimalAlpaca.onDayChanged,
+            getSellPrice = AnimalAlpaca.getSellPrice,
+            getHealthFoodFactor = AnimalAlpaca.getHealthFoodFactor,
+            saveFields = AnimalAlpaca.saveFields,
+            addDealerInfos = AnimalAlpaca.addDealerInfos,
         },
     }
 

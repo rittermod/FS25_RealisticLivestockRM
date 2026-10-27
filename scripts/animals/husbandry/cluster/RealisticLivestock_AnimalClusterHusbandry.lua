@@ -212,7 +212,8 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
         if animal.id ~= nil and animal.idFull ~= nil and animal.id ~= "0-0" and animal.visualAnimalIndex ~= nil then
 
             local age = animal:getAge()
-            local newVisualAnimalIndex = self.animalSystem:getVisualAnimalIndexByAge(animal:getSubTypeIndex(), age == -1 and 0 or age)
+            local newVisual = self.animalSystem:getVisualByAge(animal:getSubTypeIndex(), age == -1 and 0 or age, animal)
+            local newVisualAnimalIndex = newVisual ~= nil and newVisual.visualAnimalIndex or nil
 
             if newVisualAnimalIndex ~= animal.visualAnimalIndex then
                 tempHusbandryId = tonumber(string.sub(animal.id, 1, 1))
@@ -222,6 +223,21 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
                     .. "visual %s -> %s husbandry=%s",
                     tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.visualAnimalIndex),
                     tostring(newVisualAnimalIndex), tostring(tempHusbandryId))
+                -- A fleece re-add keeps the age band: the stored visual and the new one share a minAge.
+                local storedMinAge
+                local subType = self.animalSystem:getSubTypeByIndex(animal:getSubTypeIndex())
+                for _, v in ipairs(subType ~= nil and subType.visuals or {}) do
+                    if v.visualAnimalIndex == animal.visualAnimalIndex then
+                        storedMinAge = v.minAge
+                        break
+                    end
+                end
+                if newVisual ~= nil and storedMinAge == newVisual.minAge then
+                    Log:debug("AnimalClusterHusbandry:updateVisuals: fleece re-add farmId=%s uniqueId=%s "
+                        .. "fleece=%s visual %s -> %s", tostring(animal.farmId), tostring(animal.uniqueId),
+                        tostring(animal.fleeceState), tostring(animal.visualAnimalIndex),
+                        tostring(newVisualAnimalIndex))
+                end
 
                 removeHusbandryAnimal(self.husbandryIds[tempHusbandryId], tempAnimalId)
                 animal:deleteVisual()
@@ -260,7 +276,8 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
 
         age = age == -1 and 0 or age
 
-        local visualAnimalIndex = self.animalSystem:getVisualAnimalIndexByAge(subTypeIndex, age)
+        local visual = self.animalSystem:getVisualByAge(subTypeIndex, age, animal)
+        local visualAnimalIndex = visual ~= nil and visual.visualAnimalIndex or nil
 
 
         if animalId == 0 then
@@ -339,8 +356,7 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
             self.visualAnimalCount = self.visualAnimalCount + 1
             husbandryAnimalCount = husbandryAnimalCount + 1
 
-            local visualData = self.animalSystem:getVisualByAge(subTypeIndex, age)
-            local variations = visualData.visualAnimal.variations
+            local variations = visual.visualAnimal.variations
 
             if #variations >= 1 then
                 local variationIndex = animal.variation

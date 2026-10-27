@@ -107,9 +107,10 @@ source(modDirectory .. "scripts/animal/RLGeneticsDraw.lua")
 -- its re-exported tables at file scope must follow this line.
 source(modDirectory .. "scripts/animal/RLGenetics.lua")
 
--- SECTION 11c: Horse logic and the per-type behaviour table (both sourced before Animal.lua; the table reads
--- AnimalHorse at its first lookup, never at file scope)
+-- SECTION 11c: Horse and alpaca logic and the per-type behaviour table (all sourced before Animal.lua; the table
+-- reads AnimalHorse and AnimalAlpaca at its first lookup, never at file scope)
 source(modDirectory .. "scripts/animal/AnimalHorse.lua")
+source(modDirectory .. "scripts/animal/AnimalAlpaca.lua")
 source(modDirectory .. "scripts/animal/RLAnimalTypeModules.lua")
 
 -- SECTION 11d: Reproduction Logic (delegate module, sourced before Animal.lua)

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!-- Loaded only while the Beans and Alpacas DLC is active. The DLC's own fillTypes.xml loads later and
+     overwrites the four female rows; the male rows are RLRM's alone. -->
+<map>
+	<fillTypes>
+		<fillType name="ALPACA_WHITE" title="$l10n_fillType_alpaca_white" showOnPriceTable="false">
+			<physics massPerLiter="80.0" maxPhysicalSurfaceAngle="0"/>
+			<image hud="$dataS/character/animals/domesticated/alpaca/store_alpacaWhiteAdult.png"/>
+		</fillType>
+		<fillType name="ALPACA_WHITE_MALE" title="$l10n_fillType_alpaca_white_male" showOnPriceTable="false">
+			<physics massPerLiter="150.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="4000"/>
+			<image hud="$dataS/character/animals/domesticated/alpaca/store_alpacaWhiteAdult.png"/>
+		</fillType>
+		<fillType name="ALPACA_BROWN" title="$l10n_fillType_alpaca_brown" showOnPriceTable="false">
+			<physics massPerLiter="80.0" maxPhysicalSurfaceAngle="0"/>
+			<image hud="$dataS/character/animals/domesticated/alpaca/store_alpacaBrownAdult.png"/>
+		</fillType>
+		<fillType name="ALPACA_BROWN_MALE" title="$l10n_fillType_alpaca_brown_male" showOnPriceTable="false">
+			<physics massPerLiter="150.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="4000"/>
+			<image hud="$dataS/character/animals/domesticated/alpaca/store_alpacaBrownAdult.png"/>
+		</fillType>
+		<fillType name="ALPACA_GREY" title="$l10n_fillType_alpaca_grey" showOnPriceTable="false">
+			<physics massPerLiter="80.0" maxPhysicalSurfaceAngle="0"/>
+			<image hud="$dataS/character/animals/domesticated/alpaca/store_alpacaGreyAdult.png"/>
+		</fillType>
+		<fillType name="ALPACA_GREY_MALE" title="$l10n_fillType_alpaca_grey_male" showOnPriceTable="false">
+			<physics massPerLiter="150.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="4000"/>
+			<image hud="$dataS/character/animals/domesticated/alpaca/store_alpacaGreyAdult.png"/>
+		</fillType>
+		<fillType name="ALPACA_FAWN" title="$l10n_fillType_alpaca_fawn" showOnPriceTable="false">
+			<physics massPerLiter="80.0" maxPhysicalSurfaceAngle="0"/>
+			<image hud="$dataS/character/animals/domesticated/alpaca/store_alpacaFawnAdult.png"/>
+		</fillType>
+		<fillType name="ALPACA_FAWN_MALE" title="$l10n_fillType_alpaca_fawn_male" showOnPriceTable="false">
+			<physics massPerLiter="150.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="4000"/>
+			<image hud="$dataS/character/animals/domesticated/alpaca/store_alpacaFawnAdult.png"/>
+		</fillType>
+	</fillTypes>
+	<fillTypeCategories>
+		<fillTypeCategory name="ANIMAL">ALPACA_WHITE_MALE ALPACA_BROWN_MALE ALPACA_GREY_MALE ALPACA_FAWN_MALE</fillTypeCategory>
+	</fillTypeCategories>
+</map>

@@ -44,6 +44,11 @@
         <text name="animal_descriptionRamFeed" text="Pässit syövät ruohoa ja heinää."/>
         <text name="animal_descriptionRamYoung" text="Tämä on urospuolinen karitsa."/>
         <text name="animal_descriptionRamReproduction" text="Terveet, vähintään 5 kuukauden ikäiset pässit voivat lisääntyä."/>
+        <text name="animal_group_alpacas" text="Alpacas"/>
+        <text name="animal_descriptionAlpacaYoung" text="Young alpacas need hay or grass as well as water but do not produce fleece yet."/>
+        <text name="animal_descriptionAlpacaAdult" text="Adult alpacas need hay or grass as well as water and produce valuable fleece."/>
+        <text name="animal_descriptionAlpacaReproduction" text="Alpacas that are healthy and older than 14 months can reproduce."/>
+        <text name="animal_descriptionAlpacaMaleReproduction" text="Male alpacas that are healthy and older than 24 months can reproduce."/>
         <text name="rl_descriptionSheepReproduction" text="Terveet, vähintään 8 kuukauden ikäiset uuhet voivat lisääntyä."/>
 
         <!-- GOATS -->
@@ -62,6 +67,14 @@
         <text name="fillType_stallion_black" text="Musta ori"/>
         <text name="fillType_stallion_seal_brown" text="Tummanruskea ori"/>
         <text name="fillType_stallion_dun" text="Hallakko ori"/>
+        <text name="fillType_alpaca_white" text="White Alpaca"/>
+        <text name="fillType_alpaca_white_male" text="White Alpaca Male"/>
+        <text name="fillType_alpaca_brown" text="Brown Alpaca"/>
+        <text name="fillType_alpaca_brown_male" text="Brown Alpaca Male"/>
+        <text name="fillType_alpaca_grey" text="Grey Alpaca"/>
+        <text name="fillType_alpaca_grey_male" text="Grey Alpaca Male"/>
+        <text name="fillType_alpaca_fawn" text="Fawn Alpaca"/>
+        <text name="fillType_alpaca_fawn_male" text="Fawn Alpaca Male"/>
         <text name="animal_descriptionStallionFeed" text="Orit pitävät heinästä, kaurasta ja durrasta."/>
         <text name="animal_descriptionStallionProfit" text="Orit voidaan myydä voitolla."/>
         <text name="animal_descriptionStallionReproduction" text="Terveet, vähintään 36 kuukauden ikäiset orit voivat lisääntyä."/>
@@ -127,6 +140,7 @@
 
         <text name="rl_ui_milk" text="Maidon tuotto"/>
         <text name="rl_ui_wool" text="Villan tuotto"/>
+        <text name="rl_ui_fleece" text="Fleece production"/>
         <text name="rl_ui_eggs" text="Munien tuotto"/>
         <text name="rl_ui_metabolism" text="Aineenvaihdunta"/>
         <text name="rl_ui_meat" text="Laatu"/>

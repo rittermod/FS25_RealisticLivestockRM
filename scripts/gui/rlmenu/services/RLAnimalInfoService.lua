@@ -365,7 +365,7 @@ function RLAnimalInfoService.getAnimalDisplay(animal, husbandry)
 
     local visual
     if animalSystem ~= nil and subTypeIndex ~= nil and animalSystem.getVisualByAge ~= nil then
-        visual = animalSystem:getVisualByAge(subTypeIndex, age)
+        visual = animalSystem:getVisualByAge(subTypeIndex, age, animal)
     end
 
     local animalImageFilename

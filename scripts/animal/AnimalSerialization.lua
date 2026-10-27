@@ -71,6 +71,8 @@ function AnimalSerialization.writeStream(animal, streamId, connection)
     streamWriteFloat32(streamId, animal.dirt or 0)
     streamWriteFloat32(streamId, animal.fitness or 0)
     streamWriteFloat32(streamId, animal.riding or 0)
+    streamWriteFloat32(streamId, animal.happiness or 0)
+    streamWriteFloat32(streamId, animal.fleeceState or 0)
 
     if animal.isPregnant and animal.pregnancy ~= nil then
         streamWriteBool(streamId, animal.impregnatedBy ~= nil)
@@ -229,6 +231,8 @@ function AnimalSerialization.readStream(animal, streamId, connection)
     animal.dirt = streamReadFloat32(streamId)
     animal.fitness = streamReadFloat32(streamId)
     animal.riding = streamReadFloat32(streamId)
+    animal.happiness = streamReadFloat32(streamId)
+    animal.fleeceState = streamReadFloat32(streamId)
 
     if animal.isPregnant then
         if streamReadBool(streamId) then
