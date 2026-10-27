@@ -479,7 +479,7 @@
 
 
         <text name="rl_ui_immune" text="Иммунитет"/>
-        <text name="rl_ui_vaccinated" text="Вакцинированный"/>
+        <text name="rl_ui_vaccinated" text="Привит"/>
         <text name="rl_ui_vaccinate" text="Вакцинировать"/>
         <text name="rl_ui_vaccinateConfirm" text="Вакцинировать %s против %s? Одна доза стоит %s."/>
         <text name="rl_ui_notVaccinated" text="Не вакцинирован"/>
