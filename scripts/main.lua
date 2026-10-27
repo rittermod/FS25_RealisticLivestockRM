@@ -45,6 +45,8 @@ source(modDirectory .. "scripts/core/RLMapCountry.lua")
 source(modDirectory .. "scripts/animals/husbandry/cluster/RealisticLivestock_AnimalCluster.lua")
 source(modDirectory .. "scripts/animals/husbandry/cluster/RealisticLivestock_AnimalClusterHusbandry.lua")
 source(modDirectory .. "scripts/animals/husbandry/cluster/RealisticLivestock_AnimalClusterSystem.lua")
+source(modDirectory .. "scripts/animals/husbandry/cluster/RLVisualAddons.lua")
+addModEventListener(RLVisualAddons)
 source(modDirectory .. "scripts/animals/husbandry/cluster/VisualAnimal.lua")
 
 -- SECTION 4: Animal Husbandry - Placeables

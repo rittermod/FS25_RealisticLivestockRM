@@ -46,6 +46,7 @@ function VisualAnimal.new(animal, husbandryId, animalId)
 end
 
 
+--- Delete the ear-tag text nodes, then any add-ons the runtime attach linked onto the animal.
 function VisualAnimal:delete()
 
 	for _, nodeType in pairs(self.texts) do
@@ -58,22 +59,43 @@ function VisualAnimal:delete()
 
 	end
 
+	if self.attachedNodes ~= nil then
+		Log:trace("VisualAnimal:delete: farmId=%s uniqueId=%s detaching runtime add-ons",
+			tostring(self.animal.farmId), tostring(self.animal.uniqueId))
+		RLVisualAddons.detach(self.attachedNodes, self.animal.farmId, self.animal.uniqueId)
+		self.attachedNodes = nil
+	end
+
 end
 
 
+--- Resolve the add-on nodes (baked node paths, or the runtime attach for a listed base model) and apply their state.
 function VisualAnimal:load()
 
 	local nodes = self.nodes
-	if nodes.root == nil or nodes.root == 0 then return end
+	if nodes.root == nil or nodes.root == 0 then
+		Log:trace("VisualAnimal:load: farmId=%s uniqueId=%s has no root node - skipped",
+			tostring(self.animal.farmId), tostring(self.animal.uniqueId))
+		return
+	end
 
 	local visualData = g_currentMission.animalSystem:getVisualByAge(self.animal.subTypeIndex, self.animal.age, self.animal)
+	local spec, modelKey = RLVisualAddons.getModelSpec(visualData)
 
-	if visualData.monitor ~= nil then nodes.monitor = safeIndexToObject(nodes.root, visualData.monitor) end
-	if visualData.noseRing ~= nil then nodes.noseRing = safeIndexToObject(nodes.root, visualData.noseRing) end
-	if visualData.bumId ~= nil then nodes.bumId = safeIndexToObject(nodes.root, visualData.bumId) end
-	if visualData.marker ~= nil then nodes.marker = safeIndexToObject(nodes.root, visualData.marker) end
-	if visualData.earTagLeft ~= nil then nodes.earTagLeft = safeIndexToObject(nodes.root, visualData.earTagLeft) end
-	if visualData.earTagRight ~= nil then nodes.earTagRight = safeIndexToObject(nodes.root, visualData.earTagRight) end
+	if spec ~= nil then
+		Log:trace("VisualAnimal:load: farmId=%s uniqueId=%s runtime attach for model %s",
+			tostring(self.animal.farmId), tostring(self.animal.uniqueId), modelKey)
+		self.attachedNodes = RLVisualAddons.attach(nodes.root, spec, modelKey, self.animal.farmId,
+			self.animal.uniqueId)
+		for key, node in pairs(self.attachedNodes) do nodes[key] = node end
+	else
+		if visualData.monitor ~= nil then nodes.monitor = safeIndexToObject(nodes.root, visualData.monitor) end
+		if visualData.noseRing ~= nil then nodes.noseRing = safeIndexToObject(nodes.root, visualData.noseRing) end
+		if visualData.bumId ~= nil then nodes.bumId = safeIndexToObject(nodes.root, visualData.bumId) end
+		if visualData.marker ~= nil then nodes.marker = safeIndexToObject(nodes.root, visualData.marker) end
+		if visualData.earTagLeft ~= nil then nodes.earTagLeft = safeIndexToObject(nodes.root, visualData.earTagLeft) end
+		if visualData.earTagRight ~= nil then nodes.earTagRight = safeIndexToObject(nodes.root, visualData.earTagRight) end
+	end
 
 	self:setMonitor()
 	self:setNoseRing()

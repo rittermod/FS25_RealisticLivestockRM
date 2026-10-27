@@ -169,7 +169,11 @@ AnimalSystem.BREED_TO_MARKER_COLOUR = {
     ["HEREFORD"] = { 0, 0, 1 },
     ["WATER_BUFFALO"] = { 1, 1, 1 },
     ["HIGHLAND"] = { 0.6, 0.3, 0.1 },
-    ["BRAHMAN"] = { 0.8, 0.8, 0.8 }
+    ["BRAHMAN"] = { 0.8, 0.8, 0.8 },
+    ["WHITE"] = { 0, 0, 1 },
+    ["BROWN"] = { 0, 0, 1 },
+    ["GREY"] = { 0, 0, 1 },
+    ["FAWN"] = { 0, 0, 1 }
 }
 
 
