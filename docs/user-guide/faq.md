@@ -267,7 +267,7 @@ The **Diseases** setting decides how often animals fall ill in the first place. 
 
 Alpacas come with the **Beans and Alpacas** DLC. Without the DLC active, Realistic Livestock adds no alpacas on any map.
 
-With the DLC, Realistic Livestock adds a male for each of the four coat colours, because a female needs a male in the pen to get pregnant (an AI straw works too). Males count toward the alpaca shed's limit of 16 animals, so leave room for one. Alpacas can be led and sheared from 14 months.
+With the DLC, Realistic Livestock adds a male for each of the four coat colours, because a female needs a male in the pen to get pregnant (an AI straw works too). Males count toward the alpaca shed's limit of 16 animals, so leave room for one.
 
 Every alpaca, male or female, carries **happiness** and **fleece**, shown on the animal's info page, its HUD box and the dealer card:
 
@@ -275,7 +275,9 @@ Every alpaca, male or female, carries **happiness** and **fleece**, shown on the
 - **Happiness** drops a little every day. A happier alpaca sells for more, keeps its health up better and grows its fleece faster.
 - Alpacas from the dealer arrive sheared, at no happiness and no fleece.
 
-Leading an alpaca (which raises its happiness) and shearing it (which harvests its fleece) are not handled by Realistic Livestock yet.
+The **animal worker** shears woolly alpacas once a year and leads them every day, which raises their happiness. A sheared alpaca's fleece scales with its fleece genetics. The fleece fills a pallet only in a shed with a fleece pallet (the DLC's alpaca shed); in any other pen the alpacas are still sheared, but the fleece is not collected.
+
+From 14 months an alpaca can be **led out of the shed on the leash** and back again. Walking it raises its happiness. A woolly alpaca led into the alpaca shed can be **sheared by hand**, and its fleece fills the shed's fleece pallet.
 
 ---
 

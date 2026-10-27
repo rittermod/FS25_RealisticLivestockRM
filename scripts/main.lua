@@ -283,11 +283,13 @@ source(modDirectory .. "scripts/placeables/RealisticLivestock_PlaceableSystem.lu
 -- SECTION 18: Player
 source(modDirectory .. "scripts/player/RealisticLivestock_PlayerHUDUpdater.lua")
 source(modDirectory .. "scripts/animal/RLRideableClusterStream.lua")
+source(modDirectory .. "scripts/animal/RLLedAlpacaStream.lua")
 source(modDirectory .. "scripts/player/RealisticLivestock_PlayerInputComponent.lua")
 
 -- SECTION 19: Vehicles
 source(modDirectory .. "scripts/vehicles/specializations/RealisticLivestock_LivestockTrailer.lua")
 source(modDirectory .. "scripts/vehicles/specializations/Rideable.lua")
+source(modDirectory .. "scripts/vehicles/specializations/RLLedAlpacaHooks.lua")
 
 -- SECTION 20b: Insemination (dewar/straw infrastructure)
 source(modDirectory .. "scripts/insemination/AIStrawUpdater.lua")

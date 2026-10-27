@@ -324,6 +324,10 @@ function RealisticLivestock_AnimalSystem:loadMapData(_, mapXml, mission, baseDir
     Log:trace("loadMapData: saved colours applied (result=%s); a type a later loadAnimals call creates gets its own",
         tostring(coloursResult))
 
+    -- Every mod is sourced and no savegame vehicle has loaded yet: the led-alpaca hooks go in now.
+    Log:trace("loadMapData: installing the led-alpaca hooks")
+    RLLedAlpacaHooks.install()
+
 	return #self.types > 0
 
 end

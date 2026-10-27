@@ -111,6 +111,9 @@ end
 ---@param animal table The animal being looked at.
 function RealisticLivestock_PlayerHUDUpdater:showAnimalInfo(animal)
 
+    -- An MP client's led alpaca is the DLC's own cluster, not an RLRM Animal: leave it to the DLC's rows
+    if animal == nil or animal.isIndividual ~= true then return end
+
     if self.monitorBox == nil then self.monitorBox = g_currentMission.hud.infoDisplay:createBox(InfoDisplayKeyValueBox) end
 
     if animal.monitor.active or animal.monitor.removed then

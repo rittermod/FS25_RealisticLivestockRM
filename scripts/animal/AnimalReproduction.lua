@@ -27,7 +27,21 @@ local function sortChildSellPrices(a, b)
 end
 
 
---- Resolve pending insemination: attempt pregnancy from stored semen, broadcast result.
+--- Broadcast an insemination result for a pen animal; a detached animal has no pen to name.
+--- @param animal table Animal instance
+--- @param success boolean whether the insemination took
+--- @return nil
+local function broadcastInseminationResult(animal, success)
+    if animal.clusterSystem == nil then
+        Log:trace("resolveInsemination: animal=%s detached, no result broadcast (success=%s)",
+            tostring(animal.uniqueId), tostring(success))
+        return
+    end
+    g_server:broadcastEvent(AnimalInseminationResultEvent.new(animal.clusterSystem.owner, animal, success))
+end
+
+
+--- Resolve pending insemination: attempt pregnancy from stored semen, broadcast the result for a pen animal.
 --- Always clears animal.insemination regardless of success/fail.
 --- @param animal table Animal instance
 --- @param month number Current month
@@ -37,6 +51,8 @@ local function resolveInsemination(animal, month, year)
     local insemination = animal.insemination
 
     if insemination == nil or g_server == nil then
+        Log:trace("resolveInsemination: animal=%s nothing to resolve (insemination=%s, server=%s)",
+            tostring(animal.uniqueId), tostring(insemination ~= nil), tostring(g_server ~= nil))
         animal.insemination = nil
         return
     end
@@ -52,8 +68,7 @@ local function resolveInsemination(animal, month, year)
         and math.random() <= insemination.success * (math.random(80, 120) / 100)
     then
         animal:addMessage("INSEMINATION_SUCCESS")
-        g_server:broadcastEvent(AnimalInseminationResultEvent.new(
-            animal.clusterSystem.owner, animal, true))
+        broadcastInseminationResult(animal, true)
 
         animal:createPregnancy(childNum, month, year, {
             ["uniqueId"] = string.format("%s %s %s",
@@ -69,8 +84,7 @@ local function resolveInsemination(animal, month, year)
         Log:trace("  insemination success, pregnancy created (fertility=%s)", tostring(fertility))
     else
         animal:addMessage("INSEMINATION_FAIL")
-        g_server:broadcastEvent(AnimalInseminationResultEvent.new(
-            animal.clusterSystem.owner, animal, false))
+        broadcastInseminationResult(animal, false)
 
         Log:trace("  insemination failed (childNum=%d, fertility=%s)", childNum, tostring(fertility))
     end

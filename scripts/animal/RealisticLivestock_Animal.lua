@@ -1704,6 +1704,15 @@ function Animal:changeFleeceState(delta) AnimalAlpaca.changeFleeceState(self, de
 --- @return number|nil dailyHikingTime the subtype's daily hiking time in milliseconds
 function Animal:getDailyHikingTime() return AnimalAlpaca.getDailyHikingTime(self) end
 
+--- @return boolean canBeLed true when the leash may lead this animal (an alpaca old enough)
+function Animal:getCanBeLed() return AnimalAlpaca.getCanBeLed(self) end
+
+--- @return string|nil filename the led-alpaca vehicle file, nil for every animal the leash ignores
+function Animal:getLeashableFilename() return AnimalAlpaca.getLeashableFilename(self) end
+
+--- @return number timePerPoint walking milliseconds per happiness point, 0 without hiking data
+function Animal:getHikingTimePerHappinessPoint() return AnimalAlpaca.getHikingTimePerHappinessPoint(self) end
+
 --- A worker method's answer through the type's hook of that name: true only when the hook answers true.
 --- @param animal table Animal instance
 --- @param hookName string the worker method's name
@@ -1719,13 +1728,13 @@ local function workerAnswer(animal, hookName)
     return hook(animal) == true
 end
 
---- @return boolean supported true when the animal worker's riding task can exercise this animal
+--- @return boolean supported true when the animal worker's riding or leading task can exercise this animal
 function Animal:getSupportsExercise() return workerAnswer(self, "getSupportsExercise") end
 
---- @return boolean needed true when the riding task has work on this animal
+--- @return boolean needed true when the riding or leading task has work on this animal
 function Animal:getNeedsExercise() return workerAnswer(self, "getNeedsExercise") end
 
---- @return boolean applied true when the riding task exercised this animal
+--- @return boolean applied true when the riding or leading task exercised this animal
 function Animal:applyExercise() return workerAnswer(self, "applyExercise") end
 
 --- @return boolean supported true when the animal worker's grooming task can groom this animal
@@ -1736,6 +1745,18 @@ function Animal:getNeedsGrooming() return workerAnswer(self, "getNeedsGrooming")
 
 --- @return boolean applied true when the grooming task groomed this animal
 function Animal:applyGrooming() return workerAnswer(self, "applyGrooming") end
+
+--- @return boolean supported true when the animal worker's shearing task can shear this animal
+function Animal:getSupportsShearing() return workerAnswer(self, "getSupportsShearing") end
+
+--- @return boolean canBeSheared true when the shearing task has work on this animal
+function Animal:getCanBeSheared() return workerAnswer(self, "getCanBeSheared") end
+
+--- @return number amount the fleece a shearing yields from this animal, 0 without fleece data
+function Animal:getFleeceAmount() return AnimalAlpaca.getFleeceAmount(self) end
+
+--- @param state number the fleece state to set, clamped to 0-100
+function Animal:setFleeceState(state) AnimalAlpaca.setFleeceState(self, state) end
 
 --- The sale price: the type's getSellPrice hook after the disease fold, or the standard formula when it answers nil.
 --- @return number price

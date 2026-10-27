@@ -22,12 +22,14 @@ RLAnimalTypeModules.HOOKS = {
     "saveFields",          -- (xmlFile, key)
     "addDealerInfos",      -- (infos)
     "getVisual",           -- (visual|nil) -> table|nil, nil keeps the base visual
-    "getSupportsExercise", -- () -> boolean, as are the five below
+    "getSupportsExercise", -- () -> boolean, as are the seven below
     "getNeedsExercise",
     "applyExercise",
     "getSupportsGrooming",
     "getNeedsGrooming",
     "applyGrooming",
+    "getSupportsShearing",
+    "getCanBeSheared",
 }
 
 --- The built entries, keyed by type name; nil until the first get.
@@ -62,6 +64,11 @@ local function buildEntries()
             getHealthFoodFactor = AnimalAlpaca.getHealthFoodFactor,
             saveFields = AnimalAlpaca.saveFields,
             addDealerInfos = AnimalAlpaca.addDealerInfos,
+            getSupportsExercise = AnimalAlpaca.getSupportsExercise,
+            getNeedsExercise = AnimalAlpaca.getNeedsExercise,
+            applyExercise = AnimalAlpaca.applyExercise,
+            getSupportsShearing = AnimalAlpaca.getSupportsShearing,
+            getCanBeSheared = AnimalAlpaca.getCanBeSheared,
         },
     }
 

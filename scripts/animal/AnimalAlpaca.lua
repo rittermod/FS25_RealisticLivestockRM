@@ -2,7 +2,8 @@
     AnimalAlpaca.lua
     Alpaca behaviour, reached through the ALPACA entry of RLAnimalTypeModules: the name at creation, and for an
     alpaca whose subtype carries fleece data, happiness and fleece (the daily step, the price and health effects,
-    the info, HUD and dealer rows, the save). Without fleece data every hook keeps the base behaviour.
+    the info, HUD and dealer rows, the save), the animal worker's shearing and leading answers and the leash's
+    answers. Without fleece data every hook keeps the base behaviour.
     RLAnimalTypeModules reads this module at its first lookup, never at file scope.
 ]]
 
@@ -23,6 +24,19 @@ local function clampPercent(value)
     if value <= 0 then return 0 end
     if value >= 100 then return 100 end
     return value
+end
+
+
+--- Whether the animal's current visual sets the named flag; false when it has no visual.
+--- @param animal table Animal instance
+--- @param flag string visual field name
+--- @return boolean set
+local function visualFlag(animal, flag)
+    local visual = animal:getVisual()
+    local set = visual ~= nil and visual[flag] == true
+    Log:trace("AnimalAlpaca: farmId=%s uniqueId=%s visual %s=%s", tostring(animal.farmId), tostring(animal.uniqueId),
+        flag, visual ~= nil and tostring(visual[flag]) or "(no visual)")
+    return set
 end
 
 
@@ -146,7 +160,7 @@ function AnimalAlpaca.changeHappiness(animal, delta)
     end
     animal:setDirty()
     animal.happiness = after
-    Log:debug("AnimalAlpaca.changeHappiness: farmId=%s uniqueId=%s %s -> %s", tostring(animal.farmId),
+    Log:trace("AnimalAlpaca.changeHappiness: farmId=%s uniqueId=%s %s -> %s", tostring(animal.farmId),
         tostring(animal.uniqueId), tostring(before), tostring(after))
 end
 
@@ -183,6 +197,183 @@ end
 function AnimalAlpaca.getDailyHikingTime(animal)
     local subType = animal:getSubType()
     return subType ~= nil and subType.dailyHikingTime or nil
+end
+
+
+-- =============================================================================
+-- LEADING (the leash and the led alpaca)
+-- =============================================================================
+
+--- Whether the leash may lead this alpaca: its current visual can be led.
+--- @param animal table Animal instance
+--- @return boolean canBeLed
+function AnimalAlpaca.getCanBeLed(animal)
+    if not AnimalAlpaca.hasState(animal) then
+        Log:trace("AnimalAlpaca.getCanBeLed: farmId=%s uniqueId=%s no fleece data -> false", tostring(animal.farmId),
+            tostring(animal.uniqueId))
+        return false
+    end
+    return visualFlag(animal, "canBeLed")
+end
+
+
+--- The led-alpaca vehicle file for this alpaca's subtype, or nil when it has none.
+--- @param animal table Animal instance
+--- @return string|nil filename
+function AnimalAlpaca.getLeashableFilename(animal)
+    if not AnimalAlpaca.hasState(animal) then
+        Log:trace("AnimalAlpaca.getLeashableFilename: farmId=%s uniqueId=%s no fleece data -> nil",
+            tostring(animal.farmId), tostring(animal.uniqueId))
+        return nil
+    end
+    local filename = animal:getSubType().leadingFilename
+    Log:trace("AnimalAlpaca.getLeashableFilename: farmId=%s uniqueId=%s -> %s", tostring(animal.farmId),
+        tostring(animal.uniqueId), tostring(filename))
+    return filename
+end
+
+
+--- The walking time, in milliseconds, that earns one happiness point: the daily hiking time over 100, else 0.
+--- @param animal table Animal instance
+--- @return number timePerPoint 0 without hiking data
+function AnimalAlpaca.getHikingTimePerHappinessPoint(animal)
+    if not AnimalAlpaca.hasState(animal) then
+        Log:trace("AnimalAlpaca.getHikingTimePerHappinessPoint: farmId=%s uniqueId=%s no fleece data -> 0",
+            tostring(animal.farmId), tostring(animal.uniqueId))
+        return 0
+    end
+    local hikingTime = animal:getDailyHikingTime()
+    if hikingTime == nil or not (hikingTime > 0) then
+        Log:trace("AnimalAlpaca.getHikingTimePerHappinessPoint: farmId=%s uniqueId=%s hiking time %s -> 0",
+            tostring(animal.farmId), tostring(animal.uniqueId), tostring(hikingTime))
+        return 0
+    end
+    local timePerPoint = hikingTime / 100
+    Log:trace("AnimalAlpaca.getHikingTimePerHappinessPoint: farmId=%s uniqueId=%s hiking time %s -> %s",
+        tostring(animal.farmId), tostring(animal.uniqueId), tostring(hikingTime), tostring(timePerPoint))
+    return timePerPoint
+end
+
+
+-- =============================================================================
+-- ANIMAL WORKER (the shearing and leading tasks)
+-- =============================================================================
+
+--- Whether the shearing task can shear this alpaca at all: its visual supports shearing.
+--- @param animal table Animal instance
+--- @return boolean supported
+function AnimalAlpaca.getSupportsShearing(animal)
+    if not AnimalAlpaca.hasState(animal) then
+        Log:trace("AnimalAlpaca.getSupportsShearing: farmId=%s uniqueId=%s no fleece data -> false",
+            tostring(animal.farmId), tostring(animal.uniqueId))
+        return false
+    end
+    return visualFlag(animal, "supportsShearing")
+end
+
+
+--- Whether the shearing task has work on this alpaca: its visual is the woolly one.
+--- @param animal table Animal instance
+--- @return boolean canBeSheared
+function AnimalAlpaca.getCanBeSheared(animal)
+    if not AnimalAlpaca.hasState(animal) then
+        Log:trace("AnimalAlpaca.getCanBeSheared: farmId=%s uniqueId=%s no fleece data -> false",
+            tostring(animal.farmId), tostring(animal.uniqueId))
+        return false
+    end
+    return visualFlag(animal, "canBeSheared")
+end
+
+
+--- The fleece a shearing yields: the subtype's amount for the age, times fleece / 100, times productivity.
+--- @param animal table Animal instance
+--- @return number amount litres, 0 without fleece data
+function AnimalAlpaca.getFleeceAmount(animal)
+    if not AnimalAlpaca.hasState(animal) then
+        Log:trace("AnimalAlpaca.getFleeceAmount: farmId=%s uniqueId=%s no fleece data -> 0", tostring(animal.farmId),
+            tostring(animal.uniqueId))
+        return 0
+    end
+    local subType = animal:getSubType()
+    local forAge = subType.maxFleeceForAge or 0
+    if subType.fleeceAmountCurve ~= nil then
+        forAge = subType.fleeceAmountCurve:get(animal:getAge())
+    end
+    local productivity = animal.genetics ~= nil and animal.genetics.productivity or 1
+    local amount = animal.fleeceState / 100 * forAge * productivity
+    Log:trace("AnimalAlpaca.getFleeceAmount: farmId=%s uniqueId=%s forAge=%s fleece=%s productivity=%s -> %s",
+        tostring(animal.farmId), tostring(animal.uniqueId), tostring(forAge), tostring(animal.fleeceState),
+        tostring(productivity), tostring(amount))
+    return amount
+end
+
+
+--- Set the fleece state, clamped to 0-100, never floored; flags the animal before a moving write.
+--- @param animal table Animal instance
+--- @param state number the new fleece state
+function AnimalAlpaca.setFleeceState(animal, state)
+    if not AnimalAlpaca.hasState(animal) then
+        Log:trace("AnimalAlpaca.setFleeceState: farmId=%s uniqueId=%s no fleece data, nothing written",
+            tostring(animal.farmId), tostring(animal.uniqueId))
+        return
+    end
+    local before = animal.fleeceState
+    local after = clampPercent(state)
+    if after == before then
+        Log:trace("AnimalAlpaca.setFleeceState: farmId=%s uniqueId=%s already %s", tostring(animal.farmId),
+            tostring(animal.uniqueId), tostring(before))
+        return
+    end
+    -- The flag leads the write. Accepted trade: a raise in setDirty (a nil owner or another mod's override) writes
+    -- nothing and ends the worker's run before it bills or adds the fleece, so alpacas already sheared lose theirs.
+    animal:setDirty()
+    animal.fleeceState = after
+    Log:debug("AnimalAlpaca.setFleeceState: farmId=%s uniqueId=%s fleece %s -> %s", tostring(animal.farmId),
+        tostring(animal.uniqueId), tostring(before), tostring(after))
+end
+
+
+--- Whether the leading task can lead this alpaca: its visual can be led.
+--- @param animal table Animal instance
+--- @return boolean supported
+function AnimalAlpaca.getSupportsExercise(animal)
+    if not AnimalAlpaca.hasState(animal) then
+        Log:trace("AnimalAlpaca.getSupportsExercise: farmId=%s uniqueId=%s no fleece data -> false",
+            tostring(animal.farmId), tostring(animal.uniqueId))
+        return false
+    end
+    return visualFlag(animal, "canBeLed")
+end
+
+
+--- Whether the leading task has work on this alpaca: supported and happiness below 100.
+--- @param animal table Animal instance
+--- @return boolean needed
+function AnimalAlpaca.getNeedsExercise(animal)
+    local needed = animal:getSupportsExercise() and animal.happiness < 100
+    Log:trace("AnimalAlpaca.getNeedsExercise: farmId=%s uniqueId=%s happiness=%s -> %s", tostring(animal.farmId),
+        tostring(animal.uniqueId), tostring(animal.happiness), tostring(needed))
+    return needed
+end
+
+
+--- Lead the alpaca for the leading task: happiness to 100 when needed.
+--- @param animal table Animal instance
+--- @return boolean applied true when the alpaca was led
+function AnimalAlpaca.applyExercise(animal)
+    if not animal:getNeedsExercise() then
+        Log:trace("AnimalAlpaca.applyExercise: farmId=%s uniqueId=%s not needed", tostring(animal.farmId),
+            tostring(animal.uniqueId))
+        return false
+    end
+    local before = animal.happiness
+    -- The flag leads the write. Accepted trade: a raise in setDirty (a nil owner or another mod's override) writes
+    -- nothing and ends the worker's run before it bills, so the alpacas that run already led go unbilled.
+    animal:setDirty()
+    animal.happiness = 100
+    Log:debug("AnimalAlpaca.applyExercise: farmId=%s uniqueId=%s happiness %s -> 100", tostring(animal.farmId),
+        tostring(animal.uniqueId), tostring(before))
+    return true
 end
 
 
