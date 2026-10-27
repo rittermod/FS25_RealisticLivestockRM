@@ -1,6 +1,8 @@
 RealisticLivestock_AnimalItemStock = {}
 local mt = Class(AnimalItemStock)
 
+local Log = RmLogging.getLogger("RLRM")
+
 function RealisticLivestock_AnimalItemStock:getClusterId(_)
     return RLAnimalUtil.resolveClusterId(self.cluster)
 end
@@ -8,6 +10,9 @@ end
 AnimalItemStock.getClusterId = Utils.overwrittenFunction(AnimalItemStock.getClusterId, RealisticLivestock_AnimalItemStock.getClusterId)
 
 
+--- A dealer item stock for one animal: its visual, title, price and info rows (the type's rows last).
+--- @param animal table Animal instance
+--- @return table itemStock
 function RealisticLivestock_AnimalItemStock.new(animal)
 
     local self = setmetatable({}, mt)
@@ -133,13 +138,11 @@ function RealisticLivestock_AnimalItemStock.new(animal)
 
 	end
 
-	if animal.animalTypeIndex == AnimalType.HORSE then
-
-		table.insert(self.infos, { ["title"] = g_i18n:getText("ui_horseFitness"), ["value"] = string.format("%.f%%", animal:getFitnessFactor() * 100) })
-		table.insert(self.infos, { ["title"] = g_i18n:getText("ui_horseDailyRiding"), ["value"] = string.format("%.f%%", animal:getRidingFactor() * 100) })
-	
-		if Platform.gameplay.needHorseCleaning then table.insert(self.infos, { ["title"] = g_i18n:getText("statistic_cleanliness"), ["value"] = string.format("%.f%%", (1 - animal:getDirtFactor()) * 100) }) end
-
+	local typeModule = animal:getTypeModule()
+	if typeModule ~= nil and typeModule.addDealerInfos ~= nil then
+		Log:trace("AnimalItemStock.new: the type's dealer rows (farmId=%s uniqueId=%s)", tostring(animal.farmId),
+			tostring(animal.uniqueId))
+		typeModule.addDealerInfos(animal, self.infos)
 	end
 	
 	return self

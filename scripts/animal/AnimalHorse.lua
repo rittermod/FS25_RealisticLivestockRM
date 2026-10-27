@@ -1,8 +1,10 @@
 --[[
     AnimalHorse.lua
     Horse riding, fitness, dirt, sell price, info display, HUD display and XML
-    save. Animal.lua holds one-liner delegates that route here, and must be
-    sourced AFTER this module.
+    save. The field accessors are reached through one-liner delegates in
+    Animal.lua; the per-type behaviour (name, info rows, HUD, daily update,
+    sell price, save, dealer rows, worker tasks) through the HORSE entry of
+    RLAnimalTypeModules. Animal.lua must be sourced AFTER this module.
 
     Serialization and XML load stay in Animal.lua: dirt/fitness/riding are
     initialized in the constructor and serialized unconditionally for ALL animal
@@ -101,11 +103,11 @@ end
 -- ANIMAL WORKER (the hired worker's riding and grooming tasks)
 -- =============================================================================
 
---- Whether the riding task can exercise this animal: a horse whose subtype has a rideable.
+--- Whether the riding task can exercise this horse: its subtype has a rideable.
 --- @param animal table Animal instance
 --- @return boolean supported
 function AnimalHorse.getSupportsExercise(animal)
-    local supported = animal:isHorse() and animal:getRidableFilename() ~= nil
+    local supported = animal:getRidableFilename() ~= nil
     Log:trace("AnimalHorse.getSupportsExercise: farmId=%s uniqueId=%s type=%s -> %s",
         tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.animalTypeIndex), tostring(supported))
     return supported
@@ -143,11 +145,11 @@ function AnimalHorse.applyExercise(animal)
     return true
 end
 
---- Whether the grooming task can groom this animal: a horse, on a platform that needs horse cleaning.
+--- Whether the grooming task can groom this horse: the platform needs horse cleaning.
 --- @param animal table Animal instance
 --- @return boolean supported
 function AnimalHorse.getSupportsGrooming(animal)
-    local supported = animal:isHorse() and Platform.gameplay.needHorseCleaning == true
+    local supported = Platform.gameplay.needHorseCleaning == true
     Log:trace("AnimalHorse.getSupportsGrooming: farmId=%s uniqueId=%s type=%s -> %s",
         tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.animalTypeIndex), tostring(supported))
     return supported
@@ -189,9 +191,7 @@ end
 -- EXTRACTED CONDITIONAL BLOCKS
 -- =============================================================================
 
---- Process riding update during onDayChanged. Updates fitness based on riding
---- relative to threshold, resets riding, and increases dirt.
---- Called from Animal:onDayChanged when animal is HORSE and not a sale animal.
+--- The HORSE daily hook: grade fitness from riding, reset riding, raise dirt (a sale animal skips it).
 --- @param animal table Animal instance (HORSE type)
 function AnimalHorse.processRidingUpdate(animal)
     local ridingFactor = AnimalHorse.getRidingFactor(animal)
@@ -251,7 +251,7 @@ function AnimalHorse.getHorseSellPrice(animal, sellPrice, meatFactor, weightFact
 end
 
 --- Add horse-specific info rows (fitness, riding, cleanliness) to the info panel.
---- Called from Animal:updateInfos when animal is HORSE type.
+--- The HORSE entry's addInfos hook, reached from Animal:addInfos.
 --- @param animal table Animal instance (HORSE type)
 --- @param infos table Info rows array to append to
 function AnimalHorse.addHorseInfos(animal, infos)
@@ -298,7 +298,7 @@ function AnimalHorse.addHorseInfos(animal, infos)
 end
 
 --- Add horse-specific HUD info lines (riding, fitness, cleanliness).
---- Called from Animal:showInfo when animal:isHorse() is true.
+--- The HORSE entry's showHudInfo hook, reached from Animal:showInfo.
 --- @param animal table Animal instance (HORSE type)
 --- @param box table HUD info box
 function AnimalHorse.showHorseHudInfo(animal, box)
@@ -310,7 +310,7 @@ function AnimalHorse.showHorseHudInfo(animal, box)
 end
 
 --- Save horse-specific fields (dirt, fitness, riding) to XML.
---- Called from Animal:saveToXMLFile when animal is HORSE type.
+--- The HORSE entry's saveFields hook, reached from AnimalPersistence.saveToXMLFile.
 --- @param animal table Animal instance (HORSE type)
 --- @param xmlFile table XML file handle
 --- @param key string XML key path for this animal
@@ -318,4 +318,34 @@ function AnimalHorse.saveHorseFields(animal, xmlFile, key)
     xmlFile:setFloat(key .. "#dirt", animal.dirt)
     xmlFile:setFloat(key .. "#fitness", animal.fitness)
     xmlFile:setFloat(key .. "#riding", animal.riding)
+end
+
+--- A random default name for a new horse; runs mid-constructor, with no birthday yet.
+--- @param animal table Animal instance (HORSE type) under construction
+--- @return string|nil name
+function AnimalHorse.getDefaultName(animal)
+    local name = g_currentMission.animalNameSystem:getRandomName(animal.gender)
+    Log:trace("AnimalHorse.getDefaultName: farmId=%s uniqueId=%s gender=%s -> %s",
+        tostring(animal.farmId), tostring(animal.uniqueId), tostring(animal.gender), tostring(name))
+    return name
+end
+
+--- Add the horse rows (fitness, daily riding, cleanliness) to a dealer item stock's info list.
+--- @param animal table Animal instance (HORSE type)
+--- @param infos table the item stock's info rows, appended in place
+function AnimalHorse.addDealerInfos(animal, infos)
+    local before = #infos
+    table.insert(infos, { ["title"] = g_i18n:getText("ui_horseFitness"),
+        ["value"] = string.format("%.f%%", animal:getFitnessFactor() * 100) })
+    table.insert(infos, { ["title"] = g_i18n:getText("ui_horseDailyRiding"),
+        ["value"] = string.format("%.f%%", animal:getRidingFactor() * 100) })
+
+    if Platform.gameplay.needHorseCleaning then
+        table.insert(infos, { ["title"] = g_i18n:getText("statistic_cleanliness"),
+            ["value"] = string.format("%.f%%", (1 - animal:getDirtFactor()) * 100) })
+    end
+
+    Log:trace("AnimalHorse.addDealerInfos: farmId=%s uniqueId=%s cleaning=%s -> %d rows added",
+        tostring(animal.farmId), tostring(animal.uniqueId), tostring(Platform.gameplay.needHorseCleaning),
+        #infos - before)
 end

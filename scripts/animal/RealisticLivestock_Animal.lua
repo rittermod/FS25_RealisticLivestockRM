@@ -272,7 +272,14 @@ function Animal.new(config)
     self.fitness = cfg.fitness or 0
     self.riding = cfg.riding or 0
     if name == "" then name = nil end
-    self.name = name or (self:isHorse() and g_currentMission.animalNameSystem:getRandomName(self.gender) or nil)
+    local typeModule = self:getTypeModule()
+    if name == nil and typeModule ~= nil and typeModule.getDefaultName ~= nil then
+        self.name = typeModule.getDefaultName(self)
+        Log:trace("Animal.new: default name %s from the type's hook (farmId=%s uniqueId=%s)", tostring(self.name),
+            tostring(self.farmId), tostring(self.uniqueId))
+    else
+        self.name = name
+    end
 
 
     self.pos = cfg.pos or nil
@@ -520,12 +527,17 @@ function Animal:getAge()
     return self.age
 end
 
---- The age visual for this animal's own subtype and age, or nil when no visual band covers that age.
+--- The age visual for this animal's own subtype and age, or the type's getVisual hook's choice; nil when none.
 --- @return table|nil visual
 function Animal:getVisual()
     local subTypeIndex = self:getSubTypeIndex()
     local age = self:getAge()
     local visual = g_currentMission.animalSystem:getVisualByAge(subTypeIndex, age)
+
+    local typeModule = self:getTypeModule()
+    if typeModule ~= nil and typeModule.getVisual ~= nil then
+        visual = typeModule.getVisual(self, visual) or visual
+    end
 
     Log:trace("<<< Animal:getVisual = minAge %s (farmId=%s uniqueId=%s subType=%s (%s) age=%s)",
         tostring(visual and visual.minAge), tostring(self.farmId), tostring(self.uniqueId),
@@ -741,11 +753,16 @@ function Animal:addInfos(infos, forceShowAll)
     end
 
 
-    if self:isHorse() then
-        AnimalHorse.addHorseInfos(self, infos)
+    local typeModule = self:getTypeModule()
+    if typeModule ~= nil and typeModule.addInfos ~= nil then
+        Log:trace("Animal:addInfos: the type's info rows (farmId=%s uniqueId=%s)", tostring(self.farmId),
+            tostring(self.uniqueId))
+        typeModule.addInfos(self, infos)
     end
 end
 
+--- Add this animal's lines to a HUD info box.
+--- @param box table HUD info box (addLine)
 function Animal:showInfo(box)
     local index = self:getSubTypeIndex()
     local subType = self:getSubType()
@@ -772,8 +789,11 @@ function Animal:showInfo(box)
         self.gender == "male" and g_i18n:getText("rl_ui_male") or g_i18n:getText("rl_ui_female"))
 
 
-    if self:isHorse() then
-        AnimalHorse.showHorseHudInfo(self, box)
+    local typeModule = self:getTypeModule()
+    if typeModule ~= nil and typeModule.showHudInfo ~= nil then
+        Log:trace("Animal:showInfo: the type's HUD lines (farmId=%s uniqueId=%s)", tostring(self.farmId),
+            tostring(self.uniqueId))
+        typeModule.showHudInfo(self, box)
     end
 
     if self.gender ~= nil and self.gender == "female" and subType.supportsReproduction then
@@ -1546,9 +1566,7 @@ function Animal:onDayChanged(spec, isServer, day, month, year, currentDayInPerio
     end
 
 
-    if self:isHorse() and not isSaleAnimal then
-        AnimalHorse.processRidingUpdate(self)
-    end
+    self:onTypeDayChanged(isSaleAnimal)
 
     -- Reproduction: insemination resolution, pregnancy progression, natural conception
     local children, deadAnimals, childrenSold, childrenSoldAmount =
@@ -1560,6 +1578,29 @@ function Animal:onDayChanged(spec, isServer, day, month, year, currentDayInPerio
 
     return children, deadAnimals, childrenSold, childrenSoldAmount, lowHealthDeath, oldDeath, randomDeath,
         randomDeathMoney
+end
+
+--- Run the type's daily hook for this animal; a sale or AI pool animal skips it.
+--- @param isSaleAnimal boolean|nil true for a sale or AI pool animal
+function Animal:onTypeDayChanged(isSaleAnimal)
+    if isSaleAnimal then
+        Log:trace("Animal:onTypeDayChanged: sale animal, no daily hook (farmId=%s uniqueId=%s)", tostring(self.farmId),
+            tostring(self.uniqueId))
+        return
+    end
+
+    local typeModule = self:getTypeModule()
+    if typeModule ~= nil and typeModule.onDayChanged ~= nil then
+        Log:trace("Animal:onTypeDayChanged: the type's daily hook (farmId=%s uniqueId=%s)", tostring(self.farmId),
+            tostring(self.uniqueId))
+        typeModule.onDayChanged(self)
+    end
+end
+
+--- The per-type behaviour entry for this animal's type name, or nil when its type has none.
+--- @return table|nil typeModule
+function Animal:getTypeModule()
+    return RLAnimalTypeModules.get(g_currentMission.animalSystem.typeIndexToName[self.animalTypeIndex])
 end
 
 -- Reproduction delegates -> AnimalReproduction module
@@ -1613,24 +1654,41 @@ function Animal:getDirtFactor() return AnimalHorse.getDirtFactor(self) end
 
 function Animal:changeDirt(delta) AnimalHorse.changeDirt(self, delta) end
 
+--- A worker method's answer through the type's hook of that name: true only when the hook answers true.
+--- @param animal table Animal instance
+--- @param hookName string the worker method's name
+--- @return boolean answer
+local function workerAnswer(animal, hookName)
+    local typeModule = animal:getTypeModule()
+    local hook = typeModule ~= nil and typeModule[hookName] or nil
+    if hook == nil then
+        Log:trace("Animal:%s: no type hook -> false (farmId=%s uniqueId=%s)", hookName, tostring(animal.farmId),
+            tostring(animal.uniqueId))
+        return false
+    end
+    return hook(animal) == true
+end
+
 --- @return boolean supported true when the animal worker's riding task can exercise this animal
-function Animal:getSupportsExercise() return AnimalHorse.getSupportsExercise(self) end
+function Animal:getSupportsExercise() return workerAnswer(self, "getSupportsExercise") end
 
 --- @return boolean needed true when the riding task has work on this animal
-function Animal:getNeedsExercise() return AnimalHorse.getNeedsExercise(self) end
+function Animal:getNeedsExercise() return workerAnswer(self, "getNeedsExercise") end
 
 --- @return boolean applied true when the riding task exercised this animal
-function Animal:applyExercise() return AnimalHorse.applyExercise(self) end
+function Animal:applyExercise() return workerAnswer(self, "applyExercise") end
 
 --- @return boolean supported true when the animal worker's grooming task can groom this animal
-function Animal:getSupportsGrooming() return AnimalHorse.getSupportsGrooming(self) end
+function Animal:getSupportsGrooming() return workerAnswer(self, "getSupportsGrooming") end
 
 --- @return boolean needed true when the grooming task has work on this animal
-function Animal:getNeedsGrooming() return AnimalHorse.getNeedsGrooming(self) end
+function Animal:getNeedsGrooming() return workerAnswer(self, "getNeedsGrooming") end
 
 --- @return boolean applied true when the grooming task groomed this animal
-function Animal:applyGrooming() return AnimalHorse.applyGrooming(self) end
+function Animal:applyGrooming() return workerAnswer(self, "applyGrooming") end
 
+--- The sale price: the standard livestock formula, or the type's getSellPrice hook after the disease fold.
+--- @return number price
 function Animal:getSellPrice()
     local subType = self:getSubType()
     local sellPrice = subType.sellPrice:get(self.age < 0 and 0 or self.age)
@@ -1651,8 +1709,11 @@ function Animal:getSellPrice()
 
     for _, disease in pairs(self.diseases) do sellPrice = disease:modifyValue(sellPrice) end
 
-    if self:isHorse() then
-        return AnimalHorse.getHorseSellPrice(self, sellPrice, meatFactor, weightFactor)
+    local typeModule = self:getTypeModule()
+    if typeModule ~= nil and typeModule.getSellPrice ~= nil then
+        Log:trace("Animal:getSellPrice: the type's price hook (farmId=%s uniqueId=%s)", tostring(self.farmId),
+            tostring(self.uniqueId))
+        return typeModule.getSellPrice(self, sellPrice, meatFactor, weightFactor)
     end
 
     return math.max(

@@ -1,8 +1,9 @@
 --[[
     RLAnimalTypeSupport.lua
-    Pure helpers that keep an animal type RLRM ships no data for working: dealer-farm seeding,
-    offspring subtype resolution inside the parent's type, the pallets output label and the
-    load-time report lines. Data in, data out: no g_* reads, no XML, rng injected.
+    Pure helpers that keep an animal type RLRM ships no data for working: the cluster class,
+    dealer-farm seeding, offspring subtype resolution inside the parent's type, the pallets output
+    label and the load-time report lines. Data in, data out: no g_* reads, no XML, lookups and rng
+    injected.
 ]]
 
 RLAnimalTypeSupport = {}
@@ -28,6 +29,26 @@ end
 local function subTypeLabel(getSubType, subTypeIndex)
     local subType = subTypeIndex ~= nil and getSubType(subTypeIndex) or nil
     return subType ~= nil and subType.name ~= nil and tostring(subType.name) or "?"
+end
+
+
+--- The cluster class a type's declared clusterClass name resolves to, else the fallback class.
+---@param className string the XML-declared class name (a global, or `<ModName>.<Class>`)
+---@param getClassObject function function(className) -> the table the name reaches, or nil
+---@param fallbackClass table the class used when the name reaches no table
+---@return table classObject the resolved class, or fallbackClass
+---@return string reason "named" | "fallback"
+function RLAnimalTypeSupport.resolveClusterClass(className, getClassObject, fallbackClass)
+    local classObject = getClassObject(className)
+
+    if type(classObject) == "table" then
+        Log:trace("RLAnimalTypeSupport.resolveClusterClass: '%s' resolves to a class", tostring(className))
+        return classObject, "named"
+    end
+
+    Log:trace("RLAnimalTypeSupport.resolveClusterClass: '%s' resolves to nothing, using the fallback",
+        tostring(className))
+    return fallbackClass, "fallback"
 end
 
 

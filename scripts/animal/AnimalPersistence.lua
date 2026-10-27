@@ -516,8 +516,11 @@ function AnimalPersistence.saveToXMLFile(animal, xmlFile, key)
 
     if animal.name ~= nil and animal.name ~= "" then xmlFile:setString(key .. "#name", animal.name) end
 
-    if animal:isHorse() then
-        AnimalHorse.saveHorseFields(animal, xmlFile, key)
+    local typeModule = animal:getTypeModule()
+    if typeModule ~= nil and typeModule.saveFields ~= nil then
+        Log:trace("AnimalPersistence.saveToXMLFile: the type's save fields (farmId=%s uniqueId=%s)",
+            tostring(animal.farmId), tostring(animal.uniqueId))
+        typeModule.saveFields(animal, xmlFile, key)
     end
 
     xmlFile:setSortedTable(key .. ".children.child", animal.children, function (index, child)

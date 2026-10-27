@@ -171,6 +171,12 @@ AnimalSystem.BREED_TO_MARKER_COLOUR = {
 }
 
 
+--- Load RLRM's bundle, the map's animals and the bridge animals, then apply the saved ear-tag colours.
+---@param _ function Overwritten-function predecessor (unused; replaced wholesale)
+---@param mapXml number The map XML handle.
+---@param mission table The mission whose map is loading.
+---@param baseDirectory string The directory the map's relative paths resolve against.
+---@return boolean loaded true when at least one animal type is registered
 function RealisticLivestock_AnimalSystem:loadMapData(_, mapXml, mission, baseDirectory)
 
     RLSettings.initialize()
@@ -277,7 +283,10 @@ function RealisticLivestock_AnimalSystem:loadMapData(_, mapXml, mission, baseDir
         end
     end
 
-    self:loadColourConfigurations()
+    local coloursResult = self:loadColourConfigurations()
+    self.colourConfigurationsLoaded = true
+    Log:trace("loadMapData: saved colours applied (result=%s); a type a later loadAnimals call creates gets its own",
+        tostring(coloursResult))
 
 	return #self.types > 0
 
@@ -286,24 +295,34 @@ end
 AnimalSystem.loadMapData = Utils.overwrittenFunction(AnimalSystem.loadMapData, RealisticLivestock_AnimalSystem.loadMapData)
 
 
---- Register the types and subtypes of one animals XML; a new type records isRLBundled.
+--- Register the types and subtypes of one animals XML; a new type records isRLBundled and its cluster class.
 ---@param _ function Overwritten-function predecessor (unused; replaced wholesale)
 ---@param xmlFile table The animals XML file being read.
 ---@param directory string The directory the XML's relative paths resolve against.
-function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
+---@param customEnvironment string|nil The caller's text environment; nil keeps the system's current one.
+function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory, customEnvironment)
+
+    -- Held for the call so the group title and each visual load read the caller's texts.
+    local previousEnvironment = self.customEnvironment
+    self.customEnvironment = customEnvironment or previousEnvironment
+    Log:trace("loadAnimals: holding customEnvironment=%s (argument=%s, previous=%s)",
+        tostring(self.customEnvironment), tostring(customEnvironment), tostring(previousEnvironment))
+
+    local createdNames = {}
+    local createdList = {}
 
 	for _, key in xmlFile:iterator("animals.animal") do
 
 		if #self.types >= 2 ^ AnimalSystem.SEND_NUM_BITS - 1 then
 			Logging.xmlWarning(xmlFile, "Maximum number of supported animal types reached. Ignoring remaining types")
-			return
+			break
 		end
 
 		local rawName = xmlFile:getString(key .. "#type")
 
 		if rawName == nil then
 			Logging.xmlError(xmlFile, "Missing animal type. \'%s\'", key)
-			return
+			break
 		end
 
 		local name = rawName:upper()
@@ -311,7 +330,7 @@ function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
 
 		if rawConfigFilename == nil then
 			Logging.xmlError(xmlFile, "Missing config file for animal type \'%s\'. \'%s\'", name, key)
-			return
+			break
 		end
 
         local configFilename = Utils.getFilename(rawConfigFilename, directory)
@@ -322,6 +341,12 @@ function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
 		if isExistingType then
 
 			animalType = self.nameToType[name]
+
+			local declaredClass = xmlFile:getString(key .. "#clusterClass")
+			if declaredClass ~= nil then
+				Log:debug("loadAnimals: existing type '%s' declares cluster class '%s'; the registered class is kept",
+					tostring(name), tostring(declaredClass))
+			end
 
 			-- Skip dataS-prefixed config reloads: RLRM ships its own bundled
 			-- animal configs (the superset of every base-game + DLC animal type),
@@ -362,8 +387,20 @@ function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
 
 		    if clusterClass == nil then
 			    Logging.xmlError(xmlFile, "Missing animal clusterClass for \'%s\'!", key)
-			    return
+			    break
 		    end
+
+            -- A mod's own ClassUtil has no getClassObject: read the global ClassUtil behind the mod
+            -- environment's metatable, which is absent outside a mod environment.
+            local envMt = getmetatable(_G)
+            local realG = envMt and envMt.__index or _G
+            local classObject, classReason = RLAnimalTypeSupport.resolveClusterClass(clusterClass,
+                realG.ClassUtil.getClassObject, AnimalCluster)
+
+            if classReason == "fallback" then
+                Log:warning("loadAnimals: type '%s' names cluster class '%s', which does not resolve, in '%s'; "
+                    .. "it uses AnimalCluster", tostring(name), tostring(clusterClass), tostring(xmlFile:getFilename()))
+            end
 
 		    local statsBreedingName = xmlFile:getString(key .. "#statsBreeding")
 		    local title = g_i18n:convertText(xmlFile:getString(key .. "#groupTitle"), self.customEnvironment)
@@ -442,7 +479,7 @@ function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
 			    ["groupTitle"] = title,
 			    ["typeIndex"] = #self.types + 1,
 			    ["configFilename"] = configFilename,
-			    ["clusterClass"] = clusterClass == "AnimalCluster" and AnimalCluster or AnimalClusterHorse,
+			    ["clusterClass"] = classObject,
 			    ["statsBreedingName"] = statsBreedingName,
 			    ["navMeshAgentAttributes"] = {
 				    ["height"] = height,
@@ -470,8 +507,9 @@ function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
                 ["isRLBundled"] = self.isLoadingRLBundle == true
 		    }
 
-            Log:debug("loadAnimals: new type '%s' (typeIndex=%d, config='%s', isRLBundled=%s)", name,
-                animalType.typeIndex, configFilename, tostring(animalType.isRLBundled))
+            Log:debug("loadAnimals: new type '%s' (typeIndex=%d, config='%s', isRLBundled=%s, clusterClass='%s', classReason=%s)",
+                tostring(name), animalType.typeIndex, tostring(configFilename), tostring(animalType.isRLBundled),
+                tostring(clusterClass), classReason)
 
 		end
 
@@ -518,6 +556,8 @@ function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
 			        self.nameToType[name] = animalType
 			        self.nameToTypeIndex[name] = animalType.typeIndex
 			        self.typeIndexToName[animalType.typeIndex] = name
+                    createdNames[name] = true
+                    table.insert(createdList, name)
                     Log:trace("loadAnimals: registered type '%s' at index %d", name, animalType.typeIndex)
 
                 end
@@ -530,6 +570,24 @@ function RealisticLivestock_AnimalSystem:loadAnimals(_, xmlFile, directory)
         end
 
 	end
+
+    self.customEnvironment = previousEnvironment
+    Log:trace("loadAnimals: restored customEnvironment=%s", tostring(previousEnvironment))
+
+    if #createdList == 0 then
+        Log:trace("loadAnimals: no type created by this call; no saved colours to apply")
+        return
+    end
+
+    -- loadMapData applies saved colours once; a type created by a later call gets its own here.
+    if self.colourConfigurationsLoaded == true then
+        Log:debug("loadAnimals: applying saved colours to %d type(s) created after loadMapData: %s", #createdList,
+            table.concat(createdList, ", "))
+        self:loadColourConfigurations(createdNames)
+    else
+        Log:trace("loadAnimals: %d type(s) created before the saved colours load: %s", #createdList,
+            table.concat(createdList, ", "))
+    end
 
 end
 
@@ -1167,12 +1225,19 @@ function AnimalSystem:validateFarms(hasData)
 end
 
 
-function AnimalSystem:loadColourConfigurations()
+--- Apply the selected savegame's saved ear-tag colours to the registered types.
+---@param typeNames table|nil Set of type names to apply (`{ [name] = true }`); nil applies every type.
+---@return boolean|nil false when there is no savegame or no colour file, nil after an apply
+function AnimalSystem:loadColourConfigurations(typeNames)
 
     local savegameIndex = g_careerScreen.savegameList.selectedIndex
     local savegame = g_savegameController:getSavegame(savegameIndex)
 
-    if savegame == nil or savegame.savegameDirectory == nil then return false end
+    if savegame == nil or savegame.savegameDirectory == nil then
+        Log:trace("loadColourConfigurations: no savegame directory for index %s; colours not loaded",
+            tostring(savegameIndex))
+        return false
+    end
 
     -- Try new filename first, fall back to old filename (migration support)
     local xmlFile = XMLFile.loadIfExists("rm_RlAnimalSystem", savegame.savegameDirectory .. "/rm_RlAnimalSystem.xml")
@@ -1184,26 +1249,36 @@ function AnimalSystem:loadColourConfigurations()
         rootKey = "animalSystem"
     end
 
-    if xmlFile == nil then return false end
+    if xmlFile == nil then
+        Log:trace("loadColourConfigurations: no colour file in '%s'; colours not loaded",
+            tostring(savegame.savegameDirectory))
+        return false
+    end
+
+    local applied = 0
 
     xmlFile:iterate(rootKey .. ".animalTypes.type", function(_, key)
 
         local name = xmlFile:getString(key .. "#name")
-        local earTagLeft = xmlFile:getVector(key .. "#earTagLeft", { 0.8, 0.7, 0 })
-        local earTagRight = xmlFile:getVector(key .. "#earTagRight", { 0.8, 0.7, 0 })
-        local earTagLeftText = xmlFile:getVector(key .. "#earTagLeftText", { 0, 0, 0 })
-        local earTagRightText = xmlFile:getVector(key .. "#earTagRightText", { 0, 0, 0 })
 
-        if self.nameToType[name] ~= nil then
-            self.nameToType[name].colours.earTagLeft = earTagLeft
-            self.nameToType[name].colours.earTagRight = earTagRight
-            self.nameToType[name].colours.earTagLeft_text = earTagLeftText
-            self.nameToType[name].colours.earTagRight_text = earTagRightText
+        if self.nameToType[name] ~= nil and (typeNames == nil or typeNames[name] == true) then
+            local colours = self.nameToType[name].colours
+            colours.earTagLeft = xmlFile:getVector(key .. "#earTagLeft", { 0.8, 0.7, 0 })
+            colours.earTagRight = xmlFile:getVector(key .. "#earTagRight", { 0.8, 0.7, 0 })
+            colours.earTagLeft_text = xmlFile:getVector(key .. "#earTagLeftText", { 0, 0, 0 })
+            colours.earTagRight_text = xmlFile:getVector(key .. "#earTagRightText", { 0, 0, 0 })
+            applied = applied + 1
+        else
+            Log:trace("loadColourConfigurations: skipping saved entry '%s' (%s)", tostring(name),
+                self.nameToType[name] == nil and "type not registered" or "not in the filter")
         end
 
     end)
 
     xmlFile:delete()
+
+    Log:debug("loadColourConfigurations: applied saved colours to %d type(s) (%s)", applied,
+        typeNames == nil and "every type" or "filtered")
 
 end
 
