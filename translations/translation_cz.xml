@@ -12,6 +12,8 @@
         <text name="fillType_bull_hereford" text="Herefordský býk"/>
         <text name="fillType_cow_highland_cattle" text="Vysokohorský skot"/>
         <text name="fillType_bull_highland_cattle" text="Býk vysokohorského skotu"/>
+        <text name="fillType_cow_brahman" text="Brahman"/>
+        <text name="fillType_bull_brahman" text="Brahman Bull"/>
         <text name="animal_descriptionBullFeed" text="Býci mají rádi trávu, seno a TMR."/>
         <text name="animal_descriptionBullYoung" text="Toto je býčí tele."/>
         <text name="animal_descriptionBullReproduction" text="Zdraví býci starší 12 měsíců se mohou rozmnožovat."/>

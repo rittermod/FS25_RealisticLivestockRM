@@ -26,6 +26,8 @@ Each breed has two rows - one for females, one for males. Gestation and litter s
 |            |             | Male   | 12 mo | 132 mo (11 yr) | -     | -          |
 | **Cattle** | Highland *(DLC)* | Female | 12 mo | 132 mo (11 yr) | 10 mo | 1 (max 3) |
 |            |             | Male   | 12 mo | 132 mo (11 yr) | -     | -          |
+| **Cattle** | Brahman *(DLC)* | Female | 12 mo | 132 mo (11 yr) | 10 mo | 1 (max 3) |
+|            |             | Male   | 12 mo | 132 mo (11 yr) | -     | -          |
 | **Cattle** | Water Buffalo³ | Female | 12 mo | 132 mo (11 yr) | 10 mo | 1 (max 3) |
 |            |             | Male   | 12 mo | 132 mo (11 yr) | -     | -          |
 | **Pigs**   | Berkshire   | Female | 6 mo  | 96 mo (8 yr)   | 4 mo  | 12 (max 16) |

@@ -43,6 +43,16 @@
 			<economy pricePerLiter="5500"/>
 			<image hud="$dataS/menu/hud/fillTypes/hud_fill_cow.png"/>
 		</fillType>
+		<fillType name="COW_BRAHMAN" title="$l10n_fillType_cow_brahman" showOnPriceTable="false">
+			<physics massPerLiter="600.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="5000"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_cow.png"/>
+		</fillType>
+		<fillType name="BULL_BRAHMAN" title="$l10n_fillType_bull_brahman" showOnPriceTable="false">
+			<physics massPerLiter="750.0" maxPhysicalSurfaceAngle="0"/>
+			<economy pricePerLiter="5500"/>
+			<image hud="$dataS/menu/hud/fillTypes/hud_fill_cow.png"/>
+		</fillType>
 
 		<!-- WATER BUFFALOS -->
 
@@ -146,6 +156,6 @@
 		
 	</fillTypes>
 	<fillTypeCategories>
-		<fillTypeCategory name="ANIMAL">BULL_SWISS_BROWN BULL_ANGUS BULL_HOLSTEIN BULL_LIMOUSIN COW_HEREFORD BULL_HEREFORD BULL_HIGHLAND_CATTLE BULL_WATERBUFFALO RAM_LANDRACE RAM_STEINSCHAF RAM_SWISS_MOUNTAIN RAM_BLACK_WELSH BOAR_LANDRACE BOAR_BERKSHIRE BOAR_BLACK_PIED RAM_GOAT</fillTypeCategory>
+		<fillTypeCategory name="ANIMAL">BULL_SWISS_BROWN BULL_ANGUS BULL_HOLSTEIN BULL_LIMOUSIN COW_HEREFORD BULL_HEREFORD BULL_HIGHLAND_CATTLE BULL_BRAHMAN BULL_WATERBUFFALO RAM_LANDRACE RAM_STEINSCHAF RAM_SWISS_MOUNTAIN RAM_BLACK_WELSH BOAR_LANDRACE BOAR_BERKSHIRE BOAR_BLACK_PIED RAM_GOAT</fillTypeCategory>
 	</fillTypeCategories>
 </map>

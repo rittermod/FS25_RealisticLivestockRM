@@ -12,6 +12,8 @@
         <text name="fillType_bull_hereford" text="赫里福德公牛"/>
         <text name="fillType_cow_highland_cattle" text="Highland Cattle"/>
         <text name="fillType_bull_highland_cattle" text="Highland Cattle Bull"/>
+        <text name="fillType_cow_brahman" text="Brahman"/>
+        <text name="fillType_bull_brahman" text="Brahman Bull"/>
         <text name="animal_descriptionBullFeed" text="公牛喜食牧草、干草和全混合日粮。"/>
         <text name="animal_descriptionBullYoung" text="这是雄性犊牛。"/>
         <text name="animal_descriptionBullReproduction" text="健康且月龄超过12个月的公牛可以繁殖。"/>

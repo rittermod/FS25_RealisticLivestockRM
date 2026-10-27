@@ -679,6 +679,20 @@
                 </pallets>
             </output>
         </subType>
+        <!-- Brahman copies Highland's milk curve. -->
+        <subType subType="COW_BRAHMAN">
+            <output>
+                <pallets fillType="MILK">
+                    <key ageMonth="0" value="0"/>
+                    <key ageMonth="12" value="0"/>
+                    <key ageMonth="12" value="100"/>
+                    <key ageMonth="36" value="100"/>
+                    <key ageMonth="36" value="160"/>
+                    <key ageMonth="72" value="160"/>
+                    <key ageMonth="120" value="70"/>
+                </pallets>
+            </output>
+        </subType>
         <subType subType="COW_WATERBUFFALO">
             <output>
                 <pallets fillType="BUFFALOMILK">

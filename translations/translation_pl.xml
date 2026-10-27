@@ -12,6 +12,8 @@
         <text name="fillType_bull_hereford" text="Hereford Bull"/>
         <text name="fillType_cow_highland_cattle" text="Bydło Highland"/>
         <text name="fillType_bull_highland_cattle" text="Byk Highland"/>
+        <text name="fillType_cow_brahman" text="Brahman"/>
+        <text name="fillType_bull_brahman" text="Brahman Bull"/>
         <text name="animal_descriptionBullFeed" text="Byki lubią trawę, siano i TMR."/>
         <text name="animal_descriptionBullYoung" text="Jest to cielę płci męskiej."/>
         <text name="animal_descriptionBullReproduction" text="Byki, które są zdrowe i starsze niż 12 miesięcy, mogą się rozmnażać."/>

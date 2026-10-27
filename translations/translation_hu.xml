@@ -12,6 +12,8 @@
         <text name="fillType_bull_hereford" text="Hereford bika"/>
         <text name="fillType_cow_highland_cattle" text="Skót felföldi marha"/>
         <text name="fillType_bull_highland_cattle" text="Skót felföldi bika"/>
+        <text name="fillType_cow_brahman" text="Brahman"/>
+        <text name="fillType_bull_brahman" text="Brahman Bull"/>
         <text name="animal_descriptionBullFeed" text="A bikák szeretik a füvet, a szénát és a TMR-t."/>
         <text name="animal_descriptionBullYoung" text="Ez egy bikaborjú."/>
         <text name="animal_descriptionBullReproduction" text="Az egészséges és 12 hónapnál idősebb bikák képesek szaporodni."/>

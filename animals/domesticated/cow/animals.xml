@@ -193,6 +193,39 @@
 			<locomotion filename="$dataS/character/animals/domesticated/cow/highland/locomotion.xml"/>
 			<audio eatSoundGroup="eat" yellSoundGroup="yell" yellMinInterval="12000" yellMaxInterval="24000" yellTimerCrowdScale="0.2"/>
 		</animal>
+		<animal visualAnimalIndex="22" name="BRAHMAN_CATTLE_BABY" radius="0.7" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="true" headOffset="0.8" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false" canBeCleaned="true" interessDistance="10.0">
+			<statesTimers idleMin="6666" idleMax="19998" sleepMin="120000" sleepMax="180000" restMin="12000" restMax="26666" grazeMin="0" grazeMax="0" chewMin="0" chewMax="0" eatMin="66665" eatMax="93331" wanderMin="5000" wanderMax="10000"/>
+			<assets filename="$dataS/character/animals/domesticated/cow/brahman/brahmanCalfBaby.i3d" filenamePosed="$dataS/character/animals/domesticated/cow/brahman/brahmanCalfBaby_posed.i3d" animation="$dataS/character/animals/domesticated/cow/brahman/animations/young/brahmanCalfBabyAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|2" headIndex="0>0|0|3|0|0|0|0|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/cow/brahman/locomotionBaby.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yellBaby" yellMinInterval="12000" yellMaxInterval="24000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal visualAnimalIndex="23" name="BRAHMAN_CATTLE_KID" radius="1.1" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="true" headOffset="0.8" canEat="false" canDrink="false" canSleep="true" canEatDuringNight="false" canBeCleaned="true" interessDistance="10.0">
+			<statesTimers idleMin="6666" idleMax="19998" sleepMin="120000" sleepMax="180000" restMin="12000" restMax="26666" grazeMin="26666" grazeMax="39999" chewMin="9000" chewMax="18000" eatMin="66665" eatMax="93331" wanderMin="5000" wanderMax="10000"/>
+			<assets filename="$dataS/character/animals/domesticated/cow/brahman/brahmanCalf.i3d" filenamePosed="$dataS/character/animals/domesticated/cow/brahman/brahmanCalf_posed.i3d" animation="$dataS/character/animals/domesticated/cow/brahman/animations/young/brahmanCalfAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|2" headIndex="0>0|0|3|0|0|0|0|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/cow/brahman/locomotionKid.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yell" yellMinInterval="12000" yellMaxInterval="24000" yellTimerCrowdScale="0.2"/>
+		</animal>
+		<animal visualAnimalIndex="24" name="BRAHMAN_CATTLE" radius="1.8" handleThreats="false" threatAwarenessRadius="5" slowingDistance="0.5" allowMilkingPlace="true" headOffset="0.8" canEat="true" canDrink="true" canSleep="true" canEatDuringNight="true" canBeCleaned="true" interessDistance="10.0">
+			<statesTimers idleMin="6666" idleMax="19998" sleepMin="120000" sleepMax="180000" restMin="12000" restMax="26666" grazeMin="26666" grazeMax="39999" chewMin="9000" chewMax="18000" eatMin="66665" eatMax="93331" wanderMin="5000" wanderMax="10000"/>
+			<assets filename="$dataS/character/animals/domesticated/cow/brahman/cattleBrahman.i3d" filenamePosed="$dataS/character/animals/domesticated/cow/brahman/cattleBrahman_posed.i3d" animation="$dataS/character/animals/domesticated/cow/brahman/animations/adult/cattleBrahmanAnimations.i3d" skeletonIndex="0" meshIndex="1" proxyIndex="2" shaderIndex="1|0" headIndex="0>0|0|0|0|0|0|0|0">
+				<texture multi="true" tileUIndex="0" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="0" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="0" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+				<texture multi="true" tileUIndex="1" tileVIndex="1" numTilesU="2" numTilesV="2" mirrorV="false"/>
+			</assets>
+			<locomotion filename="$dataS/character/animals/domesticated/cow/brahman/locomotion.xml"/>
+			<audio eatSoundGroup="eat" yellSoundGroup="yell" yellMinInterval="12000" yellMaxInterval="24000" yellTimerCrowdScale="0.2"/>
+		</animal>
 	</animals>
 	<sound>
 		<soundGroup name="walk" volume="1" indoorVolume="0.1" range="12" innerRange="0.4">

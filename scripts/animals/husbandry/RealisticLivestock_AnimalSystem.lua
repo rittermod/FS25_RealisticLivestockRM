@@ -139,6 +139,7 @@ AnimalSystem.BREED_TO_NAME = {
     ["LIMOUSIN"] = "Limousin",
     ["HEREFORD"] = "Hereford",
     ["HIGHLAND"] = "Highland",
+    ["BRAHMAN"] = "Brahman",
     ["WATER_BUFFALO"] = "Water Buffalo",
     ["LANDRACE"] = "Landrace",
     ["BLACK_PIED"] = "Black Pied",
@@ -167,7 +168,8 @@ AnimalSystem.BREED_TO_MARKER_COLOUR = {
     ["LIMOUSIN"] = { 0, 0, 1 },
     ["HEREFORD"] = { 0, 0, 1 },
     ["WATER_BUFFALO"] = { 1, 1, 1 },
-    ["HIGHLAND"] = { 0.6, 0.3, 0.1 }
+    ["HIGHLAND"] = { 0.6, 0.3, 0.1 },
+    ["BRAHMAN"] = { 0.8, 0.8, 0.8 }
 }
 
 

@@ -1,6 +1,6 @@
 # Cattle Factsheet
 
-Cattle are the most diverse livestock in Realistic Livestock RM, with 7 breeds ranging from high-output dairy cows to premium beef cattle. Each breed has distinct milk output, sell value, and feed requirements. Bulls are heavier and sell for more than cows at every age.
+Cattle are the most diverse livestock in Realistic Livestock RM, with 8 breeds ranging from high-output dairy cows to premium beef cattle. Each breed has distinct milk output, sell value, and feed requirements. Bulls are heavier and sell for more than cows at every age.
 
 > **Note:** This documentation was generated with AI assistance and may contain inaccuracies. If you spot an error, please [open an issue](https://github.com/rittermod/FS25_RealisticLivestockRM/issues).
 
@@ -15,16 +15,17 @@ Cattle are the most diverse livestock in Realistic Livestock RM, with 7 breeds r
 | **Swiss Brown** | Dual | 650 / 850 kg | 50 - 580 L/day | Above average |
 | **Angus** | Beef | 700 / 900 kg | 30 - 365 L/day | High |
 | **Highland** *(DLC)* | Beef | 725 / 950 kg | 30 - 365 L/day | High, retains value in old age |
+| **Brahman** *(DLC)* | Beef | 725 / 950 kg | 30 - 365 L/day | High, retains value in old age |
 | **Limousin** | Beef | 630 / 675 kg | 30 - 320 L/day | Highest |
 | **Water Buffalo** | Special | 425 / 500 kg | 5 - 70 L/day | Low |
 
-*Target weights shown as cow / bull. Milk range shows the full span from poor to excellent genetics. All cows produce milk when lactating - beef breeds just produce less. Highland cattle require the Highlands & Fishing Pack DLC.*
+*Target weights shown as cow / bull. Milk range shows the full span from poor to excellent genetics. All cows produce milk when lactating - beef breeds just produce less. Highland cattle require the Highlands & Fishing Pack DLC, and Brahman cattle require the Beans and Alpacas DLC.*
 
 > **Breed-locking:** Water Buffalo bulls can only breed with Water Buffalo cows. All other bull breeds can breed with any non-Water-Buffalo cow.
 
 > **Hereford on Witcombe:** When playing on the [Witcombe](map-witcombe.md) map, Hereford uses a heritage profile with 9-month gestation, premium pricing (300 / 3000), an earlier sell-price peak at 24 months (vs 36 months for other beef breeds), and leaner feed/water needs. The values shown above are the standard RLRM Hereford used on every other map.
 
-> **Hereford on Le Mechet:** When playing on the [Le Mechet](map-le-mechet.md) map, Hereford is hidden from the Animal Dealer (the map ships no Hereford 3D model). Existing Hereford pens continue to function. Le Mechet adds four French breeds in the dealer instead - Charolaise, Montbeliarde, Simmental, and Vosgienne - see the map page for their breed character.
+> **Hereford and Brahman on Le Mechet:** When playing on the [Le Mechet](map-le-mechet.md) map, Hereford and Brahman *(DLC)* are hidden from the Animal Dealer (the map ships no Hereford or Brahman 3D model). Le Mechet adds four French breeds in the dealer instead - Charolaise, Montbeliarde, Simmental, and Vosgienne - see the map page for their breed character.
 
 ---
 
@@ -41,6 +42,7 @@ Cows produce milk **only while lactating** (10 months after giving birth). Non-l
 | **Swiss Brown** | 35 - 410 | **50 - 580** | 20 - 250 |
 | **Angus** | 20 - 230 | **30 - 365** | 15 - 160 |
 | **Highland** | 20 - 230 | **30 - 365** | 15 - 160 |
+| **Brahman** | 20 - 230 | **30 - 365** | 15 - 160 |
 | **Limousin** | 20 - 205 | **30 - 320** | 10 - 115 |
 | **Water Buffalo** | 5 - 70 | 5 - 70 | 5 - 70 |
 
@@ -63,7 +65,7 @@ xychart-beta
 
 ## Sell Prices by Breed
 
-Bulls consistently sell for more than cows at all ages. Beef breeds (Angus, Limousin, Highland) command significantly higher prices than dairy breeds.
+Bulls consistently sell for more than cows at all ages. Beef breeds (Angus, Limousin, Highland, Brahman) command significantly higher prices than dairy breeds.
 
 ### Typical Sell Prices ($)
 
@@ -80,6 +82,8 @@ Bulls consistently sell for more than cows at all ages. Beef breeds (Angus, Limo
 | **Hereford** | Cow | 210 | 2,200 | 2,800 | 1,600 |
 | | Bull | 225 | 2,400 | 3,000 | 1,800 |
 | **Highland** | Cow | 230 | 3,000 | 3,500 | 2,500 |
+| | Bull | 280 | 3,500 | 4,000 | 3,000 |
+| **Brahman** | Cow | 230 | 3,000 | 3,500 | 2,500 |
 | | Bull | 280 | 3,500 | 4,000 | 3,000 |
 | **Water Buffalo** | Cow | 150 | 1,500 | 1,500 | 1,000 |
 | | Bull | 200 | 1,750 | 2,000 | 1,250 |
@@ -110,6 +114,7 @@ Bulls consistently sell for more than cows at all ages. Beef breeds (Angus, Limo
 | **Limousin** | 320 | 3,400 | 350 | 3,750 |
 | **Hereford** | 225 | 2,400 | 250 | 2,500 |
 | **Highland** | 300 | 3,000 | 350 | 3,500 |
+| **Brahman** | 300 | 3,000 | 350 | 3,500 |
 | **Water Buffalo** | 200 | 1,500 | 250 | 1,800 |
 
 *Adult prices are at age 24-36 months. Dealer animals have randomised genetics.*
@@ -136,10 +141,12 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 | | Bull | 18 - 123 | 105 - 735 |
 | **Highland** | Cow | 20 - 140 | 140 - 960 |
 | | Bull | 20 - 140 | 145 - 1,005 |
+| **Brahman** | Cow | 20 - 140 | 140 - 960 |
+| | Bull | 20 - 140 | 145 - 1,005 |
 | **Water Buffalo** | Cow | 10 - 70 | 90 - 615 |
 | | Bull | 10 - 80 | 95 - 655 |
 
-*Highland and Limousin are the most expensive breeds to feed. Ranges show the span from the most efficient to the hungriest animals. Most animals eat near the middle of these ranges.*
+*Highland, Brahman and Limousin are the most expensive breeds to feed. Ranges show the span from the most efficient to the hungriest animals. Most animals eat near the middle of these ranges.*
 
 ### Water Consumption (L/day, newborn -> adult)
 
@@ -151,6 +158,7 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 | **Limousin** | 70 -> 200 | 70 -> 200 |
 | **Hereford** | 60 -> 150 | 65 -> 160 |
 | **Highland** | 20 -> 140 | 20 -> 140 |
+| **Brahman** | 20 -> 140 | 20 -> 140 |
 | **Water Buffalo** | 20 -> 140 | 20 -> 140 |
 
 *Lactating cows drink considerably more water than usual.*
@@ -165,6 +173,7 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 | **Limousin** | 15 -> 130 | 15 -> 130 |
 | **Hereford** | 15 -> 130 | 15 -> 130 |
 | **Highland** | 15 -> 130 | 15 -> 130 |
+| **Brahman** | 15 -> 130 | 15 -> 130 |
 | **Water Buffalo** | 10 -> 95 | 10 -> 95 |
 
 *Straw is not affected by genetics or lactation. Beef breeds use more straw than dairy breeds.*
@@ -186,6 +195,8 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 | **Hereford** | Cow | 33 kg | 675 kg | 1,200 kg |
 | | Bull | 35 kg | 750 kg | 1,400 kg |
 | **Highland** | Cow | 35 kg | 725 kg | 1,200 kg |
+| | Bull | 35 kg | 950 kg | 1,600 kg |
+| **Brahman** | Cow | 35 kg | 725 kg | 1,200 kg |
 | | Bull | 35 kg | 950 kg | 1,600 kg |
 | **Water Buffalo** | Cow | 35 kg | 425 kg | 1,200 kg |
 | | Bull | 36 kg | 500 kg | 1,400 kg |
@@ -262,7 +273,7 @@ Cattle can be vaccinated against BRD and footrot, and cows against mastitis - se
 
 1. **Dairy farming:** Holstein cows produce the most milk by far. Keep them breeding regularly - non-lactating cows produce zero milk.
 
-2. **Beef farming:** Limousin and Angus sell for the highest prices. Highland cattle retain good value even in old age, making them lower-maintenance for long-term herds.
+2. **Beef farming:** Limousin and Angus sell for the highest prices. Highland and Brahman cattle *(DLC)* retain good value even in old age, making them lower-maintenance for long-term herds.
 
 3. **CVM carriers:** CVM carrier cows give considerably more milk while the **Diseases** setting is on. Breed them with non-carriers: two carriers bred together give no more carrier calves than a carrier and a non-carrier, only about a quarter affected calves on top, which are sick and, with **Animal Death** on, die within a few months.
 

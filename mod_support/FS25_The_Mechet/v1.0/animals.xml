@@ -522,6 +522,27 @@
             </visuals>
         </subType>
 
+        <!-- COW_BRAHMAN / BULL_BRAHMAN: HIDE on Mechet maps. Mechet's husbandry config has
+             no Brahman models, so RLRM's indices 22-24 land on unrelated Mechet rows.
+             visualAnimalIndex intentionally NOT touched, as for Hereford. -->
+        <subType subType="COW_BRAHMAN">
+            <visuals>
+                <visual minAge="0"  canBeBought="false"/>
+                <visual minAge="6"  canBeBought="false"/>
+                <visual minAge="12" canBeBought="false"/>
+                <visual minAge="18" canBeBought="false"/>
+            </visuals>
+        </subType>
+
+        <subType subType="BULL_BRAHMAN">
+            <visuals>
+                <visual minAge="0"  canBeBought="false"/>
+                <visual minAge="6"  canBeBought="false"/>
+                <visual minAge="12" canBeBought="false"/>
+                <visual minAge="18" canBeBought="false"/>
+            </visuals>
+        </subType>
+
         <!-- ======================================================================
              COW_HIGHLAND_CATTLE / BULL_HIGHLAND_CATTLE: REMAP visuals to Mechet's
              native Highland indices (16=baby, 17=kid, 18=adult).
