@@ -89,7 +89,7 @@ Each of the twelve age-stages (4 breeds x baby/kid/adult) has its own dealer-men
 
 ## Compatibility
 
-> **NOT compatible with the [Cow Breeds Pack for RLRM](https://github.com/ConGan98/FS25_CowBreedsRLRM).** Both Le Mechet and the Cow Breeds pack replace the cow husbandry config to bring in their own 3D models. Only one can win at load time, and whichever one loses leaves its breeds with broken visuals (the affected animals exist as data but render as ghosts or fall back to wrong meshes). On Le Mechet maps, **disable the Cow Breeds pack**; on other maps, you can run the Cow Breeds pack normally.
+> **NOT compatible with the [Cow Breeds Pack for RLRM](https://github.com/ConGan98/FS25_CowBreedsRLRM).** Both Le Mechet and the Cow Breeds pack replace the cow husbandry config to bring in their own 3D models. Only one can win at load time, and whichever one loses leaves its breeds with broken visuals (the affected animals exist as data but render as ghosts or fall back to wrong meshes). The Cow Breeds pack has dropped Le Mechet support, so no version of it works here. On Le Mechet maps, **disable the Cow Breeds pack**; on other maps, you can run the Cow Breeds pack normally.
 
 RLRM now detects this combination and shows a warning dialog at startup naming the affected animal type, so you don't have to spot the broken visuals yourself.
 

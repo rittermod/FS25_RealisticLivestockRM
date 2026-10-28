@@ -47,7 +47,7 @@ RLRM works on virtually any map out of the box. It does not need to be on a list
 **Maps:**
 - [Hof Bergmann](https://www.lsfarming-mods.com/) - ducks, geese, cats, rabbits, alpacas, quail with full breeding support
 - [Witcombe](https://oxygendavid.itch.io/witcombe-park-farm) - UK breeds (Jersey, Gloucestershire Old Spot, Texel, Suffolk, Blue Faced Leicester) with full breeding support; Hereford heritage profile
-- [Le Mechet](https://farming-simulator.com/mod.php?mod_id=357964) - French breeds (Charolaise, Montbeliarde, Simmental, Vosgienne) with full breeding support (NOT compatible with Cow Breeds Pack unless you use the latest development version - both replace the cow husbandry config)
+- [Le Mechet](https://farming-simulator.com/mod.php?mod_id=357964) - French breeds (Charolaise, Montbeliarde, Simmental, Vosgienne) with full breeding support
 
 **Animal Packs:**
 - [Cow Breeds Pack for RLRM](https://github.com/ConGan98/FS25_CowBreedsRLRM) by ConGan98 - additional cattle breeds
