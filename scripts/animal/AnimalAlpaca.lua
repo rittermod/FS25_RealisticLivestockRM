@@ -399,7 +399,7 @@ function AnimalAlpaca.getSellPrice(animal, sellPrice, meatFactor, weightFactor)
 end
 
 
---- The ALPACA health hook: the hourly health change follows 0.6 food + 0.4 happiness; nil keeps the raw food factor.
+--- The ALPACA health hook: 0.6 food + 0.4 happiness for an alpaca that can be led; nil keeps the raw food factor.
 --- @param animal table Animal instance (ALPACA type)
 --- @param foodFactor number the pen's food factor, 0-1
 --- @return number|nil factor
@@ -407,6 +407,12 @@ function AnimalAlpaca.getHealthFoodFactor(animal, foodFactor)
     if not AnimalAlpaca.hasState(animal) then
         Log:trace("AnimalAlpaca.getHealthFoodFactor: farmId=%s uniqueId=%s no fleece data, raw food factor",
             tostring(animal.farmId), tostring(animal.uniqueId))
+        return nil
+    end
+    -- Only leading raises happiness, so an alpaca too young to be led would sit at 0 and lose health on full grass.
+    if not AnimalAlpaca.getCanBeLed(animal) then
+        Log:trace("AnimalAlpaca.getHealthFoodFactor: farmId=%s uniqueId=%s cannot be led, raw food factor %s",
+            tostring(animal.farmId), tostring(animal.uniqueId), tostring(foodFactor))
         return nil
     end
     local factor = 0.6 * foodFactor + 0.4 * animal:getHappinessFactor()

@@ -272,7 +272,7 @@ With the DLC, Realistic Livestock adds a male for each of the four coat colours,
 Every alpaca, male or female, carries **happiness** and **fleece**, shown on the animal's info page, its HUD box and the dealer card:
 
 - **Fleece** grows every day. A content alpaca grows a full coat's worth faster than an unhappy one, and the growth per month is about the same whatever your month length. From 40% fleece an adult alpaca (14 months and older) shows its woolly coat; below that it looks sheared.
-- **Happiness** drops a little every day. A happier alpaca sells for more, keeps its health up better and grows its fleece faster.
+- **Happiness** drops a little every day. A happier alpaca sells for more and grows its fleece faster. From 14 months, when it can be led, happiness also helps keep its health up, so an adult that is never led needs hay to stay healthy; a younger alpaca's health depends on its food alone.
 - Alpacas from the dealer arrive sheared, at no happiness and no fleece.
 
 The **animal worker** shears woolly alpacas once a year and leads them every day, which raises their happiness. A sheared alpaca's fleece scales with its fleece genetics. The fleece fills a pallet only in a shed with a fleece pallet (the DLC's alpaca shed); in any other pen the alpacas are still sheared, but the fleece is not collected.
