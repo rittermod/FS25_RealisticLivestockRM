@@ -1,5 +1,23 @@
 # Changelog
 
+## 1.4.2.0-dev.4:
+
+### Heads up before you update
+- On Hof Bergmann with the Beans and Alpacas DLC, existing alpacas may change colour and stats, so back up your save first.
+
+- Added Brahman cows and bulls, with RLRM ear tags and monitors, as a breed for players who own the Beans and Alpacas DLC.
+- Added ear tags, monitors and bull nose rings to adult Highland cattle.
+- Added alpacas, with RLRM ear tags and monitors, as an animal type for players who own the Beans and Alpacas DLC.
+- Gave every alpaca a name, Hof Bergmann's and existing unnamed ones included.
+- Added fleece and happiness to alpacas, so fleece grows daily, shows the woolly coat, and happiness raises price and health.
+- Made the animal worker shear and lead alpacas, filling an alpaca shed's fleece pallet and raising their happiness.
+- Added leading alpacas out of their shed on the leash and back, and shearing them by hand in the alpaca shed.
+- Fixed Hof Bergmann alpacas, which now die of old age, have a lower accident risk and can catch clostridial disease, and new ones get fleece genetics.
+- Fixed some animals of a map or mod animal type with its own cluster class being given random horse names.
+- Fixed the group name and descriptions of an animal type a mod adds with its own texts showing a "Missing" message.
+- Fixed the saved ear tag colours of an animal type a mod adds being reset on every load.
+- Shortened the Russian vaccinated status so it fits the Diseases dialog.
+
 ## 1.4.2.0-dev.3:
 - Fixed animal descriptions showing a "Missing" message on the Animals page and in the RL menu on game version 1.25.
 - Fixed the daily summary messages for sold, bought and overcrowding newborns showing wrong money totals in many languages.
