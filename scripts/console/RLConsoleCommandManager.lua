@@ -22,10 +22,9 @@ function RLConsoleCommandManager.new()
         addConsoleCommand("rlFilterCreate", "Create a sample saveable filter (age>=48 AND isPregnant==false, COW/farm 1)", "createFilter", self, "[name]")
         addConsoleCommand("rlFilterList", "List all saveable filters currently in memory", "listFilters", self, "")
         addConsoleCommand("rlFilterClear", "Clear all saveable filters (SP diagnostic only)", "clearFilters", self, "")
-        -- Herdsman rules -- dev seed/inspect for the new menu (M-Frame) until the
-        -- F7 action bar provides a create UI. The frame reads the real
-        -- g_rlHerdsmanRuleService, so seeded rules drive F3 list / F4 detail / F7
-        -- actions and persist + sync like real rules.
+        -- Herdsman rules -- dev seed/inspect. These go through the real
+        -- g_rlHerdsmanRuleService, so seeded rules show in the Herdsman tab and
+        -- persist + sync like rules made there.
         addConsoleCommand("rlHerdsmanRuleCreate", "Seed a few disabled herdsman rules (sell/buy/ai x2, farm 1) for menu dev", "createHerdsmanRules", self, "")
         addConsoleCommand("rlHerdsmanRuleList", "List all herdsman rules currently in memory", "listHerdsmanRules", self, "")
         addConsoleCommand("rlHerdsmanRuleClear", "Clear all herdsman rules (SP diagnostic only)", "clearHerdsmanRules", self, "")
@@ -572,17 +571,16 @@ end
 
 
 -- =============================================================================
--- Herdsman rules -- dev seed/inspect for menu development (mirror the filter
--- commands). The Herdsman frame (M-Frame) reads g_rlHerdsmanRuleService, but no
--- create UI exists until F7, so these seed/inspect the registry. Superseded when
--- F7 ships the action bar. SP-only via the outer registration guard.
+-- Herdsman rules -- dev seed/inspect (mirror the filter commands). They read and
+-- write g_rlHerdsmanRuleService, the registry the Herdsman tab uses. SP-only via
+-- the outer registration guard.
 -- =============================================================================
 
 
 --- Seed a few disabled herdsman rules (sell/buy/ai x2, farm 1) so the Herdsman
---- menu has data to render before the F7 create UI exists. Two AI rules prove the
+--- tab has data to render without building rules by hand. Two AI rules prove the
 --- within-section alpha sort ("AI backup" sorts before "Breed top tier"). All
---- enabled=false so the (future) day-tick stays inert. Routes through the real
+--- enabled=false so the day tick leaves them alone. Routes through the real
 --- g_rlHerdsmanRuleService:create -> CRUD event -> persist + MP sync.
 ---@return string user-facing result
 function RLConsoleCommandManager:createHerdsmanRules()
@@ -595,7 +593,7 @@ function RLConsoleCommandManager:createHerdsmanRules()
 	-- Placeholder filterId: the floor accepts a nil filterId for non-naming operations
 	-- (an unfiltered draft), but the dev seeds carry a concrete placeholder so the rules
 	-- render with a filter summary. It need not resolve to a real saved filter for the
-	-- list to render; F4's filter summary will read "missing" until pointed at one.
+	-- list to render; the filter summary reads "missing" until pointed at one.
 	local filterId = "rlHerdsmanDev_filter"
 	-- Per-operation params mirror the legacy AIAnimalManager defaults
 	-- (AIAnimalManager.new, removed 1.3.2.0) so the rules pass RLHerdsmanRuleSerialization's

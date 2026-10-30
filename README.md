@@ -18,7 +18,7 @@ This is a maintained version of the original mod by Arrow-kb, who has discontinu
 - Genetics display in animal names with configurable detail level (average score or full trait breakdown)
 - Breeding and reproduction with pregnancy mechanics and genetic inheritance
 - AI insemination system with semen dewars
-- Disease simulation with ten diseases across cows, pigs, sheep, goats, chickens and horses - a hidden phase before symptoms on harder settings, spread within a pen, immunity, vaccination, paid treatment and culling, with five difficulty levels and a per-disease on/off list
+- Disease simulation with ten diseases across cows, pigs, sheep, goats, chickens, horses and alpacas - a hidden phase before symptoms on harder settings, spread within a pen, immunity, vaccination, paid treatment and culling, with five difficulty levels and a per-disease on/off list
 - Animal monitoring to track individual animals over time
 - Weight system tied to genetics and feeding
 - Animal marking and castration
@@ -29,11 +29,12 @@ This is a maintained version of the original mod by Arrow-kb, who has discontinu
 - Dealer controls: choose which animals and age groups the dealer offers, and whether it stocks Budget, Standard or Premium quality animals
 - Daily summary mode for message log
 - In-game help pages covering monitors, pregnancy, production, weight, and genetics
-- Highland cattle bull support
+- Beans and Alpacas DLC support: Brahman cattle, and alpacas as a full animal type with fleece, happiness, leading on the leash and shearing, by hand or by the animal worker
+- Highland cattle support, with ear tags, monitors and bull nose rings
 - Animal pack system: third-party mods can add new breeds or adjust animal balance
 - Map support: Hof Bergmann (ducks, geese, cats, rabbits, alpacas, quail) with automatic version-aware compatibility
 - Map support: Witcombe (UK breeds - Jersey, Gloucestershire Old Spot, Texel, Suffolk, Blue Faced Leicester, plus Hereford heritage profile) with automatic version-aware compatibility
-- Map support: Le Mechet (French breeds - Charolaise, Montbeliarde, Simmental, Vosgienne) with automatic version-aware compatibility
+- Map support: Le Mechet (French breeds - Charolais, Montbeliarde, Simmental, Vosgienne) with automatic version-aware compatibility
 - Simple support for butchers using Extended Production Point (EPP) mod
 - Mod compatibility checks at startup: hard-block dialog for incompatible mods, plus a dismissible warning tier for mods known to degrade gameplay
 - In-game warning when two map bridges or animal packs replace the same animal type's husbandry config (last-loaded wins; first one's animals can render as ghosts)
@@ -47,7 +48,7 @@ RLRM works on virtually any map out of the box. It does not need to be on a list
 **Maps:**
 - [Hof Bergmann](https://www.lsfarming-mods.com/) - ducks, geese, cats, rabbits, alpacas, quail with full breeding support
 - [Witcombe](https://oxygendavid.itch.io/witcombe-park-farm) - UK breeds (Jersey, Gloucestershire Old Spot, Texel, Suffolk, Blue Faced Leicester) with full breeding support; Hereford heritage profile
-- [Le Mechet](https://farming-simulator.com/mod.php?mod_id=357964) - French breeds (Charolaise, Montbeliarde, Simmental, Vosgienne) with full breeding support
+- [Le Mechet](https://farming-simulator.com/mod.php?mod_id=357964) - French breeds (Charolais, Montbeliarde, Simmental, Vosgienne) with full breeding support
 
 **Animal Packs:**
 - [Cow Breeds Pack for RLRM](https://github.com/ConGan98/FS25_CowBreedsRLRM) by ConGan98 - additional cattle breeds

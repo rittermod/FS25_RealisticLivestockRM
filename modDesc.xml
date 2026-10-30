@@ -1,6 +1,6 @@
-<modDesc descVersion="114">
+<modDesc descVersion="115">
     <author>Ritter</author>
-    <version>1.4.2.0-dev.4</version>
+    <version>1.4.2.0</version>
     <title>
         <en>Realistic Livestock - Ritter version</en>
         <it>Allevamento Realistico - Versione Ritter</it>
@@ -25,43 +25,51 @@ Documentation: https://rittermod.github.io/FS25_RealisticLivestockRM
 Source code and issue tracker: https://github.com/rittermod/FS25_RealisticLivestockRM
 
 Changelog:
-1.4.2.0-dev.4:
+1.4.2.0:
 Heads up before you update:
 - On Hof Bergmann with the Beans and Alpacas DLC, existing alpacas may change colour and stats, so back up your save first.
 
+Added:
+- Added alpacas, with RLRM ear tags and monitors, as an animal type for players who own the Beans and Alpacas DLC.
+- Added fleece and happiness to alpacas, so fleece grows daily, shows the woolly coat, and happiness raises price and health.
+- Added leading alpacas out of their shed on the leash and back, and shearing them by hand in the alpaca shed.
+- Made the animal worker shear and lead alpacas, filling an alpaca shed's fleece pallet and raising their happiness.
 - Added Brahman cows and bulls, with RLRM ear tags and monitors, as a breed for players who own the Beans and Alpacas DLC.
 - Added ear tags, monitors and bull nose rings to adult Highland cattle.
-- Added alpacas, with RLRM ear tags and monitors, as an animal type for players who own the Beans and Alpacas DLC.
-- Gave every alpaca a name, Hof Bergmann's and existing unnamed ones included.
-- Added fleece and happiness to alpacas, so fleece grows daily, shows the woolly coat, and happiness raises price and health.
-- Made the animal worker shear and lead alpacas, filling an alpaca shed's fleece pallet and raising their happiness.
-- Added leading alpacas out of their shed on the leash and back, and shearing them by hand in the alpaca shed.
-- Fixed Hof Bergmann alpacas, which now die of old age, have a lower accident risk and can catch clostridial disease, and new ones get fleece genetics.
-- Fixed some animals of a map or mod animal type with its own cluster class being given random horse names.
-- Fixed the group name and descriptions of an animal type a mod adds with its own texts showing a "Missing" message.
-- Fixed the saved ear tag colours of an animal type a mod adds being reset on every load.
-- Shortened the Russian vaccinated status so it fits the Diseases dialog.
 
-1.4.2.0-dev.3:
+Changed:
+- Gave every alpaca a name, Hof Bergmann's and existing unnamed ones included.
+
+Fixed:
+- Fixed farm members without the Trade Animals permission being able to mark, monitor, rename or castrate animals.
+- Fixed the Animals page of the in-game menu showing no animals on game version 1.25.
 - Fixed animal descriptions showing a "Missing" message on the Animals page and in the RL menu on game version 1.25.
-- Fixed the daily summary messages for sold, bought and overcrowding newborns showing wrong money totals in many languages.
-- Fixed hired animal workers doing no riding or grooming of horses on game version 1.25.
 - Fixed renaming an animal from the Animals page on game version 1.25, which now uses the RL menu's name dialog.
-- Fixed a horse ridden back into its stable reappearing at a random spot instead of where it entered, in singleplayer and for the host on game version 1.25.
+- Fixed a horse ridden back into its stable on game version 1.25 staying frozen outside instead of rejoining the herd.
+- Fixed horses in multiplayer on game version 1.25 being sent to other players in a format they could not read.
+- Fixed hired animal workers doing no riding or grooming of horses on game version 1.25.
+- Fixed the daily summary messages for sold, bought and overcrowding newborns showing wrong money totals in many languages.
 - Fixed the animal dealer never stocking an animal type that a DLC or mod adds to an existing save.
 - Fixed offspring of map and bridge animals whose breed has several colours always taking the first colour.
 - Fixed newborns of an animal type added by a DLC or mod sometimes becoming a different breed or animal type.
 - Fixed saved semen straws, dewars, inseminations and dealer farms changing animal type when animal types from a DLC or mod are added or removed later.
 - Fixed a straw held in hand becoming unusable after loading a save.
-
-1.4.2.0-dev.2:
-- Fixed the Animals page of the in-game menu showing no animals on game version 1.25.
-- Fixed a horse ridden back into its stable on game version 1.25 staying frozen outside instead of rejoining the herd.
-- Fixed horses in multiplayer on game version 1.25 being sent to other players in a format they could not read.
-
-1.4.2.0-dev.1:
+- Fixed Hof Bergmann alpacas, which now die of old age, have a lower accident risk and can catch pulpy kidney, and new ones get fleece genetics.
+- Fixed some animals of a map or mod animal type with its own cluster class being given random horse names.
+- Fixed the group name and descriptions of an animal type a mod adds with its own texts showing a "Missing" message.
+- Fixed the saved ear tag colours of an animal type a mod adds being reset on every load.
 - Fixed castrating a male lowering his overall genetics rating.
+
+Translations:
+- Added Swedish as a new language (contributed by DSK-Modding).
 - Updated the Russian translation (contributed by frezer89).
+- Shortened the Russian vaccinated status so it fits the Diseases dialog.
+
+Documentation:
+- Added an alpaca factsheet to the user guide.
+- Corrected the user guide against the game, including buy prices, output units, breeding, dealer genetics, settings, filters, the Herdsman and the map pages.
+- Documented in the overview guide that marking, monitoring, renaming and castrating need the Trade Animals permission in multiplayer.
+- Corrected the guides to say no Cow Breeds Pack version works on Le Mechet, as the pack dropped Le Mechet support.
 
 1.4.1.0:
 Added:
@@ -97,45 +105,6 @@ Translations:
 Documentation:
 - Explained vaccination, footrot and protection from the mother in the disease and breeding guides, the overview, the FAQ and the cattle, pig and sheep factsheets.
 - Corrected the mod compatibility and Hof Bergmann pages on what the LSFM Animal Transport Pack's herding does with Realistic Livestock.
-
-1.4.0.0:
-Heads up before you update:
-- Every disease infection, immunity, part-way treatment and CVM carrier in your save is cleared on first load - the new disease records cannot read the old ones. Your herd starts out disease-free and CVM-free.
-- The Diseases setting becomes a difficulty level: an existing save lands on Normal, or Off if diseases were off. The Disease Chance setting is gone.
-- A sick animal that shows symptoms can no longer be sold or taken to a butcher, by you or by the herdsman. A herdsman sell rule for animals with any disease now sells none - switch it off or change its filter.
-- Foot and mouth treatment is now a one-month course like every other disease, instead of three months.
-
-Added:
-- Added avian flu (HPAI) for chickens, BRD for cattle and pulpy kidney for sheep and goats - HPAI cannot be treated, so cull a bird that shows it straight away to stop it spreading through the flock.
-- Added colic, the first horse disease: a horse can fall ill with it on its own (it never spreads), grows more slowly if it is still young, and can die of it; a $500 treatment course cures it about half the time.
-- Added a hidden phase on Hard and Very hard: a newly infected animal of most diseases shows nothing until its symptoms appear, and on every level the "Contracted" message now arrives on the day symptoms show; an animal still in the hidden phase already spreads its disease.
-- Added illness effects on growth and breeding - most illnesses slow weight gain while an animal shows symptoms, and mastitis and foot and mouth also lower its chance of conceiving.
-- Added a Cull button to the Diseases dialog for an animal showing symptoms: it removes the animal from your herd for good and pays 33% of its current sale price, or nothing for a chicken.
-- Added Choose Diseases to the RL Menu settings: switch individual diseases off so no new cases of them start; animals that already have one keep it until it runs its course.
-- Added a message when a treatment course ends without curing the animal.
-- Added a credit to Renfordt's Enhanced Livestock: changes to the disease system are inspired by it, with some parts converted directly from it.
-
-Changed:
-- Rebuilt the disease system to run on the daily tick instead of once a month - catching, spreading, treatment and recovery all move day by day, and each disease's chance of striking is a monthly rate by age, so longer months no longer raise it.
-- Turned the Diseases setting into a difficulty choice - Off, Easy, Normal, Hard or Very hard: on Easy and Normal, the default, diseases are rare or strike now and then and show symptoms at once, while on Hard and Very hard they strike more often, spread faster and most take a while to show.
-- Changed natural recovery so an untreated animal that survives stays sick for at least its illness's minimum length and then recovers on a daily chance - some animals now stay sick longer than others.
-- Changed every treatable disease to a one-month treatment course, charged day by day while it runs - foot and mouth drops from three months to one.
-- Changed illness effects on production - less milk, goat milk, eggs, wool and manure, and PED raises liquid manure - to apply in full while an animal shows symptoms and about half as strongly while it is still in the hidden phase.
-- Changed the lower sale price for a sick animal to apply only while it shows symptoms - a recovered animal or a CVM carrier now sells at full price.
-- Stopped sick animals being sold or taken to a butcher while they show symptoms - by you or by the herdsman. A herdsman sell rule for animals with any disease now sells none, and in mark mode marks none; a herdsman move to a butcher leaves sick animals in the pen and tells you how many it skipped.
-- Renamed Avian Flu to Avian Flu (LPAI) in every language, to tell it apart from the new HPAI.
-
-Removed:
-- Removed the Disease Chance setting - the difficulty level replaces it.
-
-Fixed:
-- Fixed saving while a horse is out of its pen removing vehicles from the save - one per horse out, taken from the start of the vehicle list and sometimes the horse itself.
-- Fixed January and February messages appearing below the previous year's messages in the Messages tab; pregnancy due dates, birthdays and the feed forecast now use the right year in those months too.
-- Fixed one bad entry in the disease definition file silently dropping every disease defined after it - an authoring mistake now warns and skips just the offending entry.
-
-Documentation:
-- Rewrote the disease guide to cover all nine diseases, the hidden phase and the difficulty levels.
-- Corrected the settings reference: disease messages are not collected into daily summaries, though a death from disease still counts in the day's deaths summary.
 
 ]]>
         </en>

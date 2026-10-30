@@ -1,43 +1,51 @@
 # Changelog
 
-## 1.4.2.0-dev.4:
+## 1.4.2.0:
 
 ### Heads up before you update
 - On Hof Bergmann with the Beans and Alpacas DLC, existing alpacas may change colour and stats, so back up your save first.
 
+### Added
+- Added alpacas, with RLRM ear tags and monitors, as an animal type for players who own the Beans and Alpacas DLC.
+- Added fleece and happiness to alpacas, so fleece grows daily, shows the woolly coat, and happiness raises price and health.
+- Added leading alpacas out of their shed on the leash and back, and shearing them by hand in the alpaca shed.
+- Made the animal worker shear and lead alpacas, filling an alpaca shed's fleece pallet and raising their happiness.
 - Added Brahman cows and bulls, with RLRM ear tags and monitors, as a breed for players who own the Beans and Alpacas DLC.
 - Added ear tags, monitors and bull nose rings to adult Highland cattle.
-- Added alpacas, with RLRM ear tags and monitors, as an animal type for players who own the Beans and Alpacas DLC.
-- Gave every alpaca a name, Hof Bergmann's and existing unnamed ones included.
-- Added fleece and happiness to alpacas, so fleece grows daily, shows the woolly coat, and happiness raises price and health.
-- Made the animal worker shear and lead alpacas, filling an alpaca shed's fleece pallet and raising their happiness.
-- Added leading alpacas out of their shed on the leash and back, and shearing them by hand in the alpaca shed.
-- Fixed Hof Bergmann alpacas, which now die of old age, have a lower accident risk and can catch clostridial disease, and new ones get fleece genetics.
-- Fixed some animals of a map or mod animal type with its own cluster class being given random horse names.
-- Fixed the group name and descriptions of an animal type a mod adds with its own texts showing a "Missing" message.
-- Fixed the saved ear tag colours of an animal type a mod adds being reset on every load.
-- Shortened the Russian vaccinated status so it fits the Diseases dialog.
 
-## 1.4.2.0-dev.3:
+### Changed
+- Gave every alpaca a name, Hof Bergmann's and existing unnamed ones included.
+
+### Fixed
+- Fixed farm members without the Trade Animals permission being able to mark, monitor, rename or castrate animals.
+- Fixed the Animals page of the in-game menu showing no animals on game version 1.25.
 - Fixed animal descriptions showing a "Missing" message on the Animals page and in the RL menu on game version 1.25.
-- Fixed the daily summary messages for sold, bought and overcrowding newborns showing wrong money totals in many languages.
-- Fixed hired animal workers doing no riding or grooming of horses on game version 1.25.
 - Fixed renaming an animal from the Animals page on game version 1.25, which now uses the RL menu's name dialog.
-- Fixed a horse ridden back into its stable reappearing at a random spot instead of where it entered, in singleplayer and for the host on game version 1.25.
+- Fixed a horse ridden back into its stable on game version 1.25 staying frozen outside instead of rejoining the herd.
+- Fixed horses in multiplayer on game version 1.25 being sent to other players in a format they could not read.
+- Fixed hired animal workers doing no riding or grooming of horses on game version 1.25.
+- Fixed the daily summary messages for sold, bought and overcrowding newborns showing wrong money totals in many languages.
 - Fixed the animal dealer never stocking an animal type that a DLC or mod adds to an existing save.
 - Fixed offspring of map and bridge animals whose breed has several colours always taking the first colour.
 - Fixed newborns of an animal type added by a DLC or mod sometimes becoming a different breed or animal type.
 - Fixed saved semen straws, dewars, inseminations and dealer farms changing animal type when animal types from a DLC or mod are added or removed later.
 - Fixed a straw held in hand becoming unusable after loading a save.
-
-## 1.4.2.0-dev.2:
-- Fixed the Animals page of the in-game menu showing no animals on game version 1.25.
-- Fixed a horse ridden back into its stable on game version 1.25 staying frozen outside instead of rejoining the herd.
-- Fixed horses in multiplayer on game version 1.25 being sent to other players in a format they could not read.
-
-## 1.4.2.0-dev.1:
+- Fixed Hof Bergmann alpacas, which now die of old age, have a lower accident risk and can catch pulpy kidney, and new ones get fleece genetics.
+- Fixed some animals of a map or mod animal type with its own cluster class being given random horse names.
+- Fixed the group name and descriptions of an animal type a mod adds with its own texts showing a "Missing" message.
+- Fixed the saved ear tag colours of an animal type a mod adds being reset on every load.
 - Fixed castrating a male lowering his overall genetics rating.
+
+### Translations
+- Added Swedish as a new language (contributed by DSK-Modding).
 - Updated the Russian translation (contributed by frezer89).
+- Shortened the Russian vaccinated status so it fits the Diseases dialog.
+
+### Documentation
+- Added an alpaca factsheet to the user guide.
+- Corrected the user guide against the game, including buy prices, output units, breeding, dealer genetics, settings, filters, the Herdsman and the map pages.
+- Documented in the overview guide that marking, monitoring, renaming and castrating need the Trade Animals permission in multiplayer.
+- Corrected the guides to say no Cow Breeds Pack version works on Le Mechet, as the pack dropped Le Mechet support.
 
 ## 1.4.1.0:
 
