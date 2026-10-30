@@ -770,8 +770,14 @@ function DiseaseDialog:populateCellForItemInSection(list, section, index, cell)
         cell:getAttribute("status"):setText(disease:getStatus())
     end
 
-    cell.setSelected = Utils.appendedFunction(cell.setSelected, function(cell, selected)
-		if selected then self:onClickListItem(index) end
-	end)
-    
+    -- Pooled cells outlive a reload, so the hook goes on once per cell and reads the row the list
+    -- assigned last; a captured index would go stale on the next populate.
+    if not cell.rlDiseaseSelectHooked then
+        cell.rlDiseaseSelectHooked = true
+        cell.setSelected = Utils.appendedFunction(cell.setSelected, function(cell, selected)
+            if selected then self:onClickListItem(cell.indexInSection) end
+        end)
+        Log:trace("DiseaseDialog:populateCellForItemInSection: select hook installed (index=%s)", tostring(index))
+    end
+
 end

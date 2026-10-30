@@ -221,6 +221,11 @@ function RealisticLivestockFrame:getTitleForSectionHeader(list, section)
 end
 
 
+--- Fill one husbandry row's cells and hook the cell's selection once.
+---@param list table The husbandry list.
+---@param section number The one section.
+---@param index number The row index into `data`.
+---@param cell table The row's pooled cell.
 function RealisticLivestockFrame:populateCellForItemInSection(list, section, index, cell)
 
 	local item = self.data[index]
@@ -255,9 +260,14 @@ function RealisticLivestockFrame:populateCellForItemInSection(list, section, ind
 	cell:getAttribute("manure"):setText(RLAnimalDisplayHelper.formatAmountPerDay((item.manure * 24) / daysPerMonth))
 	cell:getAttribute("liquidManure"):setText(RLAnimalDisplayHelper.formatAmountPerDay((item.liquidManure * 24) / daysPerMonth))
 	
-	cell.setSelected = Utils.appendedFunction(cell.setSelected, function(cell, selected)
-		if selected then self:onClickListItem(cell) end
-	end)
+	-- Pooled cells outlive a reload, so the hook goes on once per cell, not once per populate.
+	if not cell.rlFrameSelectHooked then
+		cell.rlFrameSelectHooked = true
+		cell.setSelected = Utils.appendedFunction(cell.setSelected, function(cell, selected)
+			if selected then self:onClickListItem(cell) end
+		end)
+		Log:trace("RealisticLivestockFrame:populateCellForItemInSection: select hook installed (index=%s)", tostring(index))
+	end
 
 end
 
