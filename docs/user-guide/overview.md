@@ -52,6 +52,8 @@ Individual animals can be monitored, marked, and castrated:
 - **Marking** - Mark animals for visual identification in your herd
 - **Castration** - Castrate males for a small sell price bonus. Castrated animals grow faster but cannot breed. They keep their genetics; only their fertility reads Infertile.
 
+In multiplayer you need the **trade animals** farm permission to monitor, mark, rename or castrate an animal.
+
 ### Diseases
 
 All ten of the mod's diseases:

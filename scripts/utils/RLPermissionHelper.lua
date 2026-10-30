@@ -100,7 +100,7 @@ end
 
 --- Read a permission for the local player, for client-side UX gating only.
 ---
---- Never a security boundary - the server revalidates every request regardless.
+--- Never a security boundary.
 ---@param permissionKey string Permission name, e.g. "tradeAnimals"
 ---@return boolean granted True only when the local player holds the permission
 function RLPermissionHelper.hasLocalPermission(permissionKey)

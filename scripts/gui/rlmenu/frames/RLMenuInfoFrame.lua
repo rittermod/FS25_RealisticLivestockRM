@@ -573,9 +573,12 @@ function RLMenuInfoFrame:updateButtonVisibility()
 
     local animal = self:getSelectedAnimal()
     if animal ~= nil then
+        local canTrade = RLPermissionHelper.hasLocalPermission("tradeAnimals")
+
         -- Mark - always shown, text toggles
         local isMarked = animal.getMarked ~= nil and animal:getMarked()
         self.markButtonInfo.text = g_i18n:getText(isMarked and "rl_ui_unmark" or "rl_ui_mark")
+        self.markButtonInfo.disabled = not canTrade
         table.insert(self.menuButtonInfo, self.markButtonInfo)
 
         -- Monitor - always shown, 3-state text + disabled
@@ -583,27 +586,27 @@ function RLMenuInfoFrame:updateButtonVisibility()
         if monitor ~= nil then
             local monitorText = monitor.removed and "removing" or (monitor.active and "remove" or "apply")
             self.monitorButtonInfo.text = g_i18n:getText("rl_ui_" .. monitorText .. "Monitor")
-            self.monitorButtonInfo.disabled = monitor.removed
+            self.monitorButtonInfo.disabled = monitor.removed or not canTrade
         else
             self.monitorButtonInfo.text = g_i18n:getText("rl_ui_applyMonitor")
-            self.monitorButtonInfo.disabled = false
+            self.monitorButtonInfo.disabled = not canTrade
         end
         table.insert(self.menuButtonInfo, self.monitorButtonInfo)
 
         -- Rename - always shown
+        self.renameButtonInfo.disabled = not canTrade
         table.insert(self.menuButtonInfo, self.renameButtonInfo)
 
-        -- Diseases gates on a PERMISSION where its neighbours gate on per-animal state,
-        -- because opening it commits the farm to a recurring treatment fee. Written
-        -- unconditionally: the buttonInfo table is reused, so a stale `true` would
-        -- survive a permission grant.
+        -- Diseases gates on the permission because opening it commits the farm to a recurring
+        -- treatment fee. Every flag here is written unconditionally: the buttonInfo tables are
+        -- reused, so a stale `true` would survive a permission grant.
         local diseasesOff = g_diseaseManager == nil or not g_diseaseManager.diseasesEnabled
-        self.diseasesButtonInfo.disabled = diseasesOff or not RLPermissionHelper.hasLocalPermission("tradeAnimals")
+        self.diseasesButtonInfo.disabled = diseasesOff or not canTrade
         table.insert(self.menuButtonInfo, self.diseasesButtonInfo)
 
         -- Castrate - males only, not chickens
         if animal.gender == "male" and animal.animalTypeIndex ~= AnimalType.CHICKEN then
-            self.castrateButtonInfo.disabled = animal.isCastrated
+            self.castrateButtonInfo.disabled = animal.isCastrated or not canTrade
             table.insert(self.menuButtonInfo, self.castrateButtonInfo)
         end
 
@@ -845,6 +848,10 @@ function RLMenuInfoFrame:onClickMark()
         Log:trace("RLMenuInfoFrame:onClickMark: no animal selected, early return")
         return
     end
+    if not RLPermissionHelper.hasLocalPermission("tradeAnimals") then
+        Log:trace("RLMenuInfoFrame:onClickMark: no tradeAnimals permission, early return")
+        return
+    end
 
     local wasMarked = animal.getMarked ~= nil and animal:getMarked()
     local isMarked = not wasMarked
@@ -866,6 +873,10 @@ function RLMenuInfoFrame:onClickMonitor()
         Log:trace("RLMenuInfoFrame:onClickMonitor: no animal selected, early return")
         return
     end
+    if not RLPermissionHelper.hasLocalPermission("tradeAnimals") then
+        Log:trace("RLMenuInfoFrame:onClickMonitor: no tradeAnimals permission, early return")
+        return
+    end
 
     Log:trace("RLMenuInfoFrame:onClickMonitor: farmId=%s uniqueId=%s monitor.active=%s monitor.removed=%s",
         tostring(animal.farmId), tostring(animal.uniqueId),
@@ -883,6 +894,10 @@ function RLMenuInfoFrame:onClickRename()
     local animal = self:getSelectedAnimal()
     if animal == nil then
         Log:trace("RLMenuInfoFrame:onClickRename: no animal selected, early return")
+        return
+    end
+    if not RLPermissionHelper.hasLocalPermission("tradeAnimals") then
+        Log:trace("RLMenuInfoFrame:onClickRename: no tradeAnimals permission, early return")
         return
     end
 
@@ -980,6 +995,10 @@ function RLMenuInfoFrame:onClickCastrate()
     local animal = self:getSelectedAnimal()
     if animal == nil then
         Log:trace("RLMenuInfoFrame:onClickCastrate: no animal selected, early return")
+        return
+    end
+    if not RLPermissionHelper.hasLocalPermission("tradeAnimals") then
+        Log:trace("RLMenuInfoFrame:onClickCastrate: no tradeAnimals permission, early return")
         return
     end
 

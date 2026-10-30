@@ -1,3 +1,5 @@
+local Log = RmLogging.getLogger("RLRM")
+
 RealisticLivestockFrame = {}
 
 local realisticLivestockFrame_mt = Class(RealisticLivestockFrame, TabbedMenuFrameElement)
@@ -140,6 +142,7 @@ function RealisticLivestockFrame:updateContent()
 end
 
 
+--- Rebuild the footer; a selected row adds the pen Monitor button, disabled without tradeAnimals.
 function RealisticLivestockFrame:updateMenuButtons()
 
 	self.menuButtonInfo = { self.backButtonInfo, self.nextPageButtonInfo, self.prevPageButtonInfo }
@@ -148,17 +151,26 @@ function RealisticLivestockFrame:updateMenuButtons()
 
 		local allRemoving = self.selectedRow.percentMonitored == 1 and not self.selectedRow.hasActiveMonitors
 		self.changeMonitorsButtonInfo.disabled = self.selectedRow.totalAnimals == 0 or allRemoving
+			or not RLPermissionHelper.hasLocalPermission("tradeAnimals")
 
 		if allRemoving then
 			self.changeMonitorsButtonInfo.text = g_i18n:getText("rl_ui_removingAllMonitor")
 		else
 			self.changeMonitorsButtonInfo.text = g_i18n:getText("rl_ui_" .. (self.selectedRow.percentMonitored == 1 and "remove" or "apply") .. "AllMonitor")
 		end
-		
+
+		Log:trace("RealisticLivestockFrame:updateMenuButtons: totalAnimals=%s allRemoving=%s disabled=%s",
+			tostring(self.selectedRow.totalAnimals), tostring(allRemoving),
+			tostring(self.changeMonitorsButtonInfo.disabled))
+
 		table.insert(self.menuButtonInfo, self.changeMonitorsButtonInfo)
 
+	else
+
+		Log:trace("RealisticLivestockFrame:updateMenuButtons: no row selected, no pen Monitor button")
+
 	end
-	
+
 	self:setMenuButtonInfoDirty()
 
 end
@@ -292,15 +304,27 @@ function RealisticLivestockFrame:onClickListItem(item)
 end
 
 
+--- Apply or remove monitors across the selected pen, then refresh the row totals and the footer.
 function RealisticLivestockFrame:onClickChangeMonitors()
 
 	local selectedRow = self.selectedRow
 
-	if selectedRow == nil then return end
+	if selectedRow == nil then
+		Log:trace("RealisticLivestockFrame:onClickChangeMonitors: no row selected, early return")
+		return
+	end
+
+	-- The footer flag goes stale if the permission is revoked while the page is open.
+	if not RLPermissionHelper.hasLocalPermission("tradeAnimals") then
+		Log:trace("RealisticLivestockFrame:onClickChangeMonitors: no tradeAnimals permission, early return")
+		return
+	end
 
 	local animals = selectedRow.placeable:getClusters()
 
 	if selectedRow.percentMonitored == 1 then
+
+		Log:trace("RealisticLivestockFrame:onClickChangeMonitors: removing %d monitors", #animals)
 
 		for _, animal in pairs(animals) do
 
@@ -312,6 +336,8 @@ function RealisticLivestockFrame:onClickChangeMonitors()
 		end
 
 	else
+
+		Log:trace("RealisticLivestockFrame:onClickChangeMonitors: applying %d monitors", #animals)
 
 		for _, animal in pairs(animals) do
 

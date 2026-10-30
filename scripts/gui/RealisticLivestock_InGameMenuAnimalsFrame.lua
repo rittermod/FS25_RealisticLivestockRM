@@ -288,9 +288,24 @@ InGameMenuAnimalsFrame.onFrameClose = Utils.appendedFunction(
 )
 
 
+--- Drop Rename for a player without tradeAnimals, then add the RL Menu entry for the selected pen.
 function RealisticLivestock_InGameMenuAnimalsFrame:onUpdateMenuButtons()
+    -- By identity from a gapless array: other mods append to this hook, and a skipped slot stays visible.
+    if not RLPermissionHelper.hasLocalPermission("tradeAnimals") then
+        for i = #self.menuButtonInfo, 1, -1 do
+            if self.menuButtonInfo[i] == self.renameButtonInfo then
+                table.remove(self.menuButtonInfo, i)
+                Log:trace("InGameMenuAnimalsFrame:onUpdateMenuButtons: Rename removed, no tradeAnimals permission")
+                break
+            end
+        end
+    end
+
     local selectedHusbandry = self.selectedHusbandry
-    if selectedHusbandry == nil then return end
+    if selectedHusbandry == nil then
+        Log:trace("InGameMenuAnimalsFrame:onUpdateMenuButtons: no selected husbandry, no RL Menu entry")
+        return
+    end
 
     table.insert(self.menuButtonInfo, {
         inputAction = InputAction.RL_OPEN_ANIMAL_SCREEN,
@@ -322,6 +337,11 @@ InGameMenuAnimalsFrame.updateMenuButtons = Utils.appendedFunction(
 function RealisticLivestock_InGameMenuAnimalsFrame:onButtonRename(superFunc)
     if not Platform.gameplay.canRenameAnimals then
         Log:trace("InGameMenuAnimalsFrame:onButtonRename: platform cannot rename animals, nothing opens")
+        return
+    end
+
+    if not RLPermissionHelper.hasLocalPermission("tradeAnimals") then
+        Log:trace("InGameMenuAnimalsFrame:onButtonRename: no tradeAnimals permission, nothing opens")
         return
     end
 
