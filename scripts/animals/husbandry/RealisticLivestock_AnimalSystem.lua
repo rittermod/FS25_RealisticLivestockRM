@@ -700,7 +700,18 @@ end
 AnimalSystem.loadAnimalConfig = Utils.overwrittenFunction(AnimalSystem.loadAnimalConfig, RealisticLivestock_AnimalSystem.loadAnimalConfig)
 
 
-function RealisticLivestock_AnimalSystem:loadSubTypes(_, animalType, xmlFile, key, directory)
+--- Register the subtypes of one animal entry, leaving a name already registered as it is.
+---@param _ function The replaced base function, never called
+---@param animalType table The type the subtypes join
+---@param xmlFile table XMLFile holding the entry
+---@param key string XML key of the animal entry
+---@param directory string Base directory for the entry's relative paths
+---@param overrideOnlyAllowed boolean|nil True when a block with no fillTypeName only overrides properties
+---@return boolean success Always true
+---@return number skipped Override-only blocks skipped because their subtype never registered
+function RealisticLivestock_AnimalSystem:loadSubTypes(_, animalType, xmlFile, key, directory, overrideOnlyAllowed)
+
+    local skipped = 0
 
     for _, subTypeKey in xmlFile:iterator(key .. ".subType") do
 
@@ -733,6 +744,14 @@ function RealisticLivestock_AnimalSystem:loadSubTypes(_, animalType, xmlFile, ke
 			end
 
 		    local fillTypeName = xmlFile:getString(subTypeKey .. "#fillTypeName")
+
+		    if fillTypeName == nil and overrideOnlyAllowed then
+			    skipped = skipped + 1
+			    Log:debug("loadSubTypes: skipping override-only block for unregistered subType '%s' (type '%s')",
+				    name, animalType.name)
+			    continue
+		    end
+
 		    local fillTypeIndex = g_fillTypeManager:getFillTypeIndexByName(fillTypeName)
 
 		    if fillTypeIndex == nil then
@@ -780,7 +799,7 @@ function RealisticLivestock_AnimalSystem:loadSubTypes(_, animalType, xmlFile, ke
 
 	end
 
-	return true
+	return true, skipped
 
 end
 

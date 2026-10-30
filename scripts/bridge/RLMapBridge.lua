@@ -5,7 +5,7 @@
     Detects supported maps and loads additional animal data (male subtypes, fill types)
     to enable full RLRM reproduction for exotic animal types defined by those maps.
 
-    The bridge files are bundled inside RLRM at xml/bridge/<modName>/.
+    The bridge files are bundled inside RLRM at mod_support/<modName>/.
     No user configuration needed - detection is automatic via g_modIsLoaded.
 ]]
 
@@ -632,6 +632,7 @@ function RLMapBridge.loadBridgeAnimals(animalSystem)
 
             local subtypesAdded = 0
             local subtypesSkipped = 0
+            local overrideOnlySkipped = 0
 
             for _, key in xmlFile:iterator("animals.animal") do
                 local rawTypeName = xmlFile:getString(key .. "#type")
@@ -650,7 +651,10 @@ function RLMapBridge.loadBridgeAnimals(animalSystem)
                     -- Count subtypes before loading
                     local beforeCount = #animalSystem.subTypes
 
-                    local success = animalSystem:loadSubTypes(animalType, xmlFile, key, mapModDir)
+                    -- A block with no fillTypeName only overrides properties, so a subtype that never
+                    -- registered (its DLC is off, the map's animals were skipped) has nothing to apply to.
+                    local success, skippedHere = animalSystem:loadSubTypes(animalType, xmlFile, key, mapModDir, true)
+                    overrideOnlySkipped = overrideOnlySkipped + (skippedHere or 0)
 
                     local afterCount = #animalSystem.subTypes
                     local added = afterCount - beforeCount
@@ -670,7 +674,8 @@ function RLMapBridge.loadBridgeAnimals(animalSystem)
                         end
                     elseif added == 0 then
                         subtypesSkipped = subtypesSkipped + 1
-                        Log:info("MapBridge: No new subtypes added for '%s' (all may have been duplicates)", typeName)
+                        Log:info("MapBridge: No new subtypes added for '%s' (already registered or override-only)",
+                            typeName)
                     else
                         Log:warning("MapBridge: loadSubTypes returned false for type '%s'", typeName)
                     end
@@ -684,8 +689,9 @@ function RLMapBridge.loadBridgeAnimals(animalSystem)
             RLMapBridge.loadBreedingGroups(xmlFile, bridge.name)
 
             xmlFile:delete()
-            Log:info("MapBridge: Bridge loading complete for '%s': %d subtypes added, %d type entries with no new subtypes",
-                bridge.name, subtypesAdded, subtypesSkipped)
+            Log:info("MapBridge: Bridge loading complete for '%s': %d subtypes added, %d type entries with no new "
+                .. "subtypes, %d override-only blocks skipped",
+                bridge.name, subtypesAdded, subtypesSkipped, overrideOnlySkipped)
         end
 
         local afterCount = #animalSystem.subTypes

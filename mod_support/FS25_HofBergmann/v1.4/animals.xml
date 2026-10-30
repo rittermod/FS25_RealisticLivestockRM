@@ -664,8 +664,7 @@
                 </pallets>
             </output>
         </subType>
-        <!-- DLC-gated (highlandsFishingPack): if the DLC is absent the subtype is unregistered
-             and the bridge simply skips this override - harmless. -->
+        <!-- Registers with or without the highlandsFishingPack DLC, so this override always applies. -->
         <subType subType="COW_HIGHLAND_CATTLE">
             <output>
                 <pallets fillType="MILK">
