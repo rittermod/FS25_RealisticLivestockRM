@@ -10,8 +10,8 @@ Saved filters are named, reusable searches that narrow a long animal list down t
 
 A filter is a set of **conditions** - small tests like "age is 30 months or more" or "is not pregnant". An animal is shown only if it matches. Conditions combine one of two ways:
 
-- **Match all (AND)** - the animal must satisfy *every* condition.
-- **Match any (OR)** - the animal must satisfy *at least one* condition.
+- **Match ALL (AND)** - the animal must satisfy *every* condition.
+- **Match ANY (OR)** - the animal must satisfy *at least one* condition.
 
 You pick which mode a filter uses when you create it.
 
@@ -37,7 +37,7 @@ Open the **RL Menu** (default **Right Shift + O**, or press **R** at one of your
    - **Dealer screens** (Buy)
 
    This keeps a "cull my herd" filter off the dealer's Buy screen, and a "good bulls to buy" filter off your own-herd screens.
-5. Choose **Match all** or **Match any** for how the conditions combine.
+5. Choose **Match ALL** or **Match ANY** for how the conditions combine.
 
 ---
 
@@ -81,21 +81,21 @@ The **Compare** picker and each saved condition row show a plain-English label i
 | **is less than** | under this value | `Genetics: overall is less than 50` | animals under 50 overall genetics |
 | **is** | matches exactly | `Gender is Female` | female animals |
 | **is not** | anything except | `Gender is not Male` | every animal except males (so, females) |
-| **is one of** | any value in a list | `Breed is one of [Holstein, Jersey]` | Holstein or Jersey animals |
-| **is none of** | no value in the list | `Breed is none of [Holstein, Jersey]` | every breed except those two |
+| **is one of** | any value in a list | `Breed is one of [Holstein, Holstein Bull]` | Holstein cows and bulls |
+| **is none of** | no value in the list | `Breed is none of [Holstein, Holstein Bull]` | every breed except those two entries |
 | **contains** | the name includes the text | `Name contains betty` | Betty, Bettyboop, ... (any name with "betty") |
 | **does not contain** | the name excludes the text | `Name does not contain keep` | any name without "keep" in it |
 
 A couple of things help when reading a row:
 
 - Rows read like a short sentence: `Age is at least 30`, `Gender is not Male`.
-- **Yes/no rows drop the verb entirely** - a Pregnant condition reads `Pregnant No` or `Pregnant Yes` (not "Pregnant is No"), and the same goes for Castrated, Has a name, and the other yes/no fields.
+- **Yes/no rows drop the verb entirely** - a Pregnant condition reads `Pregnant No` or `Pregnant Yes` (not "Pregnant is No"), and the same goes for Castrated, Has name, and the other yes/no fields.
 
 Which labels you can pick depends on the field:
 
-- **Number** fields (Age, Weight, Health, Genetics) offer all six of `is less than`, `is at most`, `is`, `is not`, `is at least`, `is more than`, plus `is one of` / `is none of` to match a list of exact values.
-- **Yes/no** fields (Pregnant, Castrated, Has a name, ...) only test `is`, matched against **Yes** or **No** - and the row drops the word, e.g. `Pregnant No`.
-- **Gender** and **Breed** use `is` / `is not` for a single value, or `is one of` / `is none of` for a list.
+- **Number** fields (Age, Weight, Health, Genetics) offer all six of `is less than`, `is at most`, `is`, `is not`, `is at least`, `is more than`.
+- **Yes/no** fields (Pregnant, Castrated, Has name, ...) only test `is`, matched against **Yes** or **No** - and the row drops the word, for example `Pregnant No`.
+- **Gender** and **Breed** use `is` / `is not` for a single value, or `is one of` / `is none of` for a list. Bulls, rams and boars are separate **Breed** entries: `Holstein` means Holstein cows only, so `Breed is none of [Holstein]` still matches Holstein Bulls. List both to cover the whole breed.
 - **Name** uses `contains` / `does not contain` only.
 
 A couple more things worth knowing:
@@ -113,8 +113,8 @@ The most useful fields:
 - **Gender**, **Breed** (the specific subtype)
 - **Genetics** - health, fertility, productivity, quality, metabolism, and overall (0-99)
 - **Pregnant**, **Lactating** (cows), **Castrated**
-- **Name** / **Has a name**
-- **Has a disease**, **Has a mark**
+- **Name** / **Has name**
+- **Has any disease**, **Has any mark**
 - **Weight** and **Health** - but only for animals with an **active monitor**; without one, these tests never match, so pair them with another condition.
 
 For the complete field-and-comparator reference - and for power users who want to hand-write filters in the save file - see [Hand-Crafting Saveable Filters](filter-preview.md).
@@ -132,16 +132,16 @@ Only filters whose **Show on** scope and **animal type** fit the current screen 
 ## Duplicate and delete
 
 - **Duplicate** copies the selected filter, giving you a starting point for a variation.
-- **Delete filter** removes it (with a confirmation).
+- **Delete** removes it (with a confirmation). The confirmation doesn't warn you if a Herdsman task uses the filter: that task stays in place but selects no animals, and shows its filter as **(missing)**, until you pick another.
 
 ---
 
 ## Multiplayer
 
-Filters are shared across the whole server and are managed by the host. You need the **trade animals** farm permission to create, edit, or delete them, and your changes sync to everyone.
+Filters belong to your farm: everyone on the farm shares the same list, other farms have their own, and the host keeps them with the savegame. You need the **trade animals** farm permission to create, edit, or delete them, and your changes sync to the rest of your farm.
 
 ---
 
 ## Filters power the Herdsman
 
-Every [Herdsman](guide-herdsman.md) rule points at one saved filter to decide which animals it acts on. If you plan to automate selling, moving, or buying, build the filter here first, then reference it from a rule.
+Every [Herdsman](guide-herdsman.md) task except Naming points at one saved filter to decide which animals it acts on. If you plan to automate selling, moving, or buying, build the filter here first, then pick it in the task.

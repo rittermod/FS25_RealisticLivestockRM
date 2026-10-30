@@ -102,7 +102,7 @@ The `animals.xml` file is where the main work happens. It can contain:
 - [Property overrides](#property-overrides) for existing breeds
 - [New subtype definitions](#adding-new-subtypes) for new breeds
 - [Config overrides](#config-overrides) for model replacement
-- [Breed metadata](#breed-metadata) for display names and marker colours
+- [Breed metadata](#breed-metadata) for display names and in-pen marker colours
 - [Breeding groups](#breeding-groups) for breeding restrictions
 
 ### Property Overrides
@@ -112,12 +112,8 @@ Override specific properties on existing breeds. Only the properties you specify
 ```xml
 <animals>
     <animal type="COW">
-        <!-- Override Holstein cow prices and food consumption -->
+        <!-- Override Holstein cow sell prices and food consumption -->
         <subType subType="COW_HOLSTEIN">
-            <buyPrice>
-                <key ageMonth="0" value="300"/>
-                <key ageMonth="24" value="3000"/>
-            </buyPrice>
             <sellPrice>
                 <key ageMonth="0" value="250"/>
                 <key ageMonth="24" value="2800"/>
@@ -155,8 +151,8 @@ Override specific properties on existing breeds. Only the properties you specify
 | Maximum weight | `subType#maxWeight` | kg (float) |
 | Reproduction | `<reproduction>` | `supported`, `minAgeMonth`, `durationMonth`, `minHealthFactor` |
 | Health rates | `<health>` | `increasePerHour`, `decreasePerHour` (0-100) |
-| Buy price curve | `<buyPrice>` | AnimCurve: `<key ageMonth="X" value="Y"/>` |
-| Sell price curve | `<sellPrice>` | AnimCurve |
+| Buy price curve | `<buyPrice>` | AnimCurve. No effect on what the dealer charges - see the note below |
+| Sell price curve | `<sellPrice>` | AnimCurve: `<key ageMonth="X" value="Y"/>` |
 | Transport price curve | `<transportPrice>` | AnimCurve |
 | Food consumption | `<input><food>` | AnimCurve |
 | Water consumption | `<input><water>` | AnimCurve |
@@ -167,6 +163,8 @@ Override specific properties on existing breeds. Only the properties you specify
 | Pallet output | `<output><pallets fillType="...">` | AnimCurve (with fill type) |
 | Visual stages | `<visuals><visual>` | Override or insert by `minAge` match (see [Visual Overrides](#visual-overrides)) |
 | Rideable vehicle | `<rideable filename="..."/>` | Horse rideable vehicle XML, path relative to the pack root |
+
+> **`<buyPrice>` has no effect on what the dealer charges.** The dealer's price is the animal's own sale value plus a markup that depends on the **Dealer Animal Quality** setting, plus the transport fee. To change what an animal costs at the dealer, override `<sellPrice>`, and `<transportPrice>` for the fee.
 
 #### Overridable type-level properties
 
@@ -187,10 +185,10 @@ Price, production, and consumption curves use age-based keyframes. The game line
 Consumption curves (`<input>`: food, water, straw) accept decimal values such as `0.2`. Every other curve reads whole numbers only - a decimal there is cut down to its whole part (`2.9` becomes `2`).
 
 ```xml
-<buyPrice>
+<sellPrice>
     <key ageMonth="0" value="200"/>     <!-- At birth: $200 -->
     <key ageMonth="24" value="2500"/>   <!-- At 24 months: $2500 -->
-</buyPrice>
+</sellPrice>
 ```
 
 ### Adding New Subtypes
@@ -199,7 +197,7 @@ To add a new breed, define a full subtype within the appropriate animal type. Ne
 
 - A unique `subType` name (uppercase, e.g., `COW_CHAROLAIS`)
 - A matching `fillTypeName` (defined in your `fillTypes.xml`)
-- Visual stages with store images
+- Visual stages, each with a store image, a `visualAnimalIndex` and at least one `<description>` child element. A stage missing any of these is skipped, and a subtype left with no stage does not load
 - All the properties a breed needs (prices, reproduction, weights, etc.)
 
 ```xml
@@ -223,6 +221,7 @@ To add a new breed, define a full subtype within the appropriate animal type. Ne
                 </visual>
             </visuals>
             <reproduction minAgeMonth="12" durationMonth="10" minHealthFactor="0.75"/>
+            <!-- No effect on the dealer's price, which follows sellPrice -->
             <buyPrice>
                 <key ageMonth="0" value="200"/>
                 <key ageMonth="24" value="2500"/>
@@ -275,7 +274,7 @@ New subtypes are loaded through the same `loadSubTypes` path RLRM's own breeds u
 Visual stages define how an animal looks at different ages (calf, juvenile, adult). Each stage is matched by `minAge`. When overriding visuals on an existing breed:
 
 - If a stage with the same `minAge` already exists, its properties are updated
-- If no stage with that `minAge` exists, a new stage is inserted (sorted by age)
+- If no stage with that `minAge` exists, a new stage is inserted (sorted by age). It must set `visualAnimalIndex`, or it is skipped with a log warning
 
 ```xml
 <subType subType="COW_HOLSTEIN">
@@ -298,6 +297,7 @@ When multiple breeds share the same 3D model but use different texture rows from
 
 ```xml
 <visual minAge="18" visualAnimalIndex="2" image="images/store_myBreed.dds">
+    <description>$l10n_animal_descriptionMature</description>
     <textureIndexes>
         <value>3</value>
         <value>4</value>
@@ -340,7 +340,7 @@ Config overrides are processed **before** subtypes are loaded, so your new subty
 
 ### Breed Metadata
 
-When adding new breeds, register their display names and marker colours so the GUI shows them correctly:
+When adding new breeds, register their display names and in-pen marker colours so the game shows them correctly:
 
 ```xml
 <animals>
@@ -358,9 +358,9 @@ When adding new breeds, register their display names and marker colours so the G
 |-----------|-------------|
 | `name` | Breed identifier (uppercase, matches the `breed` attribute on subtypes) |
 | `displayName` | Localized name for the GUI. Use `$l10n_` prefix to reference translations. |
-| `markerColour` | RGB colour for the breed's map marker, as three space-separated floats (0.0-1.0) |
+| `markerColour` | RGB colour of the in-pen marker shown on marked animals of this breed, as three space-separated floats (0.0-1.0) |
 
-The `$l10n_` references are resolved from the global translation table, which includes your pack's translations (loaded before breed metadata).
+The `$l10n_` references are resolved from RLRM's own text table, which includes your pack's translations (loaded before breed metadata).
 
 ### Breeding Groups
 
@@ -420,7 +420,7 @@ Standard FS25 translation XML:
 </l10n>
 ```
 
-These translations are loaded into the global translation table, so they work with `$l10n_` references in your animals.xml and fill types.
+These translations are loaded into RLRM's own text table, so they work with `$l10n_` references in your animals.xml and fill types.
 
 ---
 
@@ -514,7 +514,7 @@ Mention the RLRM dependency in the description so players know the pack requires
 ## Limitations
 
 - **Cannot remove breeds.** Packs can add new breeds and override properties on existing ones, but cannot remove a breed that RLRM or another pack defines. This is a limit on what a *pack* can do, not on the player: the **Choose Animals For Sale** setting lets them hide any breed or age stage from the dealer, which stops it being stocked without removing its definition.
-- **Cannot add new animal types.** Packs can only add subtypes within existing types (COW, PIG, SHEEP, HORSE, CHICKEN, and any types added by the map). Creating an entirely new animal type requires map-level support.
+- **Cannot add new animal types.** Packs can only add subtypes within existing types (COW, PIG, SHEEP, HORSE, CHICKEN, ALPACA while the Beans & Alpacas Expansion is active, and any types added by the map). Creating an entirely new animal type requires map-level support.
 - **Cannot modify diseases.** The disease system is not exposed to packs.
 - **One config override per animal type.** If two packs both override the model config for the same animal type, only the last one loaded takes effect and the other pack's visuals will break. RLRM detects this collision and warns the player - a startup dialog plus a log warning naming the packs involved. See [Config Overrides](#config-overrides).
 - **No explicit priority system.** Load order is strictly alphabetical by mod name. There's no way to declare "load after pack X" -- use naming conventions to manage order.

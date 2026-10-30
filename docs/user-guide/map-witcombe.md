@@ -53,7 +53,7 @@ By default, the map only defines **female** versions of its new breeds. Without 
 | **Blue Faced Leicester Ram** | Sheep | BFL ewe (also pairs with other sheep breeds) |
 | **Buck Rabbit** | Rabbit | Doe rabbit |
 
-All males are buyable at the Animal Dealer and behave like any other RLRM male - they cannot give birth themselves, but a healthy male older than the breeding age can mate with females in the same husbandry.
+All males are buyable at the Animal Dealer and behave like any other RLRM male: a healthy male older than the breeding age can mate with females in the same husbandry.
 
 ---
 
@@ -63,14 +63,18 @@ Each Witcombe breed has its own personality on the farm - different feed needs, 
 
 | Breed | Distinctive in-game character |
 |---|---|
-| **Jersey** | Small-frame heritage dairy. Drinks about 60% of the water of a Holstein, eats less feed, and produces less milk at peak (~160 L/day vs ~255 for Swiss Brown). 9-month gestation (one month shorter than other cattle), premium calf and adult prices. Sells best young at 24 months. |
-| **Hereford** | Leaner heritage beef breed. 9-month gestation, premium pricing (300 / 3000), and an earlier sell-price peak at 24 months (vs 36 months for other beef breeds). Eats less than a Limousin while still producing the same modest dual-purpose milk every RLRM cow produces. |
-| **Highland** | Behaves the same as Highland on any other map - the standard RLRM Highland (12-month maturity, premium adult transport price, dual-purpose milk). |
+| **Jersey** | Heritage dairy breed. Drinks about 60% of the water of a Holstein, eats less feed, and produces less milk at peak (~160 L/month vs ~255 for Swiss Brown). 9-month gestation (one month shorter than other cattle), premium calf and adult prices. Sells best young at 24 months. |
+| **Hereford** | Leaner heritage beef breed. 9-month gestation, premium sell prices while young, and an earlier sell-price peak at 24 months (vs 36 months for other beef breeds). Eats less than a Limousin and still gives more milk at peak (~265 L/month) than a Swiss Brown (~255) or a Jersey (~160). |
+| **Highland** *(DLC)* | Behaves the same as Highland on any other map - the standard RLRM Highland (12-month maturity, standard cattle transport fee, dual-purpose milk). |
 | **Gloucestershire Old Spot** | Heritage slow-grow pig. Reaches breeding age at 8 months instead of 6, grows on a slower curve with a 10-month extension, and commands premium pricing. Won't fatten as fast as a Landrace but sells for more. |
-| **Texel** | Heavier-frame meat sheep. Drinks and eats more than the other Witcombe heritage sheep; lamb sells for double after the 8-month maturity step. Lower wool yield than a wool breed (peak ~25), and lambs aren't sheared before 6 months. |
-| **Suffolk** | Fast-breeder among the Witcombe sheep - ready at 6 months, not 8. Medium frame, early-market lamb peak at 6 months. Wool peak ~35 (between Texel and base-game). |
-| **Blue Faced Leicester** | Breeding-stock economics. Highest premium of the heritage sheep (300 / 2500 to buy) but modest sell prices (peaks at 700 at 36 months) - buy for breeding, not for the meat market. Light-frame and feed-efficient. Shorter 4-month gestation, unique among Witcombe sheep. |
-| **Rabbit** | Witcombe-defined species. Most map values are kept as authored; the mod corrects rabbit-scale weights, litter size (4-8), and doe consumption rates so the animals are viable to keep (see [Rabbit Improvements](#rabbit-improvements)). |
+| **Texel** | Meat sheep. Drinks and eats more than the other Witcombe heritage sheep. A ewe's sell price climbs steadily from about 600 at 8 months to 1,200 at 36 months; a ram's doubles just after 8 months. Lower wool yield than a wool breed (peak ~25), and lambs aren't sheared before 6 months. |
+| **Suffolk** | Meat sheep with mid-range feed needs among the Witcombe sheep. Sell price climbs quickly to about 550 at 6 months, then keeps rising to 1,100 at 36 months. Wool peak ~35 (between Texel and base-game). |
+| **Blue Faced Leicester** | Breeding-stock sheep with modest sell prices (peaks at 700 at 36 months) - buy for breeding, not for the meat market. Feed-efficient. Shorter 4-month gestation, unique among Witcombe sheep. |
+| **Rabbit** | Witcombe-defined species. Most map values are kept as authored; the mod corrects rabbit-scale weights, litter size (usually 4, rarely up to 8), and doe consumption rates so the animals are viable to keep (see [Rabbit Improvements](#rabbit-improvements)). |
+
+*Food, water, straw and production figures are per in-game month, whatever your month length. The animal's info box shows them per day, so with 3 days per month it shows a third of these figures.*
+
+Prices on this page are sale values. The dealer's price is the animal's own sale value plus a markup that depends on the [**Dealer Animal Quality**](reference-settings.md#dealer-ai) setting, plus a transport fee per animal, so a breed that sells high also costs more to buy. Buying into a trailer at the dealer has no transport fee.
 
 Bulls, boars, and rams added by the mod mirror the female of the same breed - see [Breeding Notes](#breeding-notes) below.
 
@@ -85,11 +89,11 @@ Hereford exists in RLRM out of the box, but Witcombe ships its own Hereford visu
 **Heritage breed character.** On Witcombe, Hereford also feels like a traditional UK heritage breed:
 
 - **9-month gestation** (one month shorter than the standard 10).
-- **Premium pricing** at 300 / 3000 (vs RLRM's default Hereford pricing of 225 / 2400).
+- **Premium sell prices while young.** A calf starts at 250 (vs 210 for RLRM's default Hereford) and a 24-month cow is worth 3,500 (vs 2,200). The dealer's price follows the sale value, so she costs more to buy at those ages too.
 - **Leaner appetite** - lower feed, water, and manure rates than other beef cattle.
 - **Earlier sell-price peak.** Cows hit 2,500 at 18 months and peak at 3,500 at 24 months - one year earlier than other beef breeds, which peak at 36 months. Bulls follow the same shape with bigger numbers (3,000 / 4,200 at 18 / 24 months).
 
-The bull mirrors the cow's heritage pricing and lean efficiency. RLRM's standard cattle behaviour also applies on top - 12-month breeding age, the premium adult transport price, and the modest dual-purpose milk every RLRM cow produces.
+The bull mirrors the cow's heritage pricing and lean efficiency. RLRM's standard cattle behaviour also applies on top - 12-month breeding age, the standard cattle transport fee, and RLRM's dual-purpose milk, which peaks at about 265 L/month for this breed.
 
 You don't need to do anything - both the visual fix and the heritage profile are applied automatically.
 
@@ -111,7 +115,7 @@ So a Jersey cow on Witcombe is rendered as a Swiss Brown cow - both in the Anima
 
 This is the same approach RLRM uses for its own bundled subtypes that lack dedicated models. It's the lightest way to give a new breed full RLRM treatment when nobody is shipping custom 3D textures for it.
 
-> **Want breed-distinct visuals?** Install an animal pack that ships its own textures. The `FS25_CowBreedsRLRM` pack is one example - it bakes a custom cattle texture atlas (Jersey, Red Holstein, Ayrshire, Guernsey, Hereford, Charolais, and more) onto the base-game meshes, so each breed renders in its own coat colour. See [Animal Packs](guide-animal-packs.md) for installation and compatibility notes.
+> **Want breed-distinct visuals?** Install an animal pack that ships its own textures. The `FS25_CowBreedsRLRM` pack is one example - it bakes a custom cattle texture atlas (Jersey, Red Holstein, Ayrshire, Guernsey, Hereford, Charolais, and more) onto the base-game meshes, so each of its breeds renders in its own coat colour. It adds its own Jersey beside Witcombe's as a separate breed, and it covers cattle only, so Witcombe's pigs and sheep keep their shared models. See [Animal Packs](guide-animal-packs.md) for installation and compatibility notes.
 
 ---
 
@@ -122,11 +126,11 @@ The map's default rabbit data is derived from 3D model dimensions, which produce
 | What's Corrected | Why |
 |------------------|-----|
 | Female weight to 0.1 / 2.5 / 5.0 kg (min/target/max) | Map derived weight from navigation mesh size, not real rabbit weight |
-| Doe water and food consumption to rabbit-scale rates (0.1-0.5 L water, 0.2-1.5 L food per day) | Map's source values were sheep-scaled and would crash doe Health to 0% within hours of placement |
+| Doe water and food consumption to rabbit-scale rates (0.1-0.5 L water, 0.2-1.5 L food per month) | Map's source values were sheep-scaled and would crash doe Health to 0% within hours of placement |
 | Male weight to 0.1 / 3.0 / 5.5 kg | Same weight correction for the new male subtype |
-| Litter size to 4-8 kits per pregnancy | Map default was 1-3; real rabbits have 4-8 per litter |
+| Litter size to usually 4 kits per pregnancy, rarely up to 8 | Map default was usually 1, at most 3; real rabbits have 4-8 per litter |
 | Male breeding age set to 4 months | Real rabbits mature at 3-4 months |
-| Fertility curve added for rabbits (breeding from about 4 months, tapering off after ~3 years, ending around 5 years) | Without it, does could never get pregnant |
+| Fertility curve added for rabbits (breeding from about 5 months, ending around 5 years) | Without it, does would not conceive until about 13 months |
 
 Buck rabbits are also added by the mod - without them, only the female could reproduce (parthenogenetically), which is replaced with proper male/female breeding.
 
@@ -143,7 +147,7 @@ Witcombe does not enforce any "Jersey-only" or "UK-only" mating rule - its new b
 
 If you want strict same-breed reproduction, keep one breed per husbandry. The sire is picked at random among the eligible males in the pen, so with mixed breeds you can't count on same-breed pairings.
 
-**Males mirror their female of the same breed.** Bulls, boars, and rams added by the mod take on the heritage pricing, feed and water needs, and frame of their breed - a Jersey bull is priced like a heritage Jersey rather than a generic dairy bull, a Texel ram has the heavier frame, a Blue Faced Leicester ram is light-frame and feed-efficient. Rams use the same wool curve as the ewe of the same breed, including the delay before lambs are old enough to shear. Bulls do not lactate, even when the cow has a milk curve.
+**Males mirror their female of the same breed.** Bulls, boars, and rams added by the mod take on the heritage pricing and the feed and water needs of their breed - a Jersey bull is priced like a heritage Jersey rather than a generic dairy bull, a Texel ram is the heaviest of the three rams, a Blue Faced Leicester ram is the lightest and feed-efficient. Rams use the same wool curve as the ewe of the same breed, including the delay before lambs are old enough to shear.
 
 ---
 

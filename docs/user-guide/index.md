@@ -27,7 +27,7 @@ A Farming Simulator 25 mod that replaces the default animal cluster system with 
 
 ### Migrating from Arrow-kb's Realistic Livestock
 
-If you previously used the original [FS25 Realistic Livestock](https://github.com/Arrow-kb/FS25_RealisticLivestock) mod, migration is automatic - just load your savegame and all animal data will be transferred.
+If you previously used the original [FS25 Realistic Livestock](https://github.com/Arrow-kb/FS25_RealisticLivestock) mod, migration is automatic, but the two mods cannot run together. Back up your savegame first, then remove `FS25_RealisticLivestock.zip` and `FS25_FontLibrary.zip` from your mods folder. When you load your savegame, all animal data will be transferred.
 
 ## Compatibility
 
@@ -35,7 +35,7 @@ If you previously used the original [FS25 Realistic Livestock](https://github.co
 |---|---|
 | **Game** | Farming Simulator 25 |
 | **Multiplayer** | Supported (server-authoritative) |
-| **Compatibility** | see [Mod Compatibility](reference-mod-compatibility.md) for blocking conflicts and performance warnings. |
+| **Compatibility** | see [Mod Compatibility](reference-mod-compatibility.md) for blocking conflicts. |
 
 ### Map Support
 
@@ -43,7 +43,7 @@ RLRM works on virtually any map out of the box - it does not need to be on a sup
 
 - **[Hof Bergmann](map-hof-bergmann.md)** - Ducks, geese, cats, rabbits, alpacas, and quail fully supported with breeding, genetics, and reproduction
 - **[Witcombe](map-witcombe.md)** - UK breeds (Jersey, Gloucestershire Old Spot, Texel, Suffolk, Blue Faced Leicester) fully supported with breeding, genetics, and reproduction. Hereford also gets a heritage breed profile. Adds rabbit keeping with breeding support.
-- **[Le Mechet](map-le-mechet.md)** - French breeds (Charolaise, Montbeliarde, Simmental, Vosgienne) with their map-native 3D models, fully supported with breeding, genetics, and reproduction
+- **[Le Mechet](map-le-mechet.md)** - French breeds (Charolais, Montbeliarde, Simmental, Vosgienne) with their map-native 3D models, fully supported with breeding, genetics, and reproduction
 
 If a map updates to an untested version, you'll see a warning at game start - you're encouraged to report any issues.
 
@@ -65,6 +65,7 @@ Per-species reference with breeds, production, prices, breeding, and lifespan da
 - [Sheep & Goats](factsheet-sheep.md) - 4 sheep breeds plus goats covering wool, meat, and goat milk
 - [Horses](factsheet-horses.md) - 8 colour variants with riding, fitness and cleanliness
 - [Chickens](factsheet-chickens.md) - Hens and roosters with egg production curves
+- [Alpacas](factsheet-alpacas.md) - Four coat colours with happiness, fleece and shearing (Beans & Alpacas Expansion)
 
 ### Guides
 
@@ -95,7 +96,7 @@ In-depth explanations of the mod's core systems:
 
 - [Settings](reference-settings.md) - All configurable options with defaults and descriptions
 - [Breeding Stats](reference-breeding.md) - Per-species breeding ages, gestation, and fertility windows
-- [Mod Compatibility](reference-mod-compatibility.md) - Blocking conflicts and performance warnings
+- [Mod Compatibility](reference-mod-compatibility.md) - Blocking conflicts
 
 ## Credits
 

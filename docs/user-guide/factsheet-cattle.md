@@ -10,22 +10,24 @@ Cattle are the most diverse livestock in Realistic Livestock RM, with 8 breeds r
 
 | Breed | Type | Target Weight | Milk Range (peak, lactating) | Sell Value |
 |-------|------|--------------|------------------------------|------------|
-| **Holstein** | Dairy | 575 / 650 kg | 65 - 750 L/day | Moderate |
-| **Hereford** | Dual | 675 / 750 kg | 55 - 600 L/day | Above average |
-| **Swiss Brown** | Dual | 650 / 850 kg | 50 - 580 L/day | Above average |
-| **Angus** | Beef | 700 / 900 kg | 30 - 365 L/day | High |
-| **Highland** *(DLC)* | Beef | 725 / 950 kg | 30 - 365 L/day | High, retains value in old age |
-| **Brahman** *(DLC)* | Beef | 725 / 950 kg | 30 - 365 L/day | High, retains value in old age |
-| **Limousin** | Beef | 630 / 675 kg | 30 - 320 L/day | Highest |
-| **Water Buffalo** | Special | 425 / 500 kg | 5 - 70 L/day | Low |
+| **Holstein** | Dairy | 575 / 650 kg | 65 - 750 L/month | Moderate |
+| **Hereford** | Dual | 675 / 750 kg | 55 - 600 L/month | Above average |
+| **Swiss Brown** (Brown-Swiss in game) | Dual | 650 / 850 kg | 50 - 580 L/month | Above average |
+| **Angus** | Beef | 700 / 900 kg | 30 - 365 L/month | High |
+| **Highland** (Highland Cattle in game) *(DLC)* | Beef | 725 / 950 kg | 30 - 365 L/month | High, retains value in old age |
+| **Brahman** *(DLC)* | Beef | 725 / 950 kg | 30 - 365 L/month | High, retains value in old age |
+| **Limousin** | Beef | 630 / 675 kg | 30 - 320 L/month | Highest |
+| **Water Buffalo** | Special | 425 / 500 kg | 5 - 70 L/month | Low |
 
-*Target weights shown as cow / bull. Milk range shows the full span from poor to excellent genetics. All cows produce milk when lactating - beef breeds just produce less. Highland cattle require the Highlands & Fishing Pack DLC, and Brahman cattle require the Beans and Alpacas DLC.*
+*Target weights shown as cow / bull. Milk range shows the full span from poor to excellent genetics. All cows produce milk when lactating - beef breeds just produce less. Highland cattle require the Highlands Fishing Expansion, and Brahman cattle require the Beans & Alpacas Expansion.*
+
+*Food, water, straw and production figures are per in-game month, whatever your month length. The animal's info box shows them per day, so with 3 days per month it shows a third of these figures.*
 
 > **Breed-locking:** Water Buffalo bulls can only breed with Water Buffalo cows. All other bull breeds can breed with any non-Water-Buffalo cow.
 
-> **Hereford on Witcombe:** When playing on the [Witcombe](map-witcombe.md) map, Hereford uses a heritage profile with 9-month gestation, premium pricing (300 / 3000), an earlier sell-price peak at 24 months (vs 36 months for other beef breeds), and leaner feed/water needs. The values shown above are the standard RLRM Hereford used on every other map.
+> **Hereford on Witcombe:** When playing on the [Witcombe](map-witcombe.md) map, Hereford uses a heritage profile with 9-month gestation, premium sell prices, an earlier sell-price peak at 24 months (vs 36 months for other beef breeds), and lower water and straw needs. The values shown above are the standard RLRM Hereford used on every other map.
 
-> **Hereford and Brahman on Le Mechet:** When playing on the [Le Mechet](map-le-mechet.md) map, Hereford and Brahman *(DLC)* are hidden from the Animal Dealer (the map ships no Hereford or Brahman 3D model). Le Mechet adds four French breeds in the dealer instead - Charolaise, Montbeliarde, Simmental, and Vosgienne - see the map page for their breed character.
+> **Hereford and Brahman on Le Mechet:** When playing on the [Le Mechet](map-le-mechet.md) map, Hereford and Brahman *(DLC)* are hidden from the Animal Dealer (the map ships no Hereford or Brahman 3D model). Le Mechet adds four French breeds in the dealer instead - Charolais, Montbeliarde, Simmental, and Vosgienne - see the map page for their breed character.
 
 ---
 
@@ -33,10 +35,10 @@ Cattle are the most diverse livestock in Realistic Livestock RM, with 8 breeds r
 
 Cows produce milk **only while lactating** (10 months after giving birth). Non-lactating cows produce zero milk.
 
-### Milk Output Range (L/day, lactating cow)
+### Milk Output Range (L/month, lactating cow)
 
-| Breed | 12 mo | 36 mo (peak) | 120 mo |
-|-------|-------|--------------|-------|
+| Breed | Under 36 mo | 36 mo (peak) | 120 mo |
+|-------|-------------|--------------|-------|
 | **Holstein** | 40 - 445 | **65 - 750** | 35 - 410 |
 | **Hereford** | 40 - 435 | **55 - 600** | 25 - 285 |
 | **Swiss Brown** | 35 - 410 | **50 - 580** | 20 - 250 |
@@ -54,9 +56,9 @@ Cows produce milk **only while lactating** (10 months after giving birth). Non-l
 %%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#2e7d32"}}}}%%
 xychart-beta
     title "Swiss Brown Milk Output (average genetics, lactating)"
-    x-axis "Age (months)" [12, 24, 36, 48, 60, 72, 84, 96, 108, 120]
-    y-axis "Litres / day" 0 --> 300
-    line [180, 180, 255, 255, 255, 255, 219, 183, 146, 110]
+    x-axis "Age (months)" [24, 36, 48, 60, 72, 84, 96, 108, 120]
+    y-axis "Litres / month" 0 --> 300
+    line [180, 255, 255, 255, 255, 219, 183, 146, 110]
 ```
 
 *Chart shows Swiss Brown as a representative mid-range breed with average genetics. Holstein produces more, beef breeds produce less - see the table above for per-breed ranges. The line is the **age** curve (the cow's lifetime production envelope while lactating); the **lactation-phase** curve within each 10-month nursing window is shown separately in the [Breeding Guide](guide-breeding.md#lactation-phase-curve), and the breed table's "50 - 580" range combines both factors with the genetics multiplier.*
@@ -88,44 +90,33 @@ Bulls consistently sell for more than cows at all ages. Beef breeds (Angus, Limo
 | **Water Buffalo** | Cow | 150 | 1,500 | 1,500 | 1,000 |
 | | Bull | 200 | 1,750 | 2,000 | 1,250 |
 
-*These are typical prices for an average, healthy animal. Actual prices vary widely - well-bred healthy animals sell for significantly more, poor-quality animals can sell for far less, and a sick animal is worth less while sick.*
+*These are typical prices for an average, healthy animal. Actual prices vary widely - well-bred healthy animals sell for significantly more, poor-quality animals can sell for far less, and a sick animal cannot be sold at the dealer until it recovers.*
 
 ### What Affects Sell Price
 
 | Factor | Effect |
 |--------|--------|
-| Quality genetics | Better genetics -> noticeably higher price |
+| Quality genetics | Better genetics -> considerably higher price |
 | Weight | Well-fed animals near target weight are worth more |
 | Health | Healthy animals sell for significantly more |
 | Lactating | Small price bonus |
 | Pregnant | Moderate price bonus |
 | Castrated | Small price bonus |
-| Diseases | Can substantially reduce price |
+| Diseases | A sick animal cannot be sold at the dealer until it recovers |
 
----
+### Buy Prices
 
-## Buy Prices by Breed
+The dealer's price is the animal's own sale value plus a markup that depends on the [**Dealer Animal Quality**](reference-settings.md#dealer-ai) setting, plus a transport fee per animal. So it follows the same things as the sale value: age, genetics, health, weight and pregnancy. Buying into a trailer at the dealer has no transport fee.
 
-| Breed | Cow (newborn) | Cow (adult) | Bull (newborn) | Bull (adult) |
-|-------|--------------|-------------|----------------|--------------|
-| **Swiss Brown** | 200 | 2,400 | 250 | 2,700 |
-| **Holstein** | 200 | 2,200 | 235 | 2,500 |
-| **Angus** | 275 | 3,200 | 300 | 3,200 |
-| **Limousin** | 320 | 3,400 | 350 | 3,750 |
-| **Hereford** | 225 | 2,400 | 250 | 2,500 |
-| **Highland** | 300 | 3,000 | 350 | 3,500 |
-| **Brahman** | 300 | 3,000 | 350 | 3,500 |
-| **Water Buffalo** | 200 | 1,500 | 250 | 1,800 |
-
-*Adult prices are at age 24-36 months. Dealer animals have randomised genetics.*
+The transport fee grows with age, from $40 for a newborn to $200 for a cow or $500 for a bull at 18 months and older. It also comes off the price when you sell.
 
 ---
 
 ## Food & Water Consumption by Breed
 
-Genetics significantly affect how much each animal eats - some are naturally much more efficient than others. Lactating cows eat noticeably more, and the Food Scale setting also adjusts consumption.
+Genetics significantly affect how much each animal eats - some are naturally much more efficient than others. Lactating cows eat noticeably more, and the Food Scale setting also adjusts consumption. Food and water rise through a pregnancy: noticeably higher by the end with one calf, considerably with twins.
 
-### Food Consumption Range (L/day)
+### Food Consumption Range (L/month)
 
 | Breed | | Newborn | 18+ mo (adult) |
 |-------|---|---------|-----------------|
@@ -148,7 +139,7 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 
 *Highland, Brahman and Limousin are the most expensive breeds to feed. Ranges show the span from the most efficient to the hungriest animals. Most animals eat near the middle of these ranges.*
 
-### Water Consumption (L/day, newborn -> adult)
+### Water Consumption (L/month, newborn -> adult)
 
 | Breed | Cow | Bull |
 |-------|-----|------|
@@ -161,9 +152,9 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 | **Brahman** | 20 -> 140 | 20 -> 140 |
 | **Water Buffalo** | 20 -> 140 | 20 -> 140 |
 
-*Lactating cows drink considerably more water than usual.*
+*Lactating cows drink considerably more water than usual, and water rises through a pregnancy just as food does.*
 
-### Straw Consumption (L/day, newborn -> adult)
+### Straw Consumption (L/month, newborn -> adult)
 
 | Breed | Cow | Bull |
 |-------|-----|------|
@@ -201,7 +192,7 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 | **Water Buffalo** | Cow | 35 kg | 425 kg | 1,200 kg |
 | | Bull | 36 kg | 500 kg | 1,400 kg |
 
-*Higher metabolism animals reach target weight faster but eat more. Castrated animals grow faster than intact males.*
+*Higher metabolism animals reach target weight faster but eat more. Metabolism also moves each animal's own target weight: high-metabolism animals settle noticeably above the figure shown, low-metabolism animals noticeably below it. Castrated animals grow faster than intact males.*
 
 ---
 
@@ -222,7 +213,7 @@ All cattle breeds share the same reproduction rules:
 
 ### Offspring per Birth
 
-Cattle almost always produce a single calf. Twins and triplets can happen, more often from cows with high fertility genetics than from age.
+Cattle almost always produce a single calf. Litter size is mostly chance. Well below average fertility rules out the largest litters; above average adds nothing.
 
 | Outcome | Likelihood |
 |---------|------------|
@@ -230,12 +221,12 @@ Cattle almost always produce a single calf. Twins and triplets can happen, more 
 | Twins | Uncommon |
 | Triplets | Rare |
 
-*Litter size does not depend on age - a cow's chance of conceiving each cycle does. Fertility stays steady through the prime years and tapers to zero by 132 months. A cow must be at 75% health or above to conceive.*
+*Age does not change a cow's chance of conceiving - fertility genetics do. That chance holds until her end age of 132 months, then stops outright. Litter size does not depend on age either. A cow must be at 75% health or above to conceive.*
 
 ### Breeding Restrictions
 
 - Water Buffalo bulls can **only** breed Water Buffalo cows
-- All other bull breeds can cross-breed with any other cow breed
+- All other bull breeds can cross-breed with any cow breed except Water Buffalo
 - A bull will not breed with a cow that's already pregnant
 - A bull will not breed with his own daughters
 
@@ -247,9 +238,9 @@ Cattle almost always produce a single calf. Twins and triplets can happen, more 
 |-------|-----|
 | Fertility ends | 132 months (11 years) |
 | Old age deaths begin | 180 months (15 years) |
-| Maximum lifespan | ~240 months (20 years) |
+| Maximum lifespan (rarely reached) | ~240 months (20 years) |
 
-*Death can be toggled off in settings. Accidents can happen at any age (affected by weather).*
+*Most animals die of old age well before this; only the best health genetics get close. Death can be toggled off in settings. Accidents can happen at any age (affected by weather). Animals in poor health can also die at any age, the very young most easily.*
 
 ---
 
@@ -263,7 +254,7 @@ Cattle almost always produce a single calf. Twins and triplets can happen, more 
 | **BRD** | Moderately | Moderate - worst in calves | 1 month, $300 | Noticeably less milk, moderate price loss |
 | **Footrot** | Slowly | Never | 1 month, $100 (cures about 9 times in 10) | Noticeably less milk for at least 6 months untreated, major price loss |
 
-*Mastitis only affects lactating cows. The Fatal column holds while **Animal Death** is on. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*
+*Mastitis only affects lactating cows. The Fatal column holds while **Animal Death** is on. A sick animal cannot be sold at the dealer; the price loss shown is its value while sick, which sets what culling pays. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*
 
 Cattle can be vaccinated against BRD and footrot, and cows against mastitis - see [Vaccination](guide-diseases.md#vaccination).
 

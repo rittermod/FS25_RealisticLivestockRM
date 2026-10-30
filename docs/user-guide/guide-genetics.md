@@ -12,11 +12,11 @@ Every animal in Realistic Livestock RM is born with a unique set of genetic trai
 |-------|---------------|---------|------------|
 | **Health** | Health | Surviving a disease, longevity | All animals |
 | **Fertility** | Fertility | Breeding success rate | All animals |
-| **Productivity** | Milk / Wool / Eggs | Production output amount | Cows, Sheep, Goats, Chickens |
-| **Quality** | Meat | Sell price and meat value | All animals |
+| **Productivity** | Milk production / Wool production / Egg production / Fleece production | Production output amount | Cows, Sheep, Goats, Chickens, Alpacas |
+| **Quality** | Quality or Meat Quality | Sell price and meat value | All animals |
 | **Metabolism** | Metabolism | Food consumption and weight gain | All animals |
 
-> **Productivity** is species-specific: it shows as "Milk" for cows, "Wool" for sheep, and "Eggs" for chickens. Pigs and horses don't have this trait - they have no special production output.
+> **Productivity** is species-specific: it shows as "Milk production" for cows and goats, "Wool production" for sheep, "Egg production" for chickens, and "Fleece production" for [alpacas](factsheet-alpacas.md). Pigs and horses don't have this trait - they have no special production output.
 
 > **Metabolism** is double-edged: high metabolism means faster weight gain but also higher food costs. Low metabolism means cheaper to feed but slower growth.
 
@@ -26,17 +26,17 @@ Every animal in Realistic Livestock RM is born with a unique set of genetic trai
 
 Each trait is displayed in-game with a rating and colour:
 
-| Rating | Colour | Rarity |
-|--------|--------|--------|
-| **Extremely High** | Green | Rare (~5%) |
-| **Very High** | Light Green | Uncommon |
-| **High** | Yellow-Green | Fairly common |
-| **Average** | Yellow | Most common (~50%) |
-| **Low** | Orange | Fairly common |
-| **Very Low** | Dark Orange | Uncommon |
-| **Extremely Low** | Red | Rare (~5%) |
+| Rating | Colour |
+|--------|--------|
+| **Extremely High** | Green |
+| **Very High** | Light Green |
+| **High** | Yellow-Green |
+| **Average** | Yellow |
+| **Low** | Orange |
+| **Very Low** | Dark Orange |
+| **Extremely Low** | Red |
 
-*The overall genetics rating uses Good/Bad labels instead of High/Low, calculated from the average of all traits.*
+*How common each rating is depends on where the animal came from - see [Distribution](#distribution). The overall genetics rating uses Good/Bad labels instead of High/Low, calculated from the average of all traits.*
 
 ### Special Case: Fertility
 
@@ -44,9 +44,9 @@ Fertility has one additional rating:
 
 | Rating | Meaning |
 |--------|---------|
-| **Infertile** | Animal can never breed: born infertile (extremely rare - about 1 in 1,000), or a castrated male |
+| **Infertile** | Animal can never breed: born infertile (extremely rare, except for [freemartin](guide-breeding.md#freemartin-effect-cattle-only) heifers, which almost always are), or a castrated male |
 
-*Infertile animals can still produce milk/wool/eggs - they just can't reproduce. Castrating a male does not change his other genetics or his overall rating.*
+*Infertile animals still produce wool, fleece and eggs, but milk only starts after a birth, so an infertile cow or goat never gives milk. Castrating a male does not change his other genetics or his overall rating.*
 
 ---
 
@@ -63,19 +63,19 @@ Fertility has one additional rating:
 
 - Directly affects the chance of successful breeding
 - Higher fertility = more likely to produce offspring each breeding cycle
-- Extremely rare chance of being born completely infertile (about 1 in 1,000)
+- Extremely rare chance of being born completely infertile, and a [freemartin](guide-breeding.md#freemartin-effect-cattle-only) heifer is almost always infertile
 - **Impact:** Breeding success rate
 
-### Productivity - Cows, Sheep, Goats, Chickens
+### Productivity - Cows, Sheep, Goats, Chickens, Alpacas
 
-- Directly scales production output (milk, wool, eggs, goat milk)
+- Directly scales production output (milk, wool, eggs, goat milk, fleece)
 - An animal with Extremely High productivity produces many times more than one with Extremely Low
 - The large production ranges shown in each factsheet are primarily driven by this trait
-- **Impact:** The single biggest factor in milk, wool, and egg output
+- **Impact:** The single biggest factor in milk, wool, fleece and egg output
 
 *Pigs and horses don't have productivity - they have no special production output.*
 
-### Quality / Meat
+### Quality
 
 - Directly affects sell price
 - Higher quality = better meat value = higher sell price
@@ -87,6 +87,7 @@ Fertility has one additional rating:
 - **Double-edged trait:**
   - High metabolism: Eats significantly more, grows faster, reaches target weight sooner
   - Low metabolism: Eats much less, grows slower, cheaper to maintain long-term
+- It also moves each animal's own target weight: noticeably higher with high metabolism, noticeably lower with low metabolism
 - The large food consumption ranges shown in each factsheet are primarily driven by this trait
 - **Impact:** Determines how expensive an animal is to feed
 
@@ -94,21 +95,21 @@ Fertility has one additional rating:
 
 ## Distribution
 
-Most animals are average. The distribution follows a bell curve:
+How likely each rating is depends on where the animal came from. Dealer stock is what the dealer offers you. Animals the mod rolls itself are ones that reach a pen another way, such as animals placed by the base game or another mod. Bred animals take their genetics from their parents - see [Breeding & Inheritance](#breeding-inheritance).
 
-| Category | Approximate Chance |
-|----------|--------------------|
-| Bottom tier (Extremely Low) | ~5% |
-| Below average (Low to Very Low) | ~20% |
-| **Average** | **~50%** |
-| Above average (High to Very High) | ~20% |
-| Top tier (Extremely High) | ~5% |
+| Category | Dealer stock (Standard quality) | Animals the mod rolls itself |
+|----------|---------------------------------|------------------------------|
+| Bottom tier (Extremely Low) | About 1 in 50 | About 1 in 20 |
+| Below average (Low to Very Low) | About 2 in 5 | About 1 in 5 |
+| **Average** | **About 1 in 5** | **About 1 in 2** |
+| Above average (High to Very High) | About 2 in 5 | About 1 in 5 |
+| Top tier (Extremely High) | About 1 in 50 | About 1 in 20 |
 
-*Each trait is rolled independently. An animal can have excellent health but terrible productivity.*
+*Animals the mod rolls itself get a separate roll for each trait, and bred animals inherit each trait separately, so both can have excellent health but terrible productivity.*
 
 ### Dealer Animals
 
-Animals purchased from the dealer have randomised genetics. Most will be average, but you might occasionally find an exceptional animal - or a terrible one. Check genetics before buying when possible.
+Each animal the dealer offers gets one overall quality roll, and all its traits sit close to that. So a dealer animal tends to be good all round or poor all round, not strong in one trait and weak in another. At the default **Standard** setting of [Dealer Animal Quality](reference-settings.md#dealer-ai) this gives a wide spread, with Average about 1 in 5 and the extreme ratings about 1 in 50. **Budget** stock is mostly Low and Very Low, **Premium** stock is mostly High and Very High, and a few animals in each fall outside that band. Check genetics before buying when possible.
 
 ---
 
@@ -121,7 +122,7 @@ Offspring inherit traits from both parents. The mod calculates the average of bo
 - Breeding two animals with poor genetics risks passing those traits on
 - Over multiple generations, focused selection can significantly improve your herd's average genetics
 
-> **Important:** High-genetics parents don't guarantee high-genetics offspring. Without active herd management, genetics will drift towards average over generations - a real phenomenon called *regression to the mean*. See the [FAQ](faq.md#how-can-offspring-have-worse-genetics-than-their-parents) for a full explanation.
+> **Important:** High-genetics parents don't guarantee high-genetics offspring. Each young centres on the average of its two parents, then varies up or down, so a herd left alone keeps about the same average and just spreads wider. At the very top the genetic ceiling trims the luckiest rolls, so the very best parents usually have young a little below them. See the [FAQ](faq.md#how-can-offspring-have-worse-genetics-than-their-parents) for a full explanation.
 
 ### Breeding Strategy
 
@@ -178,6 +179,5 @@ The game displays an "Overall" genetics rating that combines all traits:
 | Average | Normal animal |
 | Bad | Below average in several traits |
 | Very Bad | Poor in most traits |
-| Extremely Bad | Bottom-tier across all traits |
 
 *The overall rating is calculated from the average of all applicable traits. Use it as a quick quality indicator, but check individual traits for specific breeding decisions.*

@@ -17,7 +17,7 @@ Realistic Livestock RM has ten diseases that can make your animals sick and, wit
 | **Avian Flu (LPAI)** | Chickens | Moderate | Low | 1 month, $5 | Severe reduction |
 | **Avian Flu (HPAI)** | Chickens | Fast | Almost always fatal | None - cull | Severe reduction |
 | **BRD** | Cattle | Moderate | Moderate - worst in calves | 1 month, $300 | Moderate reduction |
-| **Pulpy Kidney** | Sheep, goats | None | High - worst in lambs and kids | 1 month, $150 (cures about half the time) | Major reduction |
+| **Pulpy Kidney** | Sheep, goats, alpacas (with the Beans & Alpacas Expansion) | None | High - worst in lambs and kids | 1 month, $150 (cures about half the time) | Major reduction |
 | **Colic** | Horses | None | Moderate | 1 month, $500 (cures about half the time) | Major reduction |
 | **Footrot** | Cattle, sheep, goats | Slow | Never | 1 month, $100 (cures about 9 times in 10) | Major reduction |
 
@@ -53,7 +53,9 @@ When a disease shows in an animal in one of your pens, a "Contracted" message po
 
 ### Treatment
 
-Treat a sick animal from the **Diseases** dialog: open it from the RL Menu's Info tab, where **D** ("Animal Diseases" in Controls) opens it too. Every treatable disease has a 1-month course. A sick animal's row in the dialog shows the fee per month, and it is charged day by day while the course runs, so a finished course costs about the listed fee in total. The dialog lists the disease that most needs you first - an untreated illness before a vaccine you have not given, a course already running below both - and when it opens and after each treatment or dose it selects the first row you can start, resume or vaccinate. Each row starts with an icon: a red triangle for an illness that needs you, an orange triangle for a vaccine the animal has not had, and a green circle for an animal that is immune or vaccinated; a course already running, a CVM carrier and anything else have none. In colour-blind mode the colours change but the shapes stay the same.
+Treat a sick animal from the **Diseases** dialog: open it from the RL Menu's **Manage** tab, where **D** ("Animal Diseases" in Controls) opens it too. Every treatable disease has a 1-month course. A sick animal's row in the dialog shows the fee per month, and it is charged day by day while the course runs, so a finished course costs about the listed fee in total. The dialog lists the disease that most needs you first - an untreated illness before a vaccine you have not given, a course already running below both - and when it opens and after each treatment or dose it selects the first row you can start, resume or vaccinate. Each row starts with an icon: a red triangle for an illness that needs you, an orange triangle for a vaccine the animal has not had, and a green circle for an animal that is immune or vaccinated; a course already running, a CVM carrier and anything else have none. In colour-blind mode the colours change but the shapes stay the same.
+
+In multiplayer, treating, vaccinating and culling need the **trade animals** farm permission.
 
 Starting, resuming or stopping a course asks you to confirm first, and Start and Resume name the monthly fee. You can stop a course and resume it later. A stopped course keeps the progress it has made and costs nothing while it is stopped, and the detail panel reads **Treatment paused**.
 
@@ -86,10 +88,10 @@ Five diseases have a vaccine. A dose protects the animal straight away: while pr
 | [Mastitis](#mastitis) | Female cows and female goats - the animals that can catch it | 12 months | $20 |
 | [PED](#porcine-epidemic-diarrhoea-ped) | Pigs | 6 months | $15 |
 | [BRD](#brd-bovine-respiratory-disease) | Cattle | 12 months | $30 |
-| [Pulpy Kidney](#pulpy-kidney) | Sheep and goats | 12 months | $15 |
+| [Pulpy Kidney](#pulpy-kidney) | Sheep, goats and alpacas (with the Beans & Alpacas Expansion) | 12 months | $15 |
 | [Footrot](#footrot) | Cattle, sheep and goats | 6 months | $10 |
 
-To vaccinate an animal, open its **Diseases** dialog (the Diseases button on the animal's Info page), select the disease and press **Vaccinate**, then confirm the price. The dialog lists every vaccine the animal can take: a disease the animal shows no entry for reads **Not vaccinated**, and an animal that is already vaccinated, or immune after recovering, gets a booster from that disease's own row. A row you can vaccinate from shows how long the vaccine protects and its price per dose.
+To vaccinate an animal, open its **Diseases** dialog (the Diseases button on the **Manage** tab), select the disease and press **Vaccinate**, then confirm the price. The dialog lists every vaccine the animal can take: a disease the animal shows no entry for reads **Not vaccinated**, and an animal that is already vaccinated, or immune after recovering, gets a booster from that disease's own row. A row you can vaccinate from shows how long the vaccine protects and its price per dose.
 
 - One dose takes at once. There is no course and no second dose to come back for.
 - A booster never shortens the protection: it tops it back up to the full length when less is left.
@@ -103,7 +105,7 @@ For two diseases, a newborn is born protected when its mother is. What counts is
 | Disease | Newborns | Protected for |
 |---------|----------|---------------|
 | [PED](#porcine-epidemic-diarrhoea-ped) | Piglets | 1 month |
-| [Pulpy Kidney](#pulpy-kidney) | Lambs and kids | 2 months |
+| [Pulpy Kidney](#pulpy-kidney) | Lambs, kids and young alpacas | 2 months |
 
 Mastitis, BRD and footrot pass nothing on.
 
@@ -158,9 +160,7 @@ picks up where it left off instead of starting the course again. The animal's de
 reading **Treatment paused** rather than "Not treated". The card still shows the red medical bag,
 because that icon answers "is a treatment running", and while the course is paused the answer is no.
 
-The icons replace the old red row tint, which could only say "something is wrong" and could not
-tell an untreated animal from one you are already paying to treat. Marked animals keep their
-orange tint, including when they are also sick. The older animal screen still uses the red tint.
+Marked animals keep their orange tint, including when they are also sick.
 
 One case reads oddly and is worth knowing: a cow that inherited CVM from **both** parents is
 genuinely sick rather than a carrier, so it shows the red medical bag and reads **Not treated** -
@@ -488,9 +488,11 @@ BRD is a respiratory disease that hits calves hardest. Calves up to 6 months old
 
 ## Pulpy Kidney
 
-**Affects:** Sheep, goats
+**Affects:** Sheep, goats, alpacas (with the Beans & Alpacas Expansion)
 
 Pulpy kidney never spreads between animals - every case starts on its own. Lambs and kids up to 12 months old catch it more often than older animals, and they are the most at risk from it. It is the deadliest disease a sheep or goat can catch, and treatment cures only about half the time.
+
+Alpacas catch it just as sheep and goats do, with the same risks, treatment, vaccine and protection from the mother. Hof Bergmann v1.4's own alpacas catch it too, with or without the expansion.
 
 | Parameter | Value |
 |-----------|-------|
@@ -507,6 +509,7 @@ Pulpy kidney never spreads between animals - every case starts on its own. Lambs
 | Impact | Effect |
 |--------|--------|
 | Wool / Goat milk | Considerably reduced |
+| Alpaca fleece | Not affected |
 | Growth | Considerably slower |
 | Value while sick | Major reduction |
 

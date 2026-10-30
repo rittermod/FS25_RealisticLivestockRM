@@ -2,7 +2,7 @@
 
 All Realistic Livestock RM settings live in the RL Menu's **Settings** tab (it opens on the **General** sub-tab, where all of the options below are). The quickest way there: open the in-game menu (ESC), go to **Game Settings**, scroll to the **Realistic Livestock** section at the bottom, and press **Open Settings**. You can also open the RL Menu directly with its hotkey - it defaults to **Right Shift + O** (remappable in Settings -> Controls); look for "Open RL Menu" in the game's input bindings. If your installation was set up before this default was added, the key may not be assigned automatically - bind or reset it manually. *(Older versions listed every setting directly on the Game Settings page; those rows have moved here.)*
 
-Most settings are saved per-savegame and synced in multiplayer, and in multiplayer can only be changed by an admin - everyone else sees them read-only. The one exception is **Maximum Visible Animals** (under Customisation below): it is a per-machine display preference, saved locally on your own computer, never synced, and any player can change their own.
+Most settings are saved per-savegame and synced in multiplayer, and in multiplayer can only be changed by an admin - everyone else sees them read-only. The one exception is **Set Maximum Visual Animals** (under Customisation below): it is a per-machine display preference, saved locally on your own computer, never synced, and any player can change their own.
 
 > **Note:** This documentation was generated with AI assistance and may contain inaccuracies. If you spot an error, please [open an issue](https://github.com/rittermod/FS25_RealisticLivestockRM/issues).
 
@@ -15,7 +15,7 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 | **Animal Death** | On | Off / On | Toggles all death mechanics (old age, low health, accidents, birth complications, and fatal diseases). When off, animals live indefinitely unless you cull one. The ModHub build labels this setting "Animal Removal". |
 | **Accident Chance** | 100% | 0% - 200% (10% steps) | Scales the probability of random accident deaths. 0% disables accidents entirely. 200% doubles the chance. Only available when Death is enabled. |
 
-*With death disabled, no animal dies on its own - only a cull from the Diseases dialog removes one - but diseases can still make them sick unless the **Diseases** setting is **Off**.*
+*With death disabled, no animal dies on its own - only a cull from the Diseases dialog removes one - but diseases can still make them sick unless the **Diseases** setting is **Off**. While it is **Off**, the Diseases dialog does not open, so nothing can be culled.*
 
 ---
 
@@ -23,7 +23,7 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 
 | Setting | Default | Options | Description |
 |---------|---------|---------|-------------|
-| **Food Scale** | 1x | 0.5x - 5x (0.5 steps) | Multiplies all animal food consumption. At 0.5x, animals eat half as much. At 5x, they eat five times more. Does not affect water or straw. |
+| **Food Scale** | 100% | 50% - 500% (50% steps) | Multiplies all animal food consumption. At 50%, animals eat half as much. At 500%, they eat five times more. Does not affect water or straw. |
 
 *This setting stacks with metabolism genetics. An animal with high metabolism at maximum food scale will eat dramatically more than a low-metabolism animal at minimum scale.*
 
@@ -33,10 +33,10 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 
 | Setting | Default | Options | Description |
 |---------|---------|---------|-------------|
-| **Max Dealer Animals** | 50 | 20-200 (10 steps) | Maximum number of animals per species available in the animal dealer. Higher values give more choice when buying. |
+| **Max Dealer Animals** | 50 | 20-200 (10 steps) | Maximum number of animals per animal type available in the animal dealer, so sheep and goats share one limit. Higher values give more choice when buying. |
 | **Dealer Animal Quality** | Standard | Budget / Standard / Premium | How good - and how expensive - the animals the dealer offers are. Budget stock is weaker and cheaper; Premium stock is stronger and costs more. Changing this **discards the current dealer stock and restocks** with new animals, because each animal's genetics are fixed when it is generated. Does not affect the AI animals used for insemination. Admin only in multiplayer. |
 | **Reset Animal Dealer** | - | Button | Restocks the dealer with a fresh set of randomised animals. Use this if you want different genetics or breeds available. Admin only in multiplayer. |
-| **Choose Animals For Sale** | - | Button | Opens a checklist of every animal the dealer can offer, grouped into sections - one per breed *and sex*, so "Holstein" and "Holstein Bull" are separate sections. Each section lists one row per age group. A row is ticked when the dealer currently offers it. Untick one and the dealer stops stocking it; tick it back and it returns. Two shortcuts save a lot of clicking: **Space** ticks or unticks the **whole list** at once (if anything is ticked anywhere, the first press clears everything), and **S** does the same for **just the section you are on**, leaving every other section untouched. Both keys are rebindable under Options > Controls, and both have a button in the dialog if you would rather click. Pressing **OK** after a change restocks the dealer for **every** animal type, exactly like Reset Animal Dealer; **Back** discards. Admin only in multiplayer. |
+| **Choose Animals For Sale** | - | Button | Opens a checklist of every animal the dealer can offer, grouped into sections - one per breed *and sex*, so "Holstein" and "Holstein Bull" are separate sections. Each section lists one row per age group. A row is ticked when the dealer currently offers it. Untick one and the dealer stops stocking it; tick it back and it returns. Two shortcuts save a lot of clicking: **Space** ticks or unticks the **whole list** at once (if anything is ticked anywhere, the first press clears everything), and **S** does the same for **just the section you are on**, leaving every other section untouched. **S** can be rebound under Options > Controls, **Space** is a fixed menu key, and both have a button in the dialog if you would rather click. Pressing **OK** after a change restocks the dealer for **every** animal type, exactly like Reset Animal Dealer; **Back** discards. Admin only in multiplayer. |
 | **Reset AI Animals** | - | Button | Refreshes the artificial insemination animal pool. Use this if the current AI pool has poor genetics. Admin only in multiplayer. |
 
 ---
@@ -47,7 +47,7 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 |---------|---------|---------|-------------|
 | **Animal Country of Origin** | Map default | Map default / 16 countries | Sets the country new animals are registered in - the country code on their ear tags and identifiers. Takes effect immediately for newborn animals, dealer stock, and AI animals. Existing animals keep the country they were registered in. |
 
-*"Map default" uses the country built into the map you're playing; maps the mod doesn't recognise fall back to the United Kingdom - this setting is the fix if that doesn't suit your farm. Available countries: United Kingdom, United States, China, France, Poland, Germany, Canada, Estonia, Italy, Czech Republic, Russia, Sweden, Norway, Finland, Japan, and Spain. A small share of animals are deliberately imported from abroad - roughly 1 in 8 dealer and AI animals and 1 in 100 newborns - so an occasional foreign tag while an override is active is normal, not a bug. Tip: after changing the country, press **Reset Animal Dealer** to restock the dealer with animals from the new origin right away.*
+*"Map default" uses the country built into the map you're playing; maps the mod doesn't recognise fall back to the United Kingdom - this setting is the fix if that doesn't suit your farm. Available countries: United Kingdom, United States, China, France, Poland, Germany, Canada, Estonia, Italy, Czech Republic, Russia, Sweden, Norway, Finland, Japan, and Spain. A small share of animals are deliberately imported from abroad - roughly 1 in 8 dealer and AI animals - so an occasional foreign tag while an override is active is normal, not a bug. Animals born in your pens always take the map's country or your override. Tip: after changing the country, press **Reset Animal Dealer** to restock the dealer with animals from the new origin right away.*
 
 ---
 
@@ -57,7 +57,7 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 |---------|---------|---------|-------------|
 | **Change Tag Colour** | - | Button | Opens the ear tag colour picker. Customise the colour of animal identification tags. |
 | **Export To CSV** | - | Button | Writes the animals in your farm's pens to `animals.csv` in `modSettings/FS25_RealisticLivestockRM/` in your game profile, for a spreadsheet. In multiplayer an admin's export covers every player farm's pens. Animals being ridden or on a trailer are not included. Food, water, straw and production figures are per month. Values that need a health monitor are blank for animals without one. Close the file in other programs before exporting again, or it cannot be overwritten. Owner Farm is your game farm number; Farm Id is the herd number from the ear tag. |
-| **Set Maximum Visual Animals** | 2 | Button (opens a slider) | Sets the maximum number of animals rendered per pen. A per-machine display/performance preference: each player sets their own value, it is not synced in multiplayer or saved per-savegame, and any player (not just admins) can change it. The dialog's **Recommended** button suggests a value based on your graphics settings. |
+| **Set Maximum Visual Animals** | 50 | Button (opens a slider) | Sets the maximum number of animals rendered per pen. A per-machine display/performance preference: each player sets their own value, it is not synced in multiplayer or saved per-savegame, and any player (not just admins) can change it. The dialog's **Recommended** button suggests a value based on your graphics settings. |
 
 ---
 
@@ -65,7 +65,7 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 
 | Setting | Default | Options | Description |
 |---------|---------|---------|-------------|
-| **Maximum Amount of Messages** | 500 | 100-5,000 | Maximum number of messages stored per husbandry; older messages are removed when the limit is reached. |
+| **Maximum Amount of Messages** | 500 | 100-5,000 | Maximum number of messages stored per husbandry; older messages are removed when the limit is reached. A higher limit takes up more space in your save folder. |
 | **Message Log Summaries** | Off | Off / On | When off, every event gets its own message. When on, births, deaths, sales, purchases, newborns sold because the pen was full, and the herdsman's completed tasks are collected per husbandry and posted at the end of each day, one summary message for each kind of event. Every other message still posts on its own, including all disease messages - falling ill, recovering, and starting, stopping, resuming, or failing treatment. An animal that dies of a disease is counted in the day's deaths summary. |
 
 *Summary mode reduces message clutter in large herds but provides less detail per event.*
@@ -79,7 +79,7 @@ Most settings are saved per-savegame and synced in multiplayer, and in multiplay
 | **Diseases** | Normal | Off / Easy / Normal / Hard / Very hard | How often animals fall ill and how fast diseases spread. **Easy**: diseases are rare, spread slowly and show symptoms at once. **Normal**: diseases strike now and then, spread at a moderate pace and show symptoms at once. **Hard**: diseases strike often, spread fast and most take a while to show symptoms. **Very hard**: diseases strike very often, spread very fast and most take even longer to show symptoms. **Off**: no new infections and no disease progression, spread, or effects; no calf inherits CVM and no dealer animal is stocked carrying it. Admin only in multiplayer. |
 | **Choose Diseases** | - | Button | Choose which diseases can appear. Opens a checklist of every disease, one row each with the animals it affects. A disease is ticked while it can start new cases; on a new savegame every disease is ticked. Untick one and no new case of it starts: no animal in your pens or at the dealer catches it, and it stops spreading - even from animals already ill with it. For CVM, that also means no animal the dealer stocks from then on carries it and no calf conceived from then on inherits it. Existing cases carry on unchanged: animals already ill with it recover or die as usual, treatment works as before, and a CVM carrier keeps its extra milk. Four cases keep a disease you switched off: an animal already incubating it still falls ill and gets the "Contracted" message, a calf conceived before the change is born with it, dealer animals stocked before the change keep CVM until they rotate out of the dealer's stock, and a CVM carrier keeps it for life. **A** ticks or unticks the highlighted row and **Space** ticks or unticks the whole list (if anything is ticked, the first press clears everything); both also have a button in the dialog. **OK** saves your choice and **Back** discards it. While **Diseases** is **Off**, no disease starts whatever is ticked here. Admin only in multiplayer. |
 
-*Choosing **Off** suspends every disease but does not cure animals already infected: their diseases resume where they stopped when a level is chosen again, and existing diseases are hidden and a CVM carrier's extra milk stops while the setting is **Off**.*
+*Choosing **Off** suspends every disease but does not cure animals already infected: their diseases resume where they stopped when a level is chosen again, and existing diseases are hidden and a CVM carrier's extra milk stops while the setting is **Off**. While it is **Off**, a sick animal reads as healthy, so nothing stops it being sold and it cannot be culled. The Diseases dialog does not open, so no animal can be vaccinated, and no newborn gets [protection from its mother](guide-diseases.md#protection-from-the-mother).*
 
 ---
 
@@ -101,8 +101,10 @@ These settings only change how genetics are DISPLAYED. They are unrelated to **D
 
 | Setting | Default | Options | Description |
 |---------|---------|---------|-------------|
-| **Use Custom Animals** | Off | Off / On | Enables loading a custom animals.xml file instead of the default. Allows modifying animal stats, production curves, prices, etc. **Requires game restart to take effect.** Not available in multiplayer. |
-| **Set Animals XML Path** | - | Button | Opens a file picker to select the path to your custom animals.xml. Only available when Custom Animals is enabled. |
+| **Use Custom Animals** | Off | Off / On | Enables loading your own animal definitions instead of the default. Allows modifying animal stats, production curves, prices, etc. Your files must be unzipped, in their own folder in your mods folder. **Requires game restart to take effect.** Not available in multiplayer. |
+| **Set Animals XML Path** | - | Button | Opens a file picker on your mods folder to select your custom config XML. Only available when Custom Animals is enabled. |
+
+*The file you pick is a small config XML, not the animals file itself. It names your animals file, fill types file and translations folder, which default to `animals.xml`, `fillTypes.xml` and `l10n/` at the top of your mod's folder, and it can also leave out the map's own animals.*
 
 *Custom animals is for advanced users who want to tweak animal statistics. The default animals.xml is located in the mod's xml/ folder and can be used as a template.*
 

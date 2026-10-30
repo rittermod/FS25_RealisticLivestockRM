@@ -27,7 +27,7 @@ If your version isn't covered and you see a warning dialog, please [open an issu
 
 ## Exotic Animals
 
-Hof Bergmann adds several animal types beyond the base game. The mod gives most of these animals full RLRM treatment: individual tracking, genetics, breeding, lifecycle, and aging. Ducks are kept as a kind of chicken, so both avian flu strains can reach them; the other exotic animals catch none of the mod's diseases.
+Hof Bergmann adds several animal types beyond the base game. The mod gives most of these animals full RLRM treatment: individual tracking, genetics, breeding, lifecycle, and aging. Ducks are kept as a kind of chicken, so both avian flu strains can reach them. On v1.4, alpacas can catch pulpy kidney, even without the Beans & Alpacas Expansion. The other exotic animals catch none of the mod's diseases.
 
 Animals on Hof Bergmann carry a **DE (Germany) eartag prefix** to reflect the map's country setting.
 
@@ -48,6 +48,8 @@ All exotic animals can be bought, sold, bred, monitored, and managed through the
 
 > **Wild Ducks:** On v1.4 the bridge adds a buyable wild-duck drake and a wild-duck breeding group. However, the map has no duck husbandry building, so wild ducks stay dealer-only - you can see them at the livestock dealer, but they cannot be placed or managed on the map.
 
+> **Alpaca colours:** Hof Bergmann's alpacas come in White, Brown, Black and Grey, and the bridge adds a male of each. With the Beans & Alpacas Expansion active, the expansion brings its own coat colours: White, Brown, Grey and Fawn.
+
 ### Corrections Applied
 
 The map's default animal data is derived from 3D model dimensions, which sometimes produces unrealistic values. The bridge corrects these:
@@ -57,9 +59,11 @@ The map's default animal data is derived from 3D model dimensions, which sometim
 | **Geese** | Weight reduced from ~90 kg to 5-8 kg | Map derived weight from navigation mesh size, not real goose weight |
 | **Rabbits** | Weight refined to 2.5-5.5 kg | Same navigation mesh issue |
 | **Rabbits** | Male breeding age set to 6 months | Map default was 18 months; real rabbits mature at 3-4 months |
-| **Cats** | Litter size increased to 3-6 kittens | Map default was 1-3; real cats have 3-5 per litter |
-| **Geese** | Clutch size set to 3-6 eggs | Map default was 1-3 |
-| **Rabbits** | Litter size increased to 4-8 kits | Map default was 1-3; real rabbits have 4-8 per litter |
+| **Cats** | Litter size raised to usually 3 kittens, rarely up to 6 | Map default was usually 1, at most 3; real cats have 3-5 per litter |
+| **Geese** | Clutch size set to usually 3 eggs, rarely up to 6 | Map default was usually 1, at most 3 |
+| **Rabbits** | Litter size raised to usually 4 kits, rarely up to 8 | Map default was usually 1, at most 3; real rabbits have 4-8 per litter |
+
+Exotic females keep the mod's default timing: cats, geese, rabbits and quail first conceive at about 13 months, even though their males can breed earlier.
 
 ---
 
@@ -94,7 +98,7 @@ On HB v1.4, horses are fully rideable and compatible with the Horse Addon Pack. 
 
 On Hof Bergmann, the cow pasture buildings collect milk as **milk cans** (physical pallets that spawn at the building) rather than filling a milk tank. Every RLRM cow breed produces cans here - including the beef breeds - so a whole mixed herd contributes.
 
-> **Milk cans ignore lactation.** Everywhere else in RLRM a cow only gives milk while lactating (the 10 months after calving), and non-lactating cows give zero - see the [Cattle Factsheet](factsheet-cattle.md#milk-production-by-breed). The can-collecting cow buildings are the exception: they produce cans for **every adult cow** (from 12 months) regardless of lactation, following the cow's age curve instead of the lactation cycle. A dry cow, or a heifer that has never calved, will still fill cans. This matches how the map's own cow buildings behaved before RLRM.
+> **Milk cans ignore lactation.** Everywhere else in RLRM a cow only gives milk while lactating (the 10 months after calving), and non-lactating cows give zero - see the [Cattle Factsheet](factsheet-cattle.md#milk-production-by-breed). The can-collecting cow buildings are the exception: they produce cans for **every adult cow** (from 13 months) regardless of lactation, following the cow's age curve instead of the lactation cycle. A dry cow, or a heifer that has never calved, will still fill cans. This matches how the map's own cow buildings behaved before RLRM.
 
 If your cow building fills a **milk tank** instead of spawning cans (the older farm-style cow barn), it uses the normal RLRM rules - only lactating cows contribute.
 
@@ -105,6 +109,8 @@ If your cow building fills a **milk tank** instead of spawning cans (the older f
 ## Known Limitations
 
 ### Pasture Bulls Are Not Cattle
+
+*Hof Bergmann v1.4+ only.*
 
 Hof Bergmann adds a **BULL** animal type for decorative pasture bulls. These are **not the same** as the bull breeds in the cattle system (Holstein Bull, Angus Bull, etc.).
 
@@ -120,9 +126,11 @@ Unfortunately, each animal type loads its own set of 3D models from the map's co
 
 The pasture bull still gets individual tracking, a name, and genetics - it just doesn't participate in the cattle breeding and reproduction system.
 
-**No bull sperm collection under RLRM.** Hof Bergmann's bull stable produces BULLSPERM by modelling it as a milk output on the BULL subtype. In vanilla FS25 this works because the cluster-based milk pipeline lets the curve run on any subtype regardless of gender. RLRM replaces that pipeline with per-animal output that gates milk production on lactating female cows that have given birth in the last 10 months - none of which applies to the BULL animal type. The BULLSPERM collection trigger at the bull stable stays empty under RLRM. Loosening the gate broadly would let any male animal "produce milk" anywhere a map mod declares such an output, so this is documented as a known incompatibility rather than patched.
+**No bull sperm collection under RLRM.** Hof Bergmann's bull stable normally collects bull sperm, which the map produces the same way as milk. Under RLRM that output only runs for cows that have calved in the last 10 months, so the bull stable's collection point stays empty. This is a known incompatibility.
 
 ### Dogs Are Companion Animals
+
+*Hof Bergmann v1.4+ only.*
 
 Hof Bergmann includes 8 dog breeds (4 Labrador variants, 4 Border Collie variants). In base FS25, dogs are companion animals with special behaviour.
 

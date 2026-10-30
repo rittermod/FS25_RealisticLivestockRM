@@ -41,7 +41,7 @@ These mods are confirmed to work alongside RLRM:
 | Mod | Notes |
 |-----|-------|
 | **Seasonal Wool Production** | Works with RLRM via a built-in compatibility shim. |
-| **Enhanced Production Points / EPP butchers** | Supported. EPP butchers accept RLRM animals. |
+| **Extended Production Point / EPP butchers** | Basic support. EPP butchers accept RLRM animals. |
 
 ---
 

@@ -1,6 +1,6 @@
 # Sheep & Goats Factsheet
 
-Sheep and goats share a husbandry but have different production types. Sheep produce wool (warm weather only), while goats produce goat milk (requires lactation). Four sheep breeds offer different wool/price trade-offs, and goats are a distinct breed-locked type.
+Sheep and goats share a husbandry but have different production types. Sheep produce wool (only on days whose lowest temperature stays at 12C or above), while goats produce goat milk (requires lactation). Four sheep breeds offer different wool/price trade-offs, and goats are a distinct breed-locked type.
 
 > **Note:** This documentation was generated with AI assistance and may contain inaccuracies. If you spot an error, please [open an issue](https://github.com/rittermod/FS25_RealisticLivestockRM/issues).
 
@@ -12,18 +12,20 @@ Sheep and goats share a husbandry but have different production types. Sheep pro
 
 | Breed | Target Weight (ewe / ram) | Wool Range (peak) | Sell Value |
 |-------|--------------------------|-------------------|------------|
-| **Black Welsh** | 42 / 57.5 kg | 24 - 166 | Lowest |
-| **Landrace** | 45 / 60 kg | 21 - 149 | Below average |
+| **Black Welsh** (Black Welsh Mountain in game) | 42 / 57.5 kg | 24 - 166 | Lowest |
+| **Landrace** (Landrace of Bentheim in game) | 45 / 60 kg | 21 - 149 | Below average |
 | **Steinschaf** | 50 / 67.5 kg | 18 - 123 | Above average |
-| **Swiss Mountain** | 80 / 105 kg | 14 - 96 | Highest |
+| **Swiss Mountain** (Swiss Black-Brown Mountain in game) | 80 / 105 kg | 14 - 96 | Highest |
 
-*Black Welsh produce the most wool by far, but Swiss Mountain sell for double the price. Wool range shows the full span from poor to excellent genetics.*
+*Black Welsh produce the most wool, but Swiss Mountain sell for double the price. Wool range shows the full span from poor to excellent genetics.*
+
+*Food, water, straw and production figures are per in-game month, whatever your month length. The animal's info box shows them per day, so with 3 days per month it shows a third of these figures.*
 
 ### Goat
 
 | Breed | Target Weight (doe / ram) | Goat Milk Range (peak, lactating) | Sell Value |
 |-------|--------------------------|----------------------------------|------------|
-| **Goat** | 30 / 35 kg | 5 - 57 L/day | High |
+| **Goat** (ram: Goat Ram in game) | 30 / 35 kg | 5 - 57 L/month | High |
 
 *Rams are heavier than ewes/does.*
 
@@ -33,9 +35,9 @@ Sheep and goats share a husbandry but have different production types. Sheep pro
 
 ## Wool Production (Sheep Only)
 
-Both ewes and rams produce wool - identical output per breed. **Wool is only produced when temperature is 12°C or above** (warm weather shearing season). In winter, wool output drops to zero.
+Both ewes and rams produce wool - identical output per breed. **Wool is only produced on days whose lowest temperature stays at 12C or above.** In winter, wool output drops to zero.
 
-### Wool Output Range (units/day, warm weather)
+### Wool Output Range (units/month, warm weather)
 
 | Breed | 6 mo | 18 mo (peak) |
 |-------|------|--------------|
@@ -50,16 +52,16 @@ Both ewes and rams produce wool - identical output per breed. **Wool is only pro
 
 ## Goat Milk Production
 
-Goats produce milk **only while lactating** (10 months after giving birth). Goat milk is a separate product from cow milk (GOATMILK fill type - requires compatible storage).
+Goats produce milk **only while lactating** (10 months after giving birth). Goat milk is a separate product from cow milk (Goat Milk in game - requires compatible storage).
 
-### Goat Milk Output Range (L/day, lactating)
+### Goat Milk Output Range (L/month, lactating)
 
 | Age | Range |
 |-----|-------|
 | Early lactation | ramping up toward peak |
 | 18+ mo (peak) | **5 - 57** |
 
-*Goats only lactate after their first kidding (from about 13 months), so there is no milk before then. Output ramps up over the first months of each lactation to the peak shown. Genetics and lactation phase cause large variation between individual animals; non-lactating goats produce zero milk.*
+*Goats only lactate after their first kidding (from about 14 months), so there is no milk before then. Output ramps up over the first months of each lactation to the peak shown. Genetics and lactation phase cause large variation between individual animals; non-lactating goats produce zero milk.*
 
 ---
 
@@ -82,37 +84,31 @@ Sheep and goat prices peak at 36 months and stay at that level for older animals
 | **Goat** | Doe | 100 | 1,000 |
 | | Ram Goat | 150 | 1,500 |
 
-*These are typical prices for an average, healthy animal. Actual prices vary widely - well-bred healthy animals sell for significantly more, poor-quality animals can sell for far less, and a sick animal is worth less while sick.*
+*These are typical prices for an average, healthy animal. Actual prices vary widely - well-bred healthy animals sell for significantly more, poor-quality animals can sell for far less, and a sick animal cannot be sold at the dealer until it recovers.*
 
 ### What Affects Sell Price
 
 | Factor | Effect |
 |--------|--------|
-| Quality genetics | Better genetics -> noticeably higher price |
+| Quality genetics | Better genetics -> considerably higher price |
 | Weight | Well-fed animals near target weight are worth more |
 | Health | Healthy animals sell for significantly more |
-| Lactating (goats only) | Moderate price bonus |
+| Lactating (goats only) | Small price bonus |
 | Pregnant | Moderate price bonus |
-| Castrated | Moderate price bonus |
-| Diseases | Can substantially reduce price |
+| Castrated | Small price bonus |
+| Diseases | A sick animal cannot be sold at the dealer until it recovers |
 
 ### Buy Prices
 
-| Breed | Female (newborn / adult) | Male (newborn / adult) |
-|-------|-------------------------|------------------------|
-| **Black Welsh** | 45 / 575 | 55 / 650 |
-| **Landrace** | 50 / 600 | 60 / 800 |
-| **Steinschaf** | 90 / 950 | 125 / 1,200 |
-| **Swiss Mountain** | 115 / 1,100 | 145 / 1,350 |
-| **Goat** | 200 / 1,500 | 225 / 1,750 |
+The dealer's price is the animal's own sale value plus a markup that depends on the [**Dealer Animal Quality**](reference-settings.md#dealer-ai) setting, plus a transport fee per animal. So it follows the same things as the sale value: age, genetics, health, weight and pregnancy. Buying into a trailer at the dealer has no transport fee.
 
 ---
 
 ## Food & Water by Breed
 
-Genetics significantly affect how much each animal eats - some are naturally much more efficient than others. Lactating goats eat noticeably more, and the Food Scale setting also adjusts consumption.
+Genetics significantly affect how much each animal eats - some are naturally much more efficient than others. Lactating goats eat noticeably more, and the Food Scale setting also adjusts consumption. Food and water rise through a pregnancy, more with a bigger litter: considerably higher by the end with twins.
 
-### Food Consumption Range (L/day)
+### Food Consumption Range (L/month)
 
 | Breed | | Newborn | 18+ mo (adult) |
 |-------|---|---------|-----------------|
@@ -129,7 +125,7 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 
 *Black Welsh are the cheapest to feed. Swiss Mountain eat the most. Goats are very efficient. Ranges show the span from the most efficient to the hungriest animals.*
 
-### Water Consumption (L/day, newborn -> adult)
+### Water Consumption (L/month, newborn -> adult)
 
 | Breed | Female | Male |
 |-------|--------|------|
@@ -139,7 +135,7 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 | **Swiss Mountain** | 5 -> 85 | 5 -> 89 |
 | **Goat** | 2 -> 20 | 2 -> 23 |
 
-*Goats drink very little water compared to sheep. Lactating goats drink considerably more water than usual.*
+*Goats drink very little water compared to sheep. Lactating goats drink considerably more water than usual, and water rises through a pregnancy as well.*
 
 ---
 
@@ -158,7 +154,7 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 | **Goat** | Doe | 3.75 kg | 30 kg | 90 kg |
 | | Ram Goat | 4.0 kg | 35 kg | 115 kg |
 
-*Swiss Mountain sheep are nearly double the weight of Black Welsh. Goats are the lightest. Higher metabolism animals reach target weight faster but eat more.*
+*Swiss Mountain sheep are nearly double the weight of Black Welsh. Goats are the lightest. Higher metabolism animals reach target weight faster but eat more. Metabolism also moves each animal's own target weight: high-metabolism animals settle noticeably above the figure shown, low-metabolism animals noticeably below it.*
 
 ---
 
@@ -179,15 +175,15 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 
 ### Offspring per Birth
 
-Sheep and goats usually produce twins - at every age, including first-time mothers. Singles and triplets both occur, with triplets more likely from ewes and does with high fertility genetics.
+Sheep and goats usually produce twins - at every age, including first-time mothers. Litter size is mostly chance. Well below average fertility makes triplets less likely; above average adds nothing.
 
 | Outcome | Likelihood |
 |---------|------------|
 | Twins | Most likely |
-| Single | Common |
 | Triplets | Uncommon |
+| Single | Uncommon |
 
-*Litter size does not depend on age. Goats breed from the same age as sheep (8 months) and follow the same twin-heavy pattern. What changes with age is the chance of conceiving at all, which tapers to zero by 120 months.*
+*Litter size does not depend on age. Goats breed from the same age as sheep (8 months) and follow the same twin-heavy pattern. Age does not change a female's chance of conceiving - fertility genetics do. That chance holds until her end age of 120 months, then stops outright. Only animals with poor fertility genetics slow down in their last stretch.*
 
 ---
 
@@ -198,9 +194,9 @@ Sheep and goats usually produce twins - at every age, including first-time mothe
 | Ram stops breeding | 72 months (6 years) |
 | Female stops breeding | 120 months (10 years) |
 | Old age deaths begin | 120 months (10 years) |
-| Maximum lifespan | ~144 months (12 years) |
+| Maximum lifespan (rarely reached) | ~144 months (12 years) |
 
-*Sheep have the shortest lifespan among large livestock. Old age deaths can begin as soon as breeding ends. Death can be toggled off in settings.*
+*Most animals die of old age well before the maximum lifespan; only the best health genetics get close. Sheep have the shortest lifespan among large livestock. Old age deaths can begin as soon as breeding ends. Death can be toggled off in settings.*
 
 ---
 
@@ -213,7 +209,7 @@ Sheep and goats usually produce twins - at every age, including first-time mothe
 | **Pulpy Kidney** | None | High - worst in lambs and kids | 1 month, $150 (cures about half the time) | Major price loss; considerably less wool/milk while sick |
 | **Footrot** | Slowly | Never | 1 month, $100 (cures about 9 times in 10) | Major price loss; considerably less wool/milk while sick, for at least 6 months untreated |
 
-*Sheep never lactate, so mastitis only affects lactating goats, stopping their milk. Pulpy kidney never passes between animals, and lambs and kids up to 12 months old catch it most often. The Fatal column holds while **Animal Death** is on. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*
+*Sheep never lactate, so mastitis only affects lactating goats, stopping their milk. Pulpy kidney never passes between animals, and lambs and kids up to 12 months old catch it most often. The Fatal column holds while **Animal Death** is on. A sick animal cannot be sold at the dealer; the price loss shown is its value while sick, which sets what culling pays. See the [Disease Guide](guide-diseases.md) for detailed prevention and treatment.*
 
 Sheep and goats can be vaccinated against pulpy kidney, and the lambs and kids of a protected ewe or doe are born protected for 2 months. They can also be vaccinated against footrot (6 months, $10 a dose), which passes nothing to newborns. Female goats can also be vaccinated against mastitis - see [Vaccination](guide-diseases.md#vaccination).
 
@@ -225,8 +221,8 @@ Sheep and goats can be vaccinated against pulpy kidney, and the lambs and kids o
 
 2. **Twins are the norm.** Sheep and goats produce twins more often than singles, at any age. Budget pen space for 2 lambs per ewe per cycle.
 
-3. **Goats are niche.** Goat milk (GOATMILK) requires specific storage and processing. Make sure you have compatible facilities before investing.
+3. **Goats are niche.** Goat Milk requires specific storage and processing. Make sure you have compatible facilities before investing.
 
-4. **Seasonal wool.** Wool only produces in warm weather (12°C+). In cold climates with long winters, wool income will be seasonal. Plan accordingly.
+4. **Seasonal wool.** Wool is only produced on days whose lowest temperature stays at 12C or above, so a warm day after a cold night gives none. In cold climates with long winters, wool income will be seasonal. Plan accordingly.
 
 5. **Short lifespan.** Sheep can start dying of old age at 10 years - right when they stop breeding. Sell ageing sheep before they die of old age to recover value.

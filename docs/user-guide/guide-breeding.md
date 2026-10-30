@@ -16,6 +16,7 @@ For reproduction to occur, ALL of the following must be true:
 4. Female is **not already pregnant**
 5. Female health is **75% or above**
 6. Female is not the **daughter of that specific male** (inbreeding prevention)
+7. Mother has **recovered from her last birth**: a mother cannot conceive again for 3 months after giving birth. Lactation does not block conception.
 
 ---
 
@@ -29,12 +30,15 @@ For reproduction to occur, ALL of the following must be true:
 | **Goats** | 8 months | 5 months | 72 months (6 yr) | 5 months | 120 months (10 yr) |
 | **Horses** | 22 months | 24 months | 300 months (25 yr) | 11 months | 264 months (22 yr) |
 | **Chickens** | 6 months | 6 months | 72 months (6 yr) | 2 months | 60 months (5 yr) |
+| **Alpacas** *(Beans & Alpacas Expansion)* | 14 months | 24 months | 120 months (10 yr) | 11 months | 180 months (15 yr) |
+
+*A female can conceive from the month after the age shown.*
 
 *See the [Breeding Reference](reference-breeding.md) for a per-breed view that splits female and male rows and includes peak litter sizes.*
 
 > **Critical insight:** Males retire from breeding much earlier than females in some species! Boars stop at 4 years while sows breed until 8. Rams stop at 6 years while ewes breed until 10. Plan male replacements early.
 
-> **Genetics matter:** A male's maximum breeding age is scaled by his fertility genetics. A bull with high fertility may breed well beyond 11 years, while one with poor fertility may retire much sooner. The ages above assume average genetics. The one exception is roosters, whose 72-month cap is fixed and not affected by genetics.
+> **Genetics matter:** These ages are when a male normally stops breeding. With a younger male in the pen, a high-fertility older male can still father young past his age. A male with poor fertility genetics stops fathering earlier: the female can still conceive while he is in the pen, but the young get no recorded father, average sire genetics and their mother's breed. Roosters are the exception: their 72-month limit is the same for every rooster, whatever his genetics.
 
 ---
 
@@ -51,6 +55,7 @@ Most males can breed with any female of their species, with two important except
 | All Boars | Any pig breed |
 | All Stallions | Any horse colour |
 | All Roosters | Any hen |
+| All Alpaca males *(Beans & Alpacas Expansion)* | Any alpaca colour |
 
 *Cross-breeding between different breeds of the same species is allowed (e.g., Angus bull × Holstein cow), except for breed-locked types. See [Offspring Breed](#offspring-breed) below for what breed the offspring will be.*
 
@@ -77,7 +82,7 @@ Each offspring rolls its breed independently. A Berkshire sow bred by a Landrace
 
 ### Artificial Insemination
 
-When using artificial insemination, offspring **always inherit the mother's breed**. The AI semen system doesn't carry breed information from a specific sire, so all offspring will be the same breed as their mother.
+When using artificial insemination, offspring **always inherit the mother's breed**. A straw shows its sire's breed, but only his genetics are passed on, so all offspring will be the same breed as their mother.
 
 If breed consistency matters to you, AI is a reliable way to ensure it.
 
@@ -106,12 +111,12 @@ A Holstein calf from an Angus bull × Holstein cow cross inherits its Holstein a
 
 Two things decide how many young you get: whether the mother conceives at all, and how large the litter is once she does.
 
-- **Chance of conceiving** rises once the mother reaches breeding age, stays high through her prime years, and tapers to zero at her fertility end age (see the table above). This is the part that depends on age.
-- **Litter size** does *not* depend on age. Each birth is usually the species' typical size; a smaller or larger litter is driven by the mother's **fertility genetics**, not how old she is.
+- **Chance of conceiving.** Age does not change her chance of conceiving - **fertility genetics** do. That chance holds until her end age (see the table above), then stops outright.
+- **Litter size** does *not* depend on age. Each birth is usually the species' typical size, and litter size is mostly chance. How much fertility genetics matter is listed per species below.
 
 ### Cattle
 
-Cattle almost always produce a single calf. Twins and triplets can happen, more often from cows with high fertility genetics.
+Cattle almost always produce a single calf. Twins and triplets can happen. Litter size is mostly chance. Well below average fertility rules out the largest litters; above average adds nothing.
 
 | Outcome | Likelihood |
 |---------|------------|
@@ -119,55 +124,69 @@ Cattle almost always produce a single calf. Twins and triplets can happen, more 
 | Twins | Uncommon |
 | Triplets | Rare |
 
-*A cow's chance of conceiving stays steady through her prime years and tapers to zero by 132 months.*
+*Age does not change a cow's chance of conceiving - fertility genetics do. That chance holds until 132 months (11 years), then stops outright.*
 
 ### Pigs
 
-Pigs produce the largest litters -- typically around 12 piglets, and up to 16 from a highly fertile sow.
+Pigs produce the largest litters -- typically around 12 piglets, with 16 the most a sow can have. Litter size is mostly chance. Well below average fertility rules out the largest litters; above average adds nothing.
 
 | Outcome | Likelihood |
 |---------|------------|
 | ~12 piglets (typical) | Most likely |
 | Smaller litter | Uncommon |
-| Up to 16 piglets | Possible with high fertility |
+| 13-15 piglets | Rare |
+| 16 piglets | Very rare |
 
-*A sow stays highly fertile through her prime years, with her conception chance tapering to zero by 96 months (8 years).*
+*Age does not change a sow's chance of conceiving - fertility genetics do. That chance holds until 96 months (8 years), then stops outright.*
 
 ### Sheep & Goats
 
-Sheep and goats usually produce twins. Singles and triplets both occur, with triplets more likely from high-fertility ewes and does.
+Sheep and goats usually produce twins. Singles and triplets both occur. Litter size is mostly chance. Low fertility makes triplets a little less likely; above average adds nothing.
 
 | Outcome | Likelihood |
 |---------|------------|
 | Twins | Most likely |
-| Single | Common |
 | Triplets | Uncommon |
+| Single | Uncommon |
 
-*Twins are the most common outcome at every age, including first-time mothers. Goats breed from the same age as sheep (8 months). Conception chance tapers to zero by 120 months (10 years).*
+*Twins are the most common outcome at every age, including first-time mothers. Goats breed from the same age as sheep (8 months). Age does not change a mother's chance of conceiving - fertility genetics do. That chance holds until 120 months (10 years), then stops outright. Only animals with poor fertility genetics slow down in their last stretch.*
 
 ### Horses
 
-Horses almost always produce a single foal. Twins are an occasional surprise and triplets are rare.
+Horses almost always produce a single foal. Twins are uncommon and triplets are rare. Litter size is mostly chance. Well below average fertility rules out the largest litters; above average adds nothing.
 
 | Outcome | Likelihood |
 |---------|------------|
 | 1 foal | Most likely |
-| Twins | Occasional |
+| Twins | Uncommon |
 | Triplets | Rare |
 
-*A mare stays fertile across her breeding years, with her conception chance tapering to zero by 264 months (22 years).*
+*Age does not change a mare's chance of conceiving - fertility genetics do. That chance holds until 264 months (22 years), then stops outright. Only animals with poor fertility genetics slow down in their last stretch.*
 
 ### Chickens
 
-A successful hatch is typically around 5 chicks, and can reach up to 12 from a highly fertile hen.
+A successful hatch is typically around 5 chicks. Bigger hatches are rare, and 8 or more is very rare. Litter size is mostly chance. Well below average fertility rules out the largest litters; above average adds nothing.
 
 | Outcome | Likelihood |
 |---------|------------|
 | ~5 chicks (typical) | Most likely |
-| Fewer chicks | Common |
-| Up to 12 chicks | Possible with high fertility |
+| 6 chicks | Uncommon |
+| Fewer chicks | Uncommon |
+| 7 chicks | Rare |
+| 8 or more chicks | Very rare |
 
-*A hen's chance of hatching a clutch is high from 6 months and tapers with age, ending abruptly at 60 months (5 years) -- after that she still lays eggs but hatches no chicks.*
+*Age does not change a hen's chance of hatching a clutch - fertility genetics do. That chance holds until 60 months (5 years), then stops outright -- after that she still lays eggs but hatches no chicks. Only animals with poor fertility genetics slow down in their last stretch.*
+
+### Alpacas
+
+*Beans & Alpacas Expansion.* Mostly one young, and twins are down to chance. Alpacas have no lactation period. See the [Alpacas Factsheet](factsheet-alpacas.md).
+
+| Outcome | Likelihood |
+|---------|------------|
+| 1 young | Most likely |
+| Twins | Uncommon |
+
+*Age does not change a female's chance of conceiving - fertility genetics do. That chance holds until 180 months (15 years), then stops outright. Only animals with poor fertility genetics slow down in their last stretch.*
 
 ---
 
@@ -189,12 +208,12 @@ Milk output varies within the lactation period:
 
 | Months Since Birth | Milk Output |
 |-------------------|-------------|
-| 0-1 | Ramping up (below full potential) |
-| 2-3 | **Peak production** |
+| 0-2 | Ramping up (below full potential) |
+| 3 | **Peak production** |
 | 4-9 | Gradually declining |
 | 10+ | Lactation ends (zero milk) |
 
-*Peak milk production occurs around month 2-3 after birth. See the cattle and sheep factsheets for specific breed output ranges.*
+*Peak milk production occurs at month 3 after birth. See the cattle and sheep factsheets for specific breed output ranges.*
 
 ```mermaid
 %%{init: {"themeVariables": {"xyChart": {"plotColorPalette": "#1565c0"}}}}%%
@@ -209,20 +228,34 @@ xychart-beta
 
 ---
 
+## Feeding During Pregnancy
+
+Food and water rise through a pregnancy, more with a bigger litter.
+
+| Species | Food and water |
+|---------|----------------|
+| Cattle, Horses | Noticeably higher by the end, considerably with twins |
+| Sheep, Goats | Considerably higher by the end |
+| Alpacas | Noticeably higher by the end |
+| Pigs | A pregnant sow eats and drinks up to about twice as much as usual for most of her pregnancy |
+| Chickens | Food only, as chickens take no water: up to about double by the end |
+
+---
+
 ## Pregnancy Complications
 
-Breeding requires the mother to be at 75% health or above to conceive (see [Requirements](#requirements-for-breeding)). Once she is pregnant, birth is usually safe, but complications can still occur:
+Breeding requires the mother to be at 75% health or above to conceive (see [Requirements](#requirements-for-breeding)). Once she is pregnant, birth is usually safe, but with the **Animal Death** setting on, complications can still occur:
 
 - **Stillbirths.** An individual newborn may not survive birth. This is more likely when the newborn has poor health genetics. It reduces how many of the litter survive -- it does not shrink the litter the mother conceived.
-- **Mother death.** If a newborn is stillborn, the mother herself can die during the birth. This is rare, and only a real risk for mothers with poor health genetics; strong health genetics make it very unlikely.
+- **Mother death.** If a newborn is stillborn, the mother herself can die during the birth. This only happens to mothers with poor health genetics.
 
-*Litter size is set by the mother's fertility genetics, not by her health -- health decides how safely the birth goes, not how many young she carries. If the mother dies during birth, her surviving offspring remain.*
+*Litter size is mostly chance and does not depend on the mother's health -- health decides how safely the birth goes, not how many young she carries. If the mother dies during birth, her surviving offspring remain.*
 
 ### Freemartin Effect (Cattle Only)
 
-When a cow gives birth to twins where one is male and one is female, the female calf has a **97% chance of being infertile** (a "freemartin"). This is a real biological phenomenon. The male twin is unaffected.
+When a cow gives birth to a litter with both male and female calves, each female calf is **almost always infertile** (a "freemartin"). This is a real biological phenomenon. Male calves are unaffected.
 
-*Freemartins can still be raised for milk or sold, but they will never breed. This only affects mixed-sex cattle twins - same-sex twins are not affected.*
+*Freemartins can still be raised for sale, but they will never breed, and without a birth they never give milk. This only affects mixed-sex cattle litters - same-sex twins are not affected.*
 
 ---
 
@@ -230,9 +263,9 @@ When a cow gives birth to twins where one is male and one is female, the female 
 
 If a pen is at maximum capacity when offspring are born, **excess newborns are automatically sold**. Make sure your pens have room for new arrivals, especially:
 
-- Pig pens (litters of 11-16)
-- Sheep pens at prime age (frequent twins)
-- Any pen during peak breeding season
+- Pig pens (litters of around 12)
+- Sheep pens (frequent twins)
+- Any pen with several mothers due around the same time
 
 ---
 
@@ -242,9 +275,18 @@ If you don't want to keep males, artificial insemination (AI) is available throu
 
 - Breeds your female without needing a physical male in the pen
 - Uses an AI animal pool (can be refreshed in settings)
-- Offspring always inherit the mother's breed, so there is no need for breed-matched semen (even for Water Buffalo or goats)
+- Offspring always inherit the mother's breed, so there is no need for breed-matched semen (even for Water Buffalo or goats). Semen from any breed of the same species works, so a sire's genetics can come from another breed
 - The female must meet the age and eligibility rules, but AI does not enforce the 75% health minimum that natural breeding requires
-- The insemination button is automatically disabled when the female is ineligible (pregnant, too young, or recovering from birth)
+- The insemination button is automatically disabled when the female is ineligible (pregnant, already inseminated, too young, or recovering from birth)
+- A straw used on an infertile or too-old female always fails and is still spent. So does one used in the month she reaches her minimum breeding age, as she can only conceive from the month after
+
+### How to Inseminate
+
+1. **Buy a dewar.** In the RL Menu's **Artificial Insemination** tab, pick a sire and the number of straws. Each sire shows an **Average Success** rating: the higher it is, and the better the female's fertility genetics, the more likely a straw is to work.
+2. **Find the dewar.** It arrives at a store place, where bought vehicles appear. An empty dewar disappears by itself.
+3. **Inseminate from the menu.** On the **Manage** tab, select the female and press **I**. The dialog lists only the dewars you own for her species, with the straws left and the success rating of each. Pick one and confirm.
+4. **Or take a straw in hand.** Walk up to the dewar and use **Take Straw**. Aim at an animal in the pen and use **Inseminate**, or aim at the same dewar and use **Return straw** if you change your mind.
+5. **Wait for the result.** It arrives the next day in the **Message Log**. A failed attempt still spends the straw.
 
 ---
 
@@ -254,14 +296,15 @@ Plan your breeding based on gestation periods:
 
 | Species | Breed | Birth | Next Possible Breeding |
 |---------|-------|-------|----------------------|
-| Cattle | Month 0 | Month 10 | ~Month 12 (after lactation) |
-| Pigs | Month 0 | Month 4 | ~Month 5 |
-| Sheep | Month 0 | Month 5 | ~Month 6 |
-| Goats | Month 0 | Month 5 | ~Month 6 |
-| Horses | Month 0 | Month 11 | ~Month 12 |
-| Chickens | Month 0 | Month 2 | ~Month 3 |
+| Cattle | Month 0 | Month 10 | ~Month 13 |
+| Pigs | Month 0 | Month 4 | ~Month 7 |
+| Sheep | Month 0 | Month 5 | ~Month 8 |
+| Goats | Month 0 | Month 5 | ~Month 8 |
+| Horses | Month 0 | Month 11 | ~Month 14 |
+| Chickens | Month 0 | Month 2 | ~Month 5 |
+| Alpacas | Month 0 | Month 11 | ~Month 14 |
 
-*Cows have the longest cycle - roughly one calf per year at best. Pigs can produce 2-3 litters per year, making them the fastest-reproducing large animal.*
+*A mother cannot conceive again for 3 months after giving birth. Horses and alpacas have the longest cycle, with cows close behind - a little under one calf or foal per year at best. A sow manages about 1.7 litters, or 20 piglets, a year, making pigs the fastest-reproducing large animal. Chickens have the shortest gestation and the shortest cycle.*
 
 ---
 
@@ -269,12 +312,12 @@ Plan your breeding based on gestation periods:
 
 1. **Track male ages.** The #1 surprise is boars stopping at 4 years. Set up reminders or check your boar ages regularly.
 
-2. **Actively manage your breeding stock.** Offspring inherit from parents, but individual calves can be worse than either parent due to natural genetic variation. Pair your best animals, sell or castrate underperformers, and don't let a herd breed unchecked through generations - genetics will drift towards average without active culling. See the [FAQ](faq.md#how-can-offspring-have-worse-genetics-than-their-parents) for why this happens.
+2. **Actively manage your breeding stock.** Offspring inherit from parents, but individual calves can be worse than either parent due to natural genetic variation. Pair your best animals and sell or castrate underperformers. A herd left to breed unchecked keeps about the same average and just spreads wider, so it only improves with active selection. See the [FAQ](faq.md#how-can-offspring-have-worse-genetics-than-their-parents) for why this happens.
 
 3. **Keep health above 75%.** Below 75%, breeding fails entirely. Weak newborns (poor health genetics) can be stillborn, and a stillbirth can occasionally cost the mother too. Good food, water, straw, and medical treatment are essential.
 
 4. **Budget for lactation costs.** Lactating cows eat noticeably more food and considerably more water. Plan your feed budget for the 10-month lactation window.
 
-5. **Use pen capacity wisely.** A pig sow can produce 13 piglets at once. If your pen only has 5 spaces, 8 piglets get auto-sold at newborn prices. Expand pens before breeding season.
+5. **Use pen capacity wisely.** A pig sow can produce 13 piglets at once. If your pen only has 5 spaces, 8 piglets get auto-sold at newborn prices. Expand pens before she gives birth.
 
-6. **Vaccinate mothers before they give birth.** A sow protected against PED, or a ewe or doe protected against pulpy kidney, gives her newborns a short protection of their own - see [Protection from the mother](guide-diseases.md#protection-from-the-mother).
+6. **Vaccinate mothers before they give birth.** A sow protected against PED, or a ewe, doe or alpaca protected against pulpy kidney, gives her newborns a short protection of their own - see [Protection from the mother](guide-diseases.md#protection-from-the-mother).

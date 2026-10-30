@@ -12,7 +12,7 @@ Common questions about Realistic Livestock RM, covering genetics, breeding, dise
 
 ### What changed from the original mod
 
-Arrow-kb's original version used a simple model where offspring were randomly placed somewhere between the two parents' values. No variation beyond that range, no chance of outperforming the parents, and no regression. It was predictable but unrealistic.
+Arrow-kb's original version used a simple model where offspring were randomly placed somewhere between the two parents' values. No variation beyond that range and no chance of outperforming the parents. It was predictable but unrealistic.
 
 The current version uses a more realistic genetic model: the offspring's trait value is based on the **average of both parents** plus some **random variation**. This means offspring can exceed both parents - or fall below both.
 
@@ -30,24 +30,24 @@ xychart-beta
     title "Offspring Trait Distribution Around Mid-Parent Value"
     x-axis "Trait Value (relative to mid-parent)" ["Much Lower", "Lower", "Slightly Lower", "Mid-Parent", "Slightly Higher", "Higher", "Much Higher"]
     y-axis "Likelihood" 0 --> 100
-    bar [3, 12, 28, 100, 28, 12, 3]
+    bar [2, 16, 63, 100, 63, 16, 2]
 ```
 
 *Most offspring cluster around the mid-parent average. A few will be noticeably better or worse. Extreme outliers in either direction are rare but possible.*
 
-### Regression to the mean
+### The ceiling on top genetics
 
-This is a well-known phenomenon in genetics called **regression to the mean**, first discovered by Francis Galton in the 1880s. He noticed that children of very tall parents were tall, but usually not quite as tall as their parents. The same goes the other way - children of short parents tend to be a bit taller than their parents.
+Nothing in the mod pulls animals back towards a population average: offspring always centre on their own parents. The one limit is the top of the scale. Parents up there have little room above them and plenty below.
 
-In the mod, breeding two "Extremely High" productivity cows will produce calves that are above average - but many of them will be "Very High" rather than "Extremely High." The parents were statistical outliers, and their offspring tend to drift back towards the population average.
+In the mod, breeding two "Extremely High" productivity cows will produce calves that are above average - but many of them will be "Very High" rather than "Extremely High." A calf that would land above the ceiling stops there, so the calves of such a pair average a little below their parents. A mid-range herd has no such limit: its average stays where it is and the animals just spread wider.
 
 ### Where you'll notice it first
 
-Chickens cycle through generations much faster than other animals (2-month hatching vs 10-month cattle gestation), so genetic drift shows up in your chicken flock first. If you're seeing unexpected drops in egg production across generations, this is likely why.
+Chickens cycle through generations much faster than other animals (2-month hatching vs 10-month cattle gestation), so this variation shows up in your chicken flock first. If you're seeing unexpected drops in egg production across generations, this is likely why.
 
 ### The good news - but it takes work
 
-Over many generations, consistently breeding your best animals **does** improve the herd average. But "consistently" is the key word - you have to actively manage who breeds with who. If you let a herd stay together through multiple generations without culling, lower-genetics offspring will breed with each other and the herd average will drift towards the mean over time.
+Over many generations, consistently breeding your best animals **does** improve the herd average. But "consistently" is the key word - you have to actively manage who breeds with who. If you let a herd stay together through multiple generations without culling, lower-genetics offspring will breed with each other and the herd average stops improving: a mid-range herd just spreads wider, and a top herd slips a little.
 
 To maintain a top-tier herd:
 
@@ -63,7 +63,6 @@ See the [Genetics Guide](guide-genetics.md#breeding-inheritance) for practical b
 
 For the curious, here's the real science behind the simulation:
 
-- [Regression to the Mean](https://select-statistics.co.uk/blog/regression-to-the-mean-as-relevant-today-as-it-was-in-the-1900s/) - Select Statistics - accessible explanation of Galton's original discovery
 - [The Infinitesimal Model](https://en.wikipedia.org/wiki/Infinitesimal_model) - Wikipedia - the formal genetics model behind the simulation
 - [Mendel's Law of Segregation](https://www.khanacademy.org/science/ap-biology/heredity/mendelian-genetics-ap/a/the-law-of-segregation) - Khan Academy - why gene inheritance is random
 - [Estimating Trait Heritability](https://www.nature.com/scitable/topicpage/estimating-trait-heritability-46889/) - Nature - how heritability works in real livestock breeding
@@ -82,16 +81,20 @@ When a male and female of different breeds produce offspring, the mod flips a co
 flowchart TD
     A["Offspring born"] --> B{"Artificial\ninsemination?"}
     B -->|Yes| C["Always mother's breed"]
-    B -->|No| D{"Coin flip\n(per offspring)"}
+    B -->|No| G{"Eligible\nfather?"}
+    G -->|No| C
+    G -->|Yes| D{"Coin flip\n(per offspring)"}
     D -->|50%| E["Father's breed"]
     D -->|50%| F["Mother's breed"]
 ```
 
 Each offspring in a litter or set of twins rolls independently, so siblings from the same birth can be different breeds. A Berkshire sow bred by a Landrace boar might produce a litter with a mix of Berkshire and Landrace piglets.
 
+The coin flip needs an eligible father. A male with poor fertility genetics stops fathering earlier than the age limit, so a female can still conceive with only him in the pen, but her young get no recorded father and take her breed.
+
 ### Artificial insemination is different
 
-When using artificial insemination (AI), offspring **always** inherit the mother's breed. The AI system doesn't carry breed-specific sire information, so there's no coin flip - it defaults to the mother's breed every time.
+When using artificial insemination (AI), offspring **always** inherit the mother's breed. The straw shows the sire's breed, but only his genetics carry over at conception, so there's no coin flip - it defaults to the mother's breed every time.
 
 If you want all offspring to match a specific breed, AI gives you that control.
 
@@ -108,16 +111,16 @@ So an Angus calf born from an Angus bull x Holstein cow pairing will *look* Angu
 
 ### What about breed-locked animals?
 
-Water Buffalo and Goats can only breed within their own breed (see [Breed Restrictions](guide-breeding.md#breed-restrictions)), so the question of offspring breed doesn't arise - both parents are always the same breed.
+Water Buffalo and Goats can only mate within their own breed (see [Breed Restrictions](guide-breeding.md#breed-restrictions)), so in natural mating the question of offspring breed doesn't arise - both parents are always the same breed. AI is the exception: a straw from any breed of the same animal type can be used, so the sire's genetics can come from another breed, but the offspring still take their mother's breed.
 
 ### Quick reference
 
 | Scenario | Offspring Breed |
 |----------|----------------|
 | Same-breed parents | Always that breed |
-| Different breeds, natural mating | 50% chance of either breed (per offspring) |
+| Different breeds, natural mating | 50% chance of either breed (per offspring); mother's breed if there is no eligible father |
 | Different breeds, AI | Always mother's breed |
-| Breed-locked types | Always same breed (can only breed within breed) |
+| Breed-locked types | Always mother's breed (natural mating stays within the breed; an AI straw can be any breed of the type) |
 
 See the [Breeding Guide](guide-breeding.md#offspring-breed) for examples and practical tips.
 
@@ -165,7 +168,7 @@ See [Animal Packs](guide-animal-packs.md) for how to install and use them, or [C
 
 ### Why the mod doesn't include new breeds itself
 
-Creating animal breeds requires 3D models, textures, and animations - a completely different skill set from the scripting and game mechanics this mod focuses on. The mod works with whatever breeds the base game and DLCs provide (currently 7 cattle breeds, 3 pig breeds, 5 sheep/goat breeds, 8 horse colour variants, and chickens).
+Creating animal breeds requires 3D models, textures, and animations - a completely different skill set from the scripting and game mechanics this mod focuses on. The mod works with whatever breeds the base game and DLCs provide (currently 8 cattle breeds, 3 pig breeds, 5 sheep/goat breeds, 8 horse colour variants, chickens, and alpacas).
 
 Each breed in Realistic Livestock has detailed configuration: food consumption curves by age, production rates at different life stages, target weights, sell prices, breeding parameters, and more. Adding a breed properly is a two-part job:
 
@@ -176,7 +179,7 @@ Ritter can do part 2 but not part 1. The animal pack system makes it possible fo
 
 ### Map-based animals
 
-When a map includes its own animal types or breeds, the mod can add built-in support with full breeding and reproduction. **[Hof Bergmann](map-hof-bergmann.md)** adds exotic animal *species* (ducks, geese, cats, rabbits, alpacas, quail). **[Witcombe](map-witcombe.md)** instead adds new *breeds* within the standard cow, pig, sheep, and rabbit types (Jersey, Gloucestershire Old Spot, Texel, Suffolk, Blue Faced Leicester) - and corrects Hereford on the map with a heritage profile.
+When a map includes its own animal types or breeds, the mod can add built-in support with full breeding and reproduction. **[Hof Bergmann](map-hof-bergmann.md)** adds exotic animal *species* (ducks, geese, cats, rabbits, alpacas, quail). **[Witcombe](map-witcombe.md)** instead adds new *breeds* within the standard cow, pig, sheep, and rabbit types (Jersey, Gloucestershire Old Spot, Texel, Suffolk, Blue Faced Leicester) - and corrects Hereford on the map with a heritage profile. **[Le Mechet](map-le-mechet.md)** adds French cattle breeds (Charolais, Montbeliarde, Simmental, Vosgienne).
 
 The mod uses **version-aware map support**. It detects which version of a supported map you have installed and loads the matching configuration automatically. This means:
 
@@ -205,7 +208,7 @@ Some breed packs floating around online are stolen copies of other mods with min
 
 The selector is grouped into sections - **one per breed and sex**, so "Holstein" and "Holstein Bull" are two separate sections. Each section lists one row per age group, labelled in months. Holstein cows, for example, show four: `0-5 months`, `6-11 months`, `12-17 months` and `18-72 months`. How many groups an animal has, and where they split, varies. A row is ticked when the dealer currently offers that group: on a clean install everything starts ticked, and once you start making changes the ticks reflect your own choices.
 
-Handy while you are in there: the **Select All / Select None** button applies to the section you are currently on, not the whole list, and you can toggle the highlighted row with **A**.
+Handy while you are in there: **Select All / Select None** (**Space**) applies to the whole list, **Select Section / Deselect Section** (**S**) applies only to the section you are on, and you can toggle the highlighted row with **A**.
 
 A few things worth knowing:
 
@@ -240,7 +243,7 @@ Don't confuse this with **Genetics Display**, which only changes whether genetic
 
 ## How do I protect my animals from diseases?
 
-**Short answer:** vaccinate. Open the animal's **Diseases** dialog (the Diseases button on its Info page), select the disease and press **Vaccinate**. One dose protects it at once: while protected it cannot catch that disease and does not spread it.
+**Short answer:** vaccinate. Open the animal's **Diseases** dialog (the Diseases button on the **Manage** tab), select the disease and press **Vaccinate**. One dose protects it at once: while protected it cannot catch that disease and does not spread it.
 
 Five diseases have a vaccine:
 
@@ -249,12 +252,12 @@ Five diseases have a vaccine:
 | Mastitis | Female cows and female goats | 12 months | $20 |
 | PED | Pigs | 6 months | $15 |
 | BRD | Cattle | 12 months | $30 |
-| Pulpy Kidney | Sheep and goats | 12 months | $15 |
+| Pulpy Kidney | Sheep, goats and alpacas | 12 months | $15 |
 | Footrot | Cattle, sheep and goats | 6 months | $10 |
 
 A few things worth knowing:
 
-- **Newborns can be born protected.** A sow protected against PED gives her piglets 1 month of protection, and a ewe or doe protected against pulpy kidney gives her lambs and kids 2 months - as long as her own protection still runs on the day she gives birth. Vaccinate the young ones before it runs out.
+- **Newborns can be born protected.** A sow protected against PED gives her piglets 1 month of protection, and a ewe, doe or female alpaca protected against pulpy kidney gives her young 2 months - as long as her own protection still runs on the day she gives birth. Vaccinate the young ones before it runs out.
 - **Recovering protects too.** An animal that recovers from a disease is immune to it for a time, and a mother immune after recovering passes protection to her newborns just as a vaccinated one does.
 - **Vaccinate before the disease shows.** A dose given to an animal that has already caught the disease does nothing, and is still charged.
 - **The rest have no vaccine.** For foot and mouth, treat at once and, on **Easy** and **Normal**, move a new case into an empty pen the day it shows; cull an Avian Flu (HPAI) case the day it shows; breed CVM carriers only with non-carriers.
@@ -265,19 +268,21 @@ The **Diseases** setting decides how often animals fall ill in the first place. 
 
 ## Where are the alpacas?
 
-Alpacas come with the **Beans and Alpacas** DLC. Without the DLC active, Realistic Livestock adds no alpacas on any map.
+Alpacas need the **Beans & Alpacas Expansion**, with one exception: **[Hof Bergmann](map-hof-bergmann.md) v1.4** has its own alpacas, which get males and breeding from Realistic Livestock but no happiness or fleece. See the [Alpacas Factsheet](factsheet-alpacas.md) for breeding ages, weights and prices.
 
-With the DLC, Realistic Livestock adds a male for each of the four coat colours, because a female needs a male in the pen to get pregnant (an AI straw works too). Males count toward the alpaca shed's limit of 16 animals, so leave room for one.
+With the expansion, Realistic Livestock adds a male for each of the four coat colours, because a female needs a male in the pen to get pregnant (an AI straw works too). Males count toward the alpaca shed's limit of 16 animals, so leave room for one.
 
-Every alpaca, male or female, carries **happiness** and **fleece**, shown on the animal's info page, its HUD box and the dealer card:
+Every alpaca from the expansion, male or female, carries **happiness** and **fleece**, shown on the **Manage** tab, its HUD box and the dealer card:
 
 - **Fleece** grows every day. A content alpaca grows a full coat's worth faster than an unhappy one, and the growth per month is about the same whatever your month length. From 40% fleece an adult alpaca (14 months and older) shows its woolly coat; below that it looks sheared.
 - **Happiness** drops a little every day. A happier alpaca sells for more and grows its fleece faster. From 14 months, when it can be led, happiness also helps keep its health up, so an adult that is never led needs hay to stay healthy; a younger alpaca's health depends on its food alone.
 - Alpacas from the dealer arrive sheared, at no happiness and no fleece.
 
-The **animal worker** shears woolly alpacas once a year and leads them every day, which raises their happiness. A sheared alpaca's fleece scales with its fleece genetics. The fleece fills a pallet only in a shed with a fleece pallet (the DLC's alpaca shed); in any other pen the alpacas are still sheared, but the fleece is not collected.
+The **animal worker** shears woolly alpacas once a year and leads them every day, which raises their happiness. A sheared alpaca's fleece scales with its fleece genetics. The fleece fills a pallet only in a shed with a fleece pallet (the expansion's alpaca shed); in any other pen the alpacas are still sheared, but the fleece is not collected.
 
 From 14 months an alpaca can be **led out of the shed on the leash** and back again. Walking it raises its happiness. A woolly alpaca led into the alpaca shed can be **sheared by hand**, and its fleece fills the shed's fleece pallet.
+
+Any alpaca, on Hof Bergmann too, can catch [pulpy kidney](guide-diseases.md#pulpy-kidney), with the same risk, treatment, immunity, vaccine and mother's protection as sheep and goats. It slows growth and a sick alpaca cannot be sold at the dealer until it recovers, but fleece is unaffected.
 
 ---
 

@@ -32,7 +32,7 @@ Animals on Le Mechet carry an **FR eartag prefix** to reflect the map's country 
 
 | Animal Type | New Breed | Map Origin |
 |-------------|-----------|-----------|
-| **Cattle** | Charolaise | Le Mechet-defined |
+| **Cattle** | Charolais | Le Mechet-defined |
 | **Cattle** | Montbeliarde | Le Mechet-defined |
 | **Cattle** | Simmental | Le Mechet-defined |
 | **Cattle** | Vosgienne | Le Mechet-defined |
@@ -45,12 +45,12 @@ By default, the map only defines **female** versions of its new breeds. Without 
 
 | Male Subtype | Animal Type | Mates With |
 |--------------|-------------|-----------|
-| **Charolais Bull** | Cattle | Charolaise cow (also pairs with other cow breeds, see Breeding Notes) |
+| **Charolais Bull** | Cattle | Charolais cow (also pairs with other cow breeds, see Breeding Notes) |
 | **Montbeliarde Bull** | Cattle | Montbeliarde cow (also pairs with other cow breeds) |
 | **Simmental Bull** | Cattle | Simmental cow (also pairs with other cow breeds) |
 | **Vosgienne Bull** | Cattle | Vosgienne cow (also pairs with other cow breeds) |
 
-All bulls are buyable at the Animal Dealer and behave like any other RLRM bull - they cannot give birth themselves, but a healthy bull older than 12 months can mate with cows in the same husbandry. The 12-month gate matches every other RLRM cattle bull (Holstein, Angus, etc.); each Le Mechet breed's distinct character comes from gestation length and weights, not from when the bull becomes fertile.
+All bulls are buyable at the Animal Dealer and behave like any other RLRM bull: a healthy bull older than 12 months can mate with cows in the same husbandry. The 12-month gate matches every other RLRM cattle bull (Holstein, Angus, etc.); each Le Mechet breed's distinct character comes from gestation length, feed needs and milk, not from when the bull becomes fertile.
 
 ---
 
@@ -60,13 +60,17 @@ Each Le Mechet breed has its own personality on the farm - different feed needs,
 
 | Breed | Distinctive in-game character |
 |---|---|
-| **Charolaise** | Heavy French beef breed - the largest of the four. Carries calves longer than the rest (14-month gestation vs the standard 10), so first calves arrive around 26 months - the slowest of the four. Premium pricing throughout: 300 / 6,600 to buy, peaks at 7,800 at 36 months. Heavy appetite to match - eats about two-thirds more than a Vosgienne does. Per RLRM convention, Charolaise still produces a modest dual-purpose milk every cow gets, but the breed character is "buy for beef, milk is bonus". |
-| **Montbeliarde** | PDO Comte dairy breed. Standard 10-month gestation, first calf at 22 months (matches Holstein). Modest pricing (200 / 1,450) and a solid milk output peaking at 140 L/day. The most feed-efficient of the four - a lean dairy breed that delivers a modest milk yield on a small feed bill, the "lean dairy that also makes great cheese milk" angle. |
-| **Simmental** | Dual-purpose Fleckvieh and the fastest-breeding of the four - 9-month heritage shorter gestation (unique on this map), so first calves arrive around 21 months. Pricing sits between dairy and beef (200 / 2,050 to buy, peaks at 2,500). Mid-range feed needs and a moderate milk peak (100 L/day). The compromise breed - works for either career path. |
-| **Vosgienne** | Small mountain dairy - the rare endangered Vosges breed. Smallest frame of the four (target adult cow weight ~1/3 less than Charolaise). Standard 10-month gestation, first calf at 22 months. Modest pricing (190 / 1,900). Milk peak ~85 L/day - the "small farm efficiency" character. |
+| **Charolais** | French beef breed. Carries calves longer than the rest (14-month gestation vs the standard 10), so first calves arrive around 27 months - the slowest of the four. Premium pricing throughout: sale value peaks at 7,800 at 36 months. Heavy appetite - eats about two-thirds more than a Vosgienne does. RLRM gives it a dual-purpose milk curve peaking at 265 L/month, nearly double Montbeliarde's 140, but the breed character is "buy for beef, milk is bonus". |
+| **Montbeliarde** | PDO Comte dairy breed. Standard 10-month gestation, first calf at 23 months (matches Holstein). Modest pricing (sale value peaks at 1,500 at 36 months) and a solid milk output peaking at 140 L/month. The most feed-efficient of the four - a lean dairy breed that delivers a modest milk yield on a small feed bill, the "lean dairy that also makes great cheese milk" angle. |
+| **Simmental** | Dual-purpose Fleckvieh and the fastest-breeding of the four - 9-month heritage shorter gestation (unique on this map), so first calves arrive around 22 months. Pricing sits between dairy and beef (sale value peaks at 2,500 at 36 months). Mid-range feed needs and a moderate milk peak (100 L/month). The compromise breed - works for either career path. |
+| **Vosgienne** | Mountain dairy - the rare endangered Vosges breed. Standard 10-month gestation, first calf at 23 months. Sale value peaks at 2,250 at 36 months. Milk peak ~85 L/month - the "small farm efficiency" character. |
 | **Hereford** | **Hidden** in the Animal Dealer on this map. Le Mechet ships no Hereford 3D model, so RLRM removes the buy option to avoid scrambled visuals. If you switch it back on in **Choose Animals For Sale**, the Hereford you buy shows another breed's model on this map. On any other map, Hereford is in the dealer as usual. |
-| **Highland** *(DLC)* | Behaves the same as Highland on any other map - the standard RLRM Highland (12-month maturity, premium adult transport price, dual-purpose milk). RLRM corrects the visuals so the shaggy coat displays right on Le Mechet's husbandry. |
+| **Highland** *(DLC)* | Behaves the same as Highland on any other map - the standard RLRM Highland (12-month maturity, standard cattle transport fee, dual-purpose milk). RLRM corrects the visuals so the shaggy coat displays right on Le Mechet's husbandry. |
 | **Brahman** *(DLC)* | **Hidden** in the Animal Dealer on this map, as Hereford is. Le Mechet's husbandry has no Brahman 3D model, so RLRM removes the buy option to avoid wrong visuals. If you switch it back on in **Choose Animals For Sale**, the Brahman you buy shows another breed's model on this map. On any other map, Brahman is in the dealer as usual. |
+
+*Food, water, straw and production figures are per in-game month, whatever your month length. The animal's info box shows them per day, so with 3 days per month it shows a third of these figures.*
+
+Prices on this page are sale values. The dealer's price is the animal's own sale value plus a markup that depends on the [**Dealer Animal Quality**](reference-settings.md#dealer-ai) setting, plus a transport fee per animal, so a breed that sells high also costs more to buy. Buying into a trailer at the dealer has no transport fee.
 
 Bulls added by the mod mirror the cow of the same breed - see [Breeding Notes](#breeding-notes) below.
 
@@ -74,14 +78,14 @@ Bulls added by the mod mirror the cow of the same breed - see [Breeding Notes](#
 
 ## Map-Native 3D Models
 
-Unlike most map bridges, Le Mechet ships **its own custom cow models** for the four French breeds. So Charolaise actually looks like a Charolaise (cream-white heavy frame), Montbeliarde looks like a Montbeliarde (red-brown pied), and so on. You don't need an animal pack or texture mod - the breed-distinct visuals are built into Le Mechet itself.
+Unlike most map bridges, Le Mechet ships **its own custom cow models** for the four French breeds. So Charolais actually looks like a Charolais (cream-white), Montbeliarde looks like a Montbeliarde (red-and-white pied), and so on. You don't need an animal pack or texture mod - the breed-distinct visuals are built into Le Mechet itself.
 
 Two model meshes are shared across breed pairs via texture tiles:
 
-| Shared mesh | Used by | Coat colour |
-|---|---|---|
-| `cattleCharolaiseEtSimmental` | Charolaise + Simmental | Cream-white (Charolaise) / yellow-fawn pied (Simmental) |
-| `cattleMontbeliardeEtVosgienne` | Montbeliarde + Vosgienne | Red-and-white pied (Montbeliarde) / black-and-white pied (Vosgienne) |
+| Shared by | Coat colour |
+|---|---|
+| Charolais + Simmental | Cream-white (Charolais) / yellow-fawn pied (Simmental) |
+| Montbeliarde + Vosgienne | Red-and-white pied (Montbeliarde) / black-and-white pied (Vosgienne) |
 
 Each of the twelve age-stages (4 breeds x baby/kid/adult) has its own dealer-menu thumbnail so you can pick the right breed at the buy screen.
 
@@ -101,14 +105,14 @@ This limitation comes from how FS25 loads animal models - it's the same reason t
 
 Le Mechet's new breeds breed the same way as any other RLRM breed:
 
-- **Same-breed pairings** produce same-breed offspring. A Charolais bull and a Charolaise cow produce Charolaise calves.
+- **Same-breed pairings** produce same-breed offspring. A Charolais bull and a Charolais cow produce Charolais calves.
 - **Cross-breed pairings** produce mixed offspring whose breed follows the standard cross-breed rules. A Charolais bull and a Holstein cow can mate and will produce calves; the offspring breed is determined by the same rules used elsewhere in the mod.
 
 Le Mechet does not enforce any "French-breeds-only" mating rule - its new breeds slot into the same cross-breed system that already governs Holstein/Angus/Limousin/etc.
 
 If you want strict same-breed reproduction, keep one breed per husbandry. The sire is picked at random among the eligible males in the pen, so with mixed breeds you can't count on same-breed pairings.
 
-**Bulls mirror the cow of the same breed.** Each Le Mechet bull takes on the heritage pricing, feed and water needs, and frame of his breed - a Charolais bull is priced like a heavy beef bull, while a Vosgienne bull is the smallest-frame of the four and a Montbeliarde bull is the most feed-efficient. All Le Mechet bulls become fertile at the RLRM-standard 12 months, the same as every other RLRM cattle bull. Bulls do not lactate, even when the cow has a milk curve.
+**Bulls mirror the cow of the same breed.** Each Le Mechet bull takes on the heritage pricing and the feed and water needs of his breed - a Charolais bull is priced like a heavy beef bull, while a Vosgienne bull is the smallest-frame of the four and a Montbeliarde bull is the most feed-efficient. All Le Mechet bulls become fertile at the RLRM-standard 12 months, the same as every other RLRM cattle bull.
 
 ---
 

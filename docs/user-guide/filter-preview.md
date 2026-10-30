@@ -59,7 +59,9 @@ block as a sibling of the settings entries:
 ```
 
 Every filter has exactly one root `<group>`. Group operators can be nested
-arbitrarily deep.
+arbitrarily deep, but the in-game editor only shows the conditions directly
+in the root group. A nested group still loads and runs; the editor hides it,
+counts it in a banner and keeps it as written.
 
 ---
 
@@ -69,15 +71,16 @@ arbitrarily deep.
 |-----------|:--------:|------|-------|
 | `id` | yes | string | Stable unique identifier. Any string works; production filters created via the in-game flow use the prefix `rlFilter_`. Hand-authored ids can be any short slug, e.g. `cow_butcher`. Must be unique within the file. |
 | `name` | recommended | string | Display name shown in the in-game cycle chip and lists. Optional: the loader defaults a missing name to an empty string. Only `id` and the `.group` subtree are hard requirements. |
-| `animalType` | optional | string | Scope to a single animal type: `COW`, `SHEEP`, `PIG`, `CHICKEN`, `HORSE` and bridge-mod types (e.g. `RABBIT` on Witcombe). Omit the attribute for global scope (filter shows on every animal-type tab). |
+| `animalType` | optional | string | Scope to a single animal type: `COW`, `SHEEP`, `PIG`, `CHICKEN`, `HORSE`, `ALPACA` and bridge-mod types (for example `RABBIT` on Witcombe). A type that isn't registered in the current game skips the whole filter (see [Validation behaviour](#validation-behaviour)). Omit the attribute for global scope (filter shows on every animal-type tab). |
 | `farmId` | optional | integer | Scope to a single farm by id (`1`, `2`, ...). Omit for global scope (visible to every farm). |
 | `usage` | optional | string | Controls which screens show the filter: `ANY` (default), `OWNED` (owned-herd screens), `DEALER` (buy screen). Unknown values load as `ANY` with a warning. |
 | `version` | optional | integer | Schema version for forward compatibility. Default `1`. Leave at `1` unless future docs say otherwise. |
 
 A filter with `animalType="COW" farmId="1"` only appears on Farm 1's cow tab.
-A filter with both attributes omitted appears everywhere. The attributes are
-**immutable** once a filter is created through the in-game flow; for
-hand-authored filters they are honoured as-written each load.
+A filter with both attributes omitted appears everywhere. `farmId` is
+**immutable** once a filter is created through the in-game flow, while the
+animal type can still be changed in the editor; for hand-authored filters
+both are honoured as-written each load.
 
 ---
 
@@ -132,8 +135,7 @@ The `value` attribute is interpreted per the field's type - see the
 ```xml
 <condition field="subType" cmp="in">
     <value value="BULL_HOLSTEIN"/>
-    <value value="BULL_REDHOLSTEIN"/>
-    <value value="BULL_JERSEY"/>
+    <value value="BULL_SWISS_BROWN"/>
 </condition>
 ```
 
@@ -157,10 +159,10 @@ comparator's expected shape.
 | `gender` | enum | `==` `!=` `in` `notin` | all | Values: `male`, `female` (lowercase, internal keys). |
 | `isCastrated` | bool | `==` | all | `true` / `false`. |
 | `isPregnant` | bool | `==` | all | `true` / `false`. |
-| `isLactating` | bool | `==` | **COW only** | Other species ignore this field. Goats (a SHEEP subtype, `subType="GOAT"`) do track lactation internally, but this filter field is scoped to COW, so an `isLactating` condition always evaluates false for goats. |
+| `isLactating` | bool | `==` | **COW only** | On every other species the condition is always false, even `isLactating == false`. Goats (a SHEEP subtype, `subType="GOAT"`) do track lactation internally, but this filter field is scoped to COW, so an `isLactating` condition always evaluates false for goats. |
 | `hasName` | bool | `==` | all | True if the animal has a non-empty player-set name. |
-| `hasAnyDisease` | bool | `==` | all | True if at least one disease is showing symptoms. A cured disease (still counting down its immunity), a genetic carrier state (CVM) and a disease still in its hidden phase on **Hard** or **Very hard** do NOT count - those animals match `hasAnyDisease == false`, the same "Healthy" the quick filter offers. This also steers herdsman rules built on this field: a rule on it never selects cured animals, hidden cases or CVM carriers, and because a sick animal cannot be sold, a herdsman sell rule on it sells and marks nothing. |
-| `hasAnyMark` | bool | `==` | all | True if any mark is active (player-set or AI-manager). |
+| `hasAnyDisease` | bool | `==` | all | True if at least one disease is showing symptoms. A cured disease (still counting down its immunity), a genetic carrier state (CVM) and a disease still in its hidden phase on **Hard** or **Very hard** do NOT count - those animals match `hasAnyDisease == false`, the same "Healthy" the quick filter offers. This also steers Herdsman tasks built on this field: a task on it never selects cured animals, hidden cases or CVM carriers, and because a sick animal cannot be sold, a Herdsman Sell task on it sells and marks nothing. |
+| `hasAnyMark` | bool | `==` | all | True if any mark is active (player-set or Herdsman). |
 | `name` | string | `contains` `notcontains` | all | Case-insensitive substring match. Unnamed animals are treated as empty string, so `notcontains anything` is true for them. |
 | `weight` | number | `<` `<=` `==` `!=` `>=` `>` `in` `notin` | all | **Monitor-gated.** Returns no value when the animal's monitor is not active; the condition then evaluates to false. |
 | `health` | number | same as weight | all | **Monitor-gated.** Same as weight. |
@@ -168,7 +170,7 @@ comparator's expected shape.
 | `genetics.health` | number (0-99) | same | all | Scaled to 0-99. |
 | `genetics.fertility` | number (0-99) | same | all | Scaled to 0-99. A castrated male reads 0. |
 | `genetics.quality` | number (0-99) | same | all | Scaled to 0-99. |
-| `genetics.productivity` | number (0-99) | same | **COW, SHEEP, CHICKEN** | Scaled to 0-99. Other species don't carry productivity. |
+| `genetics.productivity` | number (0-99) | same | **COW, SHEEP, CHICKEN, ALPACA** | Scaled to 0-99. Other species don't carry productivity, so on them the condition is always false. |
 | `genetics.overall` | number (0-99) | same | all | Average of the present genetics traits, then scaled to 0-99. Matches the on-screen overall genetics number. |
 | `subType` | enum | `==` `!=` `in` `notin` | all | The internal breed/variant string. Examples (vary by map/bridge): `COW_HOLSTEIN`, `BULL_HOLSTEIN`, `SHEEP_TEXEL`, `RAM_TEXEL`, `CHICKEN`, `CHICKEN_ROOSTER`, `RABBIT`, `RABBIT_MALE`. To find the exact string for a breed on your map, open `rm_RlAnimalSystem.xml` and look at the `subType="..."` attribute on any `<animal>` entry. |
 
@@ -198,6 +200,10 @@ on the `age` field yields nil and will silently exclude every animal.
 | enum | `==`  `!=`  `in`  `notin` |
 | string | `contains`  `notcontains` |
 
+`in` and `notin` on a number field work in a hand-written filter, but the
+in-game editor doesn't offer them: it hides such a row, counts it in a banner
+and keeps it as written.
+
 `!=` is intentionally absent for bool (use `==` against the negated value).
 `==` and `!=` are intentionally absent for string (the substring matcher
 is the only intended path; for an exact match, use `contains <fullName>`
@@ -226,7 +232,7 @@ entirely in the editor (e.g. `Pregnant No`, not `Pregnant is No`).
 | `!=` | is not | `gender != male` |
 | `>=` | is at least | `age >= 30` |
 | `>` | is more than | `weight > 500` |
-| `in` | is one of | `subType in [BULL_HOLSTEIN, BULL_JERSEY]` |
+| `in` | is one of | `subType in [BULL_HOLSTEIN, BULL_SWISS_BROWN]` |
 | `notin` | is none of | `subType notin [BULL_HOLSTEIN]` |
 | `contains` | contains (case-insensitive) | `name contains betty` |
 | `notcontains` | does not contain (case-insensitive) | `name notcontains keep` |
@@ -260,9 +266,8 @@ dropped, you end up with an empty `AND` that matches every animal.
 Watch the game log for `RLFilterSerialization` warnings on first load
 to catch this.
 
-**Genetics are 0-99, not raw multipliers.** The engine stores genetics
-internally as 0.25-1.75 multipliers but every filter field exposes them
-on the same 0-99 scale you see on the in-game info card.
+**Genetics are 0-99.** Every genetics field reads on the same 0-99 scale
+you see on the in-game info card, not the game's internal values.
 `genetics.health >= 75` does what you expect.
 
 **Filter `id` collisions silently overwrite.** If two `<filter>` entries
@@ -278,11 +283,16 @@ watch the game log for warnings like:
 
 | Log line | Meaning | Fix |
 |----------|---------|-----|
-| `RLFilterSerialization.readCondition: unknown field 'X' ...` | Field name doesn't exist in the catalog. | Check spelling against the [Field reference](#field-reference). |
-| `RLFilterSerialization.readCondition: cmp 'X' is not in whitelist for field 'Y' ...` | Comparator isn't valid for that field's type. | Pick a comparator from the field's row in the table. |
-| `RLFilterSerialization.readCondition: missing field/cmp at ...` | One of the required attributes is absent. | Add the missing attribute. |
-| `RLFilterSerialization.readFilter: missing id` | `<filter>` lacks an `id` attribute. | Add a unique `id`. |
-| `RLFilterSerialization.readFilter: filter id=... has no .group subtree; skipping (corrupt save?)` | `<filter>` has no `<group>` child. | Wrap conditions in a `<group op="AND">...</group>`. |
+| `RLFilterSerialization.readCondition: unknown field 'X' at ...; skipping (fail-closed)` | Field name doesn't exist in the catalog. | Check spelling against the [Field reference](#field-reference). |
+| `RLFilterSerialization.readCondition: cmp 'X' is not in ... for field 'Y' at ...; skipping` | Comparator isn't valid for that field's type. | Pick a comparator from the field's row in the table. |
+| `RLFilterSerialization.readCondition: missing field/cmp at ... (field=... cmp=...); skipping` | One of the required attributes is absent. | Add the missing attribute. |
+| `RLFilterSerialization.readFilter: missing id at ...; skipping filter` | `<filter>` lacks an `id` attribute. | Add a unique `id`. |
+| `RLFilterSerialization.readFilter: filter id=... names animal type 'X', which is not registered; skipping filter` | `animalType` names a type this game doesn't have: a typo, or a map, pack or DLC that isn't active. | Fix the spelling, or load the savegame with that content active. |
+| `RLFilterSerialization.readFilter: filter id=... at ... has no .group subtree; skipping (corrupt save?)` | `<filter>` has no `<group>` child. | Wrap conditions in a `<group op="AND">...</group>`. |
+
+Anything skipped here is not kept: the next save rewrites the file without
+the dropped condition or filter, so hold on to your backup until the log is
+clean.
 
 A filter that loads cleanly but matches every animal usually means an
 empty `AND` group - see *Empty `AND` matches everything* above.
@@ -295,12 +305,12 @@ The filters below are real working examples. Adapt the `id`, `name`,
 `animalType`, `farmId`, and the breed strings (`subType` values) to your
 own savegame.
 
-### 1. Cull old or non-pregnant cows
+### 1. Cull cattle with poor genetics, or old and not pregnant
 
 ```xml
 <filter id="cow_cull" name="Cow cull" animalType="COW" farmId="1" version="1">
     <group op="OR">
-        <condition field="genetics.overall" cmp="&lt;" value="75.000000"/>
+        <condition field="genetics.overall" cmp="&lt;" value="30.000000"/>
         <group op="AND">
             <condition field="age" cmp=">=" value="48.000000"/>
             <condition field="isPregnant" cmp="==" value="false"/>
@@ -309,9 +319,10 @@ own savegame.
 </filter>
 ```
 
-Selects any cow with overall genetics below 75, **or** any cow that is at
-least 48 months old and not currently pregnant. Note `&lt;` - the `<`
-character must be entity-encoded inside an XML attribute value.
+Selects any animal with overall genetics below 30 (average genetics read
+about 50), **or** any animal at least 48 months old and not currently
+pregnant, so older bulls match too. Note `&lt;` - the `<` character must be
+entity-encoded inside an XML attribute value.
 
 ### 2. Sell chickens for profit, but spare marked birds
 
@@ -362,14 +373,13 @@ check vacuously, so the filter is still useful in mostly-unnamed herds.
         <condition field="genetics.overall" cmp=">=" value="80.000000"/>
         <condition field="subType" cmp="in">
             <value value="BULL_HOLSTEIN"/>
-            <value value="BULL_REDHOLSTEIN"/>
-            <value value="BULL_JERSEY"/>
+            <value value="BULL_SWISS_BROWN"/>
         </condition>
     </group>
 </filter>
 ```
 
-Bulls (male cows) with overall genetics 80+ and a dairy-breed subtype.
+Bulls (male cows) with overall genetics 80+ and a milk-breed subtype.
 
 ### 5. Match-all (placeholder while you draft)
 
@@ -391,14 +401,14 @@ test, repeat.
   condition.
 - No `between` operator. Use `AND(field >= low, field <= high)`.
 - No date-based fields. `age` is months only.
-- Per-mark-kind filtering (player vs. AI-manager mark) is not in this
+- Per-mark-kind filtering (player vs. Herdsman mark) is not in this
   schema; only the generic `hasAnyMark` is exposed.
 - The `subType` strings depend on which mods/maps you have installed.
   When in doubt, copy the exact string from an existing
   `<animal subType="..."/>` line in `rm_RlAnimalSystem.xml`.
 - Multiplayer: filters are server-authoritative. Hand-edits on the host
-  propagate to clients automatically on next reconnect or filter
-  mutation.
+  reach clients in the full list sent when they join. A change made in the
+  game afterwards sends only that one filter.
 
 ---
 

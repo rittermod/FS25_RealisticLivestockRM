@@ -11,10 +11,26 @@ Pigs are the most prolific breeders in Realistic Livestock RM, with litters of u
 | Breed | Type | Target Weight (sow / boar) | Sell Value | Character |
 |-------|------|---------------------------|------------|-----------|
 | **Berkshire** | Premium | 140 / 180 kg | Highest | Most valuable per head |
-| **Landrace** | Standard | 165 / 205 kg | Moderate | Balanced mid-range |
-| **Black Pied** | Economy | 180 / 250 kg | Lowest | Cheapest, heaviest boars |
+| **Landrace** (German Landrace in game) | Standard | 165 / 205 kg | Moderate | Balanced mid-range |
+| **Black Pied** (Bentheim Black Pied in game) | Economy | 180 / 250 kg | Lowest | Cheapest, heaviest boars |
 
 *Boars are heavier than sows and sell for more. Berkshire pigs eat the most but command the highest prices.*
+
+---
+
+## Output
+
+Pigs produce only manure and liquid manure - no milk, wool, or eggs. Their value is entirely in selling the animals.
+
+| Breed | Manure (adult, L/month) | Liquid Manure (adult, L/month) |
+|-------|-------------------------|--------------------------------|
+| **Berkshire** | 50 / 55 | 91 / 95 |
+| **Landrace** | 45 / 48 | 85 / 88 |
+| **Black Pied** | 40 / 44 | 79 / 83 |
+
+*Values shown as sow / boar.*
+
+*Food, water, straw and production figures are per in-game month, whatever your month length. The animal's info box shows them per day, so with 3 days per month it shows a third of these figures.*
 
 ---
 
@@ -26,47 +42,31 @@ Pig prices peak at 24 months and stay at that level for older animals (unlike ca
 
 | Breed | | Newborn | 6 mo | 24 mo (peak) |
 |-------|---|---------|------|--------------|
-| **Berkshire** | Sow | 45 | 450 | 1,600 |
-| | Boar | 60 | 525 | 1,850 |
-| **Landrace** | Sow | 40 | 400 | 1,400 |
-| | Boar | 50 | 475 | 1,650 |
-| **Black Pied** | Sow | 35 | 375 | 1,200 |
-| | Boar | 45 | 450 | 1,500 |
+| **Berkshire** | Sow | 28 | 356 | 1,600 |
+| | Boar | 38 | 525 | 1,850 |
+| **Landrace** | Sow | 25 | 316 | 1,400 |
+| | Boar | 31 | 475 | 1,650 |
+| **Black Pied** | Sow | 22 | 296 | 1,200 |
+| | Boar | 28 | 450 | 1,500 |
 
-*These are typical prices for an average, healthy animal. Actual prices vary widely - well-bred healthy animals sell for significantly more, poor-quality animals can sell for far less, and a sick animal is worth less while sick.*
+*These are typical prices for an average, healthy animal. Actual prices vary widely - well-bred healthy animals sell for significantly more, poor-quality animals can sell for far less, and a sick animal cannot be sold at the dealer until it recovers.*
 
 ### What Affects Sell Price
 
 | Factor | Effect |
 |--------|--------|
-| Quality genetics | Better genetics -> noticeably higher price |
+| Quality genetics | Better genetics -> considerably higher price |
 | Weight | Well-fed animals near target weight are worth more |
 | Health | Healthy animals sell for significantly more |
 | Pregnant | Moderate price bonus |
-| Castrated | Moderate price bonus |
-| Diseases | Can substantially reduce price |
+| Castrated | Small price bonus |
+| Diseases | A sick animal cannot be sold at the dealer until it recovers |
 
 ### Buy Prices
 
-| Breed | Sow (newborn) | Sow (adult) | Boar (newborn) | Boar (adult) |
-|-------|--------------|-------------|----------------|--------------|
-| **Berkshire** | 65 | 1,200 | 75 | 1,500 |
-| **Landrace** | 55 | 1,100 | 65 | 1,400 |
-| **Black Pied** | 45 | 1,000 | 55 | 1,200 |
+The dealer's price is the animal's own sale value plus a markup that depends on the [**Dealer Animal Quality**](reference-settings.md#dealer-ai) setting, plus a transport fee per animal. So it follows the same things as the sale value: age, genetics, health, weight and pregnancy. Buying into a trailer at the dealer has no transport fee.
 
----
-
-## Output
-
-Pigs produce only manure and liquid manure - no milk, wool, or eggs. Their value is entirely in selling the animals.
-
-| Breed | Manure (adult) | Liquid Manure (adult) |
-|-------|---------------|----------------------|
-| **Berkshire** | 50 / 55 | 91 / 95 |
-| **Landrace** | 45 / 48 | 85 / 88 |
-| **Black Pied** | 40 / 44 | 79 / 83 |
-
-*Values shown as sow / boar.*
+The transport fee grows with age, from $40 for a newborn to $150 for a sow or $250 for a boar at 12 months and older. It also comes off the price when you sell.
 
 ---
 
@@ -74,7 +74,7 @@ Pigs produce only manure and liquid manure - no milk, wool, or eggs. Their value
 
 Genetics significantly affect how much each animal eats - some are naturally much more efficient than others. The Food Scale setting also adjusts consumption.
 
-### Food Consumption Range (L/day)
+### Food Consumption Range (L/month)
 
 | Breed | | Newborn | 24 mo (adult) |
 |-------|---|---------|---------------|
@@ -87,7 +87,7 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 
 *Berkshire pigs eat the most. Black Pied are the most efficient to feed. Ranges show the span from the most efficient to the hungriest animals. Most animals eat near the middle of these ranges.*
 
-### Water Consumption (L/day, newborn -> adult)
+### Water Consumption (L/month, newborn -> adult)
 
 | Breed | Sow | Boar |
 |-------|-----|------|
@@ -95,7 +95,17 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 | **Landrace** | 8 -> 75 | 8 -> 80 |
 | **Black Pied** | 6 -> 68 | 8 -> 72 |
 
-*Pregnant sows eat and drink more than usual.*
+*A pregnant sow eats and drinks up to about twice as much as usual for most of her pregnancy.*
+
+### Straw Consumption (L/month, newborn -> adult)
+
+| Breed | Sow | Boar |
+|-------|-----|------|
+| **Berkshire** | 5 -> 20 | 5 -> 20 |
+| **Landrace** | 5 -> 20 | 5 -> 20 |
+| **Black Pied** | 5 -> 20 | 5 -> 20 |
+
+*Straw is not affected by genetics or pregnancy.*
 
 ---
 
@@ -110,7 +120,7 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 | **Black Pied** | Sow | 1.65 kg | 180 kg | 1,050 kg |
 | | Boar | 1.75 kg | 250 kg | 1,200 kg |
 
-*Black Pied boars have the highest target weight at 250 kg. Higher metabolism animals reach target weight faster but eat more. Castrated pigs gain weight faster than intact males.*
+*Black Pied boars have the highest target weight at 250 kg. Higher metabolism animals reach target weight faster but eat more. Metabolism also moves each animal's own target weight: high-metabolism animals settle noticeably above the figure shown, low-metabolism animals noticeably below it. Castrated pigs gain weight faster than intact males.*
 
 ---
 
@@ -131,15 +141,16 @@ Genetics significantly affect how much each animal eats - some are naturally muc
 
 ### Litter Sizes
 
-Pig litters are the largest of any animal - typically around 12 piglets, and up to 16 from a highly fertile sow.
+Pig litters are the largest of any animal - typically around 12 piglets, and very rarely up to 16. Litter size is mostly chance. Well below average fertility rules out the largest litters; above average adds nothing.
 
 | Outcome | Likelihood |
 |---------|------------|
 | ~12 piglets (typical) | Most likely |
 | Smaller litter | Uncommon |
-| Up to 16 piglets | Possible with high fertility |
+| 13-15 piglets | Rare |
+| 16 piglets | Very rare |
 
-*Litter size is driven by the sow's fertility genetics, not her age. What changes with age is her chance of conceiving each cycle, which stays high through the prime years and tapers to zero by 96 months. A sow must be at 75% health or above to conceive.*
+*Age does not change a sow's chance of conceiving - fertility genetics do. That chance holds until her end age of 96 months, then stops outright. Litter size does not depend on age either. A sow must be at 75% health or above to conceive.*
 
 ---
 
@@ -150,9 +161,9 @@ Pig litters are the largest of any animal - typically around 12 piglets, and up 
 | Boar stops breeding | 48 months (4 years) |
 | Sow stops breeding | 96 months (8 years) |
 | Old age deaths begin | 180 months (15 years) |
-| Maximum lifespan | ~240 months (20 years) |
+| Maximum lifespan (rarely reached) | ~240 months (20 years) |
 
-*Death can be toggled off in settings. Accidents can happen at any age (affected by weather).*
+*Most animals die of old age well before this; only the best health genetics get close. Death can be toggled off in settings. Accidents can happen at any age (affected by weather). Animals in poor health can also die at any age, the very young most easily.*
 
 ---
 
@@ -163,7 +174,7 @@ Pig litters are the largest of any animal - typically around 12 piglets, and up 
 | **Foot and Mouth** | Rapidly | Low to moderate | 1 month, $250 | Major price loss, slower growth |
 | **PED** | Moderately | Moderate - worst in young piglets | 1 month, $150 | Severe diarrhoea (liquid manure drastically increased, solid manure severely reduced) |
 
-*The Fatal column holds while **Animal Death** is on.*
+*The Fatal column holds while **Animal Death** is on. A sick animal cannot be sold at the dealer; the price loss shown is its value while sick, which sets what culling pays.*
 
 > **PED warning:** Porcine Epidemic Diarrhoea hits young piglets hardest - newborn piglets in their first month catch it most often, and young piglets are the most at risk from it. Older pigs rarely catch it on their own, but any pig can catch it from a sick pen mate - treat quickly. See the [Disease Guide](guide-diseases.md).
 
@@ -181,4 +192,4 @@ Pigs can be vaccinated against PED, and the piglets of a protected sow are born 
 
 4. **Watch for PED.** Newborn piglets catch it most often and young piglets are the most at risk, so treat every case at once ($150). Vaccinate your sows ($15) so the protection still runs when they farrow: their piglets are then born protected for that first month. If it keeps recurring, a lower **Diseases** setting can protect your investment.
 
-5. **Pen capacity matters.** If a pen is full when piglets are born, the excess are automatically sold. Make sure you have room for those 11-16 piglet litters.
+5. **Pen capacity matters.** If a pen is full when piglets are born, the excess are automatically sold. Make sure you have room for a full litter of around 12 piglets.

@@ -10,19 +10,19 @@ Realistic Livestock RM transforms the animal system in Farming Simulator 25. Ins
 
 ### Every Animal Is Unique
 
-Each animal you buy or breed is tracked individually. They have a name tag, a birthday, and five genetic traits that make them different from every other animal in your herd. Two Holstein cows bought on the same day will produce different amounts of milk, eat different amounts of food, and sell for different prices.
+Each animal you buy or breed is tracked individually. They have a name tag, a birthday, and four or five genetic traits that make them different from every other animal in your herd. Two Holstein cows bought on the same day will produce different amounts of milk, eat different amounts of food, and sell for different prices.
 
 ### Genetics
 
-Every animal is born with five genetic traits rated from Extremely Low to Extremely High:
+Every animal is born with genetic traits rated from Extremely Low to Extremely High - five for most species, four for pigs and horses, which have no Productivity trait:
 
 - **Health** - Surviving a disease, daily health, and longevity
 - **Fertility** - Breeding success rate
-- **Productivity** - Milk, egg, and wool output (cows, sheep, goats, chickens only)
+- **Productivity** - Milk, egg, wool, and fleece output (cows, sheep, goats, chickens, alpacas only)
 - **Quality** - Sell price and meat value
 - **Metabolism** - Food consumption and weight gain
 
-Offspring inherit traits from their parents, so selective breeding pays off over time. Most animals you encounter will be average, but occasionally you'll find an exceptional one - or a dud.
+Offspring inherit traits from their parents, so selective breeding pays off over time. Dealer animals vary widely, and occasionally you'll find an exceptional one - or a dud.
 
 See the [Genetics Guide](guide-genetics.md) for the full rating scale and breeding tips.
 
@@ -37,6 +37,7 @@ Reproduction requires a male and female of the same species in the same pen. Eac
 | Sheep / Goats | 5 months | 2 lambs (twins usual) |
 | Horses | 11 months | 1 foal |
 | Chickens | 2 months | ~5 chicks (up to 12) |
+| Alpacas | 11 months | 1 young (twins uncommon) |
 
 Males and females have different fertility windows - boars retire from breeding at just 4 years while sows can breed until 8 years. Cows lactate for 10 months after giving birth, during which they produce milk but need more food and water.
 
@@ -48,11 +49,12 @@ See the [Breeding Guide](guide-breeding.md) for full details per species.
 
 Individual animals can be monitored, marked, and castrated:
 
-- **Monitoring** - Place monitors on animals to track their stats over time. View active monitors in the livestock menu.
+- **Monitoring** - Put a monitor on an animal to see its health, weight, food, water and straw use, and production. Without one, these stay hidden on the Manage tab, on the HUD and in the CSV export. A monitor costs a monthly fee per animal (cow $21.60, pig $9, sheep $15.75, horse $30, chicken $1.80, alpaca $15.30). A removed monitor comes off at the start of the next month, and that month is still billed. The **Monitor** page in the ESC menu lists your pens with their monitored animals, fees and totals, and can apply or remove monitors for a whole pen.
 - **Marking** - Mark animals for visual identification in your herd
-- **Castration** - Castrate males for a small sell price bonus. Castrated animals grow faster but cannot breed. They keep their genetics; only their fertility reads Infertile.
+- **Castration** - Castrate males for a small sell price bonus. Castrated animals grow faster but cannot breed. They keep their genetics; only their fertility reads Infertile. Roosters cannot be castrated.
+- **HUD boxes** - Look at an animal in a pen to see its details on the HUD, with a **Genetics** box, a **Diseases** box if it is showing symptoms, and a **Monitor** box if it has a monitor.
 
-In multiplayer you need the **trade animals** farm permission to monitor, mark, rename or castrate an animal.
+In multiplayer you need the **trade animals** farm permission to monitor, mark, rename or castrate an animal, or to treat, vaccinate or cull it.
 
 ### Diseases
 
@@ -64,10 +66,10 @@ All ten of the mod's diseases:
 | CVM | Cattle (genetic) | No | Carrier cows produce extra milk while **Diseases** is on, but affected animals are sick for life |
 | Foot and Mouth | Cows, Sheep, Goats, Pigs | Yes | Spreads fast; milk severely reduced, major price loss |
 | PED | Pigs | Yes | Worst in young piglets; drastically more liquid manure |
-| Avian Flu (LPAI) | Chickens | Yes | Egg production drops to about 40% of normal while a bird is sick |
+| Avian Flu (LPAI) | Chickens | Yes | Egg production severely reduced while a bird is sick |
 | Avian Flu (HPAI) | Chickens | No | Rare but almost always fatal; cull sick birds |
 | BRD | Cattle | Yes | Worst in calves; less milk |
-| Pulpy Kidney | Sheep, Goats | Yes (cures about half the time) | Never spreads, but high fatality, worst in lambs and kids |
+| Pulpy Kidney | Sheep, Goats, Alpacas | Yes (cures about half the time) | Never spreads, but high fatality, worst in lambs, kids and young alpacas |
 | Colic | Horses | Yes (cures about half the time) | Major price loss; never spreads |
 | Footrot | Cattle, Sheep, Goats | Yes (cures about 9 times in 10) | Never fatal, but lingers for months untreated and cuts milk and wool |
 
@@ -79,10 +81,11 @@ See the [Disease Guide](guide-diseases.md) for prevention and treatment strategi
 
 Animals can die from:
 
-- **Old age** - Each species has a natural lifespan (chickens ~5-8 years, horses ~25-30 years)
+- **Old age** - Each species has a natural lifespan. Old-age deaths start at about 5 years for chickens and about 25 years for horses, and most animals die well before the maximum (8 years for chickens, 30 for horses), which only the best health genetics get close to
 - **Low health** - Unhealthy animals face increasing death risk
-- **Accidents** - Random events affected by weather conditions
+- **Accidents** - Random events affected by weather conditions. An accident pays about a third of the animal's sale value; chickens pay nothing
 - **Disease** - A sick animal can die of its disease (see the [Disease Guide](guide-diseases.md#death-risk))
+- **Birth** - A stillbirth can occasionally cost the mother her life too, which is only a real risk with poor health genetics (see the [Breeding Guide](guide-breeding.md#pregnancy-complications))
 
 Death mechanics can be fully disabled or adjusted in the mod settings.
 
@@ -110,12 +113,14 @@ Open the **RL Menu** with **Right Shift + O** in-game - or, from the ESC menu's 
 
 - **Buy** - Purchase animals from the dealer with full genetics preview
 - **Sell** - Sell animals back to the dealer
-- **Move** - Transfer animals between your husbandries
-- **Manage** - View detailed stats, genetics, health, and production for each animal
-- **Insemination** - Browse and buy stored semen for artificial breeding without keeping males
-- **Message Log** - Track births, deaths, diseases, and other events. A red triangle marks a problem you can still act on, such as a disease showing, a treatment that failed or an overcrowded pen; an orange one marks a setback such as a death or a failed insemination; a green circle marks good news such as births and cures. Routine entries have no icon, and the colours follow the game's colour-blind setting.
+- **Move** - Transfer animals between your husbandries, or deliver them to a butcher (an Extended Production Point). A butcher refuses sick animals and animals outside its age range.
+- **Manage** - View detailed stats, genetics, and pedigree (mother, father and number of children) for each animal. Health, weight and production show only on an animal with a monitor. The pen pane also estimates how many months the pen's food will last, and turns orange, then red, when only a day or two of feed is left.
+- **Artificial Insemination** - Browse and buy stored semen for artificial breeding without keeping males
+- **Messages** - Track births, deaths, diseases, and other events. A red triangle marks a problem you can still act on, such as a disease showing, a treatment that failed or an overcrowded pen; an orange one marks a setback such as a death or a failed insemination; a green circle marks good news such as births and cures. Routine entries have no icon, and the colours follow the game's colour-blind setting.
 - **Herdsman** - Automate daily herd chores with rules: sell, buy, move, castrate, name, inseminate, or look after your horses - applied to the animals a saved filter picks, in the pens you choose. See the [Herdsman guide](guide-herdsman.md).
 - **Settings** - Adjust every RLRM option: the death toggle and the **Diseases** level, food scaling, dealer stock size, how good the dealer's animals are, which breeds and age groups the dealer offers, ear tag colours, genetics display, how many animals are shown in 3D per pen, CSV export, and more. This tab also hosts the **saved filter** editor.
+
+The menu shows fewer tabs when you open it somewhere else. At the animal dealer you get **Buy**, **Sell**, **Manage** and **Insemination**. With a livestock trailer at the dealer you get **Buy** and **Sell**. With a trailer anywhere else, such as at a pen or a butcher, you get a single **Transfer** tab for loading and unloading animals.
 
 **Saved filters** let you narrow the Buy, Sell, Move, and Manage lists to just the animals you care about - and they are how the Herdsman targets animals. Press **F** on any of those screens to cycle them. See the [Saved Filters guide](guide-saved-filters.md).
 
@@ -125,16 +130,17 @@ Open the **RL Menu** with **Right Shift + O** in-game - or, from the ESC menu's 
 |-----|--------|-------|
 | **Right Shift + O** | Open RL Menu | In-game |
 | **R** | Open Manage Animals | Animal menu |
-| **A** | Select / deselect | Buy and sell dialogs |
-| **X** | Mark animal | Animal detail view |
-| **M** | Toggle monitor | Animal detail view |
-| **I** | Insemination | Animal detail view (females only) |
-| **C** | Castrate | Animal detail view (males only) |
-| **D** | Disease treatment | Animal detail view |
-| **N** | Rename animal | Animal detail view |
+| **A** | Select / deselect | Buy, Sell and Move tabs, checklist dialogs |
+| **S** | Select / deselect section | Choose Animals For Sale |
+| **X** | Mark animal | Manage tab |
+| **M** | Toggle monitor | Manage tab |
+| **I** | Insemination | Manage tab (females only) |
+| **C** | Castrate | Manage tab (males only, not roosters) |
+| **D** | Disease treatment | Manage tab |
+| **N** | Rename animal | Manage tab |
 | **F** | Cycle saved filter | Animal lists |
 
-*All keybindings can be remapped in the game's input settings.*
+*Right Shift + O, R, A, S, M, I, D, N and F can be remapped in the game's input settings. X, C and Space are fixed menu keys.*
 
 ### Map & Mod Support
 
@@ -142,7 +148,7 @@ RLRM works on virtually any map out of the box - it does not need to be on a lis
 
 - **[Hof Bergmann](map-hof-bergmann.md)** - Ducks, geese, cats, rabbits, alpacas, and quail fully supported with breeding, genetics, and reproduction. See the [dedicated page](map-hof-bergmann.md) for supported versions and known limitations (pasture bulls, dogs).
 - **[Witcombe](map-witcombe.md)** - UK breeds (Jersey, Gloucestershire Old Spot, Texel, Suffolk, Blue Faced Leicester) plus rabbit keeping, fully supported with breeding, genetics, and reproduction. See the [dedicated page](map-witcombe.md) for supported versions and the Hereford heritage profile.
-- **[Le Mechet](map-le-mechet.md)** - French breeds (Charolaise, Montbeliarde, Simmental, Vosgienne) fully supported with breeding, genetics, and reproduction, using the map's native 3D models. See the [dedicated page](map-le-mechet.md) for supported versions and caveats.
+- **[Le Mechet](map-le-mechet.md)** - French breeds (Charolais, Montbeliarde, Simmental, Vosgienne) fully supported with breeding, genetics, and reproduction, using the map's native 3D models. See the [dedicated page](map-le-mechet.md) for supported versions and caveats.
 
 If a map updates to a version that hasn't been tested yet, you'll see a warning dialog when the game starts. The dialog includes a link to report any problems.
 
@@ -156,11 +162,12 @@ If a map updates to a version that hasn't been tested yet, you'll see a warning 
 
 Each species has a detailed factsheet with breed comparisons, production ranges, and pricing:
 
-- [Cattle Factsheet](factsheet-cattle.md) - 7 breeds from dairy Holsteins to beef Angus
+- [Cattle Factsheet](factsheet-cattle.md) - 8 breeds from dairy Holsteins to beef Angus
 - [Pigs Factsheet](factsheet-pigs.md) - 3 breeds with massive litter sizes
 - [Sheep & Goats Factsheet](factsheet-sheep.md) - 4 sheep breeds + goats
 - [Horses Factsheet](factsheet-horses.md) - 8 colour variants
 - [Chickens Factsheet](factsheet-chickens.md) - Hens and roosters
+- [Alpacas Factsheet](factsheet-alpacas.md) - Four coat colours with happiness and fleece (Beans & Alpacas Expansion)
 
 ## Guides
 
