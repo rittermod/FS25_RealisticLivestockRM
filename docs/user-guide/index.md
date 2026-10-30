@@ -19,6 +19,8 @@ A Farming Simulator 25 mod that replaces the default animal cluster system with 
 
 **[Latest release on GitHub](https://github.com/rittermod/FS25_RealisticLivestockRM/releases/latest)**
 
+**[Download this guide as a PDF](https://rittermod.github.io/FS25_RealisticLivestockRM/pdf/document.pdf)**
+
 ## Installation
 
 1. Download the latest `FS25_RealisticLivestockRM.zip` from the link above

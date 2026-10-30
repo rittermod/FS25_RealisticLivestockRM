@@ -1,0 +1,18 @@
+{
+  "htmlLabels": false,
+  "flowchart": { "htmlLabels": false },
+  "class": { "htmlLabels": false },
+  "theme": "base",
+  "themeVariables": {
+    "xyChart": {
+      "backgroundColor": "#f8f8f8",
+      "titleColor": "#333333",
+      "xAxisLabelColor": "#333333",
+      "xAxisTitleColor": "#333333",
+      "yAxisLabelColor": "#333333",
+      "yAxisTitleColor": "#333333",
+      "xAxisLineColor": "#666666",
+      "yAxisLineColor": "#666666"
+    }
+  }
+}

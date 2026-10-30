@@ -1,0 +1,71 @@
+[project]
+site_name = "Realistic Livestock RM"
+site_description = "User documentation for the Realistic Livestock RM mod for Farming Simulator 25"
+site_url = "https://rittermod.github.io/FS25_RealisticLivestockRM/"
+repo_url = "https://github.com/rittermod/FS25_RealisticLivestockRM"
+repo_name = "FS25_RealisticLivestockRM"
+docs_dir = "user-guide"
+
+nav = [
+  { "Home" = "index.md" },
+  { "Overview" = "overview.md" },
+  { "Factsheets" = [
+    { "Cattle" = "factsheet-cattle.md" },
+    { "Pigs" = "factsheet-pigs.md" },
+    { "Sheep & Goats" = "factsheet-sheep.md" },
+    { "Horses" = "factsheet-horses.md" },
+    { "Chickens" = "factsheet-chickens.md" },
+    { "Alpacas" = "factsheet-alpacas.md" },
+  ] },
+  { "Guides" = [
+    { "Genetics" = "guide-genetics.md" },
+    { "Breeding & Reproduction" = "guide-breeding.md" },
+    { "Diseases" = "guide-diseases.md" },
+    { "Saved Filters" = "guide-saved-filters.md" },
+    { "Herdsman Automation" = "guide-herdsman.md" },
+    { "Animal Packs" = "guide-animal-packs.md" },
+  ] },
+  { "Maps" = [
+    { "Hof Bergmann" = "map-hof-bergmann.md" },
+    { "Witcombe" = "map-witcombe.md" },
+    { "Le Mechet" = "map-le-mechet.md" },
+  ] },
+  { "Customize" = [
+    { "Creating Animal Packs" = "guide-creating-packs.md" },
+  ] },
+  { "FAQ" = "faq.md" },
+  { "Reference" = [
+    { "Breeding Stats" = "reference-breeding.md" },
+    { "Settings" = "reference-settings.md" },
+    { "Mod Compatibility" = "reference-mod-compatibility.md" },
+  ] },
+  { "Download PDF" = "https://rittermod.github.io/FS25_RealisticLivestockRM/pdf/document.pdf" },
+]
+
+[project.theme]
+variant = "classic"
+features = ["navigation.sections", "navigation.top", "content.tooltips"]
+
+[[project.theme.palette]]
+scheme = "default"
+primary = "green"
+accent = "light green"
+toggle.icon = "material/brightness-7"
+toggle.name = "Switch to dark mode"
+
+[[project.theme.palette]]
+scheme = "slate"
+primary = "green"
+accent = "light green"
+toggle.icon = "material/brightness-4"
+toggle.name = "Switch to light mode"
+
+# Naming the extensions turns off Zensical's defaults, which would rewrite guide text
+# such as "->" into arrows. The mermaid fence only serves the local preview: the
+# published site is built from a copy with its diagrams already rendered to SVG.
+[project.markdown_extensions.admonition]
+[project.markdown_extensions.tables]
+[project.markdown_extensions.toc]
+
+[project.markdown_extensions."pymdownx.superfences"]
+custom_fences = [{ name = "mermaid", class = "mermaid" }]

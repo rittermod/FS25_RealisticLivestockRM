@@ -1,2 +1,4 @@
 site/
 scripts/tests
+/build/
+.cache/
