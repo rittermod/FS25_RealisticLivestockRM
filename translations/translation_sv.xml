@@ -13,13 +13,13 @@
         <text name="fillType_cow_highland_cattle" text="Highland Cattle"/>
         <text name="fillType_bull_highland_cattle" text="Highland Cattle-tjur"/>
         <text name="animal_descriptionBullFeed" text="Tjurar gillar gräs, hö och TMR."/>
-        <text name="animal_descriptionBullYoung" text="Detta är en handräv/ett hanligt kalv."/>
+        <text name="animal_descriptionBullYoung" text="Detta är en hankalv."/>
         <text name="animal_descriptionBullReproduction" text="Tjurar som är friska och äldre än 12 månader kan fortplanta sig."/>
         <text name="rl_descriptionCowReproduction" text="Kor som är friska och äldre än 12 månader kan fortplanta sig."/>
 
         <!-- WATER BUFFALOS -->
 
-        <text name="fillType_bull_waterbuffalo" text="Vattendjurstjur"/>
+        <text name="fillType_bull_waterbuffalo" text="Vattenbuffeltjur"/>
 
         <!-- PIGS -->
 
@@ -76,7 +76,7 @@
         <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Hantera djur"/>
         <text name="input_RL_MONITOR" text="Applicera/ta bort övervakning"/>
         <text name="input_RL_AI" text="Artificiell insemination"/>
-        <text name="input_RL_DISEASES" text="Ddjursjukdomar"/>
+        <text name="input_RL_DISEASES" text="Djursjukdomar"/>
         <text name="input_RL_SELECT" text="Välj/avmarkera djur"/>
         <text name="input_RL_SELECT_SECTION" text="Välj/avmarkera sektion"/>
         <text name="rl_ui_openAnimalScreen" text="Hantera djur"/>
@@ -87,7 +87,7 @@
         <text name="rl_button_random" text="Slumpmässig"/>
         <text name="rl_dialog_title" text="Ange maximalt antal visuella djur"/>
 
-        <text name="rl_ui_unhealthy" text="För ockuperad/otillräckligt frisk"/>
+        <text name="rl_ui_unhealthy" text="För dålig hälsa"/>
         <text name="rl_ui_unhealthyBracketed" text="Nej (för dålig hälsa)"/>
         <text name="rl_ui_noMaleAnimal" text="Inget lämpligt handjur"/>
         <text name="rl_ui_noMaleAnimalBracketed" text="Nej (inget lämpligt handjur)"/>
@@ -161,8 +161,8 @@
         <text name="rl_ui_sellSelected" text="Sälj markerade"/>
         <text name="rl_ui_moveSelected" text="Flytta markerade"/>
         <text name="rl_ui_buyConfirmation" text="Är du säker på att du vill köpa %s djur för %s?" tag="format"/>
-        <text name="rl_ui_buyPartialConfirmation" text="Köp %d av %s valda djur för %s?" tag="format"/>
-        <text name="rl_ui_buySkippedNotSupported" text="%d djur stöds inte av denna djurstall/inhägnad" tag="format"/>
+        <text name="rl_ui_buyPartialConfirmation" text="Köp %d av %d valda djur för %s?" tag="format"/>
+        <text name="rl_ui_buySkippedNotSupported" text="%d djur stöds inte av detta djurstall/denna inhägnad" tag="format"/>
         <text name="rl_ui_buyAllRejected" text="Inga av de valda djuren kan köpas till denna inhägnad."/>
         <text name="rl_ui_sellConfirmation" text="Är du säker på att du vill sälja %s djur för %s?" tag="format"/>
         <text name="rl_ui_buyBulkResult" text="%s djur köptes för %s" tag="format"/>
@@ -458,7 +458,7 @@
         <text name="rl_settings_exportCSV_failed" text="Kunde inte skriva %s. Stäng filen i andra program och försök igen."/>
 
         <text name="rl_settings_maxNumMessages_label" text="Maximalt antal meddelanden"/>
-        <text name="rl_settings_maxNumMessages_tooltip" text="Ett högre antal gör att din sparad mapp tar upp mer utrymme. När denna gräns nås raderas de tidigaste meddelandena."/>
+        <text name="rl_settings_maxNumMessages_tooltip" text="Ett högre antal gör att din sparmapp tar upp mer utrymme. När denna gräns nås raderas de tidigaste meddelandena."/>
 
         <text name="rl_settings_messageSummary_label" text="Meddelandeloggsammanfattningar"/>
         <text name="rl_settings_messageSummary_tooltip_1" text="Av: Individuella meddelanden för varje händelse"/>
@@ -472,7 +472,7 @@
 
         <text name="rl_settings_useCustomAnimals_label" text="Använd anpassade djur"/>
         <text name="rl_settings_useCustomAnimals_tooltip_1" text="Använd djurmodeller för RealisticLivestock (kräver omstart)"/>
-        <text name="rl_settings_useCustomAnimals_tooltip_2" text="Använd anpassade djurmodeller (kräver omstart, måste vara ozipmade)"/>
+        <text name="rl_settings_useCustomAnimals_tooltip_2" text="Använd anpassade djurmodeller (kräver omstart, måste vara ozippade)"/>
 
         <text name="rl_settings_animalsXML_label" text="Ange sökväg för djur-XML"/>
         <text name="rl_settings_animalsXML_tooltip" text="Ange sökväg till en anpassad XML-fil för djur"/>
@@ -521,7 +521,7 @@
         <text name="rl_help_genetics_1" text="Varje djur har 4 olika genetiska värden; metabolism, fertilitet, hälsa och kvalitet. Genetik blandas mellan mor och far och förs sedan vidare till deras avkommor."/>
         <text name="rl_help_genetics_2" text="Metabolism påverkar djurets förmåga att omvandla foder till vikt och påverkar mängden det äter."/>
         <text name="rl_help_genetics_3" text="Fertilitet påverkar djurets chans att bli dräktigt, eller att göra en hona dräktig, samt antalet ungar det producerar."/>
-        <text name="rl_help_genetics_4" text="Hälsa påverkar djurets hälsa och dess chans att tas bort varje månad. Ett djur med högre hälsojenetik har också en längre livslängd."/>
+        <text name="rl_help_genetics_4" text="Hälsa påverkar djurets hälsa och dess chans att tas bort varje månad. Ett djur med högre hälsogenetik har också en längre livslängd."/>
         <text name="rl_help_genetics_5" text="Kvalitet påverkar själva djurets värde; ett djur med högre kvalitet säljs för betydligt mer."/>
         <text name="rl_help_genetics_6" text="Nötkreatur, får och höns har också produktionsgenetik, vilket påverkar hur mycket mjölk/ägg/ull de producerar."/>
 
@@ -552,7 +552,7 @@
         <text name="rl_diseases" text="Sjukdomar"/>
         <text name="rl_disease" text="Sjukdom"/>
 
-        <text name="rl_disease_mastitis" text="Mastit (juvelfläck)"/>
+        <text name="rl_disease_mastitis" text="Mastit (juverinflammation)"/>
 
         <text name="rl_disease_cvm" text="CVM"/>
 
@@ -589,7 +589,7 @@
         <text name="rl_message_death" text="Togs bort på grund av %s"/>
         <text name="rl_message_death_github" text="Dog på grund av %s"/>
         <text name="rl_message_diseaseContracted" text="Drabbades av %s"/>
-        <text name="rl_message_diseaseCured" text="Friskknad från %s"/>
+        <text name="rl_message_diseaseCured" text="Tillfrisknade från %s"/>
         <text name="rl_message_diseaseTreatment_start" text="Startade behandling för %s vid %s"/>
         <text name="rl_message_diseaseTreatment_resume" text="Återupptog behandling för %s vid %s"/>
         <text name="rl_message_diseaseTreatment_stop" text="Avbröt behandling för %s"/>
@@ -668,7 +668,7 @@
 
         <text name="rl_ui_dependencies_missing" text="RealisticLivestock kräver följande beroenden:"/>
         <text name="rl_ui_dependency_missing_notInstalled" text="- %s (Inte installerat)"/>
-        <text name="rl_ui_dependency_missing_installed" text="- %s (Installeradt: %s, Minimi som krävs: %s)"/>
+        <text name="rl_ui_dependency_missing_installed" text="- %s (Installerat: %s, Minimum som krävs: %s)"/>
 
 
         <!-- MIGRATION -->
@@ -688,7 +688,7 @@
         <text name="rm_rl_migration_quit" text="Avsluta"/>
 
         <text name="rl_bridge_version_unknown" text="Realistic Livestock: %s version %s har inte testats med version %s av Realistic Livestock. Använder konfiguration '%s'. Om du upplever problem med exotiska djur, vänligen rapportera dem på %s."/>
-        <text name="rl_bridge_configoverride_conflict_header" text="Realistic Livestock: Konflikt upptäckt. Två eller flera bryggor/paket ersatte konfigurationen för samma djurtyp. Den senast laddade modden vinner. Om du fortsätter kommer du att få visuella buggar och spöketdjur."/>
+        <text name="rl_bridge_configoverride_conflict_header" text="Realistic Livestock: Konflikt upptäckt. Två eller flera bryggor/paket ersatte konfigurationen för samma djurtyp. Den senast laddade modden vinner. Om du fortsätter kommer du att få visuella buggar och spökdjur."/>
         <text name="rl_bridge_configoverride_conflict_line" text="%s: tillämpad av %s"/>
 
         <!-- RL Tabbed Menu -->
@@ -844,7 +844,7 @@
         <text name="rl_menu_filters_editor_title_usage" text="Visa på"/>
         <text name="rl_menu_filters_usage_any" text="Alla skärmar"/>
         <text name="rl_menu_filters_usage_owned" text="Skärmar för egna besättningar"/>
-        <text name="rl_menu_filters_usage_dealer" text="Handlerskärmar"/>
+        <text name="rl_menu_filters_usage_dealer" text="Handlarskärmar"/>
 
         <!-- Conditions editor (number + bool). Bool True/False
              strings reuse base-game `ui_yes` / `ui_no` (see
@@ -946,5 +946,22 @@
         <text name="rl_menu_herdsman_default_name" text="Ny uppgift"/>
         <text name="rl_menu_herdsman_duplicate_suffix" text=" (kopia)"/>
         <text name="rl_menu_herdsman_duplicate_suffix_n" text=" (kopia %d)"/>
+        <!-- Beans and Alpacas DLC (English fallback) -->
+        <text name="fillType_cow_brahman" text="Brahman"/>
+        <text name="fillType_bull_brahman" text="Brahman Bull"/>
+        <text name="animal_group_alpacas" text="Alpacas"/>
+        <text name="animal_descriptionAlpacaYoung" text="Young alpacas need hay or grass as well as water but do not produce fleece yet."/>
+        <text name="animal_descriptionAlpacaAdult" text="Adult alpacas need hay or grass as well as water and produce valuable fleece."/>
+        <text name="animal_descriptionAlpacaReproduction" text="Alpacas that are healthy and older than 14 months can reproduce."/>
+        <text name="animal_descriptionAlpacaMaleReproduction" text="Male alpacas that are healthy and older than 24 months can reproduce."/>
+        <text name="fillType_alpaca_white" text="White Alpaca"/>
+        <text name="fillType_alpaca_white_male" text="White Alpaca Male"/>
+        <text name="fillType_alpaca_brown" text="Brown Alpaca"/>
+        <text name="fillType_alpaca_brown_male" text="Brown Alpaca Male"/>
+        <text name="fillType_alpaca_grey" text="Grey Alpaca"/>
+        <text name="fillType_alpaca_grey_male" text="Grey Alpaca Male"/>
+        <text name="fillType_alpaca_fawn" text="Fawn Alpaca"/>
+        <text name="fillType_alpaca_fawn_male" text="Fawn Alpaca Male"/>
+        <text name="rl_ui_fleece" text="Fleece production"/>
     </texts>
 </l10n>
