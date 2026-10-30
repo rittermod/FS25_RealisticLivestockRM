@@ -1,0 +1,950 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<l10n>
+    <texts>
+        <!-- COWS -->
+
+        <text name="fillType_bull" text="Tjur"/>
+        <text name="fillType_bull_swiss_brown" text="Brun Swiss-tjur"/>
+        <text name="fillType_bull_holstein" text="Holstein-tjur"/>
+        <text name="fillType_bull_angus" text="Angustjur"/>
+        <text name="fillType_bull_limousin" text="Limousintjur"/>
+        <text name="fillType_cow_hereford" text="Hereford"/>
+        <text name="fillType_bull_hereford" text="Herefordtjur"/>
+        <text name="fillType_cow_highland_cattle" text="Highland Cattle"/>
+        <text name="fillType_bull_highland_cattle" text="Highland Cattle-tjur"/>
+        <text name="animal_descriptionBullFeed" text="Tjurar gillar gräs, hö och TMR."/>
+        <text name="animal_descriptionBullYoung" text="Detta är en handräv/ett hanligt kalv."/>
+        <text name="animal_descriptionBullReproduction" text="Tjurar som är friska och äldre än 12 månader kan fortplanta sig."/>
+        <text name="rl_descriptionCowReproduction" text="Kor som är friska och äldre än 12 månader kan fortplanta sig."/>
+
+        <!-- WATER BUFFALOS -->
+
+        <text name="fillType_bull_waterbuffalo" text="Vattendjurstjur"/>
+
+        <!-- PIGS -->
+
+        <text name="fillType_boar" text="Galt"/>
+        <text name="fillType_boar_landrace" text="Lantrasgalt"/>
+        <text name="fillType_boar_black_pied" text="Svartvit galt"/>
+        <text name="fillType_boar_berkshire" text="Berkshire-galt"/>
+        <text name="animal_descriptionBoarReproduction" text="Galtar som är friska och äldre än 8 månader kan fortplanta sig."/>
+        <text name="rl_descriptionPigReproduction" text="Suggor som är friska och äldre än 6 månader kan fortplanta sig."/>
+        <text name="animal_descriptionBoarFeed" text="Galtar äter nästan vad som helst. Du kan utfodra dem med majs, vete, korn, raps, solrosor, sojabönor, potatis, sorghum och sockerbetor."/>
+        <text name="animal_descriptionBoarYoung" text="Detta är en hanlig smågris."/>
+
+        <!-- SHEEP -->
+
+        <text name="fillType_ram" text="Vädur"/>
+        <text name="fillType_ram_landrace" text="Bentheimer landsbygdsvädur"/>
+        <text name="fillType_ram_steinschaf" text="Steinschaf-vädur"/>
+        <text name="fillType_ram_black_welsh" text="Black Welsh Mountain-vädur"/>
+        <text name="fillType_ram_swiss_mountain" text="Schweizisk svartbrun bergsvädur"/>
+        <text name="animal_descriptionRamFeed" text="Vädurar äter gräs och hö."/>
+        <text name="animal_descriptionRamYoung" text="Detta är ett hanligt lamm."/>
+        <text name="animal_descriptionRamReproduction" text="Vädurar som är friska och äldre än 5 månader kan fortplanta sig."/>
+        <text name="rl_descriptionSheepReproduction" text="Tackor som är friska och äldre än 8 månader kan fortplanta sig."/>
+
+        <!-- GOATS -->
+
+        <text name="fillType_ram_goat" text="Bock"/>
+        <text name="rl_descriptionGoatReproduction" text="Hondjur av getter som är friska och äldre än 16 månader kan fortplanta sig."/>
+
+        <!-- HORSES -->
+
+        <text name="fillType_stallion" text="Hingst"/>
+        <text name="fillType_stallion_gray" text="Skimmelhingst"/>
+        <text name="fillType_stallion_pinto" text="Pinto-hingst"/>
+        <text name="fillType_stallion_palomino" text="Palominohingst"/>
+        <text name="fillType_stallion_chestnut" text="Fuxhingst"/>
+        <text name="fillType_stallion_bay" text="Brun hingst"/>
+        <text name="fillType_stallion_black" text="Svart hingst"/>
+        <text name="fillType_stallion_seal_brown" text="Mörkbrun hingst"/>
+        <text name="fillType_stallion_dun" text="Isabellfärgad hingst"/>
+        <text name="animal_descriptionStallionFeed" text="Hingstar gillar hö, havre och sorghum."/>
+        <text name="animal_descriptionStallionProfit" text="Hingstar kan säljas med vinst."/>
+        <text name="animal_descriptionStallionReproduction" text="Hingstar som är friska och äldre än 36 månader kan fortplanta sig."/>
+        <text name="rl_descriptionHorseReproduction" text="Ston som är friska och äldre än 22 månader kan fortplanta sig."/>
+
+        <!-- CHICKENS -->
+
+        <text name="rl_descriptionChickenReproduction" text="Hönor som är friska och äldre än 6 månader kan fortplanta sig."/>
+
+
+        <!-- UI -->
+
+
+        <text name="input_RL_OPEN_ANIMAL_SCREEN" text="Hantera djur"/>
+        <text name="input_RL_MONITOR" text="Applicera/ta bort övervakning"/>
+        <text name="input_RL_AI" text="Artificiell insemination"/>
+        <text name="input_RL_DISEASES" text="Ddjursjukdomar"/>
+        <text name="input_RL_SELECT" text="Välj/avmarkera djur"/>
+        <text name="input_RL_SELECT_SECTION" text="Välj/avmarkera sektion"/>
+        <text name="rl_ui_openAnimalScreen" text="Hantera djur"/>
+        <text name="rl_button_apply" text="Tillämpa"/>
+        <text name="rl_button_confirm" text="Bekräfta"/>
+        <text name="rl_button_recommended" text="Rekommenderad"/>
+        <text name="rl_button_cancel" text="Avbryt"/>
+        <text name="rl_button_random" text="Slumpmässig"/>
+        <text name="rl_dialog_title" text="Ange maximalt antal visuella djur"/>
+
+        <text name="rl_ui_unhealthy" text="För ockuperad/otillräckligt frisk"/>
+        <text name="rl_ui_unhealthyBracketed" text="Nej (för dålig hälsa)"/>
+        <text name="rl_ui_noMaleAnimal" text="Inget lämpligt handjur"/>
+        <text name="rl_ui_noMaleAnimalBracketed" text="Nej (inget lämpligt handjur)"/>
+        <text name="rl_ui_recoveringLastBirth" text="Återhämtar sig från senaste födseln"/>
+        <text name="rl_ui_recoveringLastBirthBracketed" text="Nej (återhämtar sig från senaste födseln)"/>
+        <text name="rl_ui_tooYoung" text="För ungt"/>
+        <text name="rl_ui_tooYoungBracketed" text="Nej (för ungt)"/>
+        <text name="rl_ui_pregnant" text="Dräktig"/>
+        <text name="rl_ui_lactating" text="Lakterar"/>
+        <text name="rl_ui_canReproduce" text="Kan fortplanta sig"/>
+        <text name="rl_ui_impregnatedBy" text="Dräktig med"/>
+        <text name="rl_ui_unknown" text="Okänd"/>
+        <text name="rl_ui_yes" text="Ja"/>
+        <text name="rl_ui_no" text="Nej"/>
+        <text name="rl_ui_mother" text="Moder"/>
+        <text name="rl_ui_father" text="Fader"/>
+        <text name="rl_ui_uniqueId" text="Unikt ID"/>
+        <text name="rl_ui_farmId" text="Gårds-ID"/>
+        <text name="rl_ui_gender" text="Kön"/>
+        <text name="rl_ui_male" text="Hane"/>
+        <text name="rl_ui_female" text="Hona"/>
+        <text name="rl_ui_weight" text="Vikt"/>
+        <text name="rl_ui_targetWeight" text="Målvikt"/>
+        <text name="rl_ui_value" text="Värde"/>
+        <text name="rl_ui_valuePerKilo" text="Värde per kg"/>
+        <text name="rl_ui_genetics" text="Genetik"/>
+        <text name="rl_ui_overall" text="Totalt"/>
+        <text name="rl_ui_rename" text="Byt namn"/>
+        <text name="rl_ui_maleNumImpregnatable" text="Dräktighetsbara djur i fållan"/>
+
+        <text name="rl_ui_breederQuality" text="Avelskvalitet"/>
+        <text name="rl_ui_birthday" text="Födelsedag"/>
+        <text name="rl_ui_pregnancyExpected" text="Beräknad"/>
+        <text name="rl_ui_pregnancyExpecting" text="Väntar"/>
+        <text name="rl_ui_pregnancyBaby" text="unge"/>
+        <text name="rl_ui_pregnancyBabies" text="ungar"/>
+        <text name="rl_ui_animalOrigin" text="Ursprung"/>
+        <text name="rl_ui_months" text="månader"/>
+        <text name="rl_ui_month" text="månad"/>
+        <text name="rl_ui_years" text="år"/>
+        <text name="rl_ui_year" text="år"/>
+
+        <text name="rl_ui_milk" text="Mjölkproduktion"/>
+        <text name="rl_ui_wool" text="Ullproduktion"/>
+        <text name="rl_ui_eggs" text="Äggproduktion"/>
+        <text name="rl_ui_metabolism" text="Metabolism"/>
+        <text name="rl_ui_meat" text="Kvalitet"/>
+        <text name="rl_ui_meat_github" text="Köttkvalitet"/>
+        <text name="rl_ui_quality" text="Kvalitet"/>
+        <text name="rl_ui_quality_github" text="Köttkvalitet"/>
+        <text name="rl_ui_health" text="Hälsa"/>
+        <text name="rl_ui_fertility" text="Fruktbarhet"/>
+
+        <text name="rl_ui_genetics_infertile" text="Steril"/>
+        <text name="rl_ui_genetics_extremelyLow" text="Extremt låg"/>
+        <text name="rl_ui_genetics_veryLow" text="Mycket låg"/>
+        <text name="rl_ui_genetics_low" text="Låg"/>
+        <text name="rl_ui_genetics_average" text="Genomsnittlig"/>
+        <text name="rl_ui_genetics_high" text="Hög"/>
+        <text name="rl_ui_genetics_veryHigh" text="Mycket hög"/>
+        <text name="rl_ui_genetics_extremelyHigh" text="Extremt hög"/>
+
+        <text name="rl_ui_genetics_extremelyBad" text="Extremt dålig"/>
+        <text name="rl_ui_genetics_veryBad" text="Mycket dålig"/>
+        <text name="rl_ui_genetics_bad" text="Dålig"/>
+        <text name="rl_ui_genetics_good" text="Bra"/>
+        <text name="rl_ui_genetics_veryGood" text="Mycket bra"/>
+        <text name="rl_ui_genetics_extremelyGood" text="Extremt bra"/>
+
+        <text name="rl_ui_buySelected" text="Köp markerade"/>
+        <text name="rl_ui_sellSelected" text="Sälj markerade"/>
+        <text name="rl_ui_moveSelected" text="Flytta markerade"/>
+        <text name="rl_ui_buyConfirmation" text="Är du säker på att du vill köpa %s djur för %s?" tag="format"/>
+        <text name="rl_ui_buyPartialConfirmation" text="Köp %d av %s valda djur för %s?" tag="format"/>
+        <text name="rl_ui_buySkippedNotSupported" text="%d djur stöds inte av denna djurstall/inhägnad" tag="format"/>
+        <text name="rl_ui_buyAllRejected" text="Inga av de valda djuren kan köpas till denna inhägnad."/>
+        <text name="rl_ui_sellConfirmation" text="Är du säker på att du vill sälja %s djur för %s?" tag="format"/>
+        <text name="rl_ui_buyBulkResult" text="%s djur köptes för %s" tag="format"/>
+        <text name="rl_ui_sellBulkResult" text="%s djur såldes för %s" tag="format"/>
+        <text name="rl_ui_moveBulkResult" text="%s djur flyttades" tag="format"/>
+        <text name="rl_ui_moveSingle" text="Flytta"/>
+        <text name="rl_ui_moveSelectDestination" text="Välj destination"/>
+        <text name="rl_ui_moveNoDestinations" text="Inga destinationer tillgängliga för denna djurtyp."/>
+        <text name="rl_ui_moveEPPAgeFormat" text="ålder %d-%d mån" tag="format"/>
+        <text name="rl_ui_moveValidSummary" text="%d djur kommer att flyttas" tag="format"/>
+        <text name="rl_ui_moveRejectedAge" text="%d djur hoppades över: uppfyller inte ålderskravet (%d-%d månader)" tag="format"/>
+        <text name="rl_ui_moveRejectedCapacity" text="%d djur hoppades över: inte tillräckligt med utrymme på destinationen" tag="format"/>
+        <text name="rl_ui_moveAllRejected" text="Inga djur kan flyttas till denna destination."/>
+        <text name="rl_ui_moveBulkConfirmTitle" text="Flytta djur"/>
+        <text name="rl_ui_moveErrorNoPermission" text="Du har inte behörighet att flytta djur hit."/>
+        <text name="rl_ui_moveErrorNotSupported" text="Denna destination stöder inte denna djurtyp."/>
+        <text name="rl_ui_sellErrorSick" text="Sjuka djur kan inte säljas. Behandla eller avliva dem från sjukdomsdialogen – ett djur på ett släp måste först lastas av i en fålla."/>
+        <text name="rl_ui_sellSkippedSick" text="%d sjuka djur utelämnade: sjuka djur kan inte säljas." tag="format"/>
+        <text name="rl_ui_moveErrorSick" text="Sjuka djur kan inte skickas till slakteriet."/>
+        <text name="rl_ui_moveRejectedSick" text="%d djur hoppades över: sjuka djur kan inte skickas till slakteriet" tag="format"/>
+        <text name="rl_ui_moveErrorNoSpace" text="Inte tillräckligt med utrymme på destinationen."/>
+        <text name="rl_ui_tradeRequestInProgress" text="En handel pågår redan. Vänligen vänta."/>
+        <text name="rl_ui_tradeRequestTimeout" text="Servern svarade inte. Vänligen försök igen."/>
+
+        <text name="rl_ui_monitor" text="Övervaka"/>
+        <text name="rl_ui_monitorSubscriptions" text="Övervakningsabonnemang"/>
+        <text name="finance_monitorSubscriptions" text="Övervakningsabonnemang"/>
+        <text name="rl_ui_monitorFee" text="Övervakningsavgift"/>
+        <text name="rl_ui_applyMonitor" text="Tillämpa övervakning"/>
+        <text name="rl_ui_removeMonitor" text="Ta bort övervakning"/>
+        <text name="rl_ui_removingMonitor" text="Tar bort..."/>
+        <text name="rl_ui_input_food" text="Foder"/>
+        <text name="rl_ui_input_water" text="Vatten"/>
+        <text name="rl_ui_input_straw" text="Halm"/>
+        <text name="rl_ui_output_milk" text="Mjölk"/>
+        <text name="rl_ui_output_manure" text="Gödsel"/>
+        <text name="rl_ui_output_liquidManure" text="Flytgödsel"/>
+        <text name="rl_ui_output_pallets_eggs" text="Ägg"/>
+        <text name="rl_ui_output_pallets_wool" text="Ull"/>
+        <text name="rl_ui_output_pallets_goatMilk" text="Getmjölk"/>
+        <text name="rl_ui_amountPerDay" text="%s l / dag" tag="format"/>
+        <text name="rl_ui_feePerMonth" text="%s / månad" tag="format"/>
+        <text name="rl_ui_feePerDose" text="%s / dos" tag="format"/>
+
+        <text name="rl_ui_animalType" text="Typ"/>
+        <text name="rl_ui_amountMonitored" text="Övervakade"/>
+        <text name="rl_ui_production" text="Produkter"/>
+        <text name="rl_ui_applyAllMonitor" text="Tillämpa alla övervakningar"/>
+        <text name="rl_ui_removeAllMonitor" text="Ta bort alla övervakningar"/>
+        <text name="rl_ui_removingAllMonitor" text="Tar bort alla..."/>
+        <text name="rl_ui_fee" text="Avgift"/>
+
+        <text name="rl_ui_leftEarTag" text="Vänster öronmärke"/>
+        <text name="rl_ui_rightEarTag" text="Höger öronmärke"/>
+        <text name="rl_ui_backgroundColour" text="Bakgrundsfärg"/>
+        <text name="rl_ui_backgroundHue" text="Bakgrundsnyans"/>
+        <text name="rl_ui_backgroundRgb" text="Bakgrunds-RGB"/>
+        <text name="rl_ui_textColour" text="Textfärg"/>
+        <text name="rl_ui_textHue" text="Textnyans"/>
+        <text name="rl_ui_textRgb" text="Text-RGB"/>
+
+        <text name="rl_ui_formatMonths" text="%s månader"/>
+        <text name="rl_ui_formatMonth" text="%s månad"/>
+        <text name="rl_ui_notPregnant" text="Inte dräktig"/>
+        <text name="rl_ui_any" text="Valfri"/>
+        <text name="rl_ui_pregnancy" text="Dräktighet"/>
+        <text name="rl_ui_productivity" text="Produktivitet"/>
+        <text name="rl_ui_selectAll" text="Välj alla"/>
+        <text name="rl_ui_selectNone" text="Avmarkera alla"/>
+        <text name="rl_ui_selectSection" text="Välj sektion"/>
+        <text name="rl_ui_deselectSection" text="Avmarkera sektion"/>
+        <text name="rl_ui_doesntHaveName" text="Inget namn"/>
+        <text name="rl_ui_doesHaveName" text="Har namn"/>
+
+
+
+        <text name="rl_ui_castrated" text="Kastrerad"/>
+        <text name="rl_ui_castrate" text="Kastrera"/>
+
+        <text name="rl_ui_unknownCauses" text="okända orsaker"/>
+        <text name="rl_ui_unreadMessages" text="Inhägnad '%s' har olästa meddelanden!"/>
+        <text name="rl_ui_herdsman" text="Djurvaktare"/>
+        <text name="rl_ui_budget" text="Budget"/>
+        <text name="rl_ui_budgetType" text="Budgettyp"/>
+        <text name="rl_ui_fixed" text="Fast"/>
+        <text name="rl_ui_percentage" text="Procentuell"/>
+        <text name="rl_ui_maxAnimals" text="Max antal djur"/>
+        <text name="rl_ui_herdsmanRecentlyBought" text="Senaste djurvaktarköp"/>
+        <text name="rl_ui_herdsmanWages" text="Djurvaktarlön"/>
+        <text name="finance_herdsmanWages" text="Djurvaktarlön"/>
+        <text name="rl_ui_medicine" text="Medicin"/>
+        <text name="finance_medicine" text="Medicin"/>
+        <text name="rl_ui_semenPurchase" text="Insemineringsinköp"/>
+        <text name="rl_ui_semenPurchase_github" text="Sädesinköp"/>
+        <text name="finance_semenPurchase" text="Insemineringsinköp"/>
+        <text name="finance_semenPurchase_github" text="Sädesinköp"/>
+        <text name="rl_ui_alphabetical" text="Alfabetisk"/>
+        <text name="rl_ui_breed" text="Ras"/>
+        <text name="rl_ui_dontMark" text="Markera inte"/>
+        <text name="rl_ui_mark" text="Markera"/>
+        <text name="rl_ui_unmark" text="Avmarkera"/>
+        <text name="rl_ui_favourite" text="Favorit"/>
+        <text name="rl_ui_unFavourite" text="Ta bort favorit"/>
+        <text name="rl_ui_dewar" text="Kvävetank (Dewar)"/>
+        <text name="rl_ui_semenPurchase_successful" text="Artificiellt inseminat har köpts. Du kan hämta det i affären"/>
+        <text name="rl_ui_semenPurchase_successful_github" text="Säd har köpts. Du kan hämta det i affären"/>
+        <text name="rl_ui_semenPurchase_unsuccessful" text="Det gick inte att köpa det artificiella inseminatet"/>
+        <text name="rl_ui_semenPurchase_unsuccessful_github" text="Det gick inte att köpa säden"/>
+        <text name="rl_ui_earTag" text="Öronmärke"/>
+        <text name="rl_ui_species" text="Art"/>
+        <text name="rl_ui_strawSingle" text="Dos"/>
+        <text name="rl_ui_strawMultiple" text="Doser"/>
+        <text name="rl_ui_artificialInsemination" text="Artificiell insemination"/>
+        <text name="rl_ui_semenPurchaseNoPermission" text="Du har inte behörighet att handla med djur eller köpa inseminat."/>
+        <text name="rl_ui_semenPurchaseNoPermission_github" text="Du har inte behörighet att handla med djur eller köpa säd."/>
+        <text name="rl_ui_semenPurchaseNoMoney" text="Du har inte tillräckligt med pengar för att köpa detta inseminat."/>
+        <text name="rl_ui_semenPurchaseNoMoney_github" text="Du har inte tillräckligt med pengar för att köpa denna säd."/>
+        <text name="rl_ui_takeStraw" text="Ta dos"/>
+        <text name="rl_ui_inseminateAnimal" text="Inseminera %s"/>
+        <text name="rl_ui_inseminate" text="Inseminera"/>
+        <text name="rl_ui_strawEmpty" text="Denna dos är tom"/>
+        <text name="rl_ui_averageSuccess" text="Genomsnittlig framgång"/>
+        <text name="rl_ui_success" text="Framgång"/>
+
+        <text name="rl_ui_healthy" text="Frisk"/>
+        <text name="rl_ui_hasDisease" text="Har sjukdom"/>
+        <text name="rl_ui_diseasedAnimals" text="Sjuka djur"/>
+
+
+        <text name="rl_insemination_male" text="Endast honor kan artificiellt insemineras"/>
+        <text name="rl_insemination_pregnant" text="Detta djur är redan dräktigt"/>
+        <text name="rl_insemination_animalType" text="Djur måste tillhöra samma art som fadern"/>
+        <text name="rl_insemination_inseminated" text="Detta djur har redan blivit artificiellt inseminerat"/>
+        <text name="rl_insemination_recovering" text="Detta djur återhämtar sig fortfarande från sin föregående dräktighet"/>
+        <text name="rl_insemination_father" text="Inavel är inte tillåtet"/>
+        <text name="rl_insemination_young" text="Detta djur är för ungt för att artificiellt insemineras"/>
+
+
+        <text name="rl_mark_aiManager_sell" text="Markerad av djurvaktare för försäljning"/>
+        <text name="rl_mark_aiManager_castrate" text="Markerad av djurvaktare för kastrering"/>
+        <text name="rl_mark_aiManager_disease" text="Markerad av djurvaktare för behandling"/>
+        <text name="rl_mark_aiManager_ai" text="Markerad av djurvaktare för artificiell insemination"/>
+        <text name="rl_mark_aiManager_move" text="Markerad av djurvaktare för flytt"/>
+        <text name="rl_mark_player" text="Markerad av spelare"/>
+
+
+        <!-- AI - BUYING -->
+
+
+        <text name="rl_ui_herdsmanTooltip_buy_enabled_1" text="Djurvaktaren kommer inte att köpa djur"/>
+        <text name="rl_ui_herdsmanTooltip_buy_enabled_2" text="Djurvaktaren kommer att köpa djur"/>
+
+        <text name="rl_ui_herdsmanTooltip_buy_budget|type_1" text="Inköpsbudgeten är ett fast belopp"/>
+        <text name="rl_ui_herdsmanTooltip_buy_budget|type_2" text="Inköpsbudgeten är en procentsats av din gårds kapital"/>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- AI - SELLING -->
+
+
+        <text name="rl_ui_herdsmanTooltip_sell_enabled_1" text="Djurvaktaren kommer inte att sälja djur"/>
+        <text name="rl_ui_herdsmanTooltip_sell_enabled_2" text="Djurvaktaren kommer att sälja djur"/>
+
+
+
+
+
+
+
+
+
+
+
+
+        <!-- AI - CASTRATING -->
+
+
+        <text name="rl_ui_herdsmanTooltip_castrate_enabled_1" text="Djurvaktaren kommer inte att kastrera djur"/>
+        <text name="rl_ui_herdsmanTooltip_castrate_enabled_2" text="Djurvaktaren kommer att kastrera djur"/>
+
+
+
+
+
+
+
+
+
+
+        <!-- AI - NAMING -->
+
+
+        <text name="rl_ui_herdsmanTooltip_naming_enabled_1" text="Djurvaktaren kommer inte att namnge djur"/>
+        <text name="rl_ui_herdsmanTooltip_naming_enabled_2" text="Djurvaktaren kommer att namnge djur"/>
+
+        <text name="rl_ui_herdsmanTooltip_naming_convention_1" text="Djurvaktaren kommer att namnge djur slumpmässigt"/>
+        <text name="rl_ui_herdsmanTooltip_naming_convention_2" text="Djurvaktaren kommer att namnge djur alfabetiskt"/>
+
+
+        <!-- AI - AI -->
+
+
+        <text name="rl_ui_herdsmanTooltip_ai_enabled_1" text="Djurvaktaren kommer inte att AI-inseminera djur"/>
+        <text name="rl_ui_herdsmanTooltip_ai_enabled_2" text="Djurvaktaren kommer att AI-inseminera djur"/>
+
+
+
+
+        <text name="rl_ui_herdsmanTooltip_ai_semen" text="Djurvaktaren kommer att använda inseminat från %s"/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_github" text="Djurvaktaren kommer att använda säd från %s"/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_any" text="Djurvaktaren kommer att använda valfritt dugligt inseminat"/>
+        <text name="rl_ui_herdsmanTooltip_ai_semen_any_github" text="Djurvaktaren kommer att använda valfri duglig säd"/>
+
+
+
+
+
+
+
+
+
+        <!--  SETTINGS  -->
+
+
+        <text name="rl_settings" text="Realistiska husdjur (Realistic Livestock)"/>
+        <text name="rl_settings_openMenu_button" text="Öppna inställningar"/>
+        <text name="rl_settings_openMenu_label" text="Öppna inställningar för Realistiska husdjur"/>
+
+        <text name="rl_settings_off" text="Av"/>
+        <text name="rl_settings_on" text="På"/>
+        <text name="rl_settings_veryHard" text="Mycket svårt"/>
+
+        <text name="rl_settings_deathEnabled_label" text="Borttagning av djur"/>
+        <text name="rl_settings_deathEnabled_label_github" text="Djurdöd"/>
+        <text name="rl_settings_deathEnabled_tooltip_1" text="Djur tas inte bort på grund av dräktighet, hälsa, ålder eller olyckor"/>
+        <text name="rl_settings_deathEnabled_tooltip_1_github" text="Djur dör inte på grund av dräktighet, hälsa, ålder eller olyckor"/>
+        <text name="rl_settings_deathEnabled_tooltip_2" text="Djur kommer att tas bort på grund av dräktighet, hälsa, ålder eller olyckor"/>
+        <text name="rl_settings_deathEnabled_tooltip_2_github" text="Djur kommer att dö på grund av dräktighet, hälsa, ålder eller olyckor"/>
+
+        <text name="rl_settings_accidentsChance_label" text="Olycksrisk"/>
+        <text name="rl_settings_accidentsChance_tooltip" text="Ändra sannolikheten för att djur tas bort på grund av slumpmässiga olyckor"/>
+        <text name="rl_settings_accidentsChance_tooltip_github" text="Ändra sannolikheten för att djur dör på grund av slumpmässiga olyckor"/>
+
+        <text name="rl_settings_foodScale_label" text="Foderskala"/>
+        <text name="rl_settings_foodScale_tooltip" text="Ändra mängden foder som djuren äter"/>
+
+        <text name="rl_settings_maxDealerAnimals_label" text="Maximalt antal djur hos handlare"/>
+        <text name="rl_settings_maxDealerAnimals_tooltip" text="Ändra det maximala antalet djur som djurhandlaren har i lager per djurtyp"/>
+        <text name="rl_settings_dealerQuality_label" text="Kvalitet på djur hos handlare"/>
+        <text name="rl_settings_dealerQuality_tooltip" text="Ställer in hur bra – och hur dyra – djuren som handlaren erbjuder är. Budgetdjur är svagare och billigare; premiumdjur är starkare och kostar mer. Ändring av detta kasserar det nuvarande lagret och fyller på med nya djur. Påverkar inte AI-djuren som används för insemination."/>
+        <text name="rl_settings_dealerQuality_texts_1" text="Budget"/>
+        <text name="rl_settings_dealerQuality_texts_2" text="Standard"/>
+        <text name="rl_settings_dealerQuality_texts_3" text="Premium"/>
+
+        <text name="rl_settings_mapCountry_label" text="Ursprungsland för djur"/>
+        <text name="rl_settings_mapCountry_tooltip" text="Åsidosätt det land som nya djur registreras i (öronmärken, identifierare). Gäller endast nya djur; befintliga djur behåller sitt land."/>
+        <text name="rl_settings_mapCountry_texts_1" text="Kartans standard"/>
+
+        <text name="rl_settings_resetDealer_label" text="Återställ djurhandlare"/>
+        <text name="rl_settings_resetDealer_tooltip" text="Ta bort alla handlarens djur och fyll på lagret med nya djur"/>
+        <text name="rl_settings_resetDealer_text" text="Återställ djurhandlare"/>
+
+        <text name="rl_settings_dealerSale_label" text="Välj djur till salu"/>
+        <text name="rl_settings_dealerSale_tooltip" text="Välj vilka djur och åldersgrupper handlaren erbjuder till försäljning. Om du ändrar detta fylls handlarens lager på på nytt."/>
+        <text name="rl_settings_dealerSale_text" text="Välj djur till salu"/>
+        <text name="rl_settings_diseaseSelection_label" text="Välj sjukdomar"/>
+        <text name="rl_settings_diseaseSelection_tooltip" text="Välj vilka sjukdomar som kan uppstå. Om du stänger av en stoppas nya fall; djur som redan är sjuka tillfrisknar eller dör som vanligt."/>
+
+        <text name="rl_settings_resetAIAnimals_label" text="Återställ AI-djur"/>
+        <text name="rl_settings_resetAIAnimals_tooltip" text="Ta bort alla AI-djur som är tillgängliga för artificiell insemination och fyll på med nya slumpmässigt genererade djur"/>
+        <text name="rl_settings_resetAIAnimals_text" text="Återställ AI-djur"/>
+
+        <text name="rl_settings_tagColour_label" text="Ändra märkfärg"/>
+        <text name="rl_settings_tagColour_tooltip" text="Ändra färg på öronmärken"/>
+        <text name="rl_settings_tagColour_text" text="Ändra märkfärg"/>
+        <text name="rl_settings_maxVisualAnimals_label" text="Ange maximalt antal visuella djur"/>
+        <text name="rl_settings_maxVisualAnimals_text" text="Ange maximalt antal visuella djur"/>
+        <text name="rl_settings_maxVisualAnimals_tooltip" text="Ställ in det maximala antalet djur som återges per fålla. Maskinspecifik skärminställning; synkroniseras inte i flerspelarläge."/>
+
+        <text name="rl_settings_exportCSV_label" text="Exportera till CSV"/>
+        <text name="rl_settings_exportCSV_tooltip" text="Exportera statistik till CSV"/>
+        <text name="rl_settings_exportCSV_text" text="Exportera till CSV"/>
+        <text name="rl_settings_exportCSV_failed" text="Kunde inte skriva %s. Stäng filen i andra program och försök igen."/>
+
+        <text name="rl_settings_maxNumMessages_label" text="Maximalt antal meddelanden"/>
+        <text name="rl_settings_maxNumMessages_tooltip" text="Ett högre antal gör att din sparad mapp tar upp mer utrymme. När denna gräns nås raderas de tidigaste meddelandena."/>
+
+        <text name="rl_settings_messageSummary_label" text="Meddelandeloggsammanfattningar"/>
+        <text name="rl_settings_messageSummary_tooltip_1" text="Av: Individuella meddelanden för varje händelse"/>
+        <text name="rl_settings_messageSummary_tooltip_2" text="På: Dagliga sammanfattningar per djurstall (minskar loggbrus)"/>
+
+        <text name="rl_settings_diseaseDifficulty_tooltip_1" text="Djur kan inte drabbas av eller ärva sjukdomar"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_2" text="Sjukdomar är sällsynta, sprids långsamt och visar symtom omedelbart"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_3" text="Sjukdomar drabbar då och då, sprids i måttlig takt och visar symtom omedelbart"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_4" text="Sjukdomar drabbar ofta, sprids snabbt och de flesta tar en stund på sig att visa symtom"/>
+        <text name="rl_settings_diseaseDifficulty_tooltip_5" text="Sjukdomar drabbar väldigt ofta, sprids mycket snabbt och de flesta tar ännu längre tid på sig att visa symtom"/>
+
+        <text name="rl_settings_useCustomAnimals_label" text="Använd anpassade djur"/>
+        <text name="rl_settings_useCustomAnimals_tooltip_1" text="Använd djurmodeller för RealisticLivestock (kräver omstart)"/>
+        <text name="rl_settings_useCustomAnimals_tooltip_2" text="Använd anpassade djurmodeller (kräver omstart, måste vara ozipmade)"/>
+
+        <text name="rl_settings_animalsXML_label" text="Ange sökväg för djur-XML"/>
+        <text name="rl_settings_animalsXML_tooltip" text="Ange sökväg till en anpassad XML-fil för djur"/>
+        <text name="rl_settings_animalsXML_text" text="Ange sökväg för djur-XML"/>
+
+        <text name="rl_settings_geneticsDisplay_label" text="Genetikvisning"/>
+        <text name="rl_settings_geneticsDisplay_tooltip" text="Visa numeriska genetikvärden i djurnamn"/>
+        <text name="rl_settings_geneticsDisplay_texts_1" text="Av"/>
+        <text name="rl_settings_geneticsDisplay_texts_2" text="Kort"/>
+        <text name="rl_settings_geneticsDisplay_texts_3" text="Lång"/>
+        <text name="rl_settings_geneticsPosition_label" text="Genetikposition"/>
+        <text name="rl_settings_geneticsPosition_tooltip" text="Var genetik ska visas i namnet"/>
+        <text name="rl_settings_geneticsPosition_texts_1" text="Prefix"/>
+        <text name="rl_settings_geneticsPosition_texts_2" text="Suffix"/>
+        <text name="rl_settings_sortByGenetics_label" text="Sortera efter genetik"/>
+        <text name="rl_settings_sortByGenetics_tooltip_1" text="Djur sorteras efter typ och ålder"/>
+        <text name="rl_settings_sortByGenetics_tooltip_2" text="Djur sorteras efter genetik (högst först)"/>
+
+
+
+        <!--  HELP  -->
+
+
+        <text name="rl_help_monitors_title" text="Övervakning"/>
+        <text name="rl_help_monitors_1" text="För att se merparten av ett djurs statistik måste du sätta på det en övervakningsbricka, vilket kan göras via djurmenyn (där du köper och säljer djur). Övervakningsbrickor syns också visuellt på djuret, på dess vänstra öra bredvid ID-brickan."/>
+        <text name="rl_help_monitors_2" text="Övervakningsbrickor gör att viktig information visas för dig, inklusive hälsa, vikt, laktation, produktion samt krav på halm, foder och vatten."/>
+        <text name="rl_help_monitors_3" text="Att fästa en bricka på ett djur kostar dig ett litet månatligt abonnemang baserat på djurets art. Om du väljer att ta bort brickan tas den bort i början av nästa månad."/>
+
+        <text name="rl_help_pregnancy_title" text="Dräktighet"/>
+        <text name="rl_help_pregnancy_1" text="Hondjur kräver alla minst 1 handjur för att potentiellt kunna bli dräktiga. Båda djuren måste ha rätt ålder och hälsa och tillhöra samma art. Avel mellan olika rasvarianter (t.ex. holsteinko och angustjur) är tillåten."/>
+        <text name="rl_help_pregnancy_2" text="Inavel är inte tillåtet. Om en hane och en hona är direkt besläktade kommer de inte att para sig."/>
+        <text name="rl_help_pregnancy_3" text="Chansen för en hona att bli dräktig beror på både hennes och hanens fertilitet. En hona med högre fertilitet har också betydligt större chans att få flera avkommor samtidigt."/>
+        <text name="rl_help_pregnancy_4" text="När en hona blir dräktig börjar hon bära på sin avkomma. Du kan se förväntat dräktighetsdatum och antal avkommor genom att titta på djuret i fållan eller genom att klicka på henne i djurmenyn."/>
+        <text name="rl_help_pregnancy_5" text="När hon når sitt beräknade datum föder hon sina ungar. Nyfödda har dock en viss risk att tas bort, liksom mamman om dräktigheten går dåligt. Nyfödda som föds i en överfylld fålla säljs automatiskt."/>
+
+        <text name="rl_help_production_title" text="Produktion"/>
+        <text name="rl_help_production_1" text="Kor av alla raser börjar endast producera mjölk efter att ha kalvat. När kon har kalvat producerar hon mjölk exponentiellt i 3 månader, varefter hennes produktion sjunker långsamt under de kommande 6 månaderna. 10 månader efter dräktigheten slutar kon att producera mjölk fram till nästa dräktighet."/>
+        <text name="rl_help_production_2" text="Får producerar ull under varma månader. Under kalla månader, under 12C, producerar de inte ull."/>
+        <text name="rl_help_production_3" text="Mjölk-, ull- och äggproduktionen påverkas dessutom av djurets genetik. Ett djur med god produktionsgenetik producerar mer, medan ett djur med dålig genetik inte producerar särskilt mycket alls."/>
+
+        <text name="rl_help_weight_title" text="Vikt"/>
+        <text name="rl_help_weight_1" text="Djur har en viss vikt som påverkas av hur mycket de äter och dricker. Varje art och ras har sin egen medelvikt som påverkar vikten för varje enskilt djur."/>
+        <text name="rl_help_weight_2" text="Vikten ökar djurets värde, och en låg vikt påverkar dess chans att tas bort varje månad."/>
+
+        <text name="rl_help_genetics_title" text="Genetik"/>
+        <text name="rl_help_genetics_1" text="Varje djur har 4 olika genetiska värden; metabolism, fertilitet, hälsa och kvalitet. Genetik blandas mellan mor och far och förs sedan vidare till deras avkommor."/>
+        <text name="rl_help_genetics_2" text="Metabolism påverkar djurets förmåga att omvandla foder till vikt och påverkar mängden det äter."/>
+        <text name="rl_help_genetics_3" text="Fertilitet påverkar djurets chans att bli dräktigt, eller att göra en hona dräktig, samt antalet ungar det producerar."/>
+        <text name="rl_help_genetics_4" text="Hälsa påverkar djurets hälsa och dess chans att tas bort varje månad. Ett djur med högre hälsojenetik har också en längre livslängd."/>
+        <text name="rl_help_genetics_5" text="Kvalitet påverkar själva djurets värde; ett djur med högre kvalitet säljs för betydligt mer."/>
+        <text name="rl_help_genetics_6" text="Nötkreatur, får och höns har också produktionsgenetik, vilket påverkar hur mycket mjölk/ägg/ull de producerar."/>
+
+
+
+        <!--  DISEASES  -->
+
+
+        <text name="rl_ui_immune" text="Immun"/>
+        <text name="rl_ui_vaccinated" text="Vaccinerad"/>
+        <text name="rl_ui_vaccinate" text="Vaccinera"/>
+        <text name="rl_ui_vaccinateConfirm" text="Vaccinera %s mot %s? En dos kostar %s."/>
+        <text name="rl_ui_notVaccinated" text="Inte vaccinerad"/>
+        <text name="rl_ui_startTreatment" text="Starta behandling"/>
+        <text name="rl_ui_resumeTreatment" text="Återuppta behandling"/>
+        <text name="rl_ui_stopTreatment" text="Avbryt behandling"/>
+        <text name="rl_ui_cull" text="Avliva"/>
+        <text name="rl_ui_cullConfirm" text="Avliva %s? Det tas bort permanent från din besättning och du får %s i kompensation."/>
+        <text name="rl_ui_startTreatmentConfirm" text="Börja behandla %s för %s? Behandlingen pågår i %s och kostar %s i månaden."/>
+        <text name="rl_ui_resumeTreatmentConfirm" text="Återuppta behandlingen av %s för %s? Behandlingen har %s kvar och kostar %s i månaden."/>
+        <text name="rl_ui_stopTreatmentConfirm" text="Sluta behandla %s för %s? Ingen avgift debiteras medan den är stoppad, och de månader som redan genomförts behålls om du återupptar den."/>
+        <text name="rl_ui_duration" text="Varaktighet"/>
+        <text name="rl_ui_beingTreated" text="Under behandling"/>
+        <text name="rl_ui_notTreated" text="Behandlas ej"/>
+        <text name="rl_ui_treatmentPaused" text="Behandling pausad"/>
+        <text name="rl_ui_carrier" text="Bärare"/>
+
+        <text name="rl_diseases" text="Sjukdomar"/>
+        <text name="rl_disease" text="Sjukdom"/>
+
+        <text name="rl_disease_mastitis" text="Mastit (juvelfläck)"/>
+
+        <text name="rl_disease_cvm" text="CVM"/>
+
+        <text name="rl_disease_footAndMouth" text="Mun- och klövsjuka"/>
+
+        <text name="rl_disease_ped" text="Porcin epidemisk diarré (PED)"/>
+
+        <text name="rl_disease_avianFluLPAI" text="Fågelinfluensa (LPAI)"/>
+        <text name="rl_disease_avianFluHPAI" text="Fågelinfluensa (HPAI)"/>
+        <text name="rl_disease_brd" text="BRD (luftvägsinfektion)"/>
+        <text name="rl_disease_clostridial" text="Pulpy kidney (enterotoxemi)"/>
+        <text name="rl_disease_colic" text="Kolik"/>
+        <text name="rl_disease_footRot" text="Klövröta"/>
+
+
+
+        <!--  MESSAGES  -->
+
+
+        <text name="rl_messageTitle_pregnancy" text="Dräktighet"/>
+        <text name="rl_messageTitle_death" text="Borttagning"/>
+        <text name="rl_messageTitle_death_github" text="Död"/>
+        <text name="rl_messageTitle_disease" text="Sjukdom"/>
+        <text name="rl_messageTitle_name" text="Namn"/>
+        <text name="rl_messageTitle_movement" text="Förflyttning"/>
+        <text name="rl_messageTitle_aiManager" text="Djurvaktare"/>
+        <text name="rl_messageTitle_insemination" text="Artificiell insemination"/>
+
+        <text name="rl_message_pregnancySingle" text="Födde 1 unge"/>
+        <text name="rl_message_pregnancyMultiple" text="Födde %s ungar"/>
+        <text name="rl_message_pregnancySold" text="%s ungar såldes för %s på grund av trängsel"/>
+        <text name="rl_message_pregnancyDied" text="%s ungar togs bort vid födseln"/>
+        <text name="rl_message_pregnancyDied_github" text="%s ungar dog vid födseln"/>
+        <text name="rl_message_death" text="Togs bort på grund av %s"/>
+        <text name="rl_message_death_github" text="Dog på grund av %s"/>
+        <text name="rl_message_diseaseContracted" text="Drabbades av %s"/>
+        <text name="rl_message_diseaseCured" text="Friskknad från %s"/>
+        <text name="rl_message_diseaseTreatment_start" text="Startade behandling för %s vid %s"/>
+        <text name="rl_message_diseaseTreatment_resume" text="Återupptog behandling för %s vid %s"/>
+        <text name="rl_message_diseaseTreatment_stop" text="Avbröt behandling för %s"/>
+        <text name="rl_message_diseaseTreatment_failed" text="Behandlingen för %s avslutades utan att bota"/>
+        <text name="rl_message_nameChange" text="Namnet ändrades från '%s' till '%s'"/>
+        <text name="rl_message_nameAdded" text="Tilldelades namnet '%s'"/>
+        <text name="rl_message_nameDeleted" text="Namnet '%s' togs bort"/>
+        <text name="rl_message_boughtAnimals_single" text="1 djur köptes för %s"/>
+        <text name="rl_message_boughtAnimals_multiple" text="%s djur köptes för %s"/>
+        <text name="rl_message_soldAnimals_single" text="1 djur såldes för %s"/>
+        <text name="rl_message_soldAnimals_multiple" text="%s djur såldes för %s"/>
+        <text name="rl_message_movedAnimalsTo_single" text="1 djur flyttades till %s"/>
+        <text name="rl_message_movedAnimalsTo_multiple" text="%s djur flyttades till %s"/>
+        <text name="rl_message_movedAnimalsFrom_single" text="1 djur flyttades från %s"/>
+        <text name="rl_message_movedAnimalsFrom_multiple" text="%s djur flyttades från %s"/>
+        <text name="rl_message_aiManager_boughtAnimals_single" text="Djurvaktaren köpte 1 djur för %s"/>
+        <text name="rl_message_aiManager_boughtAnimals_multiple" text="Djurvaktaren köpte %s djur för %s"/>
+        <text name="rl_message_aiManager_soldAnimals_single" text="Djurvaktaren sålde 1 djur för %s"/>
+        <text name="rl_message_aiManager_soldAnimals_multiple" text="Djurvaktaren sålde %s djur för %s"/>
+        <text name="rl_message_aiManager_castrated_single" text="Djurvaktaren kastrerade 1 djur"/>
+        <text name="rl_message_aiManager_castrated_multiple" text="Djurvaktaren kastrerade %s djur"/>
+        <text name="rl_message_aiManager_named_single" text="Djurvaktaren namngav 1 djur"/>
+        <text name="rl_message_aiManager_named_multiple" text="Djurvaktaren namngav %s djur"/>
+        <text name="rl_message_aiManager_mark_sell_single" text="Djurvaktaren markerade 1 djur för försäljning"/>
+        <text name="rl_message_aiManager_mark_sell_multiple" text="Djurvaktaren markerade %s djur för försäljning"/>
+        <text name="rl_message_aiManager_mark_castrate_single" text="Djurvaktaren markerade 1 djur för kastrering"/>
+        <text name="rl_message_aiManager_mark_castrate_multiple" text="Djurvaktaren markerade %s djur för kastrering"/>
+        <text name="rl_message_aiManager_mark_disease_single" text="Djurvaktaren markerade 1 djur för behandling"/>
+        <text name="rl_message_aiManager_mark_disease_multiple" text="Djurvaktaren markerade %s djur för behandling"/>
+        <text name="rl_message_insemination_success" text="Inseminationen lyckades"/>
+        <text name="rl_message_insemination_fail" text="Inseminationen misslyckades"/>
+        <text name="rl_message_aiManager_mark_ai_single" text="Djurvaktaren markerade 1 djur för AI"/>
+        <text name="rl_message_aiManager_mark_ai_multiple" text="Djurvaktaren markerade %s djur för AI"/>
+        <text name="rl_message_aiManager_ai_single" text="Djurvaktaren inseminerade 1 djur"/>
+        <text name="rl_message_aiManager_ai_multiple" text="Djurvaktaren inseminerade %s djur"/>
+        <text name="rl_message_aiManager_movedAnimals_single" text="Djurvaktaren flyttade 1 djur"/>
+        <text name="rl_message_aiManager_movedAnimals_multiple" text="Djurvaktaren flyttade %s djur"/>
+        <text name="rl_message_aiManager_mark_move_single" text="Djurvaktaren markerade 1 djur för flytt"/>
+        <text name="rl_message_aiManager_mark_move_multiple" text="Djurvaktaren markerade %s djur för flytt"/>
+        <text name="rl_message_aiManager_moveSkippedAge_single" text="Djurvaktaren hoppade över 1 djur (fel ålder för slakteriet)"/>
+        <text name="rl_message_aiManager_moveSkippedAge_multiple" text="Djurvaktaren hoppade över %s djur (fel ålder för slakteriet)"/>
+        <text name="rl_message_aiManager_moveSkippedSick_single" text="Djurvaktaren hoppade över 1 djur (sjuka djur kan inte gå till slakteriet)"/>
+        <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Djurvaktaren hoppade över %s djur (sjuka djur kan inte gå till slakteriet)"/>
+        <text name="rl_message_aiManager_horseCare_single" text="Djurvaktaren sköt om 1 häst"/>
+        <text name="rl_message_aiManager_horseCare_multiple" text="Djurvaktaren sköt om %s hästar"/>
+
+        <!-- Daily summary messages -->
+        <text name="rl_message_dailyBirthsSummary" text="%s djur föddes i %s"/>
+        <text name="rl_message_dailyDeathsSummary" text="%s djur dog i %s - %s"/>
+        <text name="rl_message_dailySalesSummary" text="Sålde %s djur i %s för %s"/>
+        <text name="rl_message_dailyOvercrowdingSummary" text="Trängsel: sålde %s nyfödda i %s för %s"/>
+        <text name="rl_message_dailyPurchasesSummary" text="Köpte %s djur i %s för %s"/>
+        <text name="rl_message_dailyCastrationsSummary" text="Kastrerade %s djur i %s"/>
+        <text name="rl_message_dailyNamingsSummary" text="Namngav %s djur i %s"/>
+        <text name="rl_message_dailyInseminationsSummary" text="Inseminerade %s djur i %s"/>
+        <text name="rl_message_dailyMarkSellSummary" text="Markerade %s djur till försäljning i %s"/>
+        <text name="rl_message_dailyMarkCastrateSummary" text="Markerade %s djur för kastrering i %s"/>
+        <text name="rl_message_dailyMarkInseminateSummary" text="Markerade %s djur för insemination i %s"/>
+        <text name="rl_message_dailyMovesSummary" text="Flyttade %s djur från %s"/>
+        <text name="rl_message_dailyMarkMoveSummary" text="Markerade %s djur för flytt från %s"/>
+        <text name="rl_message_dailyHorseCareSummary" text="Sköt om %s hästar i %s"/>
+
+
+
+        <!--  DEATHS  -->
+
+
+        <text name="rl_death_pregnancy" text="en dålig dräktighet"/>
+        <text name="rl_death_health" text="dålig hälsa"/>
+        <text name="rl_death_age" text="hög ålder"/>
+        <text name="rl_death_accident" text="en olycka"/>
+        <text name="rl_death_disease" text="en sjukdom"/>
+        <text name="rl_death_cull" text="avlivning"/>
+
+
+
+        <text name="rl_ui_dependencies_missing" text="RealisticLivestock kräver följande beroenden:"/>
+        <text name="rl_ui_dependency_missing_notInstalled" text="- %s (Inte installerat)"/>
+        <text name="rl_ui_dependency_missing_installed" text="- %s (Installeradt: %s, Minimi som krävs: %s)"/>
+
+
+        <!-- MIGRATION -->
+
+        <text name="rm_rl_conflict_title" text="Modkonflikt upptäckt"/>
+        <text name="rm_rl_mod_conflict_message" text="Följande mod(dar) krockar med 'Realistic Livestock - Ritter version' och kan inte användas samtidigt: %s &#10;&#10;Inaktivera de motstridiga moddarna och starta om spelet."/>
+
+        <text name="rl_mod_warn_title" text="Varning om modkompatibilitet"/>
+        <text name="rl_mod_warn_message" text="Följande mod(dar) som laddats med Realistic Livestock RM kan orsaka problem:%s&#10;&#10;Se %s för information. Spelet fortsätter."/>
+        <text name="rl_mod_compat_url" text="https://rittermod.github.io/FS25_RealisticLivestockRM/user-guide/reference-mod-compatibility"/>
+        <text name="rl_mod_warn_FS25_AnimalFoodCalculator" text="FS25_AnimalFoodCalculator: betydande prestandapåverkan som ökar med besättningsstorleken."/>
+
+        <text name="rm_rl_migration_title" text="Meddelande om datamigrering"/>
+        <text name="rm_rl_migration_message" text="Tidigare data för Realistic Livestock hittades i det här sparandet. Dina inställningar, djurdata, kvävetankar (Dewars) och AI-stråverktyg kommer automatiskt att migreras till Realistic Livestock - RitterMod-versionen när spelet sparar."/>
+        <text name="rm_rl_migration_files_found" text="Datafiler som hittades:"/>
+        <text name="rm_rl_migration_continue" text="Fortsätt"/>
+        <text name="rm_rl_migration_quit" text="Avsluta"/>
+
+        <text name="rl_bridge_version_unknown" text="Realistic Livestock: %s version %s har inte testats med version %s av Realistic Livestock. Använder konfiguration '%s'. Om du upplever problem med exotiska djur, vänligen rapportera dem på %s."/>
+        <text name="rl_bridge_configoverride_conflict_header" text="Realistic Livestock: Konflikt upptäckt. Två eller flera bryggor/paket ersatte konfigurationen för samma djurtyp. Den senast laddade modden vinner. Om du fortsätter kommer du att få visuella buggar och spöketdjur."/>
+        <text name="rl_bridge_configoverride_conflict_line" text="%s: tillämpad av %s"/>
+
+        <!-- RL Tabbed Menu -->
+        <text name="input_RL_MENU" text="Öppna RL-meny"/>
+        <!-- Messages tab -->
+        <text name="rl_menu_messages_title" text="Meddelanden"/>
+        <text name="rl_menu_messages_empty" text="Inga meddelanden än"/>
+        <text name="rl_menu_messages_no_farm" text="Du måste äga en gård för att visa meddelanden"/>
+        <text name="rl_menu_messages_summary" text="%s meddelanden"/>
+        <text name="rl_menu_messages_col_type" text="Typ"/>
+        <text name="rl_menu_messages_col_animal" text="Djur"/>
+        <text name="rl_menu_messages_col_message" text="Meddelande"/>
+        <text name="rl_menu_messages_col_husbandry" text="Inhägnad/Stall"/>
+        <text name="rl_menu_messages_col_date" text="Datum"/>
+        <text name="rl_menu_messages_unknown" text="Okänd: %s"/>
+        <!-- Messages delete -->
+        <text name="rl_menu_messages_delete_button" text="Radera"/>
+        <text name="rl_menu_messages_delete_all_button" text="Radera alla"/>
+        <text name="rl_menu_messages_confirm_delete_all" text="Radera alla %s meddelanden? Detta kan inte ångras."/>
+        <!-- Info tab -->
+        <text name="rl_menu_info_title" text="Hantera"/>
+        <text name="rl_menu_info_empty_no_husbandries" text="Du behöver minst ett djurstall för att visa djur"/>
+        <text name="rl_menu_info_empty_no_animals" text="Inga djur i det här stallet"/>
+        <text name="rl_menu_info_filter_button" text="Filter"/>
+
+        <!-- Info tab detail pane -->
+        <text name="rl_menu_info_pen_information" text="Stallinformation"/>
+        <text name="rl_menu_info_pedigree_header" text="Stamtavla"/>
+        <text name="rl_menu_info_genetics_header" text="Genetik"/>
+        <text name="rl_menu_info_diseases_header" text="Sjukdomar"/>
+        <text name="rl_menu_info_input_header" text="Tillförsel (övervakad)"/>
+        <text name="rl_menu_info_output_header" text="Produktion (övervakad)"/>
+        <text name="rl_menu_info_children" text="Avkommor"/>
+
+        <!-- Move tab -->
+        <text name="rl_menu_move_title" text="Flytta"/>
+        <!-- Transfer tab -->
+        <text name="rl_menu_transfer_title" text="Överför"/>
+        <text name="rl_menu_transfer_load" text="Lasta"/>
+        <text name="rl_menu_transfer_unload" text="Lasta av"/>
+        <text name="rl_menu_transfer_empty_no_animals" text="Inga djur på denna sida"/>
+        <text name="rl_menu_transfer_counterpart" text="Destination"/>
+        <text name="rl_menu_transfer_world" text="Närliggande djur"/>
+        <text name="rl_menu_transfer_deliver" text="Leverera"/>
+        <text name="rl_menu_move_summary" text="%d djur" tag="format"/>
+
+        <!-- Sell tab -->
+        <text name="rl_menu_sell_title" text="Sälj"/>
+        <text name="rl_menu_sell_cart_header" text="Försäljningssammanfattning"/>
+        <text name="rl_menu_sell_cart_selected" text="Valda"/>
+        <text name="rl_menu_sell_cart_empty" text="Välj djur att sälja"/>
+
+        <!-- Buy tab -->
+        <text name="rl_menu_buy_title" text="Köp"/>
+        <text name="rl_menu_buy_empty_no_types" text="Handlaren har inga djurtyper tillgängliga"/>
+        <text name="rl_menu_buy_empty_no_animals" text="Inga djur tillgängliga hos handlaren för denna typ"/>
+        <text name="rl_menu_buy_cart_header" text="Köpsammanfattning"/>
+        <text name="rl_menu_buy_cart_selected" text="Valda"/>
+
+        <!-- AI tab -->
+        <text name="rl_menu_ai_title" text="Artificiell insemination"/>
+        <text name="rl_menu_ai_quantity" text="Antal"/>
+        <text name="rl_menu_ai_price" text="Pris"/>
+        <text name="rl_menu_ai_empty_no_stock" text="Inga tjurar tillgängliga hos handlaren för denna art"/>
+        <text name="rl_menu_ai_empty_no_species" text="Inga djurarter registrerade"/>
+        <text name="rl_menu_herdsman_title" text="Djurvaktare"/>
+        <text name="rl_menu_herdsman_detail_action" text="Åtgärd"/>
+        <text name="rl_menu_herdsman_action_perform" text="Utför"/>
+        <text name="rl_menu_herdsman_action_markOnly" text="Endast markering"/>
+        <text name="rl_menu_herdsman_action_perform_tooltip" text="Djurvaktaren utför denna uppgift på matchande djur."/>
+        <text name="rl_menu_herdsman_action_markOnly_tooltip" text="Djurvaktaren flaggar endast matchande djur – uppgiften utförs inte, till reducerad lön."/>
+        <text name="rl_menu_herdsman_operation_tooltip" text="Uppgiften som djurvaktaren utför på matchande djur."/>
+        <text name="rl_menu_herdsman_name_tooltip" text="Ett namn för att identifiera denna uppgift."/>
+        <text name="rl_menu_herdsman_filter_tooltip" text="Det sparade filter som avgör vilka djur denna uppgift matchar."/>
+        <text name="rl_menu_herdsman_husbandries_tooltip" text="De stall som denna uppgift körs i. Budget och gränser gäller separat för var och en."/>
+        <text name="rl_menu_herdsman_maxAnimals_sell_tooltip" text="Djurvaktaren säljer upp till %s matchande djur per dag i varje vald inhägnad."/>
+        <text name="rl_menu_herdsman_maxAnimals_buy_tooltip" text="Djurvaktaren köper upp till %s matchande djur per dag i varje vald inhägnad."/>
+        <text name="rl_menu_herdsman_maxAnimals_ai_tooltip" text="Djurvaktaren inseminerar upp till %s matchande djur per dag i varje vald inhägnad."/>
+        <text name="rl_menu_herdsman_maxAnimals_move_tooltip" text="Djurvaktaren flyttar upp till %s matchande djur per dag i varje vald inhägnad."/>
+        <text name="rl_menu_herdsman_budgetFixed_tooltip" text="Djurvaktaren spenderar upp till %s per dag i varje vald inhägnad."/>
+        <text name="rl_menu_herdsman_budgetPercentage_tooltip" text="Djurvaktaren spenderar upp till %s av din gårds pengar per dag i varje vald inhägnad."/>
+        <text name="rl_menu_herdsman_destination_tooltip" text="Den inhägnad dit djurvaktaren flyttar matchande djur."/>
+        <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Huruvida djurvaktaren utför denna hästvårdsuppgift varje dag."/>
+        <text name="rl_menu_herdsman_enabled_move_tooltip" text="Huruvida djurvaktaren utför denna flyttuppgift varje dag."/>
+        <text name="rl_menu_herdsman_empty" text="Inga djurvaktaruppgifter än"/>
+        <text name="rl_menu_herdsman_empty_editor" text="Välj en uppgift att redigera"/>
+        <text name="rl_menu_herdsman_section_sell" text="Sälj"/>
+        <text name="rl_menu_herdsman_section_buy" text="Köp"/>
+        <text name="rl_menu_herdsman_section_castrate" text="Kastrera"/>
+        <text name="rl_menu_herdsman_section_naming" text="Namngivning"/>
+        <text name="rl_menu_herdsman_section_ai" text="Artificiell insemination"/>
+        <text name="rl_menu_herdsman_section_horsecare" text="Hästvård"/>
+        <text name="rl_menu_herdsman_detail_operation" text="Uppgift"/>
+        <text name="rl_menu_herdsman_detail_enabled" text="Aktiverad"/>
+        <text name="rl_menu_herdsman_detail_convention" text="Namngivningskonvention"/>
+        <text name="rl_menu_herdsman_detail_budgetfixed" text="Fast belopp"/>
+        <text name="rl_menu_herdsman_detail_budgetpercentage" text="Gårdspengar %"/>
+        <text name="rl_menu_herdsman_detail_semen" text="Säd"/>
+        <text name="rl_menu_herdsman_detail_husbandries" text="Inhägnader"/>
+        <text name="rl_menu_herdsman_detail_none" text="(ingen)"/>
+        <text name="rl_menu_herdsman_detail_missing" text="(saknas)"/>
+        <text name="rl_menu_herdsman_detail_required" text="Krävs"/>
+        <text name="rl_menu_herdsman_detail_wholeNumberRange" text="Värdet måste vara ett heltal mellan %d och %d"/>
+        <text name="rl_menu_herdsman_detail_wholeNumberMin" text="Värdet måste vara ett heltal, %d eller mer"/>
+        <text name="rl_menu_herdsman_filter_select" text="Välj filter"/>
+        <text name="rl_menu_herdsman_filter_picker_title" text="Välj filter"/>
+        <text name="rl_menu_herdsman_filter_picker_empty" text="Inga filter tillgängliga för denna uppgift."/>
+        <text name="rl_menu_herdsman_husbandry_select" text="Välj inhägnader"/>
+        <text name="rl_menu_herdsman_husbandry_count" text="%d valda"/>
+        <text name="rl_menu_herdsman_husbandry_picker_title" text="Välj inhägnader"/>
+        <text name="rl_menu_herdsman_husbandry_picker_empty" text="Inga inhägnader tillgängliga för denna uppgift."/>
+        <text name="rl_menu_dealerSale_title" text="Djur till salu"/>
+        <text name="rl_menu_dealerSale_empty" text="Inga djur tillgängliga hos denna handlare."/>
+        <text name="rl_menu_herdsman_husbandry_emptyRejected" text="Välj minst en inhägnad."/>
+        <text name="rl_menu_herdsman_filter_picker_currentUnavailable" text="Det aktuella filtret är otillgängligt för denna uppgift."/>
+        <text name="rl_menu_herdsman_section_move" text="Flytta"/>
+        <text name="rl_menu_herdsman_detail_destination" text="Destination"/>
+        <text name="rl_menu_herdsman_destination_select" text="Välj destination"/>
+        <text name="rl_menu_herdsman_destination_butcher_suffix" text="(slakteri)"/>
+        <text name="rl_menu_herdsman_destination_picker_title" text="Välj destination"/>
+        <text name="rl_menu_herdsman_destination_picker_empty" text="Ingen destinationsinhägnad tillgänglig för denna uppgift."/>
+        <text name="rl_menu_herdsman_destination_picker_currentUnavailable" text="Aktuell destination otillgänglig för denna uppgift."/>
+
+        <!-- Settings tab shell -->
+        <text name="rl_menu_settings_title" text="Inställningar"/>
+        <text name="rl_menu_settings_tab_general" text="Allmänt"/>
+        <text name="rl_menu_settings_tab_filters" text="Filter"/>
+
+        <!-- Filters tab list -->
+        <text name="rl_menu_filters_quick_filter_title" text="Snabbfilter"/>
+        <text name="rl_ui_qf_saveFilter" text="Spara filter"/>
+        <text name="rl_ui_qf_saveDropsValue" text="Sparade filter stöder inte värde; detta villkor kommer inte att tas med."/>
+        <text name="rl_menu_filters_empty" text="Inga sparade filter än"/>
+        <text name="rl_menu_filters_empty_no_farm" text="Du behöver en gård för att spara filter"/>
+        <text name="rl_menu_filters_new_button" text="Nytt filter"/>
+        <text name="rl_menu_filters_default_name" text="Nytt filter"/>
+        <text name="rl_menu_filters_detail_placeholder" text="Kommer att implementeras"/>
+
+        <!-- Editor + Duplicate/Delete -->
+        <text name="rl_menu_filters_empty_editor" text="Välj ett filter att redigera"/>
+        <text name="rl_menu_filters_editor_title_name" text="Namn"/>
+        <text name="rl_menu_filters_editor_title_animal_type" text="Djurtyp"/>
+        <text name="rl_menu_filters_editor_title_op" text="Villkor"/>
+        <text name="rl_menu_filters_animal_type_any" text="Valfri"/>
+        <text name="rl_menu_filters_op_and" text="Matcha ALLA"/>
+        <text name="rl_menu_filters_op_or" text="Matcha NÅGON"/>
+        <text name="rl_menu_filters_duplicate_button" text="Duplicera"/>
+        <text name="rl_menu_filters_delete_button" text="Radera"/>
+        <text name="rl_menu_filters_duplicate_suffix" text=" (kopia)"/>
+        <text name="rl_menu_filters_duplicate_suffix_n" text=" (kopia %d)"/>
+        <text name="rl_menu_filters_delete_confirm_text" text="Radera filtret &quot;%s&quot;? Detta kan inte ångras."/>
+        <!-- Usage scope axis -->
+        <text name="rl_menu_filters_editor_title_usage" text="Visa på"/>
+        <text name="rl_menu_filters_usage_any" text="Alla skärmar"/>
+        <text name="rl_menu_filters_usage_owned" text="Skärmar för egna besättningar"/>
+        <text name="rl_menu_filters_usage_dealer" text="Handlerskärmar"/>
+
+        <!-- Conditions editor (number + bool). Bool True/False
+             strings reuse base-game `ui_yes` / `ui_no` (see
+             basegame/l10n/l10n_en.xml `ui_yes`="Yes", `ui_no`="No") so the
+             editor reads identically to other base-game True/False prompts;
+             no new RLRM-local keys for True/False. -->
+        <text name="rl_menu_filters_add_condition" text="Lägg till villkor"/>
+        <text name="rl_menu_filters_add_group_button" text="Lägg till grupp"/>
+        <text name="rl_menu_filters_add_group_not_implemented" text="Att lägga till grupp har ännu inte implementerats i denna version."/>
+        <text name="rl_menu_filters_edit_condition" text="Redigera villkor"/>
+        <text name="rl_menu_filters_delete_condition" text="Radera villkor"/>
+        <text name="rl_menu_filters_dialog_title" text="Redigera villkor"/>
+        <text name="rl_menu_filters_field_label" text="Fält"/>
+        <text name="rl_menu_filters_cmp_label" text="Jämför"/>
+        <text name="rl_menu_filters_cmp_lt" text="är mindre än"/>
+        <text name="rl_menu_filters_cmp_le" text="är som mest"/>
+        <text name="rl_menu_filters_cmp_eq" text="är"/>
+        <text name="rl_menu_filters_cmp_ne" text="är inte"/>
+        <text name="rl_menu_filters_cmp_ge" text="är minst"/>
+        <text name="rl_menu_filters_cmp_gt" text="är mer än"/>
+        <text name="rl_menu_filters_cmp_in" text="är en av"/>
+        <text name="rl_menu_filters_cmp_notin" text="är ingen av"/>
+        <text name="rl_menu_filters_cmp_contains" text="innehåller"/>
+        <text name="rl_menu_filters_cmp_notcontains" text="innehåller inte"/>
+        <text name="rl_menu_filters_value_label" text="Värde"/>
+        <text name="rl_menu_filters_value_invalid_number" text="Ogiltigt nummer"/>
+        <text name="rl_menu_filters_preserved_banner" text="%d villkor dolda – kan redigeras i ett senare skede. Sparas vid stängning."/>
+
+        <!-- Field labels per catalog key - one label for every field in
+             RLFilterFieldCatalog (number, bool, enum, and string). -->
+        <text name="rl_menu_filters_field_age" text="Ålder"/>
+        <text name="rl_menu_filters_field_isCastrated" text="Kastrerad"/>
+        <text name="rl_menu_filters_field_isPregnant" text="Dräktig"/>
+        <text name="rl_menu_filters_field_isLactating" text="Lakterande"/>
+        <text name="rl_menu_filters_field_hasName" text="Har namn"/>
+        <text name="rl_menu_filters_field_hasAnyDisease" text="Har någon sjukdom"/>
+        <text name="rl_menu_filters_field_hasAnyMark" text="Har någon markering"/>
+        <text name="rl_menu_filters_field_weight" text="Vikt"/>
+        <text name="rl_menu_filters_field_health" text="Hälsa"/>
+        <text name="rl_menu_filters_field_genetics_metabolism" text="Genetik: metabolism"/>
+        <text name="rl_menu_filters_field_genetics_health" text="Genetik: hälsa"/>
+        <text name="rl_menu_filters_field_genetics_fertility" text="Genetik: fertilitet"/>
+        <text name="rl_menu_filters_field_genetics_quality" text="Genetik: kvalitet"/>
+        <text name="rl_menu_filters_field_genetics_productivity" text="Genetik: produktivitet"/>
+        <text name="rl_menu_filters_field_genetics_overall" text="Genetik: totalt"/>
+        <text name="rl_menu_filters_field_gender" text="Kön"/>
+        <text name="rl_menu_filters_field_subType" text="Ras"/>
+        <text name="rl_menu_filters_field_name" text="Namn"/>
+
+        <!-- enum value labels (gender). subType labels resolve via
+             pre-translated fillType.title; no RLRM-local keys needed there.
+             l10n-miss path in RLFilterFieldDisplay capitalises the internal
+             key so a missing translation never renders as a raw lowercase
+             identifier. -->
+        <text name="rl_menu_filters_gender_male" text="Hane"/>
+        <text name="rl_menu_filters_gender_female" text="Hona"/>
+
+        <!-- inline hint strings surfaced by the condition dialog
+             hintText element (empty-string commit) and the conditions-list
+             refuse-to-edit path (legacy subType row whose enum domain
+             resolves empty under the current filter scope). -->
+        <text name="rl_menu_filters_emptyValueRejected" text="Värdet kan inte vara tomt"/>
+        <text name="rl_menu_filters_subtypeRequiresAnimalType" text="Ställ in filtrets djurtyp först för att redigera detta villkor"/>
+        <text name="rl_menu_filters_invalidNumber" text="Ange ett giltigt nummer"/>
+        <text name="rl_menu_filters_enumValueDrifted" text="Det lagrade värdet är inte längre giltigt – välj ett annat"/>
+        <text name="rl_menu_filters_valueOutOfRange_both" text="Värdet måste vara mellan %d och %d"/>
+        <text name="rl_menu_filters_valueOutOfRange_min" text="Värdet måste vara minst %d"/>
+        <text name="rl_menu_filters_valueOutOfRange_max" text="Värdet måste vara som mest %d"/>
+
+        <!-- multi-value editor (RLFilterValueSetDialog). Summary
+             button text on the condition dialog renders "N selected" via
+             valueSet_summary; the dialog itself shows valueSet_title. The
+             "Edit values..." valueSet_button text is the summary button
+             fallback when the cmp picker first switches to in/notin and
+             workingValue is nil. Button labels (Select / Select all /
+             OK / Back) reuse $l10n_button_select, $l10n_rl_ui_selectAll,
+             $l10n_button_ok, $l10n_button_back - no new keys needed. -->
+        <text name="rl_menu_filters_valueSet_title" text="Välj värden"/>
+        <text name="rl_menu_filters_valueSet_summary" text="%d valda"/>
+        <text name="rl_menu_filters_valueSet_button" text="Redigera värden..."/>
+
+        <!-- Filter cycle + chip MVP -->
+        <text name="rl_menu_filter_chip_none" text="Inget filter"/>
+        <text name="rl_menu_filter_chip_active" text="Filter: %s"/>
+        <text name="rl_menu_filter_chip_quick" text="Filter: QF"/>
+        <text name="rl_menu_filter_chip_quick_plus_saved" text="Filter: QF + %s"/>
+        <text name="rl_menu_cycle_filter_button" text="Byt filter"/>
+        <text name="rl_menu_filter_chip_unnamed" text="(namnlös)"/>
+
+
+        <!-- Missing keys (English fallback) -->
+        <text name="input_RL_RENAME" text="Byt namn"/>
+        <text name="input_RL_CYCLE_FILTER" text="Byt sparat filter"/>
+        <!-- Herdsman rule lifecycle -->
+        <text name="rl_menu_herdsman_new_button" text="Ny uppgift"/>
+        <text name="rl_menu_herdsman_duplicate_button" text="Duplicera"/>
+        <text name="rl_menu_herdsman_delete_button" text="Radera"/>
+        <text name="rl_menu_herdsman_delete_confirm_text" text="Radera uppgiften &quot;%s&quot;? Detta kan inte ångras."/>
+        <text name="rl_menu_herdsman_default_name" text="Ny uppgift"/>
+        <text name="rl_menu_herdsman_duplicate_suffix" text=" (kopia)"/>
+        <text name="rl_menu_herdsman_duplicate_suffix_n" text=" (kopia %d)"/>
+    </texts>
+</l10n>
