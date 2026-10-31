@@ -33,6 +33,7 @@ local OPERATION_TITLE_KEY = {
     naming    = "rl_menu_herdsman_section_naming",
     ai        = "rl_menu_herdsman_section_ai",
     horseCare = "rl_menu_herdsman_section_horsecare",
+    vaccinate = "rl_menu_herdsman_section_vaccinate",
 }
 
 -- Exported read-only so a test can sweep it against OPERATION_ORDER: a declaration table

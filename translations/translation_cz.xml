@@ -779,6 +779,7 @@
         <text name="rl_menu_herdsman_budgetPercentage_tooltip" text="Pastýř utratí až %s z peněz vaší farmy denně v každém vybraném objektu."/>
         <text name="rl_menu_herdsman_destination_tooltip" text="Chovný objekt, do kterého pastýř přesune odpovídající zvířata."/>
         <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Zda pastýř tento úkol péče o koně provádí každý den."/>
+        <text name="rl_menu_herdsman_enabled_vaccinate_tooltip" text="Zda pastýř tento úkol očkování provádí každý den."/>
         <text name="rl_menu_herdsman_enabled_move_tooltip" text="Zda pastýř tento úkol přesunu provádí každý den."/>
         <text name="rl_menu_herdsman_empty" text="Zatím žádné úkoly pro pastýře"/>
         <text name="rl_menu_herdsman_empty_editor" text="Vyberte úkol k úpravě"/>
@@ -788,6 +789,7 @@
         <text name="rl_menu_herdsman_section_naming" text="Pojmenování"/>
         <text name="rl_menu_herdsman_section_ai" text="Inseminace"/>
         <text name="rl_menu_herdsman_section_horsecare" text="Péče o koně"/>
+        <text name="rl_menu_herdsman_section_vaccinate" text="Očkování"/>
         <text name="rl_menu_herdsman_detail_operation" text="Úkol"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Povoleno"/>
         <text name="rl_menu_herdsman_detail_convention" text="Formát jména"/>

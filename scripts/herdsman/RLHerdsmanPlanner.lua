@@ -46,6 +46,10 @@
 --        (no `mark` key at all - a stray one would flip the executor row and route it into the
 --        message layer's mark-precedence branch)
 --
+-- `vaccinate` is RANKED but has NO plan arm: an enabled vaccinate rule reaches the operation
+-- if-chain, matches nothing, and falls out - emitting no action, charging no wage and dosing no
+-- animal. The chain has no `else`, and that absence is what makes the fall-through silent.
+--
 -- Run order is RLHerdsmanRuleService.OPERATION_ORDER: sell frees herd space and funds buys before
 -- buy fills the space and spends the proceeds.
 --
@@ -97,6 +101,7 @@ RLHerdsmanPlanner.OPERATION_TRAITS = {
     naming    = { noFilter = true },
     ai        = {},
     horseCare = {},
+    vaccinate = {},
 }
 
 --- Herdsman daily wage per animal, keyed by the runtime AnimalType.* index so it matches

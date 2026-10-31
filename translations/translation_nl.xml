@@ -756,6 +756,7 @@
         <text name="rl_menu_herdsman_budgetPercentage_tooltip" text="De veehoeder besteedt tot %s van het geld van je bedrijf per dag, in elk geselecteerd bedrijf."/>
         <text name="rl_menu_herdsman_destination_tooltip" text="Het bedrijf waar de veehoeder bijpassende dieren naartoe verplaatst."/>
         <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Of de veehoeder deze verzorgingstaak voor paarden elke dag uitvoert."/>
+        <text name="rl_menu_herdsman_enabled_vaccinate_tooltip" text="Of de veehoeder deze vaccinatietaak elke dag uitvoert."/>
         <text name="rl_menu_herdsman_enabled_move_tooltip" text="Of de veehoeder deze verplaatsingstaak elke dag uitvoert."/>
         <text name="rl_menu_herdsman_empty" text="No herdsman tasks yet"/>
         <text name="rl_menu_herdsman_empty_editor" text="Select a task to edit"/>
@@ -765,6 +766,7 @@
         <text name="rl_menu_herdsman_section_naming" text="Naamgeving"/>
         <text name="rl_menu_herdsman_section_ai" text="Kunstmatige inseminatie"/>
         <text name="rl_menu_herdsman_section_horsecare" text="Paardenverzorging"/>
+        <text name="rl_menu_herdsman_section_vaccinate" text="Vaccinatie"/>
         <text name="rl_menu_herdsman_detail_operation" text="Task"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Ingeschakeld"/>
         <text name="rl_menu_herdsman_detail_convention" text="Naamgevingsconventie"/>

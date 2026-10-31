@@ -47,6 +47,7 @@ local PARAM_VISIBILITY = {
     naming    = { convention = true, previous = true },
     ai        = { filter = true, maxAnimals = true, mark = true, semen = true },
     horseCare = { filter = true },
+    vaccinate = { filter = true },
 }
 
 --- operation -> allowed filter-usage set. Buy draws from the dealer pool, every
@@ -60,6 +61,7 @@ local ALLOWED_USAGES = {
     naming    = { [RLFilterUsage.ANY] = true, [RLFilterUsage.OWNED]  = true },
     ai        = { [RLFilterUsage.ANY] = true, [RLFilterUsage.OWNED]  = true },
     horseCare = { [RLFilterUsage.ANY] = true, [RLFilterUsage.OWNED]  = true },
+    vaccinate = { [RLFilterUsage.ANY] = true, [RLFilterUsage.OWNED]  = true },
 }
 
 --- Operation x animalType restrictions, declared by type NAME and OWNED by
@@ -239,12 +241,14 @@ function RLHerdsmanRulePresenter.getTooltipDescriptor(operation, field, state, v
     elseif field == "name" then
         key = "rl_menu_herdsman_name_tooltip"
     elseif field == "enabled" then
-        -- Move and horse care have no carried-over string family, so they need their own
-        -- branch: falling through would build a key that exists in no locale.
+        -- Move, horse care and vaccination have no carried-over string family, so they need
+        -- their own branch: falling through would build a key that exists in no locale.
         if operation == "move" then
             key = "rl_menu_herdsman_enabled_move_tooltip"
         elseif operation == "horseCare" then
             key = "rl_menu_herdsman_enabled_horseCare_tooltip"
+        elseif operation == "vaccinate" then
+            key = "rl_menu_herdsman_enabled_vaccinate_tooltip"
         elseif isBinaryState(state) then
             key = string.format("rl_ui_herdsmanTooltip_%s_enabled_%d", tostring(operation), state)
         else
@@ -385,6 +389,9 @@ function RLHerdsmanRulePresenter.defaultParamsForOperation(operation)
         -- separates a REGISTERED param-free operation from an unregistered one - the fallback
         -- below returns the same empty table but warns, and it must keep warning.
         params = {}
+    elseif operation == "vaccinate" then
+        -- Param-free for the same reason as horse care; explicit so it does not hit the warning.
+        params = {}
     else
         Log:warning("RLHerdsmanRulePresenter.defaultParamsForOperation: unknown operation '%s'; returning empty params", tostring(operation))
         return {}
@@ -484,6 +491,8 @@ local PARAM_VALIDATORS = {
     -- for ANY params table. The entry must exist all the same - an operation ABSENT from this
     -- table is an unknown one and fails closed.
     horseCare = {},
+    -- Param-free like horseCare; the entry is what marks the operation as known.
+    vaccinate = {},
 }
 
 --- Process-lifetime flag: warn exactly once if validateParams is called with an unknown

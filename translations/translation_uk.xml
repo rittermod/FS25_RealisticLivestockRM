@@ -736,6 +736,7 @@
         <text name="rl_menu_herdsman_budgetPercentage_tooltip" text="Пастух витрачає до %s від коштів вашої ферми на день у кожному вибраному загоні."/>
         <text name="rl_menu_herdsman_destination_tooltip" text="Загін, до якого пастух переміщує відповідних тварин."/>
         <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Чи виконуватиме пастух це завдання з догляду за конями щодня."/>
+        <text name="rl_menu_herdsman_enabled_vaccinate_tooltip" text="Чи виконуватиме пастух це завдання з вакцинації щодня."/>
         <text name="rl_menu_herdsman_enabled_move_tooltip" text="Чи виконуватиме пастух це завдання з переміщення щодня."/>
         <text name="rl_menu_herdsman_empty" text="Завдання для пастуха ще не створені"/>
         <text name="rl_menu_herdsman_empty_editor" text="Оберіть завдання для редагування"/>
@@ -745,6 +746,7 @@
         <text name="rl_menu_herdsman_section_naming" text="Найменування"/>
         <text name="rl_menu_herdsman_section_ai" text="Штучне запліднення"/>
         <text name="rl_menu_herdsman_section_horsecare" text="Догляд за конями"/>
+        <text name="rl_menu_herdsman_section_vaccinate" text="Вакцинація"/>
         <text name="rl_menu_herdsman_detail_operation" text="Завдання"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Увімкнено"/>
         <text name="rl_menu_herdsman_detail_convention" text="Принцип найменування"/>

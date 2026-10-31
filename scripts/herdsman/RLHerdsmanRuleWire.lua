@@ -51,6 +51,7 @@ RLHerdsmanRuleWire.NIL_INT_SENTINEL = -1
 ---   naming    -> convention String, previous String ("" sentinel for nil cursor)
 ---   ai        -> maxAnimals Int32, mark Bool, semen String
 ---   horseCare -> (no fields; zero bytes both ways)
+---   vaccinate -> (no fields; zero bytes both ways)
 ---
 --- The codec is a transport, not a validator: it round-trips type-correct values verbatim, and
 --- value validation belongs to the picker and the service floor. ONE exception: `move`'s `read`
@@ -181,6 +182,11 @@ local PARAMS_WIRE_CODECS = {
         -- the fail-closed "drop the whole record" signal, which a param-free operation can never
         -- mean. The entry cannot be inferred from a passing round trip - the unknown-operation
         -- branch also writes zero bytes and yields `params = {}` - so its presence is asserted.
+        write = function(_streamId, _p) end,
+        read = function(_streamId) return {} end,
+    },
+    vaccinate = {
+        -- ZERO params, exactly as horseCare: no bytes either way, and an EMPTY table read back.
         write = function(_streamId, _p) end,
         read = function(_streamId) return {} end,
     },
