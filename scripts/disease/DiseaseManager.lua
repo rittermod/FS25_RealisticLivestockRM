@@ -358,6 +358,56 @@ function DiseaseManager:getVaccineModelsFor(animal)
 end
 
 
+-- The herdsman's narrowing of `getVaccineModelsFor`, which stays as it is for the dialog: a player
+-- may dose any animal, but an automated task that doses every heifer calf against mastitis from
+-- birth spends money for years before the disease can reach it. So age and, for a lactation
+-- disease, pregnancy or lactation are read here, from the same infection curve and prerequisites
+-- the infection roll uses - a disease that can reach a newborn is still dosed from birth. The curve
+-- is read at next month's age too: protection that runs out in the month the animal comes of age
+-- would otherwise be renewed only after it lapsed, which at one day per month is the whole month.
+--- The vaccines the herdsman should give this animal today, in sorted title order.
+---@param animal table the live animal
+---@return table models a fresh array of registry entries carrying a `vaccine` block; empty when diseases are off
+function DiseaseManager:getHerdsmanDosesFor(animal)
+
+    local doses = {}
+
+    if not self.diseasesEnabled then
+        return doses
+    end
+
+    for _, model in ipairs(self:getVaccineModelsFor(animal)) do
+        local title = model.title
+        local chance = math.max(infectionChanceFor(model.infection, animal.age),
+            infectionChanceFor(model.infection, animal.age + 1))
+        local reason = nil
+
+        if not self:isTitleEnabled(title) then
+            reason = "title disabled"
+        elseif not RLDiseaseVaccination.isAtRisk(animal, chance, needsLactation(model)) then
+            reason = "not at risk"
+        elseif not RLDiseaseVaccination.check(animal, model) then
+            reason = "refused"
+        elseif not RLDiseaseVaccination.isDue(animal:getDisease(title), model) then
+            reason = "protected"
+        end
+
+        if reason == nil then
+            doses[#doses + 1] = model
+        else
+            Log:trace("DiseaseManager:getHerdsmanDosesFor: skipped title=%s, reason=%s (age=%s uniqueId=%s)",
+                tostring(title), reason, tostring(animal.age), tostring(animal.uniqueId))
+        end
+    end
+
+    Log:trace("DiseaseManager:getHerdsmanDosesFor: %s dose(s) due (uniqueId=%s)", tostring(#doses),
+        tostring(animal.uniqueId))
+
+    return doses
+
+end
+
+
 -- The one per-title producer gate: the roll, the seed, the spread entries and inheritance read it.
 -- Hot path, so silent; the global is bootstrapped at source time, so it takes no guard.
 --- True when a title may produce new cases.

@@ -3,7 +3,8 @@
     What a disease's vaccine block does to a record. A dose on a healthy animal makes it immune, a
     dose on an immune one tops the protection up and never shortens it, and a dose on an infected
     one is wasted: charged by the caller, nothing changes. Every dose takes. At birth, each newborn
-    takes the block's maternal months for every disease its dam holds at RECOVERED.
+    takes the block's maternal months for every disease its dam holds at RECOVERED. `isDue` and
+    `isAtRisk` are the herdsman's half: whether a dose is worth giving, never whether it is allowed.
 
     Pure: no setting, no g_*, no GUI. Callers log the outcome.
 ]]
@@ -48,6 +49,50 @@ function RLDiseaseVaccination.check(animal, model)
     Log:trace("RLDiseaseVaccination.check: allowed (title=%s farmId=%s uniqueId=%s)", tostring(model.title),
         tostring(animal.farmId), tostring(animal.uniqueId))
     return true, nil
+end
+
+
+--- Whether the herdsman should dose against a disease, read off the record alone. No record means
+--- never vaccinated or protection already expired - expiry deletes the record, so the two cannot be
+--- told apart and both are due. A RECOVERED record is due once a month or less is left: a dose
+--- restores the full window rather than adding to it, so an earlier dose throws months away and a
+--- later one leaves a day unprotected. The window is capped at half the vaccine's protection so a
+--- short vaccine is not renewed every day, and widened by the progression epsilon so a counter
+--- that reloaded a hair above it is not skipped on its last day. Any other state is due only while
+--- the player cannot see it: the herdsman knows no more than the dialog shows, so a hidden
+--- incubation gets the same wasted dose the dialog would offer, and a visible illness gets none.
+---@param record table|nil The animal's record of the disease, nil when it holds none.
+---@param model table The disease's registry entry, carrying `vaccine`.
+---@return boolean due True when a dose should be given.
+function RLDiseaseVaccination.isDue(record, model)
+    if record == nil then
+        return true
+    end
+
+    if record.state == RLDiseaseRecord.STATE.RECOVERED then
+        local window = math.min(1, model.vaccine.protectionMonths / 2) + RLDiseaseProgression.COMPLETION_EPSILON
+        -- Inverted so a NaN counter is due too, as in `apply`.
+        return not (record.immunityMonthsRemaining > window)
+    end
+
+    return not Disease.isVisibleToPlayer(record)
+end
+
+
+--- Whether a disease can reach an animal at all right now, so a dose would buy anything. `chance` is
+--- the authored infection chance at the animal's age, or at next month's when that is higher; a
+--- disease that needs a lactating animal also counts a pregnant one, because the point of that dose
+--- is to land before calving.
+---@param animal table The live animal.
+---@param chance number The per-month infection chance at the animal's age or the next month's.
+---@param needsLactation boolean True when the disease's prerequisites ask for a lactating animal.
+---@return boolean atRisk
+function RLDiseaseVaccination.isAtRisk(animal, chance, needsLactation)
+    if not (chance > 0) then
+        return false
+    end
+
+    return not needsLactation or animal.isPregnant == true or animal.isLactating == true
 end
 
 

@@ -3,8 +3,10 @@
 -- mutations. It dispatches AIAnimalSellEvent / AIAnimalBuyEvent / AIAnimalInseminationEvent /
 -- AIAnimalMoveEvent, applies castrate + naming + horse care as direct server-side field writes and
 -- broadcasts the matching per-animal event (caller-mutates-first, no sendLocal) so those writes
--- sync to clients, sets the AI_MANAGER_* mark for mark-mode actions, persists the naming cursor,
--- and deducts the herdsman wage once per farm via MoneyType.HERDSMAN_WAGES.
+-- sync to clients, gives vaccine doses through DiseaseVaccinateEvent.apply (synced by the pen's
+-- flush), sets the AI_MANAGER_* mark for mark-mode actions, persists the naming cursor, and deducts
+-- the herdsman wage once per farm via MoneyType.HERDSMAN_WAGES, and the day's vaccine doses once per
+-- farm via MoneyType.MEDICINE.
 --
 -- Membership backstop: before each DIRECT mutation the executor resolves the action's animal in the
 -- husbandry's LIVE cluster by three-field identity - the same check AnimalCastrateEvent:run performs
@@ -26,6 +28,7 @@
 --     ruleService             = <RLHerdsmanRuleService>,         -- setNamingCursor(id, previous)
 --     animalNameSystem        = <real AnimalNameSystem>,         -- getRandomName(gender)
 --     defer                   = function(fn) ... end,            -- run fn after the current day-change chain
+--     diseaseManager          = <DiseaseManager>,                -- getDiseaseByTitle, diseasesEnabled (vaccinate)
 --   }
 --
 -- `defer` is a STRUCTURAL dep rather than a defaulted one: horse care is the one deferred leg, and a
@@ -258,6 +261,26 @@ function RLHerdsmanExecutor.executeActions(plan, ctx)
         end
     end
 
+    -- One MEDICINE charge per farm for the day's vaccine doses, in the wage's shape. Charged per dose,
+    -- as the Diseases dialog does, a large herd would post one money line per dose. First-seen order.
+    local doseFarmOrder, doseByFarm = {}, {}
+    for _, row in ipairs(summary.results) do
+        if row.operation == "vaccinate" and row.farmId ~= nil and isFiniteNumber(row.amountSpent) then
+            if doseByFarm[row.farmId] == nil then
+                doseByFarm[row.farmId] = 0
+                doseFarmOrder[#doseFarmOrder + 1] = row.farmId
+            end
+            doseByFarm[row.farmId] = doseByFarm[row.farmId] + row.amountSpent
+        end
+    end
+    for _, farmId in ipairs(doseFarmOrder) do
+        local spent = doseByFarm[farmId]
+        if spent > 0 then
+            ctx.mission:addMoney(-spent, farmId, MoneyType.MEDICINE, true, true)
+            Log:debug("%s vaccine doses charged farmId=%s amount=%.2f", LOG_PREFIX, tostring(farmId), spent)
+        end
+    end
+
     return summary
 end
 
@@ -322,9 +345,9 @@ function RLHerdsmanExecutor._executeOne(action, ctx, summary, wageFarmOrder)
     -- and the action is dropped; chargeWage=true charges regardless of the dispatch outcome, because
     -- the wage is charged independently of dispatch. A guarded direct-mutation leg adds a 4th value
     -- (the count ACTUALLY mutated or marked) and a 5th (its own membership-skip count), both nil from
-    -- the unguarded legs. `extra` is the SCALING-FREE row channel: only the move EPP leg returns it,
-    -- a { movedCount, skippedAge, skippedSick } table merged onto the row without touching
-    -- actualCount, so its wage stays planned.
+    -- the unguarded legs. `extra` is the SCALING-FREE row channel: the move EPP leg returns a
+    -- { movedCount, skippedAge, skippedSick } table and the vaccinate leg an { amountSpent } one,
+    -- merged onto the row without touching actualCount, so its wage stays planned.
     local op = action.operation
     local chargeWage, dispatched, skipReason, actualCount, skippedCount, extra
     if op == "sell" then
@@ -341,6 +364,8 @@ function RLHerdsmanExecutor._executeOne(action, ctx, summary, wageFarmOrder)
         chargeWage, dispatched, skipReason, actualCount, skippedCount, extra = RLHerdsmanExecutor._doMove(action, ctx, placeable, farmId, count)
     elseif op == "horseCare" then
         chargeWage, dispatched, skipReason, actualCount, skippedCount = RLHerdsmanExecutor._doHorseCare(action, ctx, placeable, farmId, count)
+    elseif op == "vaccinate" then
+        chargeWage, dispatched, skipReason, actualCount, skippedCount, extra = RLHerdsmanExecutor._doVaccinate(action, ctx, placeable, farmId, count)
     else
         chargeWage, dispatched, skipReason = false, false, "bad-data"
         Log:warning("%s rule=%s husbandry=%s farm=%s: unknown operation '%s' - skipped (no wage)",
@@ -360,10 +385,14 @@ function RLHerdsmanExecutor._executeOne(action, ctx, summary, wageFarmOrder)
     -- movedCount = animals dispatched to the butcher, falling back to count for husbandry rows;
     -- skippedAge / skippedSick = animals filtered out for age / for showing symptoms. Husbandry-move
     -- and non-move rows carry no extra.
+    -- amountSpent = the vaccinate leg's dose total, charged once per farm by executeActions.
     if type(extra) == "table" then
         result.movedCount = extra.movedCount
         result.skippedAge = extra.skippedAge
         result.skippedSick = extra.skippedSick
+        if extra.amountSpent ~= nil then
+            result.amountSpent = extra.amountSpent
+        end
     end
 
     if chargeWage then
@@ -676,6 +705,87 @@ function RLHerdsmanExecutor._doHorseCare(action, ctx, placeable, farmId, count)
     Log:debug("%s rule=%s op=horseCare husbandry=%s farm=%s: armed deferred care for %d horse(s) (%d skipped at membership)",
         LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), actual, skipped)
     return true, true, nil, actual, skipped
+end
+
+--- Vaccinate: give every planned dose to each RESOLVED cluster member, inline. Each dose goes
+--- through DiseaseVaccinateEvent.apply - the player's own path - so the record write and the dirty
+--- flag that syncs it through the pen's flush are the dialog's, never a copy. The charge is deferred:
+--- the leg returns the dose total as `extra.amountSpent` and executeActions charges it once per farm.
+--- apply is unguarded by contract, so the event's own refusal is re-run here per dose: diseases may
+--- have been switched off, or the animal died, since the plan.
+---
+--- Not deferred like horse care: a dose is due a month before protection runs out, so whether the
+--- pen's disease tick runs before or after this one cannot leave an animal unprotected.
+---@param action table the vaccinate action (animals + titles + ruleId / husbandryId)
+---@param ctx table dispatch context (ctx.diseaseManager resolves each title)
+---@param placeable table husbandry placeable owning the animals' cluster system
+---@param farmId number owning farm (wage attribution + log context)
+---@param count number planned animal count (the wage scales actual/planned against it)
+---@return boolean chargeWage
+---@return boolean dispatched
+---@return string|nil skipReason
+---@return number|nil actualCount nil on a bad-data fail-closed; count of animals given a dose otherwise
+---@return number|nil skippedCount membership-skip count (nil when actualCount is nil)
+---@return table|nil extra { amountSpent } when at least one dose was given
+function RLHerdsmanExecutor._doVaccinate(action, ctx, placeable, farmId, count)
+    if type(action.titles) ~= "table" then
+        Log:warning("%s rule=%s op=vaccinate husbandry=%s farm=%s: no titles table - skipped (no wage)",
+            LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId))
+        return false, false, "bad-data"
+    end
+
+    local clusterAnimals = resolveClusterAnimals(placeable)
+    if clusterAnimals == nil then
+        Log:warning("%s rule=%s op=vaccinate husbandry=%s farm=%s: cluster unavailable (getClusterSystem) - whole action skipped (no wage)",
+            LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId))
+        return false, false, "bad-data"
+    end
+
+    local diseaseManager = ctx.diseaseManager
+    local actual, skipped, doses, spent = 0, 0, 0, 0
+    for i, probe in ipairs(action.animals) do
+        local animal = resolveMember(clusterAnimals, probe, action, farmId)
+        if animal == nil then
+            skipped = skipped + 1
+        else
+            local given = 0
+            for _, title in ipairs(action.titles[i] or {}) do
+                local model = diseaseManager:getDiseaseByTitle(title)
+                local refused = nil
+                if not diseaseManager.diseasesEnabled then
+                    refused = "DISEASES_OFF"
+                elseif model == nil then
+                    refused = "UNKNOWN_TITLE"
+                else
+                    local _, reason = RLDiseaseVaccination.check(animal, model)
+                    refused = reason
+                end
+
+                if refused ~= nil then
+                    Log:warning("%s rule=%s op=vaccinate husbandry=%s farm=%s uniqueId=%s title=%s: refused at execute (%s) - dose skipped",
+                        LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId),
+                        tostring(animal.uniqueId), tostring(title), refused)
+                elseif DiseaseVaccinateEvent.apply(placeable, animal, model, true) then
+                    given = given + 1
+                    spent = spent + model.vaccine.cost
+                end
+            end
+            if given > 0 then
+                actual = actual + 1
+                doses = doses + given
+            end
+        end
+    end
+
+    Log:debug("%s rule=%s op=vaccinate husbandry=%s farm=%s: vaccinated=%d doses=%d spent=%.2f skipped=%d of %d planned",
+        LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), actual, doses, spent,
+        skipped, count)
+
+    -- Nothing dosed - every animal left the pen, or every dose was refused: the wage scales to 0.
+    if actual == 0 then
+        return true, false, "not-in-husbandry", 0, skipped
+    end
+    return true, true, nil, actual, skipped, { amountSpent = spent }
 end
 
 --- Naming: alphabetical writes the planner-assigned names and advances the server-only cursor via

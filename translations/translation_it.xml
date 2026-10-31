@@ -620,6 +620,8 @@
         <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
+        <text name="rl_message_aiManager_vaccinated_single" text="Il mandriano ha vaccinato 1 animale per %s"/>
+        <text name="rl_message_aiManager_vaccinated_multiple" text="Il mandriano ha vaccinato %s animali per %s"/>
 
         <!-- Daily summary messages -->
         <text name="rl_message_dailyBirthsSummary" text="%s animali sono nati presso %s"/>
@@ -636,6 +638,7 @@
         <text name="rl_message_dailyMovesSummary" text="Spostati %s animali da %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="Segnati %s animali per lo spostamento da %s"/>
         <text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
+        <text name="rl_message_dailyVaccinationsSummary" text="Vaccinati %s animali presso %s per %s"/>
 
         <!-- DEATHS -->
 
@@ -750,6 +753,7 @@
         <text name="rl_menu_herdsman_budgetPercentage_tooltip" text="The herdsman spends up to %s of your farm's money per day, in each selected husbandry."/>
         <text name="rl_menu_herdsman_destination_tooltip" text="The husbandry the herdsman moves matching animals into."/>
         <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Whether the herdsman runs this horse care task each day."/>
+        <text name="rl_menu_herdsman_enabled_vaccinate_tooltip" text="Se il mandriano esegue questa attività di vaccinazione ogni giorno."/>
         <text name="rl_menu_herdsman_enabled_move_tooltip" text="Whether the herdsman runs this move task each day."/>
         <text name="rl_menu_herdsman_empty" text="Ancora nessuna regola del mandriano"/>
         <text name="rl_menu_herdsman_empty_editor" text="Seleziona una regola da modificare"/>
@@ -759,6 +763,7 @@
         <text name="rl_menu_herdsman_section_naming" text="Denominazione"/>
         <text name="rl_menu_herdsman_section_ai" text="Inseminazione artificiale"/>
         <text name="rl_menu_herdsman_section_horsecare" text="Horse Care"/>
+        <text name="rl_menu_herdsman_section_vaccinate" text="Vaccinazione"/>
         <text name="rl_menu_herdsman_detail_operation" text="Operazione"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Attivato"/>
         <text name="rl_menu_herdsman_detail_convention" text="Convenzione di denominazione"/>

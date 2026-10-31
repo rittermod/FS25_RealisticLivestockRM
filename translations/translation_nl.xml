@@ -608,6 +608,8 @@
         <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Veehoeder verzorgde 1 paard"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Veehoeder verzorgde %s paarden"/>
+        <text name="rl_message_aiManager_vaccinated_single" text="Veehoeder vaccineerde 1 dier voor %s"/>
+        <text name="rl_message_aiManager_vaccinated_multiple" text="Veehoeder vaccineerde %s dieren voor %s"/>
 
 
 
@@ -646,6 +648,7 @@
         <text name="rl_message_dailyMovesSummary" text="%s dieren verplaatst vanaf %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="%s dieren gemarkeerd om te verplaatsen vanaf %s"/>
         <text name="rl_message_dailyHorseCareSummary" text="%s paarden verzorgd bij %s"/>
+        <text name="rl_message_dailyVaccinationsSummary" text="%s dieren gevaccineerd bij %s voor %s"/>
         <text name="rl_message_dailySalesSummary" text="%s dieren verkocht bij %s voor %s"/>
         <text name="rl_settings_accidentsChance_tooltip_github" text="Verander de kans dat dieren sterven door willekeurige ongevallen"/>
         <text name="rl_settings_deathEnabled_label_github" text="Sterfte"/>
@@ -756,6 +759,7 @@
         <text name="rl_menu_herdsman_budgetPercentage_tooltip" text="De veehoeder besteedt tot %s van het geld van je bedrijf per dag, in elk geselecteerd bedrijf."/>
         <text name="rl_menu_herdsman_destination_tooltip" text="Het bedrijf waar de veehoeder bijpassende dieren naartoe verplaatst."/>
         <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Of de veehoeder deze verzorgingstaak voor paarden elke dag uitvoert."/>
+        <text name="rl_menu_herdsman_enabled_vaccinate_tooltip" text="Of de veehoeder deze vaccinatietaak elke dag uitvoert."/>
         <text name="rl_menu_herdsman_enabled_move_tooltip" text="Of de veehoeder deze verplaatsingstaak elke dag uitvoert."/>
         <text name="rl_menu_herdsman_empty" text="No herdsman tasks yet"/>
         <text name="rl_menu_herdsman_empty_editor" text="Select a task to edit"/>
@@ -765,6 +769,7 @@
         <text name="rl_menu_herdsman_section_naming" text="Naamgeving"/>
         <text name="rl_menu_herdsman_section_ai" text="Kunstmatige inseminatie"/>
         <text name="rl_menu_herdsman_section_horsecare" text="Paardenverzorging"/>
+        <text name="rl_menu_herdsman_section_vaccinate" text="Vaccinatie"/>
         <text name="rl_menu_herdsman_detail_operation" text="Task"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Ingeschakeld"/>
         <text name="rl_menu_herdsman_detail_convention" text="Naamgevingsconventie"/>

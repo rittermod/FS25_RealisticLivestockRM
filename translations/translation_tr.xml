@@ -647,6 +647,8 @@
         <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
+        <text name="rl_message_aiManager_vaccinated_single" text="Çoban 1 hayvanı %s karşılığında aşıladı"/>
+        <text name="rl_message_aiManager_vaccinated_multiple" text="Çoban %s hayvanı %s karşılığında aşıladı"/>
 
         <!-- Daily summary messages -->
         <text name="rl_message_dailyBirthsSummary" text="%s hayvan doğdu: %s"/>
@@ -800,6 +802,7 @@
         <text name="rl_menu_herdsman_budgetPercentage_tooltip" text="The herdsman spends up to %s of your farm's money per day, in each selected husbandry."/>
         <text name="rl_menu_herdsman_destination_tooltip" text="The husbandry the herdsman moves matching animals into."/>
         <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Whether the herdsman runs this horse care task each day."/>
+        <text name="rl_menu_herdsman_enabled_vaccinate_tooltip" text="Çobanın bu aşılama görevini her gün yapıp yapmayacağı."/>
         <text name="rl_menu_herdsman_enabled_move_tooltip" text="Whether the herdsman runs this move task each day."/>
         <text name="rl_menu_herdsman_empty" text="No herdsman tasks yet"/>
         <text name="rl_menu_herdsman_empty_editor" text="Select a task to edit"/>
@@ -809,6 +812,7 @@
         <text name="rl_menu_herdsman_section_naming" text="Naming"/>
         <text name="rl_menu_herdsman_section_ai" text="Artificial Insemination"/>
         <text name="rl_menu_herdsman_section_horsecare" text="Horse Care"/>
+        <text name="rl_menu_herdsman_section_vaccinate" text="Aşılama"/>
         <text name="rl_menu_herdsman_detail_operation" text="Task"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Enabled"/>
         <text name="rl_menu_herdsman_detail_convention" text="Naming Convention"/>
@@ -884,6 +888,7 @@
         <text name="rl_message_dailyMovesSummary" text="Moved %s animals from %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="Marked %s animals for moving from %s"/>
         <text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
+        <text name="rl_message_dailyVaccinationsSummary" text="%s hayvan aşılandı (%s), toplam %s"/>
         <!-- Filter condition editor (English fallback) -->
         <text name="rl_menu_filters_add_condition" text="Add condition"/>
         <text name="rl_menu_filters_add_group_button" text="Add group"/>

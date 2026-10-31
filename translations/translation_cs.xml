@@ -622,6 +622,8 @@
         <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
+        <text name="rl_message_aiManager_vaccinated_single" text="牧工为1头动物接种了疫苗，花费%s"/>
+        <text name="rl_message_aiManager_vaccinated_multiple" text="牧工为%s头动物接种了疫苗，花费%s"/>
 
         <!-- Daily summary messages -->
         <text name="rl_message_dailyBirthsSummary" text="%s animals were born at %s"/>
@@ -638,6 +640,7 @@
         <text name="rl_message_dailyMovesSummary" text="Moved %s animals from %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="Marked %s animals for moving from %s"/>
         <text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
+        <text name="rl_message_dailyVaccinationsSummary" text="已为%s头动物接种疫苗，地点：%s，花费%s"/>
 
 
 
@@ -768,6 +771,7 @@
         <text name="rl_menu_herdsman_budgetPercentage_tooltip" text="The herdsman spends up to %s of your farm's money per day, in each selected husbandry."/>
         <text name="rl_menu_herdsman_destination_tooltip" text="The husbandry the herdsman moves matching animals into."/>
         <text name="rl_menu_herdsman_enabled_horseCare_tooltip" text="Whether the herdsman runs this horse care task each day."/>
+        <text name="rl_menu_herdsman_enabled_vaccinate_tooltip" text="牧工是否每天执行此疫苗接种任务。"/>
         <text name="rl_menu_herdsman_enabled_move_tooltip" text="Whether the herdsman runs this move task each day."/>
         <text name="rl_menu_herdsman_empty" text="No herdsman tasks yet"/>
         <text name="rl_menu_herdsman_empty_editor" text="Select a task to edit"/>
@@ -777,6 +781,7 @@
         <text name="rl_menu_herdsman_section_naming" text="Naming"/>
         <text name="rl_menu_herdsman_section_ai" text="Artificial Insemination"/>
         <text name="rl_menu_herdsman_section_horsecare" text="Horse Care"/>
+        <text name="rl_menu_herdsman_section_vaccinate" text="疫苗接种"/>
         <text name="rl_menu_herdsman_detail_operation" text="Task"/>
         <text name="rl_menu_herdsman_detail_enabled" text="Enabled"/>
         <text name="rl_menu_herdsman_detail_convention" text="Naming Convention"/>
