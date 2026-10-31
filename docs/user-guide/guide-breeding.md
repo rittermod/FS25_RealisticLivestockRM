@@ -38,7 +38,7 @@ For reproduction to occur, ALL of the following must be true:
 
 > **Critical insight:** Males retire from breeding much earlier than females in some species! Boars stop at 4 years while sows breed until 8. Rams stop at 6 years while ewes breed until 10. Plan male replacements early.
 
-> **Genetics matter:** These ages are when a male normally stops breeding. With a younger male in the pen, a high-fertility older male can still father young past his age. A male with poor fertility genetics stops fathering earlier: the female can still conceive while he is in the pen, but the young get no recorded father, average sire genetics and their mother's breed. Roosters are the exception: their 72-month limit is the same for every rooster, whatever his genetics.
+> **Genetics matter:** A pen needs a male under these ages to conceive, so females stop conceiving once every male is past his age. With a younger male in the pen, a high-fertility older male can still father young past his age. A male with poor fertility genetics stops fathering earlier: the female can still conceive while he is in the pen, but the young get no recorded father, average sire genetics and their mother's breed. Roosters are the exception: their 72-month limit is the same for every rooster, whatever his genetics.
 
 ---
 
