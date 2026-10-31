@@ -348,15 +348,14 @@
                              widgets the row template stays stable across
                              field-type swaps and future group rows. -->
                         <ListItem profile="rlMenu_filterConditionRow" name="defaultCell">
-                            <!-- Mirrors rl_moveDestName in
-                                 AnimalMoveDestinationDialog.xml: a top-left
-                                 anchored profile, so the explicit size holds.
-                                 Y=-10px puts the baseline 10px below the row
-                                 top, that dialog's -5px scaled to this 50px
-                                 row. populateCellForItemInSection shifts X
-                                 for the indent. -->
+                            <!-- Y=-10px puts the baseline 10px below the
+                                 row top. The profile sets the width from the
+                                 row, and a longer condition ends in the
+                                 engine's "..." at that width.
+                                 populateCellForItemInSection shifts X for the
+                                 indent. -->
                             <Text profile="rl_filterConditionText" name="conditionText"
-                                  position="20px -10px" size="800px 28px"/>
+                                  position="20px -10px"/>
                         </ListItem>
                     </SmoothList>
 
