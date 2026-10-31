@@ -1,6 +1,6 @@
 # Herdsman Automation
 
-The Herdsman handles your routine herd chores automatically, once a day. You set up **tasks** - each task does one job (sell, move, buy, castrate, name, inseminate, or look after your horses) to the animals a [saved filter](guide-saved-filters.md) picks out, in the pens you choose. Set your tasks once and the Herdsman keeps your herd in shape while you get on with farming.
+The Herdsman handles your routine herd chores automatically, once a day. You set up **tasks** - each task does one job (sell, move, buy, castrate, name, inseminate, look after your horses, or vaccinate) to the animals a [saved filter](guide-saved-filters.md) picks out, in the pens you choose. Set your tasks once and the Herdsman keeps your herd in shape while you get on with farming.
 
 > **Note:** This documentation was generated with AI assistance and may contain inaccuracies. If you spot an error, please [open an issue](https://github.com/rittermod/FS25_RealisticLivestockRM/issues).
 
@@ -24,16 +24,16 @@ In multiplayer you need the **trade animals** farm permission to create or edit 
 
 Every task has four parts:
 
-- **Operation** (labeled **Task** in the menu) - the single job it does: Sell, Move, Buy, Castrate, Naming, Artificial Insemination, or Horse Care.
+- **Operation** (labeled **Task** in the menu) - the single job it does: Sell, Move, Buy, Castrate, Naming, Artificial Insemination, Horse Care, or Vaccination.
 - **Filter** - a [saved filter](guide-saved-filters.md) that decides which animals qualify. (Naming tasks don't need one.)
 - **Pens** - which of your husbandries the task looks at. A task with **no pens does nothing** - it never falls back to "all pens".
-- **Settings** - the options for that operation (how many animals per day, a buy budget, a semen source, and so on), plus an on/off switch. Some operations have no options of their own - Horse Care just needs a filter and its pens - so this section only shows the on/off switch. The daily limit and the buy budget apply to each selected pen separately, not to the task as a whole: a Sell task limited to 5 animals a day on three pens can sell 15.
+- **Settings** - the options for that operation (how many animals per day, a buy budget, a semen source, and so on), plus an on/off switch. Some operations have no options of their own - Horse Care and Vaccination just need a filter and their pens - so this section only shows the on/off switch. The daily limit and the buy budget apply to each selected pen separately, not to the task as a whole: a Sell task limited to 5 animals a day on three pens can sell 15.
 
 Each day the Herdsman runs tasks in a **fixed order**:
 
-**Sell -> Move -> Buy -> Castrate -> Naming -> Artificial Insemination -> Horse Care**
+**Sell -> Move -> Buy -> Castrate -> Naming -> Artificial Insemination -> Horse Care -> Vaccination**
 
-So selling happens before buying - a "sell old cows, then buy young ones" pair does the sensible thing within a single day.
+So selling happens before buying - a "sell old cows, then buy young ones" pair does the sensible thing within a single day. Vaccination runs last, so animals sold that day are never vaccinated and animals bought that day are.
 
 ---
 
@@ -46,6 +46,7 @@ So selling happens before buying - a "sell old cows, then buy young ones" pair d
 - **Naming** - gives unnamed animals names, either at random or alphabetically. No filter needed.
 - **Artificial Insemination** - inseminates matching females using stored semen (from a source you choose, or any available).
 - **Horse Care** - exercises and grooms matching horses every day, so their Daily Riding and Cleanliness stay up and they hold their sale value. Only available for horse pens.
+- **Vaccination** - gives matching animals every vaccine they are due, the same doses you can give from the Diseases dialog. An animal is due when it has no protection, or when a month or less of protection is left, so it never goes unprotected. It skips animals the disease can't reach yet - too young for it, or for mastitis, a female that is neither pregnant nor in milk - and animals visibly sick with that disease; an animal about to come of age is dosed a month ahead. Each dose costs what it costs in the Diseases dialog, on top of the wage, but the day's doses are charged as one medicine expense and reported as one message per pen with the number of animals and the total. Only available for cattle, sheep, pig and alpaca pens.
 
 Sell, Move, Castrate and Artificial Insemination tasks have an **Action** setting. **Perform** carries out the job. **Mark only** just flags the animals it would have picked, at a reduced wage, so you can check them and act yourself: nothing is sold, moved, castrated or inseminated, and each flagged animal's row shows a note such as *Herdsman marked for selling*. The marks are refreshed each day.
 
@@ -79,6 +80,7 @@ You can **Duplicate** a task as a starting point for another, or **Delete** one 
 - **Horse Care needs a filter like any other task.** Only Naming works without one, so a Horse Care task with no filter selected can't stay switched on. A filter that simply matches every horse is a perfectly good starting point.
 - **Horse Care bills every horse, every day.** The wage is per horse per day and there is no cap and no upper limit on herd size, so a large stable keeps paying for as long as the task is enabled - and it keeps paying whether or not you ever sell the horse. The payoff comes when you sell, so it suits a stable you trade from rather than one you only breed in. We recommend selling a horse manually after a full riding session to sell at the highest possible price - selling automatically via the Herdsman forgoes the riding share of the care bonus for that day, though the fitness and cleanliness built up by earlier care still count.
 - **The game's own animal worker also rides and grooms horses.** Hire it on the Animals page with Manage Animal Workers. On a pen Horse Care already looks after, it usually finds nothing left to do and charges nothing; a horse you rode that day gets dirty again, and the worker grooms and bills it.
+- **Vaccination's first day is the expensive one.** A new Vaccination task doses every due animal in its pens at once; after that it only doses an animal when its protection is about to run out, every six or twelve months depending on the vaccine. A filter that matches every animal of the pen's type is a good starting point. Nothing is vaccinated while diseases are switched off in the settings.
 
 ---
 
