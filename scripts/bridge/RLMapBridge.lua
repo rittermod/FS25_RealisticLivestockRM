@@ -68,8 +68,8 @@ RLMapBridge.maxFertilityAgeByGroup = {}
 --- Four-step algorithm:
 ---   1. Exact match: mapVersion is in a config's supportedVersions list -> "confirmed"
 ---   2. Version spec: supportedVersions entries starting with ><=! are evaluated as specifiers -> "confirmed"
----   3. Closest lower: highest config whose max confirmed version <= mapVersion -> "unknown"
----   4. Lowest overall: if nothing <= mapVersion, use the config with the lowest min version -> "unknown"
+---   3. Closest lower: config holding the highest version <= mapVersion, specifier operands included -> "unknown"
+---   4. Lowest overall: if nothing <= mapVersion, use the config with the lowest version -> "unknown"
 --- Nil mapVersion is treated as oldest possible (goes to step 4).
 --- @param mapVersion string|nil Detected map version string (e.g. "1.3.0.1")
 --- @param configs table Array of config tables from loadBridgeXml, each with:
@@ -84,34 +84,38 @@ function RLMapBridge.resolveVersionConfig(mapVersion, configs)
     local mapParsed = RLVersionSpec.parseVersion(mapVersion)
     Log:trace("MapBridge: resolveVersionConfig: mapVersion=%s, %d config(s)", tostring(mapVersion), #configs)
 
-    -- Pre-parse all config version objects and track min/max per config
-    -- minVersion/maxVersion are full { tuple, suffix } objects for suffix-aware ordering
+    -- Pre-parse all config version objects and track each config's known versions and minimum
+    -- Known versions are full { tuple, suffix } objects for suffix-aware ordering
     -- Version entries starting with ><=! are treated as version specifiers (range checks),
-    -- all others are exact version strings (for string matching and min/max fallback).
+    -- all others are exact version strings (for string matching). Both kinds feed the known
+    -- versions, so a config listing only specifiers still takes part in steps 3 and 4.
     local configData = {}
     for _, config in ipairs(configs) do
         local parsedVersions = {}
         local versionSpecs = {}
+        local knownVersions = {}
         local minVersion = nil
-        local maxVersion = nil
 
         for _, verStr in ipairs(config.supportedVersions) do
             if verStr:match("^[><=!]") then
                 -- Version specifier (e.g. ">=1.3.0.1,<1.4.0.0")
                 table.insert(versionSpecs, verStr)
+                for _, parsed in ipairs(RLVersionSpec.getSupportedVersions(verStr)) do
+                    table.insert(knownVersions, parsed)
+                end
             else
                 -- Exact version string (e.g. "1.3.0.1", "1.4.0.0 Beta1")
                 local parsed = RLVersionSpec.parseVersion(verStr)
                 if parsed ~= nil then
                     table.insert(parsedVersions, { str = verStr, parsed = parsed })
-
-                    if minVersion == nil or RLVersionSpec.compareVersions(parsed, minVersion) < 0 then
-                        minVersion = parsed
-                    end
-                    if maxVersion == nil or RLVersionSpec.compareVersions(parsed, maxVersion) > 0 then
-                        maxVersion = parsed
-                    end
+                    table.insert(knownVersions, parsed)
                 end
+            end
+        end
+
+        for _, known in ipairs(knownVersions) do
+            if minVersion == nil or RLVersionSpec.compareVersions(known, minVersion) < 0 then
+                minVersion = known
             end
         end
 
@@ -119,15 +123,13 @@ function RLMapBridge.resolveVersionConfig(mapVersion, configs)
             config = config,
             parsedVersions = parsedVersions,
             versionSpecs = versionSpecs,
-            minVersion = minVersion,
-            maxVersion = maxVersion
+            knownVersions = knownVersions,
+            minVersion = minVersion
         })
     end
 
     -- Step 1: Exact match using raw version strings (not parsed tuples)
-    -- Exact matches take priority over range specs - a pre-release version explicitly listed
-    -- in a config (e.g. "1.4.0.0 Beta1") should resolve there, not get caught by another
-    -- config's range (e.g. ">=1.3.0.1,<1.4.0.0" would match Beta1 since Beta < release).
+    -- Exact matches take priority over range specs.
     if mapVersion ~= nil then
         for _, cd in ipairs(configData) do
             for _, pv in ipairs(cd.parsedVersions) do
@@ -151,16 +153,18 @@ function RLMapBridge.resolveVersionConfig(mapVersion, configs)
         end
     end
 
-    -- Step 3: Highest config whose max confirmed version <= mapVersion
+    -- Step 3: The config holding the highest known version <= mapVersion
     if mapParsed ~= nil then
         local bestConfig = nil
-        local bestMaxVersion = nil
+        local bestVersion = nil
 
         for _, cd in ipairs(configData) do
-            if cd.maxVersion ~= nil and RLVersionSpec.compareVersions(cd.maxVersion, mapParsed) <= 0 then
-                if bestMaxVersion == nil or RLVersionSpec.compareVersions(cd.maxVersion, bestMaxVersion) > 0 then
-                    bestConfig = cd
-                    bestMaxVersion = cd.maxVersion
+            for _, known in ipairs(cd.knownVersions) do
+                if RLVersionSpec.compareVersions(known, mapParsed) <= 0 then
+                    if bestVersion == nil or RLVersionSpec.compareVersions(known, bestVersion) > 0 then
+                        bestConfig = cd
+                        bestVersion = known
+                    end
                 end
             end
         end
