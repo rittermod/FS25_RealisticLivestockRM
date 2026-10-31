@@ -245,6 +245,9 @@ RLConstants.MAX_LIFESPAN_MONTHS_BY_TYPE = {
 -- Health lost per hour by an unfed animal whose subtype XML sets no health#decreasePerHour.
 RLConstants.HEALTH_DECREASE_PER_HOUR = 8
 
+-- Share of the animal's normal weight for its age at which starvation stops taking weight.
+RLConstants.STARVATION_WEIGHT_FLOOR_FACTOR = 0.5
+
 
 -- Severity vocabulary. Definition-only data on the message rows: never saved, never streamed,
 -- so changing a message's severity is not a savegame or wire change. The Diseases dialog

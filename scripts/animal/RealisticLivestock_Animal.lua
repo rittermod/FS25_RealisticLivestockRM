@@ -1277,8 +1277,9 @@ function Animal:updateWeight(foodFactor)
     local weight = self.weight
     local metabolism = self.genetics.metabolism
     local adultMonth = subType.reproductionMinAgeMonth * 1.5
+    local daysPerPeriod = g_currentMission.environment.daysPerPeriod
 
-    local baseIncrease = ((targetWeight - minWeight) / adultMonth) / (24 * g_currentMission.environment.daysPerPeriod)
+    local baseIncrease = ((targetWeight - minWeight) / adultMonth) / (24 * daysPerPeriod)
     local increase = baseIncrease * (self.gender == "female" and 0.6 or 1.0) * (1 + ((adultMonth - self.age) / 75)) *
     math.min(foodFactor * 1.25, 1)
 
@@ -1313,17 +1314,28 @@ function Animal:updateWeight(foodFactor)
     end
 
     local decrease = 0
-    if weight > targetWeight then decrease = (weight - targetWeight) / (metabolism * 25) end
+    if weight > targetWeight then decrease = (weight - targetWeight) / (metabolism * 25 * daysPerPeriod) end
 
     if foodFactor == 0 then
-        Log:trace("updateWeight: animal=%s/%s starving, weight=%s targetWeight=%s",
-            tostring(self.farmId), tostring(self.uniqueId), tostring(weight), tostring(targetWeight))
-
-        if weight < targetWeight then
-            decrease = (targetWeight - weight) / ((1 - (metabolism - 1)) * 150)
-        elseif weight > targetWeight then
-            decrease = decrease + ((weight - targetWeight) / ((1 - (metabolism - 1)) * 150))
+        local weightForAge = minWeight +
+            ((targetWeight - minWeight) / adultMonth) * math.clamp(self.age, 0, adultMonth)
+        local starvationFloor = weightForAge * RLConstants.STARVATION_WEIGHT_FLOOR_FACTOR
+        local starvationLoss = baseIncrease * metabolism
+        local headroom = math.max(weight - starvationFloor, 0)
+        local outcome = "full"
+        if headroom <= 0 then
+            outcome = "under-floor"
+        elseif headroom < starvationLoss then
+            outcome = "capped"
         end
+
+        Log:trace("updateWeight: animal=%s/%s/%s typeIndex=%s starving (%s), weight=%s targetWeight=%s"
+            .. " loss=%s floor=%s",
+            tostring(self.farmId), tostring(self.uniqueId), tostring(self.birthday.country),
+            tostring(self.animalTypeIndex), outcome, tostring(weight), tostring(targetWeight),
+            tostring(starvationLoss), tostring(starvationFloor))
+
+        decrease = decrease + math.min(starvationLoss, headroom)
     end
 
     self.weight = math.max(self.weight + increase - decrease, 0.001)
