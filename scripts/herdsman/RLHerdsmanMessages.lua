@@ -73,6 +73,13 @@ local ID_FAMILY = {
         exec = { single = "AI_MANAGER_HORSE_CARE_SINGLE", multiple = "AI_MANAGER_HORSE_CARE_MULTIPLE" },
         mark = nil,
     },
+    vaccinate = {
+        -- A money family like buy: the count is animals given at least one dose, the amount the
+        -- doses' total, which the executor charges once per farm - so the player reads one line per
+        -- pen instead of one money change per dose. The wage is the executor's and is not here.
+        exec = { single = "AI_MANAGER_VACCINATED_SINGLE", multiple = "AI_MANAGER_VACCINATED_MULTIPLE", amountField = "amountSpent" },
+        mark = nil,
+    },
 }
 
 -- =============================================================================
@@ -118,7 +125,7 @@ RLHerdsmanMessages.ID_FAMILY       = ID_FAMILY
 ---   4. elseif dispatched == true -> the EXEC id family
 ---   5. else                      -> genuine skip (no record)
 --- then count-normalize: n = tonumber(movedCount or count); nil/non-number or n < 1 -> skip;
---- floor(n) == 1 -> _SINGLE else _MULTIPLE. Args: sell/buy exec carry money (SINGLE {money},
+--- floor(n) == 1 -> _SINGLE else _MULTIPLE. Args: sell/buy/vaccinate exec carry money (SINGLE {money},
 --- MULTIPLE {count,money}) and the raw `amount` that money formats; all others SINGLE {}, MULTIPLE
 --- {count} and no amount; the count arg is a STRING while record.count stays numeric.
 ---

@@ -651,6 +651,8 @@
         <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
+        <text name="rl_message_aiManager_vaccinated_single" text="L'éleveur a vacciné 1 animal pour %s"/>
+        <text name="rl_message_aiManager_vaccinated_multiple" text="L'éleveur a vacciné %s animaux pour %s"/>
 
         <!-- Messages de résumé quotidien -->
         <text name="rl_message_dailyBirthsSummary" text="%s animaux sont nés à %s"/>
@@ -667,6 +669,7 @@
         <text name="rl_message_dailyMovesSummary" text="%s animaux déplacés depuis %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="%s animaux marqués pour déplacement depuis %s"/>
         <text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
+        <text name="rl_message_dailyVaccinationsSummary" text="%s animaux vaccinés à %s pour %s"/>
 
 
 

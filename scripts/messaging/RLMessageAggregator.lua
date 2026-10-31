@@ -47,7 +47,10 @@ RLMessageAggregator.AGGREGATABLE = {
     AI_MANAGER_MARK_MOVE_MULTIPLE = "markMoves",
     -- Horse care (count-only, net-new, perform-only - no mark family exists for it).
     AI_MANAGER_HORSE_CARE_SINGLE = "horseCares",
-    AI_MANAGER_HORSE_CARE_MULTIPLE = "horseCares"
+    AI_MANAGER_HORSE_CARE_MULTIPLE = "horseCares",
+    -- Vaccination (money, like purchases: the dose total; perform-only - no mark family).
+    AI_MANAGER_VACCINATED_SINGLE = "vaccinations",
+    AI_MANAGER_VACCINATED_MULTIPLE = "vaccinations"
 }
 
 -- The count-only herdsman summary categories in their FIXED emission order (decision 1b):
@@ -188,7 +191,9 @@ local function queue(husbandry, id, animal, args, date, amount)
             markInseminations = { count = 0 },
             moves = { count = 0 },
             markMoves = { count = 0 },
-            horseCares = { count = 0 }
+            horseCares = { count = 0 },
+            -- Herdsman vaccination: a money bucket like purchases, not a count-only one above.
+            vaccinations = { count = 0, totalValue = 0 }
         }
         RLMessageAggregator.pending[husbandry] = pending
     end
@@ -237,6 +242,17 @@ local function queue(husbandry, id, animal, args, date, amount)
         pending.purchases.count = pending.purchases.count + count
         pending.purchases.totalValue = pending.purchases.totalValue + value
         traceMoney(id, category, value, pending.purchases)
+
+    elseif category == "vaccinations" then
+        local count = 1
+        if id == "AI_MANAGER_VACCINATED_MULTIPLE" then
+            count = (args ~= nil and tonumber(args[1])) or 1
+        end
+        local value = moneyValue(husbandry, id, amount)
+
+        pending.vaccinations.count = pending.vaccinations.count + count
+        pending.vaccinations.totalValue = pending.vaccinations.totalValue + value
+        traceMoney(id, category, value, pending.vaccinations)
 
     elseif RLMessageAggregator.HERDSMAN_SUMMARY_CATEGORY_SET[category] then
         -- Herdsman count-only categories: the _MULTIPLE ids carry the count in args[1], the _SINGLE
@@ -332,6 +348,10 @@ function RLMessageAggregator.consolidateDay()
 
                 if pending.purchases.count > 0 then
                     emitMoneySummary(husbandry, husbandryName, "DAILY_PURCHASES_SUMMARY", pending.purchases)
+                end
+
+                if pending.vaccinations.count > 0 then
+                    emitMoneySummary(husbandry, husbandryName, "DAILY_VACCINATIONS_SUMMARY", pending.vaccinations)
                 end
 
                 -- Herdsman count-only summaries: one DAILY_*_SUMMARY per non-empty bucket, args

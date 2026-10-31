@@ -635,6 +635,8 @@
         <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Djurvaktaren hoppade över %s djur (sjuka djur kan inte gå till slakteriet)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Djurvaktaren sköt om 1 häst"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Djurvaktaren sköt om %s hästar"/>
+        <text name="rl_message_aiManager_vaccinated_single" text="Djurvaktaren vaccinerade 1 djur för %s"/>
+        <text name="rl_message_aiManager_vaccinated_multiple" text="Djurvaktaren vaccinerade %s djur för %s"/>
 
         <!-- Daily summary messages -->
         <text name="rl_message_dailyBirthsSummary" text="%s djur föddes i %s"/>
@@ -651,6 +653,7 @@
         <text name="rl_message_dailyMovesSummary" text="Flyttade %s djur från %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="Markerade %s djur för flytt från %s"/>
         <text name="rl_message_dailyHorseCareSummary" text="Sköt om %s hästar i %s"/>
+        <text name="rl_message_dailyVaccinationsSummary" text="Vaccinerade %s djur i %s för %s"/>
 
 
 

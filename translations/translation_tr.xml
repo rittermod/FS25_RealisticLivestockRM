@@ -647,6 +647,8 @@
         <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
+        <text name="rl_message_aiManager_vaccinated_single" text="Çoban 1 hayvanı %s karşılığında aşıladı"/>
+        <text name="rl_message_aiManager_vaccinated_multiple" text="Çoban %s hayvanı %s karşılığında aşıladı"/>
 
         <!-- Daily summary messages -->
         <text name="rl_message_dailyBirthsSummary" text="%s hayvan doğdu: %s"/>
@@ -886,6 +888,7 @@
         <text name="rl_message_dailyMovesSummary" text="Moved %s animals from %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="Marked %s animals for moving from %s"/>
         <text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
+        <text name="rl_message_dailyVaccinationsSummary" text="%s hayvan aşılandı (%s), toplam %s"/>
         <!-- Filter condition editor (English fallback) -->
         <text name="rl_menu_filters_add_condition" text="Add condition"/>
         <text name="rl_menu_filters_add_group_button" text="Add group"/>

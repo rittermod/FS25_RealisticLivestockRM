@@ -609,6 +609,8 @@
         <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Herdsman cared for 1 horse"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Herdsman cared for %s horses"/>
+        <text name="rl_message_aiManager_vaccinated_single" text="O tratador vacinou 1 animal por %s"/>
+        <text name="rl_message_aiManager_vaccinated_multiple" text="O tratador vacinou %s animais por %s"/>
 
 
 
@@ -647,6 +649,7 @@
         <text name="rl_message_dailyMovesSummary" text="Moved %s animals from %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="Marked %s animals for moving from %s"/>
         <text name="rl_message_dailyHorseCareSummary" text="Cared for %s horses at %s"/>
+        <text name="rl_message_dailyVaccinationsSummary" text="%s animais vacinados em %s por %s"/>
         <text name="rl_message_dailySalesSummary" text="Vendidos %s animais em %s por %s"/>
         <text name="rl_settings_accidentsChance_tooltip_github" text="Alterar a probabilidade de animais morrerem devido a acidentes aleatórios"/>
         <text name="rl_settings_deathEnabled_label_github" text="Morte de Animais"/>

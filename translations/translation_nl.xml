@@ -608,6 +608,8 @@
         <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Veehoeder verzorgde 1 paard"/>
         <text name="rl_message_aiManager_horseCare_multiple" text="Veehoeder verzorgde %s paarden"/>
+        <text name="rl_message_aiManager_vaccinated_single" text="Veehoeder vaccineerde 1 dier voor %s"/>
+        <text name="rl_message_aiManager_vaccinated_multiple" text="Veehoeder vaccineerde %s dieren voor %s"/>
 
 
 
@@ -646,6 +648,7 @@
         <text name="rl_message_dailyMovesSummary" text="%s dieren verplaatst vanaf %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="%s dieren gemarkeerd om te verplaatsen vanaf %s"/>
         <text name="rl_message_dailyHorseCareSummary" text="%s paarden verzorgd bij %s"/>
+        <text name="rl_message_dailyVaccinationsSummary" text="%s dieren gevaccineerd bij %s voor %s"/>
         <text name="rl_message_dailySalesSummary" text="%s dieren verkocht bij %s voor %s"/>
         <text name="rl_settings_accidentsChance_tooltip_github" text="Verander de kans dat dieren sterven door willekeurige ongevallen"/>
         <text name="rl_settings_deathEnabled_label_github" text="Sterfte"/>

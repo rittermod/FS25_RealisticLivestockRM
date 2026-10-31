@@ -650,6 +650,8 @@
         <text name="rl_message_aiManager_moveSkippedSick_multiple" text="Herdsman skipped %s animals (sick animals cannot go to the butcher)"/>
         <text name="rl_message_aiManager_horseCare_single" text="Pastýř se postaral o 1 koně" />
         <text name="rl_message_aiManager_horseCare_multiple" text="Pastýř se postaral o %s koní" />
+        <text name="rl_message_aiManager_vaccinated_single" text="Pastýř očkoval 1 zvíře za %s"/>
+        <text name="rl_message_aiManager_vaccinated_multiple" text="Pastýř očkoval %s zvířat za %s"/>
 
         <!-- Daily summary messages -->
         <text name="rl_message_dailyBirthsSummary" text="V %s se narodilo %s zvířat"/>
@@ -666,6 +668,7 @@
         <text name="rl_message_dailyMovesSummary" text="Přesunuto %s zvířat z objektu %s"/>
         <text name="rl_message_dailyMarkMoveSummary" text="Označeno %s zvířat k přesunu z objektu %s"/>
         <text name="rl_message_dailyHorseCareSummary" text="Ošetřeno %s koní v objektu %s"/>
+        <text name="rl_message_dailyVaccinationsSummary" text="Očkováno %s zvířat v objektu %s za %s"/>
 
 
 
