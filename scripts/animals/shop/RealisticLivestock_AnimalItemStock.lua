@@ -116,8 +116,10 @@ function RealisticLivestock_AnimalItemStock.new(animal)
 				value = string.format("%.2f", animal.targetWeight or 50) .. "kg"
 			})
 		
-			if animal.animalTypeIndex == AnimalType.COW and animal.gender == "female" and animal:getAge() >= subType.reproductionMinAgeMonth then
-		
+			local animalType = g_currentMission.animalSystem:getTypeByIndex(animal.animalTypeIndex)
+
+			if RLAnimalTypeSupport.canLactate(animalType.name, subType.name, animal.gender) and animal:getAge() >= subType.reproductionMinAgeMonth then
+
 				table.insert(self.infos, {
 					title = g_i18n:getText("rl_ui_lactating"),
 					value = animal.isLactating and yes or no
