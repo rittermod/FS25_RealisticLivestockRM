@@ -841,13 +841,18 @@ function Animal:showInfo(box)
                 (self.impregnatedBy ~= nil and self.impregnatedBy.uniqueId ~= "-1") and self.impregnatedBy.uniqueId or
                 g_i18n:getText("rl_ui_unknown")) end
     elseif self.gender ~= nil and self.gender == "male" and subType.reproductionMinAgeMonth ~= nil and self.age >= subType.reproductionMinAgeMonth then
-        local monotonicHour = g_currentMission.environment:getMonotonicHour()
-        if self.numImpregnatableAnimals == nil or (self.lastNumImpregnatableAnimalsUpdate ~= nil and monotonicHour >= self.lastNumImpregnatableAnimalsUpdate + 1) then
-            self.lastNumImpregnatableAnimalsUpdate = monotonicHour
-            self.numImpregnatableAnimals = self:getNumberOfImpregnatableFemalesForMale()
-        end
+        if self:getIsInfertile() then
+            Log:trace("Animal:showInfo: no impregnatable line for an infertile male (farmId=%s uniqueId=%s)",
+                tostring(self.farmId), tostring(self.uniqueId))
+        else
+            local monotonicHour = g_currentMission.environment:getMonotonicHour()
+            if self.numImpregnatableAnimals == nil or (self.lastNumImpregnatableAnimalsUpdate ~= nil and monotonicHour >= self.lastNumImpregnatableAnimalsUpdate + 1) then
+                self.lastNumImpregnatableAnimalsUpdate = monotonicHour
+                self.numImpregnatableAnimals = self:getNumberOfImpregnatableFemalesForMale()
+            end
 
-        box:addLine(g_i18n:getText("rl_ui_maleNumImpregnatable"), string.format("%s", self.numImpregnatableAnimals or 0))
+            box:addLine(g_i18n:getText("rl_ui_maleNumImpregnatable"), string.format("%s", self.numImpregnatableAnimals or 0))
+        end
     end
 
     box:addLine(g_i18n:getText("rl_ui_value"), g_i18n:formatMoney(self:getSellPrice(), 2, true, true))
@@ -1799,13 +1804,32 @@ end
 
 function Animal:getDailyRidingTime() return AnimalHorse.getDailyRidingTime(self) end
 
+--- Whether this animal has no usable fertility: a castrated male or a stored gene of 0.
+--- @return boolean isInfertile
+function Animal:getIsInfertile()
+    local fertility = RLGenetics.effectiveFertility(self.genetics, self.isCastrated)
+    return fertility ~= nil and fertility <= 0
+end
+
+--- How many females in this male's pen he could impregnate now; 0 for an infertile male.
+--- @return number count
 function Animal:getNumberOfImpregnatableFemalesForMale()
     if self.gender == "female" or self.clusterSystem == nil then return 0 end
+
+    if self:getIsInfertile() then
+        Log:trace("Animal:getNumberOfImpregnatableFemalesForMale: infertile, counts 0 (farmId=%s uniqueId=%s)",
+            tostring(self.farmId), tostring(self.uniqueId))
+        return 0
+    end
 
     local subType = self:getSubType()
     local animalType = self.animalTypeIndex
 
-    if (subType.reproductionMinAgeMonth ~= nil and subType.reproductionMinAgeMonth > self.age) or ((animalType == AnimalType.COW and self.age >= 132) or (animalType == AnimalType.SHEEP and self.age >= 72) or (animalType == AnimalType.HORSE and self.age >= 300) or (animalType == AnimalType.CHICKEN and self.age >= 72) or (animalType == AnimalType.PIG and self.age >= 48)) then return 0 end
+    if (subType.reproductionMinAgeMonth ~= nil and subType.reproductionMinAgeMonth > self.age) or ((animalType == AnimalType.COW and self.age >= 132) or (animalType == AnimalType.SHEEP and self.age >= 72) or (animalType == AnimalType.HORSE and self.age >= 300) or (animalType == AnimalType.CHICKEN and self.age >= 72) or (animalType == AnimalType.PIG and self.age >= 48)) then
+        Log:trace("Animal:getNumberOfImpregnatableFemalesForMale: out of breeding age (farmId=%s uniqueId=%s age=%s)",
+            tostring(self.farmId), tostring(self.uniqueId), tostring(self.age))
+        return 0
+    end
 
     local i = 0
     local id = self:getIdentifiers()

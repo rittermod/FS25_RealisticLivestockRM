@@ -130,11 +130,16 @@ function RealisticLivestock_AnimalItemStock.new(animal)
 		end
 
 		if animal.gender == "male" and animal:getAge() >= subType.reproductionMinAgeMonth then
-			
-			table.insert(self.infos, {
-				title = g_i18n:getText("rl_ui_maleNumImpregnatable"),
-				value = animal:getNumberOfImpregnatableFemalesForMale() or 0
-			})
+
+			if animal:getIsInfertile() then
+				Log:trace("AnimalItemStock.new: no impregnatable row for an infertile male (farmId=%s uniqueId=%s)",
+					tostring(animal.farmId), tostring(animal.uniqueId))
+			else
+				table.insert(self.infos, {
+					title = g_i18n:getText("rl_ui_maleNumImpregnatable"),
+					value = animal:getNumberOfImpregnatableFemalesForMale() or 0
+				})
+			end
 
 		end
 
