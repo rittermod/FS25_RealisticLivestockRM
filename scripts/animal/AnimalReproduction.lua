@@ -986,11 +986,14 @@ function AnimalReproduction.reproduce(animal, spec, day, month, year, isSaleAnim
     if not isSaleAnimal then
 
         local farmIndex = spec:getOwnerFarmId()
-        local animalTypeReal = animalSystem:getTypeByIndex(subType.typeIndex)
 
-        if animalTypeReal.statsBreedingName ~= nil then
+        if subType.statsBreedingName ~= nil then
             local stats = g_currentMission:farmStats(farmIndex)
-            stats:updateStats(animalTypeReal.statsBreedingName, childNum)
+            stats:updateStats(subType.statsBreedingName, childNum)
+            Log:debug("AnimalReproduction: farm stat %s +%d farmId=%s mother=%s subType=%s",
+                subType.statsBreedingName, childNum, tostring(farmIndex), tostring(animal.uniqueId), animal.subType)
+        else
+            Log:trace("AnimalReproduction: no farm stat for subType=%s", animal.subType)
         end
 
     end
