@@ -46,6 +46,8 @@ function RealisticLivestock_FillTypeManager.loadFillTypes(xmlFile, missionInfo, 
 
     local xml = loadXMLFile("fillTypes", modDir .. "xml/fillTypes.xml")
     g_fillTypeManager:loadFillTypes(xml, modDir , false, modName)
+    delete(xml)
+    Log:debug("FillTypeManager: loaded 'xml/fillTypes.xml'")
 
     RealisticLivestock_FillTypeManager.loadDlcBundleFillTypes()
 
