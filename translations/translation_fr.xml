@@ -102,13 +102,9 @@
         <text name="rl_dialog_title" text="Définir le nombre maximum d'animaux visibles"/>
 
         <text name="rl_ui_unhealthy" text="Trop malade"/>
-        <text name="rl_ui_unhealthyBracketed" text="Non (trop malade)"/>
         <text name="rl_ui_noMaleAnimal" text="Aucun mâle disponible"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="Non (aucun mâle disponible)"/>
-        <text name="rl_ui_recoveringLastBirth" text="En récupération après la dernière mise bas"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Non (en récupération après la mise bas)"/>
+        <text name="rl_ui_recoveringLastBirth" text="En récupération après la mise bas"/>
         <text name="rl_ui_tooYoung" text="Trop jeune"/>
-        <text name="rl_ui_tooYoungBracketed" text="Non (trop jeune)"/>
         <text name="rl_ui_pregnant" text="Gestante"/>
         <text name="rl_ui_lactating" text="En lactation"/>
         <text name="rl_ui_canReproduce" text="Peut se reproduire"/>

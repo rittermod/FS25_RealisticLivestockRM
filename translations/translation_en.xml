@@ -103,13 +103,9 @@
         <text name="rl_dialog_title" text="Set Maximum Number of Visual Animals"/>
 
         <text name="rl_ui_unhealthy" text="Too unhealthy"/>
-        <text name="rl_ui_unhealthyBracketed" text="No (too unhealthy)"/>
         <text name="rl_ui_noMaleAnimal" text="No suitable male animal"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="No (no suitable male animal)"/>
         <text name="rl_ui_recoveringLastBirth" text="Recovering from last birth"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="No (recovering from last birth)"/>
         <text name="rl_ui_tooYoung" text="Too young"/>
-        <text name="rl_ui_tooYoungBracketed" text="No (too young)"/>
         <text name="rl_ui_pregnant" text="Pregnant"/>
         <text name="rl_ui_lactating" text="Lactating"/>
         <text name="rl_ui_canReproduce" text="Can reproduce"/>

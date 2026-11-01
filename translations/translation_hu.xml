@@ -103,13 +103,9 @@
         <text name="rl_dialog_title" text="Látható állatok maximális számának beállítása"/>
 
         <text name="rl_ui_unhealthy" text="Túl beteg"/>
-        <text name="rl_ui_unhealthyBracketed" text="Nem (túl beteg)"/>
         <text name="rl_ui_noMaleAnimal" text="Nincs megfelelő hím állat"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="Nem (nincs megfelelő hím állat)"/>
         <text name="rl_ui_recoveringLastBirth" text="Ellés utáni lábadozás"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Nem (ellés utáni lábadozás)"/>
         <text name="rl_ui_tooYoung" text="Túl fiatal"/>
-        <text name="rl_ui_tooYoungBracketed" text="Nem (túl fiatal)"/>
         <text name="rl_ui_pregnant" text="Vemhes"/>
         <text name="rl_ui_lactating" text="Tejelő / Szoptat"/>
         <text name="rl_ui_canReproduce" text="Szaporodóképes"/>

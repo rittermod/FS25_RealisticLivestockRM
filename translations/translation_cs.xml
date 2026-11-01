@@ -96,13 +96,9 @@
         <text name="rl_dialog_title" text="设置最大可视动物数量"/>
 
         <text name="rl_ui_unhealthy" text="健康状况过差"/>
-        <text name="rl_ui_unhealthyBracketed" text="否（健康状况过差）"/>
         <text name="rl_ui_noMaleAnimal" text="无合适雄性动物"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="否（无合适雄性动物）"/>
         <text name="rl_ui_recoveringLastBirth" text="上次分娩后恢复中"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="否（上次分娩后恢复中）"/>
         <text name="rl_ui_tooYoung" text="过于年幼"/>
-        <text name="rl_ui_tooYoungBracketed" text="否（过于年幼）"/>
         <text name="rl_ui_pregnant" text="怀孕"/>
         <text name="rl_ui_lactating" text="哺乳期"/>
         <text name="rl_ui_canReproduce" text="可繁殖"/>

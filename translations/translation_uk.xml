@@ -85,14 +85,10 @@
         <text name="rl_button_cancel" text="Скасувати"/>
         <text name="rl_button_random" text="Випадково"/>
         <text name="rl_dialog_title" text="Встановити максимальну кількість видимих тварин"/>
-        <text name="rl_ui_unhealthy" text="Надто поганий стан здоров’я"/>
-        <text name="rl_ui_unhealthyBracketed" text="Ні (поганий стан здоров’я)"/>
+        <text name="rl_ui_unhealthy" text="Поганий стан здоров’я"/>
         <text name="rl_ui_noMaleAnimal" text="Немає відповідного самця"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="Ні (немає відповідного самця)"/>
         <text name="rl_ui_recoveringLastBirth" text="Відновлення після пологів"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Ні (відновлення після пологів)"/>
         <text name="rl_ui_tooYoung" text="Занадто молодий"/>
-        <text name="rl_ui_tooYoungBracketed" text="Ні (занадто молодий)"/>
         <text name="rl_ui_pregnant" text="Вагітна"/>
         <text name="rl_ui_lactating" text="Лактація"/>
         <text name="rl_ui_canReproduce" text="Може розмножуватись"/>

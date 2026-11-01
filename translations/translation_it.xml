@@ -101,13 +101,9 @@
         <text name="rl_dialog_title" text="Imposta il numero massimo di animali visibili"/>
 
         <text name="rl_ui_unhealthy" text="Troppo malato"/>
-        <text name="rl_ui_unhealthyBracketed" text="No (troppo malato)"/>
         <text name="rl_ui_noMaleAnimal" text="Nessun maschio adatto"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="No (nessun maschio adatto)"/>
         <text name="rl_ui_recoveringLastBirth" text="In ripresa dall'ultimo parto"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="No (in ripresa dall'ultimo parto)"/>
         <text name="rl_ui_tooYoung" text="Troppo giovane"/>
-        <text name="rl_ui_tooYoungBracketed" text="No (troppo giovane)"/>
         <text name="rl_ui_pregnant" text="Incinta"/>
         <text name="rl_ui_lactating" text="In lattazione"/>
         <text name="rl_ui_canReproduce" text="Può riprodursi"/>

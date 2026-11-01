@@ -94,13 +94,9 @@
         <text name="rl_dialog_title" text="Установить максимальное количество видимых животных"/>
 
         <text name="rl_ui_unhealthy" text="Слишком нездоров"/>
-        <text name="rl_ui_unhealthyBracketed" text="Нет (слишком нездоров)"/>
         <text name="rl_ui_noMaleAnimal" text="Нет подходящего самца"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="Нет (нет подходящего самца)"/>
         <text name="rl_ui_recoveringLastBirth" text="Восстанавливается после последних родов"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Нет (восстанавливается после последних родов)"/>
         <text name="rl_ui_tooYoung" text="Слишком молод"/>
-        <text name="rl_ui_tooYoungBracketed" text="Нет (слишком молод)"/>
         <text name="rl_ui_pregnant" text="Беременна"/>
         <text name="rl_ui_lactating" text="Лактирует"/>
         <text name="rl_ui_canReproduce" text="Может размножаться"/>

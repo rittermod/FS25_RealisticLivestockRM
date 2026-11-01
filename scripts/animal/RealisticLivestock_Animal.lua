@@ -823,15 +823,17 @@ function Animal:showInfo(box)
         local text = yesText
 
         if self.age < subType.reproductionMinAgeMonth then
-            text = g_i18n:getText("rl_ui_tooYoungBracketed")
+            text = g_i18n:getText("rl_ui_tooYoung")
         elseif self.isParent and self.monthsSinceLastBirth <= 2 then
-            text = g_i18n:getText("rl_ui_recoveringLastBirthBracketed")
+            text = g_i18n:getText("rl_ui_recoveringLastBirth")
         elseif self.clusterSystem ~= nil and not RealisticLivestock.hasMaleAnimalInPen(self.clusterSystem.owner.spec_husbandryAnimals, name, self) and not self.isPregnant then
-            text = g_i18n:getText("rl_ui_noMaleAnimalBracketed")
+            text = g_i18n:getText("rl_ui_noMaleAnimal")
         elseif healthFactor < subType.reproductionMinHealth then
-            text = g_i18n:getText("rl_ui_unhealthyBracketed")
+            text = g_i18n:getText("rl_ui_unhealthy")
         end
 
+        Log:trace("Animal:showInfo: Can reproduce line (farmId=%s uniqueId=%s value=%s)", tostring(self.farmId),
+            tostring(self.uniqueId), text)
         box:addLine(g_i18n:getText("rl_ui_canReproduce"), text)
 
         if self.age >= subType.reproductionMinAgeMonth then box:addLine(g_i18n:getText("rl_ui_pregnant"),
