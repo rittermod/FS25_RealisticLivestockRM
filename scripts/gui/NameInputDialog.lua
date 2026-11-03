@@ -1,5 +1,6 @@
 NameInputDialog = {}
 
+local Log = RmLogging.getLogger("RLRM")
 local nameInputDialog_mt = Class(NameInputDialog, YesNoDialog)
 local function nameInputDialog_callback() end
 local modDirectory = g_currentModDirectory
@@ -92,19 +93,32 @@ function NameInputDialog:setText(text)
 end
 
 
+--- Configures the shared dialog instance for one open: callback, prefill, prompt and character limit.
+---@param callback function|nil Called with (text, clickOk, args), or (target, text, clickOk, args) when target is set
+---@param target table|nil Callback owner passed as the first argument
+---@param text string|nil Prefilled name
+---@param prompt string|nil Prompt text; nil keeps the current prompt
+---@param maxCharacters number|nil Character limit; nil keeps the field's current limit
+---@param args any Passed back to the callback
+---@param gender string|nil Gender used by the random-name button
 function NameInputDialog:setCallback(callback, target, text, prompt, maxCharacters, args, gender)
 
     self.onTextEntered = callback or nameInputDialog_callback
     self.target = target
     self.callbackArgs = args
-    self.textElement:setText(text or "")
+    -- The field cuts on setText to its current limit, so the caller's limit goes first.
     self.textElement.maxCharacters = maxCharacters or self.textElement.maxCharacters
+    self.textElement:setText(text or "")
 
     if prompt ~= nil then self.dialogTextElement:setText(prompt) end
 
     self.dialogPrompt = prompt
     self.maxCharacters = maxCharacters
     self.animalGender = gender
+
+    Log:trace("NameInputDialog:setCallback: limit=%s requested=%s prefillLength=%s shownLength=%s",
+        tostring(self.textElement.maxCharacters), tostring(maxCharacters),
+        tostring(text and utf8Strlen(text)), tostring(self.textElement.text and utf8Strlen(self.textElement.text)))
 
 end
 
