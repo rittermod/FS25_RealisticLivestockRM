@@ -606,9 +606,12 @@
         instead of inline widgets. White-on-grey, left-aligned, indent-friendly
         (Phase 2 group depth applies a left position offset). Selection
         highlight is handled by the parent rlMenu_filterConditionRow's
-        imageSelectedColor.
+        imageSelectedColor. The width is the row's less the element's 20px left
+        inset and an 8px right margin.
     -->
     <Profile name="rl_filterConditionText" extends="baseReference" with="anchorTopLeft">
+        <size value="100% 28px"/>
+        <absoluteSizeOffset value="28px 0px"/>
         <textBold value="false"/>
         <textSize value="18px"/>
         <textAlignment value="left"/>

@@ -96,13 +96,9 @@
         <text name="rl_dialog_title" text="Aseta visuaalisten eläinten maksimimäärä"/>
 
         <text name="rl_ui_unhealthy" text="Liian huonokuntoinen"/>
-        <text name="rl_ui_unhealthyBracketed" text="Ei (liian huonokuntoinen)"/>
         <text name="rl_ui_noMaleAnimal" text="Ei soveltuvaa uros eläintä"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="Ei (ei soveltuvaa uros eläintä)"/>
         <text name="rl_ui_recoveringLastBirth" text="Toipumassa viimeisimmästä synnytyksestä"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Ei (toipumassa viimeisimmästä synnytyksestä)"/>
         <text name="rl_ui_tooYoung" text="Liian nuori"/>
-        <text name="rl_ui_tooYoungBracketed" text="Ei (liian nuori)"/>
         <text name="rl_ui_pregnant" text="Tiineenä"/>
         <text name="rl_ui_lactating" text="Imettävä"/>
         <text name="rl_ui_canReproduce" text="Voi lisääntyä"/>

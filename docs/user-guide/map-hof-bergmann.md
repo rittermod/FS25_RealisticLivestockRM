@@ -62,6 +62,7 @@ The map's default animal data is derived from 3D model dimensions, which sometim
 | **Cats** | Litter size raised to usually 3 kittens, rarely up to 6 | Map default was usually 1, at most 3; real cats have 3-5 per litter |
 | **Geese** | Clutch size set to usually 3 eggs, rarely up to 6 | Map default was usually 1, at most 3 |
 | **Rabbits** | Litter size raised to usually 4 kits, rarely up to 8 | Map default was usually 1, at most 3; real rabbits have 4-8 per litter |
+| **Quail** *(v1.4+)* | Clutch size raised to usually 8 chicks, rarely up to 14 | Map default was usually 1, at most 3; real quail lay 8-12 eggs per clutch |
 
 Exotic females keep the mod's default timing: cats, geese, rabbits and quail first conceive at about 13 months, even though their males can breed earlier.
 

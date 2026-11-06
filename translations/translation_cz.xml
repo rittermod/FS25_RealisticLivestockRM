@@ -103,13 +103,9 @@
         <text name="rl_dialog_title" text="Nastavit maximální počet vizuálních zvířat"/>
 
         <text name="rl_ui_unhealthy" text="Příliš nezdravé"/>
-        <text name="rl_ui_unhealthyBracketed" text="Ne (příliš nezdravé)"/>
         <text name="rl_ui_noMaleAnimal" text="Žádné vhodné samčí zvíře"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="Ne (žádné vhodné samčí zvíře)"/>
         <text name="rl_ui_recoveringLastBirth" text="Zotavuje se po posledním porodu"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Ne (zotavuje se po posledním porodu)"/>
         <text name="rl_ui_tooYoung" text="Příliš mladé"/>
-        <text name="rl_ui_tooYoungBracketed" text="Ne (příliš mladé)"/>
         <text name="rl_ui_pregnant" text="Březí"/>
         <text name="rl_ui_lactating" text="V laktaci"/>
         <text name="rl_ui_canReproduce" text="Může se rozmnožovat"/>

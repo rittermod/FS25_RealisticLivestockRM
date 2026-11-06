@@ -96,13 +96,9 @@
         <text name="rl_dialog_title" text="Maximale Anzahl visueller Tiere"/>
 
         <text name="rl_ui_unhealthy" text="Zu krank"/>
-        <text name="rl_ui_unhealthyBracketed" text="Nein (zu krank)"/>
         <text name="rl_ui_noMaleAnimal" text="Kein geeignetes männliches Tier"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="Nein (kein geeignetes männliches Tier)"/>
         <text name="rl_ui_recoveringLastBirth" text="Erholen von der letzten Geburt"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Nein (erholt sich von der letzten Geburt)"/>
         <text name="rl_ui_tooYoung" text="Zu jung"/>
-        <text name="rl_ui_tooYoungBracketed" text="Nein (zu jung)"/>
         <text name="rl_ui_pregnant" text="Schwanger"/>
         <text name="rl_ui_lactating" text="Säugend"/>
         <text name="rl_ui_canReproduce" text="Kann reproduzieren"/>

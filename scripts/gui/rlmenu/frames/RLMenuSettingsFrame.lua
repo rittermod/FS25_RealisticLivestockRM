@@ -2550,25 +2550,6 @@ function RLMenuSettingsFrame:populateCellForItemInSection(list, _section, index,
     end
 
     local displayText = formatConditionDisplay(self, row, field)
-
-    -- Pixel-accurate truncation. String values truncate in the MIDDLE, so two
-    -- long values differing only at the suffix stay distinguishable. textSize
-    -- is read live from the widget so a profile change propagates.
-    local textSize = conditionText.textSize
-    local budgetPx = nil
-    if cell ~= nil and cell.size ~= nil and cell.size[1] ~= nil
-       and g_referenceScreenWidth ~= nil then
-        local rowWidthPx = cell.size[1] * g_referenceScreenWidth
-        local leftOffsetPx = 20  -- matches the XML position="20px ..."
-        budgetPx = rowWidthPx - leftOffsetPx - 8 -- 8px right padding so the
-                                                 -- truncation sentinel isn't
-                                                 -- flush against the row edge
-    end
-    if textSize ~= nil and budgetPx ~= nil and budgetPx > 0 then
-        displayText = RLFilterFieldDisplay.limitConditionRowText(
-            displayText, textSize, budgetPx, field.type)
-    end
-
     conditionText:setText(displayText)
 
     -- Depth-aware indent, inert while every row is at depth 0. setPosition

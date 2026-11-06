@@ -900,8 +900,11 @@ function RealisticLivestock.calculateRandomMonthlyAnimalDeaths(spec, cluster, is
     end
 end
 
--- check if given animal pen has a viable male animal for reproduction
-
+--- Check whether a pen holds a male who can get the given female pregnant.
+--- @param spec table The husbandry's animal spec, or a cluster system
+--- @param subT string The female's subtype name
+--- @param female table The female animal
+--- @return boolean hasMale
 function RealisticLivestock.hasMaleAnimalInPen(spec, subT, female)
     if spec == nil then return false end
 
@@ -936,35 +939,35 @@ function RealisticLivestock.hasMaleAnimalInPen(spec, subT, female)
         end
 
         if subT == "COW_WATERBUFFALO" then
-            if s.name == "BULL_WATERBUFFALO" and animal.age < 132 then return true end
+            if s.name == "BULL_WATERBUFFALO" and animal.age < 132 then
+                Log:trace("hasMaleAnimalInPen: Found eligible buffalo bull (age=%d) for '%s'", animal.age, subT)
+                return true
+            end
         elseif subT == "GOAT" then
-            if s.name == "RAM_GOAT" and animal.age < 72 then return true end
+            if s.name == "RAM_GOAT" and animal.age < 72 then
+                Log:trace("hasMaleAnimalInPen: Found eligible ram goat (age=%d) for '%s'", animal.age, subT)
+                return true
+            end
         elseif s.name ~= "RAM_GOAT" and s.name ~= "BULL_WATERBUFFALO" then
             -- Bridge breeding compatibility check (nil = no opinion, true = compatible, false = incompatible)
             if RLMapBridge.isBreedingCompatible(s.name, subT) == false then
                 Log:trace("hasMaleAnimalInPen: Bridge says '%s' incompatible with '%s', skipping", s.name, subT)
             elseif animal.gender == "male" then
-                local bridgeMaxAge = RLMapBridge.getMaxFertilityAge(s.name)
-                local eligible = false
+                local maxAge = RLMapBridge.getMaxFertilityAge(s.name)
+                    or (animalType == AnimalType.COW and 132)
+                    or (animalType == AnimalType.SHEEP and 72)
+                    or (animalType == AnimalType.HORSE and 300)
+                    or (animalType == AnimalType.CHICKEN and 72)
+                    or (animalType == AnimalType.PIG and 48)
+                    or 120
 
-                if bridgeMaxAge ~= nil then
-                    eligible = animal.age < bridgeMaxAge
-                else
-                    eligible = (animalType == AnimalType.COW and animal.age < 132) or
-                        (animalType == AnimalType.SHEEP and animal.age < 72) or
-                        (animalType == AnimalType.HORSE and animal.age < 300) or
-                        (animalType == AnimalType.CHICKEN and animal.age < 72) or
-                        (animalType == AnimalType.PIG and animal.age < 48) or
-                        (animalType ~= AnimalType.CHICKEN and animal.age < 120)
-                end
-
-                if eligible then
-                    Log:trace("hasMaleAnimalInPen: Found eligible male '%s' (age=%d, maxAge=%s) for female subType '%s'",
-                        s.name, animal.age, tostring(bridgeMaxAge or "base"), subT)
+                if animal.age < maxAge then
+                    Log:trace("hasMaleAnimalInPen: Found eligible male '%s' (age=%d, maxAge=%d) for female subType '%s'",
+                        s.name, animal.age, maxAge, subT)
                     return true
                 else
-                    Log:trace("hasMaleAnimalInPen:   skip male '%s' (age=%d, too old, maxAge=%s)",
-                        s.name, animal.age, tostring(bridgeMaxAge or "base"))
+                    Log:trace("hasMaleAnimalInPen:   skip male '%s' (age=%d, too old, maxAge=%d)",
+                        s.name, animal.age, maxAge)
                 end
             else
                 Log:trace("hasMaleAnimalInPen:   skip '%s' (gender=%s, not male)", s.name, animal.gender or "nil")

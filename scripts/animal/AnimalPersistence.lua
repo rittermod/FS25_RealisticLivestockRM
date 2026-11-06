@@ -100,7 +100,13 @@ function AnimalPersistence.loadFromXMLFile(xmlFile, key, clusterSystem, isLegacy
     xmlFile:iterate(key .. ".marks.mark", function(_, markKey)
 
         local mark = xmlFile:getString(markKey .. "#key", "PLAYER")
-        marks[mark].active = xmlFile:getBool(markKey .. "#active", false)
+        if marks[mark] ~= nil then
+            marks[mark].active = xmlFile:getBool(markKey .. "#active", false)
+            Log:trace("loadAnimal: mark %s active=%s", tostring(mark), tostring(marks[mark].active))
+        else
+            Log:warning("loadAnimal: unknown mark key '%s' skipped (key=%s farmId=%s uniqueId=%s)",
+                tostring(mark), tostring(key), tostring(farmId), tostring(id))
+        end
 
     end)
 

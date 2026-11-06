@@ -61,7 +61,7 @@ Goats produce milk **only while lactating** (10 months after giving birth). Goat
 | Early lactation | ramping up toward peak |
 | 18+ mo (peak) | **5 - 57** |
 
-*Goats only lactate after their first kidding (from about 14 months), so there is no milk before then. Output ramps up over the first months of each lactation to the peak shown. Genetics and lactation phase cause large variation between individual animals; non-lactating goats produce zero milk.*
+*Goats only lactate after a kidding (from about 14 months), so there is no milk before then; a doe the dealer sells as a recent mother may already be lactating. Output ramps up over the first months of each lactation to the peak shown. Genetics and lactation phase cause large variation between individual animals; non-lactating goats produce zero milk.*
 
 ---
 

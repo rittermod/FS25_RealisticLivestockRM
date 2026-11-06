@@ -88,13 +88,9 @@
         <text name="rl_dialog_title" text="Ange maximalt antal visuella djur"/>
 
         <text name="rl_ui_unhealthy" text="För dålig hälsa"/>
-        <text name="rl_ui_unhealthyBracketed" text="Nej (för dålig hälsa)"/>
         <text name="rl_ui_noMaleAnimal" text="Inget lämpligt handjur"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="Nej (inget lämpligt handjur)"/>
         <text name="rl_ui_recoveringLastBirth" text="Återhämtar sig från senaste födseln"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Nej (återhämtar sig från senaste födseln)"/>
         <text name="rl_ui_tooYoung" text="För ungt"/>
-        <text name="rl_ui_tooYoungBracketed" text="Nej (för ungt)"/>
         <text name="rl_ui_pregnant" text="Dräktig"/>
         <text name="rl_ui_lactating" text="Lakterar"/>
         <text name="rl_ui_canReproduce" text="Kan fortplanta sig"/>

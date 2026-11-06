@@ -94,13 +94,9 @@
         <text name="rl_dialog_title" text="Indstil maksimalt antal visuelle dyr"/>
 
         <text name="rl_ui_unhealthy" text="For usund"/>
-        <text name="rl_ui_unhealthyBracketed" text="Nej (for usund)"/>
         <text name="rl_ui_noMaleAnimal" text="Ingen egnet han-dyr"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="Nej (ingen egnet han-dyr)"/>
         <text name="rl_ui_recoveringLastBirth" text="Kommer sig efter sidst fødsel"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Nej (kommer sig efter sidst fødsel)"/>
         <text name="rl_ui_tooYoung" text="For ung"/>
-        <text name="rl_ui_tooYoungBracketed" text="Nej (for ung)"/>
         <text name="rl_ui_pregnant" text="Gravid"/>
         <text name="rl_ui_lactating" text="Lakterende"/>
         <text name="rl_ui_canReproduce" text="Kan reproducere"/>

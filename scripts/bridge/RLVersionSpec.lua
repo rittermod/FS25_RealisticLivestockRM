@@ -258,3 +258,23 @@ function RLVersionSpec.matchesVersionSpec(versionStr, specStr)
 
     return true
 end
+
+--- List the versions a specifier supports: the operands of `>=`, `>`, `==` and `<=`, never `<` or `!=`.
+--- @param specStr string Specifier (e.g. ">=1.3.0.1,<1.4")
+--- @return table versions Parsed version objects, in constraint order
+function RLVersionSpec.getSupportedVersions(specStr)
+    local versions = {}
+
+    for _, constraint in ipairs(string.split(specStr, ",")) do
+        local op, verStr = constraint:match("^%s*([><=!]+)%s*(.-)%s*$")
+        if op ~= nil and op ~= "<" and op ~= "!=" then
+            local version = RLVersionSpec.parseVersion(verStr)
+            if version ~= nil then
+                table.insert(versions, version)
+            end
+        end
+    end
+
+    Log:trace("VersionSpec: getSupportedVersions: '%s' -> %d version(s)", specStr, #versions)
+    return versions
+end

@@ -844,15 +844,21 @@ function AnimalReproduction.reproduce(animal, spec, day, month, year, isSaleAnim
 
         if animal.deathEnabled and math.random() >= genetics.health * (weight / minWeight) * 1.15 then
 
-            childNum = childNum - 1
-            animalsToSell = animalsToSell - 1
+            -- A stillborn newborn frees the place a pending auto-sale would have taken; only with no sale
+            -- left does it lower the kept count, so each stillbirth is counted once.
+            if animalsToSell > 0 then
+                animalsToSell = animalsToSell - 1
+            else
+                childNum = childNum - 1
+            end
 
             table.insert(childrenToRemove, i)
             deadChildrenCount = deadChildrenCount + 1
 
             child.isDead = true
 
-            Log:trace("  child %d died at birth (weight=%.1f minWeight=%.1f)", i, weight, minWeight)
+            Log:trace("  child %d died at birth (weight=%.1f minWeight=%.1f) -> kept=%d toSell=%d",
+                i, weight, minWeight, childNum, animalsToSell)
 
             continue
 
@@ -986,11 +992,14 @@ function AnimalReproduction.reproduce(animal, spec, day, month, year, isSaleAnim
     if not isSaleAnimal then
 
         local farmIndex = spec:getOwnerFarmId()
-        local animalTypeReal = animalSystem:getTypeByIndex(subType.typeIndex)
 
-        if animalTypeReal.statsBreedingName ~= nil then
-            local stats = g_currentMission:farmStats(farmIndex)
-            stats:updateStats(animalTypeReal.statsBreedingName, childNum)
+        if subType.statsBreedingName ~= nil then
+            local total = g_farmManager:updateFarmStats(farmIndex, subType.statsBreedingName, childNum)
+            Log:debug("AnimalReproduction: farm stat %s +%d farmId=%s total=%s mother=%s subType=%s",
+                subType.statsBreedingName, childNum, tostring(farmIndex), tostring(total),
+                tostring(animal.uniqueId), animal.subType)
+        else
+            Log:trace("AnimalReproduction: no farm stat for subType=%s", animal.subType)
         end
 
     end

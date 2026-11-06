@@ -96,13 +96,9 @@
         <text name="rl_dialog_title" text="Kies maximaal aantal visuele dieren"/>
 
         <text name="rl_ui_unhealthy" text="Te ongezond"/>
-        <text name="rl_ui_unhealthyBracketed" text="Nee (te ongezond)"/>
         <text name="rl_ui_noMaleAnimal" text="Geen geschikt mannelijk dier"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="Nee (geen geschikt mannelijk dier)"/>
         <text name="rl_ui_recoveringLastBirth" text="Herstellend van bevalling"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Nee (herstellend van bevalling)"/>
         <text name="rl_ui_tooYoung" text="Te jong"/>
-        <text name="rl_ui_tooYoungBracketed" text="Nee (te jong)"/>
         <text name="rl_ui_pregnant" text="Drachtig"/>
         <text name="rl_ui_lactating" text="Melkgevend"/>
         <text name="rl_ui_canReproduce" text="Kan voortplanten"/>

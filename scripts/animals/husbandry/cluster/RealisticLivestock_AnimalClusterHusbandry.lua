@@ -390,7 +390,13 @@ function RealisticLivestock_AnimalClusterHusbandry:updateVisuals(superFunc, remo
             animal.visualAnimalIndex = nil
         end
 
-        self.husbandryIdsToVisualAnimalCount[self.husbandryIds[i]] = husbandryAnimalCount
+        -- A retry walk that ran past the last husbandry took no add, so no count changed
+        if i <= #self.husbandryIds then
+            self.husbandryIdsToVisualAnimalCount[self.husbandryIds[i]] = husbandryAnimalCount
+        else
+            Log:trace("AnimalClusterHusbandry:updateVisuals: walk passed the last husbandry, no add taken for "
+                .. "farmId=%s uniqueId=%s", tostring(animal.farmId), tostring(animal.uniqueId))
+        end
 
         if self.visualAnimalCount > RealisticLivestock_AnimalClusterHusbandry.MAX_HUSBANDRIES then
             Log:trace("AnimalClusterHusbandry:updateVisuals: visual cap passed, stopping (visualCount=%s)",

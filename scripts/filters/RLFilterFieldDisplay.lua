@@ -1,10 +1,9 @@
 -- RLFilterFieldDisplay.lua
 -- UI-layer helper for the saveable-filter editor. Owns everything the
 -- pure-data RLFilterFieldCatalog deliberately refuses to know about: i18n
--- key lookup, FillTypeManager resolution for subType labels, pixel-accurate
--- truncation for conditions-list rows. Loading this module pulls in no
--- additional runtime state; every helper is callable from a stub frame as
--- long as g_currentMission / g_i18n / g_fillTypeManager / getTextWidth are
+-- key lookup and FillTypeManager resolution for subType labels. Loading this
+-- module pulls in no additional runtime state; every helper is callable from
+-- a stub frame as long as g_currentMission / g_i18n / g_fillTypeManager are
 -- mockable (the tests mock them).
 --
 -- Split from RLFilterFieldCatalog so the catalog stays mockable + runtime-free
@@ -21,10 +20,6 @@ RLFilterFieldDisplay = {}
 -- Fixed gender domain, as stable internal keys the UI translates at render time. ORDER
 -- MATTERS: it drives the picker's option order, which maps to the index the dialog persists.
 local GENDER_DOMAIN = { "male", "female" }
-
--- Middle-truncate sentinel between head and tail when a string value exceeds the
--- row's pixel budget. ASCII, and its pixel cost is measured like any other text.
-local MIDDLE_TRUNCATE_SENTINEL = "..."
 
 -- =============================================================================
 -- Internal helpers
@@ -271,8 +266,8 @@ end
 -- Condition row display formatting
 -- =============================================================================
 
---- Format a condition row as a localised "FieldLabel cmp value" string; the caller truncates
---- it. A number renders CANONICALLY, never the in-flight text buffer, and a string renders
+--- Format a condition row as a localised "FieldLabel cmp value" string. A number renders
+--- CANONICALLY, never the in-flight text buffer, and a string renders
 --- verbatim - case-folding lives in the evaluator, so the row shows what the user typed.
 ---@param condition table {field, cmp, value}
 ---@param fieldEntry table catalog entry resolved from condition.field
@@ -324,59 +319,6 @@ function RLFilterFieldDisplay.formatConditionDisplay(condition, fieldEntry, anim
         return string.format("%s %s", fieldLabel, valueDisplay)
     end
     return string.format("%s %s %s", fieldLabel, cmpDisplay, valueDisplay)
-end
-
--- =============================================================================
--- Row truncation (pixel-accurate, locale-correct)
--- =============================================================================
-
---- Middle-truncate under a pixel budget, keeping BOTH head and tail so two long values
---- differing only at the suffix stay distinguishable. Falls back to a suffix truncate when
---- the sentinel itself will not fit.
----@param text string
----@param textSize number
----@param widthPx number
----@return string truncated text
-local function middleTruncate(text, textSize, widthPx)
-    if text == nil then return "" end
-    if widthPx <= 0 then return text end
-    local totalWidth = getTextWidth(textSize, text)
-    if totalWidth <= widthPx then return text end
-
-    local sentinelWidth = getTextWidth(textSize, MIDDLE_TRUNCATE_SENTINEL)
-    if sentinelWidth >= widthPx then
-        -- No room for the sentinel; fall back to suffix-truncate.
-        return Utils.limitTextToWidth(text, textSize, widthPx, false, MIDDLE_TRUNCATE_SENTINEL)
-    end
-
-    -- Each half gets half of (widthPx - sentinelWidth). The helper itself
-    -- subtracts its own sentinel width, so we pass the half budget and an
-    -- empty trim sentinel; we add MIDDLE_TRUNCATE_SENTINEL ourselves when
-    -- joining.
-    local halfBudget = (widthPx - sentinelWidth) / 2
-    local head = Utils.limitTextToWidth(text, textSize, halfBudget, false, "")
-    local tail = Utils.limitTextToWidth(text, textSize, halfBudget, true,  "")
-    Log:trace("RLFilterFieldDisplay.middleTruncate: budget=%.1fpx head='%s' tail='%s'",
-        widthPx, tostring(head), tostring(tail))
-    return head .. MIDDLE_TRUNCATE_SENTINEL .. tail
-end
-
---- Limit a row's text to its pixel width: strings middle-truncate to stay
---- distinguishable, every other type suffix-truncates.
----@param text string the full "field cmp value" row text
----@param textSize number font size in normalised units (caller resolves
----       via element.textSize)
----@param widthPx number row content width budget in pixels
----@param valueType string|nil "number"|"bool"|"enum"|"string" - drives the
----       truncate strategy. nil = suffix-truncate (safe default).
----@return string truncated text
-function RLFilterFieldDisplay.limitConditionRowText(text, textSize, widthPx, valueType)
-    if text == nil then return "" end
-    if widthPx == nil or widthPx <= 0 then return text end
-    if valueType == "string" then
-        return middleTruncate(text, textSize, widthPx)
-    end
-    return Utils.limitTextToWidth(text, textSize, widthPx, false, MIDDLE_TRUNCATE_SENTINEL)
 end
 
 Log:debug("RLFilterFieldDisplay: loaded")

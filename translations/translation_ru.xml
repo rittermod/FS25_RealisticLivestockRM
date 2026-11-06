@@ -12,8 +12,8 @@
         <text name="fillType_bull_hereford" text="Херефордский бык"/>
         <text name="fillType_cow_highland_cattle" text="Хайленд"/>
         <text name="fillType_bull_highland_cattle" text="Бык Хайленд"/>
-        <text name="fillType_cow_brahman" text="Brahman"/>
-        <text name="fillType_bull_brahman" text="Brahman Bull"/>
+        <text name="fillType_cow_brahman" text="Брахман"/>
+        <text name="fillType_bull_brahman" text="Бык брахман"/>
         <text name="animal_descriptionBullFeed" text="Быки любят траву, сено и моносмесь."/>
         <text name="animal_descriptionBullYoung" text="Это теленок-самец."/>
         <text name="animal_descriptionBullReproduction" text="Быки, которые здоровы и старше 12 месяцев, могут размножаться."/>
@@ -44,11 +44,11 @@
         <text name="animal_descriptionRamFeed" text="Бараны едят траву и сено."/>
         <text name="animal_descriptionRamYoung" text="Это ягненок-самец."/>
         <text name="animal_descriptionRamReproduction" text="Бараны, которые здоровы и старше 5 месяцев, могут размножаться."/>
-        <text name="animal_group_alpacas" text="Alpacas"/>
-        <text name="animal_descriptionAlpacaYoung" text="Young alpacas need hay or grass as well as water but do not produce fleece yet."/>
-        <text name="animal_descriptionAlpacaAdult" text="Adult alpacas need hay or grass as well as water and produce valuable fleece."/>
-        <text name="animal_descriptionAlpacaReproduction" text="Alpacas that are healthy and older than 14 months can reproduce."/>
-        <text name="animal_descriptionAlpacaMaleReproduction" text="Male alpacas that are healthy and older than 24 months can reproduce."/>
+        <text name="animal_group_alpacas" text="Альпаки"/>
+        <text name="animal_descriptionAlpacaYoung" text="Молодым альпакам необходимы сено или трава, а также вода, но они пока не производят руно."/>
+        <text name="animal_descriptionAlpacaAdult" text="Взрослым альпакам необходимы сено или трава, а также вода, и они производят ценное руно."/>
+        <text name="animal_descriptionAlpacaReproduction" text="Самки альпак, которые здоровы и старше 14 месяцев, могут размножаться."/>
+        <text name="animal_descriptionAlpacaMaleReproduction" text="Самцы альпак, которые здоровы и старше 24 месяцев, могут размножаться."/>
         <text name="rl_descriptionSheepReproduction" text="Овцы, которые здоровы и старше 8 месяцев, могут размножаться."/>
 
         <!-- КОЗЫ -->
@@ -67,14 +67,14 @@
         <text name="fillType_stallion_black" text="Вороной жеребец"/>
         <text name="fillType_stallion_seal_brown" text="Темно-гнедой жеребец"/>
         <text name="fillType_stallion_dun" text="Саврасый жеребец"/>
-        <text name="fillType_alpaca_white" text="White Alpaca"/>
-        <text name="fillType_alpaca_white_male" text="White Alpaca Male"/>
-        <text name="fillType_alpaca_brown" text="Brown Alpaca"/>
-        <text name="fillType_alpaca_brown_male" text="Brown Alpaca Male"/>
-        <text name="fillType_alpaca_grey" text="Grey Alpaca"/>
-        <text name="fillType_alpaca_grey_male" text="Grey Alpaca Male"/>
-        <text name="fillType_alpaca_fawn" text="Fawn Alpaca"/>
-        <text name="fillType_alpaca_fawn_male" text="Fawn Alpaca Male"/>
+        <text name="fillType_alpaca_white" text="Белая альпака"/>
+        <text name="fillType_alpaca_white_male" text="Белый самец альпаки"/>
+        <text name="fillType_alpaca_brown" text="Коричневая альпака"/>
+        <text name="fillType_alpaca_brown_male" text="Коричневый самец альпаки"/>
+        <text name="fillType_alpaca_grey" text="Серая альпака"/>
+        <text name="fillType_alpaca_grey_male" text="Серый самец альпаки"/>
+        <text name="fillType_alpaca_fawn" text="Бежевая альпака"/>
+        <text name="fillType_alpaca_fawn_male" text="Бежевый самец альпаки"/>
         <text name="animal_descriptionStallionFeed" text="Жеребцы любят сено, овес и сорго."/>
         <text name="animal_descriptionStallionProfit" text="Жеребцов можно продать с прибылью."/>
         <text name="animal_descriptionStallionReproduction" text="Жеребцы, которые здоровы и старше 36 месяцев, могут размножаться."/>
@@ -94,13 +94,9 @@
         <text name="rl_dialog_title" text="Установить максимальное количество видимых животных"/>
 
         <text name="rl_ui_unhealthy" text="Слишком нездоров"/>
-        <text name="rl_ui_unhealthyBracketed" text="Нет (слишком нездоров)"/>
         <text name="rl_ui_noMaleAnimal" text="Нет подходящего самца"/>
-        <text name="rl_ui_noMaleAnimalBracketed" text="Нет (нет подходящего самца)"/>
         <text name="rl_ui_recoveringLastBirth" text="Восстанавливается после последних родов"/>
-        <text name="rl_ui_recoveringLastBirthBracketed" text="Нет (восстанавливается после последних родов)"/>
         <text name="rl_ui_tooYoung" text="Слишком молод"/>
-        <text name="rl_ui_tooYoungBracketed" text="Нет (слишком молод)"/>
         <text name="rl_ui_pregnant" text="Беременна"/>
         <text name="rl_ui_lactating" text="Лактирует"/>
         <text name="rl_ui_canReproduce" text="Может размножаться"/>
@@ -138,7 +134,7 @@
 
         <text name="rl_ui_milk" text="Производство молока"/>
         <text name="rl_ui_wool" text="Производство шерсти"/>
-        <text name="rl_ui_fleece" text="Fleece production"/>
+        <text name="rl_ui_fleece" text="Производство руна"/>
         <text name="rl_ui_eggs" text="Производство яиц"/>
         <text name="rl_ui_metabolism" text="Метаболизм"/>
         <text name="rl_ui_meat" text="Качество мяса"/>

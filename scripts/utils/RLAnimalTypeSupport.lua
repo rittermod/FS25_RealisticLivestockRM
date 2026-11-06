@@ -1,8 +1,8 @@
 --[[
     RLAnimalTypeSupport.lua
     Pure helpers for animal types beyond RLRM's five core types: the cluster class, dealer-farm
-    seeding, offspring subtype resolution inside the parent's type, the pallets output label, the
-    load-time report lines, and the DLC-gated bundle files (a type RLRM ships only while its DLC is
+    seeding, offspring subtype resolution inside the parent's type, the pallets output label, who can
+    lactate, the load-time report lines, and the DLC-gated bundle files (a type RLRM ships only while its DLC is
     active). Data in, data out: no g_* reads, no XML, lookups, rng and the active-mod set injected.
 ]]
 
@@ -224,6 +224,19 @@ function RLAnimalTypeSupport.palletsOutputLabel(typeName, subTypeName, fillTypeT
     Log:trace("RLAnimalTypeSupport.palletsOutputLabel: type %s has no fill-type title, using the generic key",
         tostring(typeName))
     return "rl_ui_output_pallets", true
+end
+
+
+--- Whether an animal of this type, subtype and gender can lactate at all.
+---@param typeName string|nil the animal type name (COW, SHEEP, ...)
+---@param subTypeName string|nil the subtype name (GOAT, ...)
+---@param gender string|nil "female" or "male"
+---@return boolean canLactate true for a female cow or a female goat
+function RLAnimalTypeSupport.canLactate(typeName, subTypeName, gender)
+    local canLactate = gender == "female" and (typeName == "COW" or subTypeName == "GOAT")
+    Log:trace("RLAnimalTypeSupport.canLactate: type=%s subType=%s gender=%s -> %s", tostring(typeName),
+        tostring(subTypeName), tostring(gender), tostring(canLactate))
+    return canLactate
 end
 
 

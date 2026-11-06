@@ -1969,7 +1969,7 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
         subTypeIndex = subTypeIndex,
         isParent = isParent,
         isPregnant = isPregnant,
-        isLactating = animalTypeIndex == AnimalType.COW and animalGender == "female"
+        isLactating = RLAnimalTypeSupport.canLactate(animalType.name, subType.name, animalGender)
             and isParent and monthsSinceLastBirth < 10,
         name = name,
         genetics = genetics
@@ -1978,6 +1978,10 @@ function AnimalSystem:createNewSaleAnimal(animalTypeIndex)
     animal.farmId = tostring(farmId)
     animal.uniqueId = uniqueId
     animal.birthday.country = farmCountryIndex
+
+    Log:trace("createNewSaleAnimal: uniqueId=%s subType=%s isParent=%s monthsSinceLastBirth=%s isLactating=%s",
+        tostring(uniqueId), tostring(subType.name), tostring(isParent), tostring(monthsSinceLastBirth),
+        tostring(animal.isLactating))
 
     local variations = self:getVisualByAge(subTypeIndex, age, animal).visualAnimal.variations
     local variationIndex = 1
