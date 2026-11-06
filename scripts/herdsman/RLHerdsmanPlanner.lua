@@ -153,10 +153,7 @@ end
 -- Internal helpers (pure)
 -- =============================================================================
 
---- Build the claim-set / dedup key for an animal from its identity triple. Returns nil when ANY
---- identity field is nil - `toKey`'s string concat would otherwise raise - so the caller skips the
---- animal and warns instead of crashing. The three-field key keeps two animals that share a uniqueId
---- across farms or countries distinct, and is the deterministic tie-break for equal-price sorts.
+--- Claim / dedup / tie-break key: identity triple plus animal type; nil when a triple field is nil.
 ---@param animal table|nil
 ---@return string|nil key, or nil when an identity field is missing
 local function animalKey(animal)
@@ -168,7 +165,9 @@ local function animalKey(animal)
     if farmId == nil or uniqueId == nil or country == nil then
         return nil
     end
-    return RLAnimalUtil.toKey(farmId, uniqueId, country)
+    -- One farm's cow and pig can share the triple, so the type keeps a claimed cow from hiding the pig.
+    -- Trailing, it leaves every sort order intact; the key never leaves this call, so an index is safe.
+    return RLAnimalUtil.toKey(farmId, uniqueId, country) .. " " .. tostring(animal.animalTypeIndex)
 end
 
 --- Dedupe a rule's target uniqueIds and return them in lexicographic order, plus the number of
@@ -562,7 +561,9 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                         LOG_PREFIX, tostring(fid), tostring(aUid), tostring(acountry))
                     warnedAnimals[animal] = true
                 end
-            elseif not claimed[key] then
+            elseif claimed[key] then
+                Log:trace("%s skip key=%s: already claimed by this operation", LOG_PREFIX, key)
+            else
                 local match = noFilter or RLFilterEvaluator.evaluate(filter, animal, evalCtx)
                 if match then
                     matched[#matched + 1] = animal
