@@ -206,9 +206,11 @@ end
 ---@param object table The pen holding the animal.
 ---@param animal table The live animal.
 ---@param model table The disease's registry entry, carrying `vaccine`.
+---@param deferCharge boolean|nil True when the caller charges the dose itself, as the herdsman
+---    does once per farm: one money line per dose floods the player's notifications.
 ---@return boolean ok False when a step raised; the step's error is logged.
 ---@return string|nil outcome The rule's outcome, nil when the rule raised.
-function DiseaseVaccinateEvent.apply(object, animal, model)
+function DiseaseVaccinateEvent.apply(object, animal, model, deferCharge)
     local outcome = nil
 
     local ok = RmSafeUtils.safeCall("DiseaseVaccinateEvent.apply", function()
@@ -219,7 +221,10 @@ function DiseaseVaccinateEvent.apply(object, animal, model)
         local ownerFarmId = object:getOwnerFarmId()
         local penName = tostring(object.getName ~= nil and object:getName() or object)
 
-        if type(ownerFarmId) ~= "number" or ownerFarmId <= 0 or ownerFarmId > FarmManager.MAX_NUM_FARMS then
+        if deferCharge == true then
+            Log:trace("DiseaseVaccinateEvent.apply: charge deferred to the caller (title=%s uniqueId=%s cost=%s)",
+                tostring(model.title), tostring(animal.uniqueId), tostring(cost))
+        elseif type(ownerFarmId) ~= "number" or ownerFarmId <= 0 or ownerFarmId > FarmManager.MAX_NUM_FARMS then
             Log:warning("DiseaseVaccinateEvent.apply: the owner farmId=%s of pen %s is not a real farm, dose "
                 .. "applied with no charge (title=%s uniqueId=%s outcome=%s cost=%s)",
                 tostring(ownerFarmId), penName, tostring(model.title), tostring(animal.uniqueId),

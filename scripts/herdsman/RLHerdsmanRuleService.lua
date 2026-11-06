@@ -12,7 +12,7 @@
 --
 -- Validity floor, enforced on BOTH create and update:
 --   * `name`              non-empty string
---   * `operation`         one of sell|move|buy|castrate|naming|ai|horseCare
+--   * `operation`         one of sell|move|buy|castrate|naming|ai|horseCare|vaccinate
 --   * `farmId`            integer (the owning farm)
 --   * `enabled`           boolean
 --   * `params`            table (opaque here; the per-operation codec owns its shape)
@@ -48,6 +48,7 @@ RLHerdsmanRuleService.OPERATIONS = {
     naming    = true,
     ai        = true,
     horseCare = true,
+    vaccinate = true,
 }
 
 --- Canonical run / visual order: Sell frees herd space before Buy fills it. The single source of
@@ -56,7 +57,7 @@ RLHerdsmanRuleService.OPERATIONS = {
 ---
 --- APPEND-ONLY at the TAIL. The frame binds the operation selector's widget state to the ARRAY
 --- INDEX, so inserting anywhere but the end silently reassigns every later operation's state.
-RLHerdsmanRuleService.OPERATION_ORDER = { "sell", "move", "buy", "castrate", "naming", "ai", "horseCare" }
+RLHerdsmanRuleService.OPERATION_ORDER = { "sell", "move", "buy", "castrate", "naming", "ai", "horseCare", "vaccinate" }
 
 --- Within-operation comparator: alphabetical by name, case-insensitive, with a nil-safe
 --- `tostring(id)` tie-break. Shared by the presenter's section sort and the planner's run-order
@@ -93,6 +94,8 @@ end
 local OPERATION_ANIMAL_TYPES = {
     castrate  = { exclude = { "CHICKEN" } },
     horseCare = { allow   = { "HORSE" } },
+    -- Only the types diseases.xml gives a vaccine; a pen of any other type has nothing to dose.
+    vaccinate = { allow   = { "COW", "SHEEP", "PIG", "ALPACA" } },
 }
 
 --- Exposed read-only so the frame resolves exactly the names these declarations reference.
@@ -323,7 +326,7 @@ local function validateRuleFields(r)
         return false, string.format("name must be a non-empty string (got %s)", tostring(r.name))
     end
     if type(r.operation) ~= "string" or not RLHerdsmanRuleService.OPERATIONS[r.operation] then
-        return false, string.format("operation must be one of sell|move|buy|castrate|naming|ai|horseCare (got %s)", tostring(r.operation))
+        return false, string.format("operation must be one of sell|move|buy|castrate|naming|ai|horseCare|vaccinate (got %s)", tostring(r.operation))
     end
     if type(r.farmId) ~= "number" or math.floor(r.farmId) ~= r.farmId then
         return false, string.format("farmId must be an integer (got %s)", tostring(r.farmId))

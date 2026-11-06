@@ -21,6 +21,7 @@
 --     farmBalanceByFarmId = { [farmId] = balance },        -- money-ledger seed, farm-scoped
 --     dewarsByFarmId      = { [farmId] = { [animalTypeIndex] = { {animal=<sire>, straws=n, uniqueId=s}, ... } } },
 --     buyMarkup           = number,                        -- active dealer-quality markup
+--     diseaseManager      = <real DiseaseManager>,         -- getHerdsmanDosesFor (vaccinate only)
 --   }
 -- `buyMarkup` is a STRUCTURAL dep, deliberately unguarded and undefaulted: any default this module
 -- could pick would be the one wrong number that reading the preset exists to eliminate, so a ctx
@@ -45,6 +46,9 @@
 --   horseCare { ruleId, operation="horseCare", husbandryId, animals=<pool order>, wage }
 --        (no `mark` key at all - a stray one would flip the executor row and route it into the
 --        message layer's mark-precedence branch)
+--
+--   vaccinate { ruleId, operation="vaccinate", husbandryId, animals=<pool order>, titles, wage }
+--        (`titles[i]` is the array of disease titles due for `animals[i]`; no `mark` key, as horseCare)
 --
 -- Run order is RLHerdsmanRuleService.OPERATION_ORDER: sell frees herd space and funds buys before
 -- buy fills the space and spends the proceeds.
@@ -97,6 +101,7 @@ RLHerdsmanPlanner.OPERATION_TRAITS = {
     naming    = { noFilter = true },
     ai        = {},
     horseCare = {},
+    vaccinate = {},
 }
 
 --- Herdsman daily wage per animal, keyed by the runtime AnimalType.* index so it matches
@@ -342,6 +347,9 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
     local dewarsByFarmId = type(ctx.dewarsByFarmId) == "table" and ctx.dewarsByFarmId or {}
     -- Read RAW - no coercion, no `or` default. See the structural-dep note in the file header.
     local buyMarkup = ctx.buyMarkup
+    -- Read RAW for the same reason: only the vaccinate arm calls it, and a ctx missing it must
+    -- raise there rather than vaccinate nothing while looking healthy.
+    local diseaseManager = ctx.diseaseManager
 
     -- The declared animal type NAME -> live index map, resolved ONCE per call through the module
     -- seam. A name that does not resolve is simply absent, which is what gives each declaration its
@@ -1362,6 +1370,45 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
                         claimAll(claimed, selected)
                         actions[#actions + 1] = { ruleId = rule.id, operation = "horseCare", husbandryId = uid,
                             animals = selected, wage = wage }
+                    end
+                end
+            end
+
+        elseif op == "vaccinate" then
+            -- Owned-herd, no cap, no sort, no mark - the horseCare arm plus one narrowing: a matched
+            -- animal is selected only when at least one vaccine is due for it. Which ones are due
+            -- (age, pregnancy or lactation, the renewal window, a visible illness) is decided by
+            -- DiseaseManager:getHerdsmanDosesFor, so this arm carries the titles and nothing else.
+            -- An animal with nothing due stays unclaimed, which costs nothing: it is not due for a
+            -- later vaccinate rule either.
+            for _, uid in ipairs(targets) do
+                local h = resolveGatedHusbandry(uid, op, rule.id)
+                if h ~= nil then
+                    local pool = ownedPool(uid)
+                    local matched = matchFromPool(pool, filter, false, claimed)
+                    local selected, titles, doses = {}, {}, 0
+                    for _, animal in ipairs(matched) do
+                        local due = {}
+                        for _, model in ipairs(diseaseManager:getHerdsmanDosesFor(animal)) do
+                            due[#due + 1] = model.title
+                        end
+                        if #due > 0 then
+                            selected[#selected + 1] = animal
+                            titles[#selected] = due
+                            doses = doses + #due
+                        end
+                    end
+                    local n = #selected
+                    -- The horseCare coefficient, but charged only on the days a dose is given - once
+                    -- every six or twelve months per animal - rather than every day.
+                    local wage = wageFor(h.animalTypeIndex) * 0.15 * n
+                    Log:debug("%s rule=%s op=vaccinate husbandry=%s candidates=%d matched=%d selected=%d doses=%d wage=%.2f",
+                        LOG_PREFIX, tostring(rule.id), tostring(uid), #pool, #matched, n, doses, wage)
+                    if n > 0 then
+                        -- Same-op claim; the animals STAY in the owned pool, as horse care's do.
+                        claimAll(claimed, selected)
+                        actions[#actions + 1] = { ruleId = rule.id, operation = "vaccinate", husbandryId = uid,
+                            animals = selected, titles = titles, wage = wage }
                     end
                 end
             end

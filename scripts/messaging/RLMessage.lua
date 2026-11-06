@@ -246,6 +246,18 @@ RLMessage = {
 		["title"] = "aiManager",
 		["severity"] = RLConstants.SEVERITY.INFO
 	},
+	-- Herdsman vaccination op (money: the day's dose total for the pen, which the executor charges
+	-- once per farm as medicine). Perform-only, so no mark variant.
+	["AI_MANAGER_VACCINATED_SINGLE"] = {
+		["text"] = "aiManager_vaccinated_single",
+		["title"] = "aiManager",
+		["severity"] = RLConstants.SEVERITY.INFO
+	},
+	["AI_MANAGER_VACCINATED_MULTIPLE"] = {
+		["text"] = "aiManager_vaccinated_multiple",
+		["title"] = "aiManager",
+		["severity"] = RLConstants.SEVERITY.INFO
+	},
 	-- Herdsman move age-skip (EPP butcher destinations): animals outside the butcher's
 	-- accepted age window are skipped at delivery. Count-only, INDIVIDUAL (not in
 	-- RLMessageAggregator.AGGREGATABLE) - exceptional + actionable, so it stays out of the daily
@@ -342,6 +354,11 @@ RLMessage = {
 	},
 	["DAILY_HORSE_CARE_SUMMARY"] = {
 		["text"] = "dailyHorseCareSummary",
+		["title"] = "aiManager",
+		["severity"] = RLConstants.SEVERITY.INFO
+	},
+	["DAILY_VACCINATIONS_SUMMARY"] = {
+		["text"] = "dailyVaccinationsSummary",
 		["title"] = "aiManager",
 		["severity"] = RLConstants.SEVERITY.INFO
 	}

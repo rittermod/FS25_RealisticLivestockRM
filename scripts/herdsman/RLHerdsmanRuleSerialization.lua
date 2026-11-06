@@ -10,9 +10,9 @@
 --     .targetHusbandries.target(k)     -- @uniqueId per target string; none when empty
 --     .params                          -- operation-specific subtree (PARAMS_CODECS)
 --
--- A param-free operation (horseCare) emits NO `.params` node at all. Its codec entry still has to
--- exist: `writeRule` resolves the codec before emitting any XML and skips the whole record when
--- there is none, so a missing entry silently drops the rule at save time.
+-- A param-free operation (horseCare, vaccinate) emits NO `.params` node at all. Its codec entry
+-- still has to exist: `writeRule` resolves the codec before emitting any XML and skips the whole
+-- record when there is none, so a missing entry silently drops the rule at save time.
 --
 -- Structural sibling of RLFilterSerialization minus the recursive group/AST - rule records are flat.
 -- The rule keeps ONLY the operation params; the age/gender/disease/genetics selection block lives
@@ -168,6 +168,14 @@ local PARAMS_CODECS = {
         -- entry would make every horseCare rule work for a session and then vanish on save. `read`
         -- must return `{}` and never nil - nil means a required field is missing and drops the
         -- record.
+        validate = function(_p) return true end,
+        write = function(_x, _k, _p) end,
+        read = function(_x, _k) return {} end,
+    },
+    vaccinate = {
+        -- ZERO params, for the same reason as horseCare: which vaccines to give is decided per
+        -- animal from diseases.xml, so the rule is enabled or it is not. The entry still has to
+        -- exist, or the rule vanishes on save.
         validate = function(_p) return true end,
         write = function(_x, _k, _p) end,
         read = function(_x, _k) return {} end,

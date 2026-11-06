@@ -27,10 +27,12 @@
 --     buyMarkup              = number,                          -- active dealer-quality markup (buy pricing)
 --     dealerQualityIndex     = number|nil,                      -- preset index it came from; DEBUG readout ONLY
 --     defer(fn)              -> nil,                            -- run fn after the current DAY_CHANGED chain (horse care only)
+--     diseaseManager         = <DiseaseManager>,                -- g_diseaseManager (vaccination only)
 --     server, mission, ruleService, animalSystem, animalNameSystem,
 --   }
--- `defer` and `buyMarkup` are forwarded verbatim into the executor / planner ctx, where each is a
--- STRUCTURAL dep. Both are resolved here because buildEnv is this module's only g_*-reading layer.
+-- `defer`, `buyMarkup` and `diseaseManager` are forwarded verbatim into the executor / planner ctx,
+-- where each is a STRUCTURAL dep. All are resolved here because buildEnv is this module's only
+-- g_*-reading layer.
 --
 -- readout contract (run's return value; surfaced at DEBUG):
 --   readout = {
@@ -203,6 +205,8 @@ local function buildPlannerCtx(farm, husbandriesById, env)
         -- Deliberately NOT defaulted here: the planner treats it as a structural dep and must
         -- raise on a ctx that lacks it rather than price at a stale markup.
         buyMarkup           = env.buyMarkup,
+        -- Not defaulted either: the vaccinate arm asks it which doses each animal is due.
+        diseaseManager      = env.diseaseManager,
     }
 end
 
@@ -224,6 +228,8 @@ local function buildExecutorCtx(husbandriesById, eppPlaceablesById, env)
         -- Deliberately NOT defaulted, like buyMarkup: the executor treats it as a structural dep
         -- and must fail loud rather than skip the care write while still charging for it.
         defer                   = env.defer,
+        -- The vaccinate leg resolves each planned title back to its model and re-checks it here.
+        diseaseManager          = env.diseaseManager,
     }
 end
 
@@ -406,6 +412,9 @@ function RLHerdsmanDayTick.buildEnv()
         -- @see RLMessageAggregator.initialize. Injected rather than read inside the executor,
         -- which documents no g_* reads.
         defer              = function(fn) Timer.createOneshot(0, fn) end,
+        -- A VALUE read inside the DAY_CHANGED handler, like buyMarkup: main.lua sources the disease
+        -- modules AFTER this one, so a file-scope reference would read nil.
+        diseaseManager     = g_diseaseManager,
         server             = g_server,
         mission            = mission,
         ruleService        = ruleService,
