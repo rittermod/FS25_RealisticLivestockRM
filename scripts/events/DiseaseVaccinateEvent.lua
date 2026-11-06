@@ -7,6 +7,7 @@
     the charge. The payload is the pen, the animal's identity and the disease title; the dose price
     is resolved on the applying machine.
 
+    getRefusal is the one refusal every caller asks, the herdsman included, with the manager passed in.
     isServer, dispatchToServer, apply, chargeDose and sendEvent are seams a test may swap.
     RLDiseaseVaccination and g_diseaseManager are read at call time only.
 ]]
@@ -21,20 +22,23 @@ local Log = RmLogging.getLogger("RLRM")
 DiseaseVaccinateEvent.PERMISSION = "tradeAnimals"
 
 
---- Why a request is refused before the dose: diseases off, or the rule's own refusal.
+--- Why a dose is refused: diseases off, or the rule's own refusal. Every model use waits for a nil reason.
+---@param diseaseManager table The disease manager to ask.
 ---@param animal table The live animal.
 ---@param title string The disease title requested.
 ---@return string|nil reason Nil when the dose is allowed.
 ---@return table|nil model The resolved registry entry, nil when diseases are off.
-local function refusal(animal, title)
-    if not g_diseaseManager.diseasesEnabled then
-        Log:trace("DiseaseVaccinateEvent refusal: diseases off (title=%s farmId=%s uniqueId=%s)", tostring(title),
+function DiseaseVaccinateEvent.getRefusal(diseaseManager, animal, title)
+    if not diseaseManager.diseasesEnabled then
+        Log:trace("DiseaseVaccinateEvent.getRefusal: diseases off (title=%s farmId=%s uniqueId=%s)", tostring(title),
             tostring(animal.farmId), tostring(animal.uniqueId))
         return "DISEASES_OFF", nil
     end
 
-    local model = g_diseaseManager:getDiseaseByTitle(title)
+    local model = diseaseManager:getDiseaseByTitle(title)
     local _, reason = RLDiseaseVaccination.check(animal, model)
+    Log:trace("DiseaseVaccinateEvent.getRefusal: reason=%s (title=%s farmId=%s uniqueId=%s)", tostring(reason),
+        tostring(title), tostring(animal.farmId), tostring(animal.uniqueId))
     return reason, model
 end
 
@@ -155,7 +159,7 @@ function DiseaseVaccinateEvent:run(connection)
         return
     end
 
-    local refused, model = refusal(animal, self.title)
+    local refused, model = DiseaseVaccinateEvent.getRefusal(g_diseaseManager, animal, self.title)
 
     if refused ~= nil then
         Log:warning("DiseaseVaccinateEvent:run: refusing, reason=%s (pen=%s ownerFarmId=%s farmId=%s uniqueId=%s "
@@ -179,7 +183,7 @@ end
 function DiseaseVaccinateEvent.sendEvent(object, animal, title)
     if DiseaseVaccinateEvent.isServer() then
         -- Re-checked: the animal can have died, or diseases been switched off, since the caller last looked.
-        local refused, model = refusal(animal, title)
+        local refused, model = DiseaseVaccinateEvent.getRefusal(g_diseaseManager, animal, title)
 
         if refused ~= nil then
             Log:debug("VACCINATE: refused on the authority, reason=%s (title=%s uniqueId=%s farmId=%s)",

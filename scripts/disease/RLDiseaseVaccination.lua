@@ -52,15 +52,7 @@ function RLDiseaseVaccination.check(animal, model)
 end
 
 
---- Whether the herdsman should dose against a disease, read off the record alone. No record means
---- never vaccinated or protection already expired - expiry deletes the record, so the two cannot be
---- told apart and both are due. A RECOVERED record is due once a month or less is left: a dose
---- restores the full window rather than adding to it, so an earlier dose throws months away and a
---- later one leaves a day unprotected. The window is capped at half the vaccine's protection so a
---- short vaccine is not renewed every day, and widened by the progression epsilon so a counter
---- that reloaded a hair above it is not skipped on its last day. Any other state is due only while
---- the player cannot see it: the herdsman knows no more than the dialog shows, so a hidden
---- incubation gets the same wasted dose the dialog would offer, and a visible illness gets none.
+--- Whether the herdsman should dose: no record, protection in its renewal window, or an illness the player can't see.
 ---@param record table|nil The animal's record of the disease, nil when it holds none.
 ---@param model table The disease's registry entry, carrying `vaccine`.
 ---@return boolean due True when a dose should be given.
@@ -70,8 +62,9 @@ function RLDiseaseVaccination.isDue(record, model)
     end
 
     if record.state == RLDiseaseRecord.STATE.RECOVERED then
+        -- A month or less left, capped at half a short vaccine's protection; the epsilon keeps a
+        -- counter reloaded a hair above the window due. Inverted so a NaN counter is due too.
         local window = math.min(1, model.vaccine.protectionMonths / 2) + RLDiseaseProgression.COMPLETION_EPSILON
-        -- Inverted so a NaN counter is due too, as in `apply`.
         return not (record.immunityMonthsRemaining > window)
     end
 
@@ -79,10 +72,7 @@ function RLDiseaseVaccination.isDue(record, model)
 end
 
 
---- Whether a disease can reach an animal at all right now, so a dose would buy anything. `chance` is
---- the authored infection chance at the animal's age, or at next month's when that is higher; a
---- disease that needs a lactating animal also counts a pregnant one, because the point of that dose
---- is to land before calving.
+--- Whether a dose buys anything: a positive chance, and for a lactation disease a pregnant or lactating animal.
 ---@param animal table The live animal.
 ---@param chance number The per-month infection chance at the animal's age or the next month's.
 ---@param needsLactation boolean True when the disease's prerequisites ask for a lactating animal.
@@ -134,7 +124,7 @@ local function buildImmune(animal, model, months, vaccinated, caller)
 end
 
 
---- Apply one dose. Unguarded: a caller owes `check` and the diseases-on test, as the event's `refusal` provides.
+--- Apply one dose. Unguarded: a caller owes `check` and the diseases-on test - DiseaseVaccinateEvent.getRefusal.
 ---@param animal table The live animal.
 ---@param model table The disease's registry entry, carrying `vaccine`; never written.
 ---@return string outcome An `OUTCOME` value.

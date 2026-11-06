@@ -1375,12 +1375,8 @@ function RLHerdsmanPlanner.planActions(rules, ctx)
             end
 
         elseif op == "vaccinate" then
-            -- Owned-herd, no cap, no sort, no mark - the horseCare arm plus one narrowing: a matched
-            -- animal is selected only when at least one vaccine is due for it. Which ones are due
-            -- (age, pregnancy or lactation, the renewal window, a visible illness) is decided by
-            -- DiseaseManager:getHerdsmanDosesFor, so this arm carries the titles and nothing else.
-            -- An animal with nothing due stays unclaimed, which costs nothing: it is not due for a
-            -- later vaccinate rule either.
+            -- The horseCare arm (owned herd, no cap, sort or mark), narrowed to animals that
+            -- getHerdsmanDosesFor gives a dose today; one with nothing due stays unclaimed.
             for _, uid in ipairs(targets) do
                 local h = resolveGatedHusbandry(uid, op, rule.id)
                 if h ~= nil then

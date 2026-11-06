@@ -91,7 +91,7 @@ Five diseases have a vaccine. A dose protects the animal straight away: while pr
 | [Pulpy Kidney](#pulpy-kidney) | Sheep, goats and alpacas (with the Beans & Alpacas Expansion) | 12 months | $15 |
 | [Footrot](#footrot) | Cattle, sheep and goats | 6 months | $10 |
 
-To vaccinate an animal, open its **Diseases** dialog (the Diseases button on the **Manage** tab), select the disease and press **Vaccinate**, then confirm the price. The dialog lists every vaccine the animal can take: a disease the animal shows no entry for reads **Not vaccinated**, and an animal that is already vaccinated, or immune after recovering, gets a booster from that disease's own row. A row you can vaccinate from shows how long the vaccine protects and its price per dose.
+To vaccinate an animal, open its **Diseases** dialog (the Diseases button on the **Manage** tab), select the disease and press **Vaccinate**, then confirm the price. The dialog lists every vaccine the animal can take: a disease the animal shows no entry for reads **Not vaccinated**, and an animal that is already vaccinated, or immune after recovering, gets a booster from that disease's own row. A row you can vaccinate from shows how long the vaccine protects and its price per dose. To keep a herd vaccinated without opening the dialog, give the Herdsman a [Vaccination task](guide-herdsman.md).
 
 - One dose takes at once. There is no course and no second dose to come back for.
 - A booster never shortens the protection: it tops it back up to the full length when less is left.

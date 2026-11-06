@@ -28,7 +28,7 @@
 --     ruleService             = <RLHerdsmanRuleService>,         -- setNamingCursor(id, previous)
 --     animalNameSystem        = <real AnimalNameSystem>,         -- getRandomName(gender)
 --     defer                   = function(fn) ... end,            -- run fn after the current day-change chain
---     diseaseManager          = <DiseaseManager>,                -- getDiseaseByTitle, diseasesEnabled (vaccinate)
+--     diseaseManager          = <DiseaseManager>,                -- DiseaseVaccinateEvent.getRefusal (vaccinate)
 --   }
 --
 -- `defer` is a STRUCTURAL dep rather than a defaulted one: horse care is the one deferred leg, and a
@@ -215,7 +215,8 @@ end
 --- deduct it once per farm at the end. Fails LOUD on a missing STRUCTURAL ctx dep (a day-tick wiring
 --- bug) and fails CLOSED - skip plus a warning, never raising - on a per-action data problem.
 ---@param plan table|nil ordered action records from RLHerdsmanPlanner.planActions
----@param ctx table dispatch context (server, mission, husbandryPlaceablesById, ruleService, animalNameSystem)
+---@param ctx table dispatch context (server, mission, husbandryPlaceablesById, ruleService, animalNameSystem,
+---    defer, diseaseManager)
 ---@return table summary { wageByFarm = { [farmId]=number }, results = { <row per action> } }
 function RLHerdsmanExecutor.executeActions(plan, ctx)
     local summary = { wageByFarm = {}, results = {} }
@@ -230,14 +231,14 @@ function RLHerdsmanExecutor.executeActions(plan, ctx)
     -- broken tick. `defer` is checked for CALLABILITY: a `== nil` check would let a non-callable
     -- through to the horse-care arm, where calling it raises far from the cause.
     if ctx.mission == nil or ctx.ruleService == nil or ctx.animalNameSystem == nil
-        or ctx.husbandryPlaceablesById == nil or type(ctx.defer) ~= "function" then
-        -- One convention for all five: present-and-usable as a boolean, so the reader does not have
+        or ctx.husbandryPlaceablesById == nil or type(ctx.defer) ~= "function" or ctx.diseaseManager == nil then
+        -- One convention for all six: present-and-usable as a boolean, so the reader does not have
         -- to work out which field uses which format.
         error(string.format(
-            "%s missing structural ctx dep (T4 wiring bug): mission=%s ruleService=%s animalNameSystem=%s husbandryPlaceablesById=%s defer=%s",
+            "%s missing structural ctx dep (T4 wiring bug): mission=%s ruleService=%s animalNameSystem=%s husbandryPlaceablesById=%s defer=%s diseaseManager=%s",
             LOG_PREFIX, tostring(ctx.mission ~= nil), tostring(ctx.ruleService ~= nil),
             tostring(ctx.animalNameSystem ~= nil), tostring(ctx.husbandryPlaceablesById ~= nil),
-            tostring(type(ctx.defer) == "function")))
+            tostring(type(ctx.defer) == "function"), tostring(ctx.diseaseManager ~= nil)))
     end
 
     if plan == nil then
@@ -347,8 +348,8 @@ function RLHerdsmanExecutor._executeOne(action, ctx, summary, wageFarmOrder)
     -- the wage is charged independently of dispatch. A guarded direct-mutation leg adds a 4th value
     -- (the count ACTUALLY mutated or marked) and a 5th (its own membership-skip count), both nil from
     -- the unguarded legs. `extra` carries the butcher move's filter counts, a { movedCount, skippedAge,
-    -- skippedSick, skippedSpace } table merged onto the row, and the vaccinate leg's { amountSpent }; 
-    -- that leg also returns its delivered count as actualCount.
+    -- skippedSick, skippedSpace } table merged onto the row (the move also returns its delivered count
+    -- as actualCount), or the vaccinate leg's { amountSpent }.
     local op = action.operation
     local chargeWage, dispatched, skipReason, actualCount, skippedCount, extra
     if op == "sell" then
@@ -384,11 +385,8 @@ function RLHerdsmanExecutor._executeOne(action, ctx, summary, wageFarmOrder)
     end
 
     -- movedCount = animals dispatched to the butcher, falling back to count for husbandry rows;
-    -- skippedAge / skippedSick = animals filtered out for age / for showing symptoms. Husbandry-move
-    -- and non-move rows carry no extra.
-    -- amountSpent = the vaccinate leg's dose total, charged once per farm by executeActions.
     -- skippedAge / skippedSick / skippedSpace = animals left out for age, for showing symptoms, or for
-    -- lack of free butcher slots. Husbandry-move and non-move rows carry no extra.
+    -- lack of free butcher slots; amountSpent = the dose total executeActions charges per farm.
     if type(extra) == "table" then
         result.movedCount = extra.movedCount
         result.skippedAge = extra.skippedAge
@@ -575,10 +573,8 @@ local HORSE_CARE_DIRT_DELTA = -100
 ---@return nil the row and wage were committed when the action was armed; this half cannot retract them
 function RLHerdsmanExecutor._writeHorseCare(action, placeable, planned, farmId)
     local clusterAnimals = resolveClusterAnimals(placeable)
-    -- An EMPTY list is the teardown signal and aborts ONCE; without this case every probe would fail
-    -- membership and emit its own warning for a husbandry that no longer exists. Base onDelete nils
-    -- clusterHusbandry but never clusterSystem, and AnimalClusterSystem:delete sets animals = {}, so
-    -- the torn-down shape is {} rather than nil.
+    -- An EMPTY list is the teardown signal and aborts ONCE, so a deleted pen logs one warning rather
+    -- than one membership warning per horse. A deleted pen reads as {} here, not nil.
     if clusterAnimals == nil or #clusterAnimals == 0 then
         -- Distinguish a cluster system that is GONE from a live pen that merely emptied during this
         -- same day-change chain; reporting the second as "cluster gone" misdirects diagnosis.
@@ -603,14 +599,9 @@ function RLHerdsmanExecutor._writeHorseCare(action, placeable, planned, farmId)
         else
             local ok = RmSafeUtils.safeAnimalCall(animal, "RLHerdsmanExecutor:horseCareWrite", function()
                 local ridingBefore, dirtBefore = animal.riding, animal.dirt
-                -- The flag LEADS the two field writes, and that order is the contract: a raise
-                -- between the writes must not leave the horse mutated server-side but unflagged,
-                -- because under-flagging is a silent MP divergence while over-flagging costs one
-                -- extra cluster pass. This leg owns the flag - neither the AnimalHorse mutators nor
-                -- the base cluster class sets one - so do not assume a mutator flags on your behalf.
-                -- setDirty only marks: the placeable's own update flushes and broadcasts
-                -- AnimalClusterUpdateEvent, whose payload already carries dirt / fitness / riding.
-                -- Flag-first is safe only because nothing can flush in this window.
+                -- setDirty LEADS the two writes: a raise between them must not leave the horse changed
+                -- but unflagged, a silent MP divergence. No mutator here flags, so this leg owns the
+                -- flag; setDirty only marks, so nothing flushes in between.
                 animal:setDirty()
                 animal:setRiding(HORSE_CARE_RIDING)
                 animal:changeDirt(HORSE_CARE_DIRT_DELTA)
@@ -711,15 +702,7 @@ function RLHerdsmanExecutor._doHorseCare(action, ctx, placeable, farmId, count)
     return true, true, nil, actual, skipped
 end
 
---- Vaccinate: give every planned dose to each RESOLVED cluster member, inline. Each dose goes
---- through DiseaseVaccinateEvent.apply - the player's own path - so the record write and the dirty
---- flag that syncs it through the pen's flush are the dialog's, never a copy. The charge is deferred:
---- the leg returns the dose total as `extra.amountSpent` and executeActions charges it once per farm.
---- apply is unguarded by contract, so the event's own refusal is re-run here per dose: diseases may
---- have been switched off, or the animal died, since the plan.
----
---- Not deferred like horse care: a dose is due a month before protection runs out, so whether the
---- pen's disease tick runs before or after this one cannot leave an animal unprotected.
+--- Vaccinate: re-check and give each resolved member its planned doses through DiseaseVaccinateEvent.apply.
 ---@param action table the vaccinate action (animals + titles + ruleId / husbandryId)
 ---@param ctx table dispatch context (ctx.diseaseManager resolves each title)
 ---@param placeable table husbandry placeable owning the animals' cluster system
@@ -754,16 +737,7 @@ function RLHerdsmanExecutor._doVaccinate(action, ctx, placeable, farmId, count)
         else
             local given = 0
             for _, title in ipairs(action.titles[i] or {}) do
-                local model = diseaseManager:getDiseaseByTitle(title)
-                local refused = nil
-                if not diseaseManager.diseasesEnabled then
-                    refused = "DISEASES_OFF"
-                elseif model == nil then
-                    refused = "UNKNOWN_TITLE"
-                else
-                    local _, reason = RLDiseaseVaccination.check(animal, model)
-                    refused = reason
-                end
+                local refused, model = DiseaseVaccinateEvent.getRefusal(diseaseManager, animal, title)
 
                 if refused ~= nil then
                     Log:warning("%s rule=%s op=vaccinate husbandry=%s farm=%s uniqueId=%s title=%s: refused at execute (%s) - dose skipped",
@@ -1021,9 +995,9 @@ function RLHerdsmanExecutor._doMove(action, ctx, placeable, farmId, count)
         return true, false, "bad-data"
     end
 
-    -- broadcastEvent(..., true) runs the local :run SYNCHRONOUSLY, so two moves to the same dest in
-    -- one tick cannot over-fill: the first move's updateNow reduces the dest's free slots before the
-    -- second validate reads them.
+    -- The local run completes before this call returns, so two moves to the same dest in one tick
+    -- cannot over-fill: the first move's updateNow reduces the dest's free slots before the second
+    -- validate reads them.
     ctx.server:broadcastEvent(AIAnimalMoveEvent.new(placeable, dest, action.animals), true)
     Log:debug("%s rule=%s op=move husbandry=%s farm=%s: broadcast AIAnimalMoveEvent dest=%s count=%d",
         LOG_PREFIX, tostring(action.ruleId), tostring(action.husbandryId), tostring(farmId), tostring(action.destinationHusbandry), count)

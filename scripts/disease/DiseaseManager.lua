@@ -358,18 +358,14 @@ function DiseaseManager:getVaccineModelsFor(animal)
 end
 
 
--- The herdsman's narrowing of `getVaccineModelsFor`, which stays as it is for the dialog: a player
--- may dose any animal, but an automated task that doses every heifer calf against mastitis from
--- birth spends money for years before the disease can reach it. So age and, for a lactation
--- disease, pregnancy or lactation are read here, from the same infection curve and prerequisites
--- the infection roll uses - a disease that can reach a newborn is still dosed from birth. The curve
--- is read at next month's age too: protection that runs out in the month the animal comes of age
--- would otherwise be renewed only after it lapsed, which at one day per month is the whole month.
 --- The vaccines the herdsman should give this animal today, in sorted title order.
 ---@param animal table the live animal
 ---@return table models a fresh array of registry entries carrying a `vaccine` block; empty when diseases are off
 function DiseaseManager:getHerdsmanDosesFor(animal)
 
+    -- The dialog's offer, narrowed to doses worth paying for: the title is switched on, the infection
+    -- curve can reach the animal at this or next month's age (or the dam-to-be of a lactation
+    -- disease), and the dose is due.
     local doses = {}
 
     if not self.diseasesEnabled then
