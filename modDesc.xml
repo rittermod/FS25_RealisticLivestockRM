@@ -25,6 +25,33 @@ Documentation: https://rittermod.github.io/FS25_RealisticLivestockRM
 Source code and issue tracker: https://github.com/rittermod/FS25_RealisticLivestockRM
 
 Changelog:
+1.4.3.0-dev.1:
+Added:
+- Added a Herdsman Vaccination task that gives matching cattle, sheep, pigs and alpacas the vaccines they are due (contributed by foketina).
+
+Changed:
+- Shortened the Can reproduce line in the animal look-at box to just the reason, so more of its label stays readable.
+
+Fixed:
+- Fixed goats the dealer sells as recent mothers giving no milk until they kid again.
+- Fixed boars and rams past their breeding age keeping a pen conceiving when no younger male was there.
+- Fixed a future Hof Bergmann update loading the oldest map config instead of the newest.
+- Fixed castrated and infertile males showing how many females they could impregnate.
+- Fixed animals without food or water collapsing to a few kg, so they now lose weight steadily and stop at half their normal weight.
+- Fixed overweight animals slimming down too fast on longer months, so fed adults settle at the same weight whatever the month length.
+- Fixed long filter conditions cutting off well before the end of their row.
+- Fixed goat and water buffalo births counting toward the sheep and cow breeding achievements.
+- Fixed births in animal pens some maps leave without an owner logging an error.
+- Fixed a pen's animal visuals stopping with an error when the game had no room to show one more animal.
+- Fixed the animal rename dialog cutting names longer than 20 characters the first time it opened in a session.
+- Fixed quail on Hof Bergmann usually having a single chick per clutch.
+- Fixed stillborn newborns throwing off a pen's birth and sale counts.
+- Fixed herdsman moves to a butcher sending nothing when the butcher had fewer free places than the animals picked.
+- Fixed the herdsman skipping some animals on farms with several animal types when two rules of the same task covered different pens.
+
+Translations:
+- Updated the Russian translation (contributed by frezer89).
+
 1.4.2.0:
 Heads up before you update:
 - On Hof Bergmann with the Beans and Alpacas DLC, existing alpacas may change colour and stats, so back up your save first.
