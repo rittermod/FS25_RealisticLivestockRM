@@ -286,6 +286,7 @@ source(modDirectory .. "scripts/placeables/RealisticLivestock_PlaceableSystem.lu
 source(modDirectory .. "scripts/player/RealisticLivestock_PlayerHUDUpdater.lua")
 source(modDirectory .. "scripts/animal/RLRideableClusterStream.lua")
 source(modDirectory .. "scripts/animal/RLLedAlpacaStream.lua")
+source(modDirectory .. "scripts/player/RLEnterActionPolicy.lua")
 source(modDirectory .. "scripts/player/RealisticLivestock_PlayerInputComponent.lua")
 
 -- SECTION 19: Vehicles

@@ -3,6 +3,8 @@ RealisticLivestock_PlayerInputComponent = {}
 local modName = g_currentModName
 
 
+--- Show the ride or Take straw prompt for the looked-at animal or dewar, after the base update.
+--- @param _ number Frame time (unused)
 function RealisticLivestock_PlayerInputComponent:update(_)
 
     self.dewar = nil
@@ -22,17 +24,19 @@ function RealisticLivestock_PlayerInputComponent:update(_)
                 canAccess = accessHandler:canPlayerAccess(vehicleInRange, self.player)
             end
 
+            local vehicleTakesEnter = RLEnterActionPolicy.getVehicleTakesEnter(vehicleInRange, canAccess)
+
             local closestNode = self.player.targeter:getClosestTargetedNodeFromType(PlayerInputComponent)
             self.player.hudUpdater:setCurrentRaycastTarget(closestNode)
 
-            if not canAccess and closestNode ~= nil then
+            if not vehicleTakesEnter and closestNode ~= nil then
 
                 local husbandryId, animalId = getAnimalFromCollisionNode(closestNode)
 
                 if husbandryId ~= nil and husbandryId ~= 0 then
 
                     local clusterHusbandry = currentMission.husbandrySystem:getClusterHusbandryById(husbandryId)
-                    if clusterHusbandry ~= nil then
+                    if clusterHusbandry ~= nil and not canAccess then
                         local placeable = clusterHusbandry:getPlaceable()
                         local animal = clusterHusbandry:getClusterByAnimalId(animalId, husbandryId)
 
@@ -58,7 +62,19 @@ function RealisticLivestock_PlayerInputComponent:update(_)
                         self.dewar = object
 
                         g_inputBinding:setActionEventText(self.enterActionId, g_i18n:getText("rl_ui_takeStraw"))
-                        g_inputBinding:setActionEventActive(self.enterActionId, true)        
+                        g_inputBinding:setActionEventActive(self.enterActionId, true)
+
+                        if self.rlPromptDewar ~= object then
+                            local enterable = vehicleInRange ~= nil and vehicleInRange.spec_enterable ~= nil
+                            local vehicleId = nil
+                            if vehicleInRange ~= nil and vehicleInRange.getUniqueId ~= nil then
+                                vehicleId = vehicleInRange:getUniqueId()
+                            end
+                            Log:trace("update: Take straw prompt shown, dewar=%s straws=%s"
+                                .. " vehicleInRange=%s enterable=%s canAccess=%s",
+                                tostring(object:getUniqueId()), tostring(object.straws),
+                                tostring(vehicleId), tostring(enterable), tostring(canAccess))
+                        end
 
                     end
 
@@ -70,6 +86,11 @@ function RealisticLivestock_PlayerInputComponent:update(_)
 
     end
 
+    if self.dewar == nil and self.rlPromptDewar ~= nil then
+        Log:trace("update: Take straw prompt cleared")
+    end
+    self.rlPromptDewar = self.dewar
+
 end
 
 PlayerInputComponent.update = Utils.appendedFunction(PlayerInputComponent.update, RealisticLivestock_PlayerInputComponent.update)
@@ -78,7 +99,34 @@ PlayerInputComponent.update = Utils.appendedFunction(PlayerInputComponent.update
 --- Take a straw from the targeted dewar: spawn hand tool, decrement count, sync to server.
 function RealisticLivestock_PlayerInputComponent:onInputEnter()
 
-    if g_time <= g_currentMission.lastInteractionTime + 200 or g_currentMission.interactiveVehicleInRange ~= nil or self.rideablePlaceable ~= nil or self.dewar == nil or HandToolAIStraw.numHeldStraws > 10 then return end
+    local mission = g_currentMission
+
+    if g_time <= mission.lastInteractionTime + 200 then
+        Log:trace("onInputEnter: skipped, within the interaction cooldown")
+        return
+    end
+
+    local vehicleInRange = mission.interactiveVehicleInRange
+    local canAccess = vehicleInRange ~= nil and mission.accessHandler:canPlayerAccess(vehicleInRange, self.player)
+    if RLEnterActionPolicy.getVehicleTakesEnter(vehicleInRange, canAccess) then
+        Log:trace("onInputEnter: skipped, a usable vehicle took the press")
+        return
+    end
+
+    if self.rideablePlaceable ~= nil then
+        Log:trace("onInputEnter: skipped, a rideable animal took the press")
+        return
+    end
+
+    if self.dewar == nil then
+        Log:trace("onInputEnter: skipped, no dewar targeted")
+        return
+    end
+
+    if HandToolAIStraw.numHeldStraws > 10 then
+        Log:trace("onInputEnter: skipped, holding %d straws already", HandToolAIStraw.numHeldStraws)
+        return
+    end
 
     local strawType = g_handToolTypeManager:getTypeByName(modName .. ".aiStraw")
     local handTool = _G[strawType.className].new(g_currentMission:getIsServer(), g_currentMission:getIsClient())
