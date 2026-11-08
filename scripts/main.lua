@@ -121,6 +121,9 @@ source(modDirectory .. "scripts/animal/AnimalReproduction.lua")
 -- SECTION 11e: Health/Death Logic (delegate module, sourced before Animal.lua)
 source(modDirectory .. "scripts/animal/AnimalHealth.lua")
 
+-- SECTION 11e2: The shared sale-price formula (pure, sourced before Animal.lua)
+source(modDirectory .. "scripts/animal/RLSellPrice.lua")
+
 -- SECTION 11f: Persistence & Serialization (delegate modules, sourced before Animal.lua)
 source(modDirectory .. "scripts/animal/AnimalPersistence.lua")
 source(modDirectory .. "scripts/animal/AnimalSerialization.lua")

@@ -1780,22 +1780,9 @@ function Animal:setFleeceState(state) AnimalAlpaca.setFleeceState(self, state) e
 --- The sale price: the type's getSellPrice hook after the disease fold, or the standard formula when it answers nil.
 --- @return number price
 function Animal:getSellPrice()
-    local subType = self:getSubType()
-    local sellPrice = subType.sellPrice:get(self.age < 0 and 0 or self.age)
-
-    local weight = self.weight
-    local targetWeightForAge = ((self.targetWeight - subType.minWeight) / (subType.reproductionMinAgeMonth * 1.5)) *
-    math.min(self.age + 1.5, subType.reproductionMinAgeMonth * 1.5) * 0.85
-
-    local weightFactor = 1 + ((weight - targetWeightForAge) / targetWeightForAge)
-
     local meatFactor = self.genetics.quality
-
-    sellPrice = sellPrice + (sellPrice * 0.25 * (meatFactor - 1))
-
-    sellPrice = math.max(sellPrice + (((sellPrice * 0.6) / subType.targetWeight) * weight * (-1 + meatFactor)), 0.5)
-
-    if self.isCastrated then sellPrice = sellPrice + sellPrice * 0.15 end
+    local sellPrice, weightFactor = RLSellPrice.basePrice(self:getSubType(), self.age, self.weight, self.targetWeight,
+        meatFactor, self.isCastrated)
 
     for _, disease in pairs(self.diseases) do sellPrice = disease:modifyValue(sellPrice) end
 
@@ -1811,9 +1798,7 @@ function Animal:getSellPrice()
             tostring(self.farmId), tostring(self.uniqueId))
     end
 
-    return math.max(
-    sellPrice * 0.6 + (sellPrice * 0.4 * weightFactor * (0.75 * self:getHealthFactor())) +
-    sellPrice * (self.isLactating and 0.15 or 0) + sellPrice * (self.isPregnant and 0.25 or 0), sellPrice * 0.05)
+    return RLSellPrice.finalPrice(sellPrice, weightFactor, self:getHealthFactor(), self.isLactating, self.isPregnant)
 end
 
 function Animal:getDailyRidingTime() return AnimalHorse.getDailyRidingTime(self) end
